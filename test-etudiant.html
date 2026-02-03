@@ -1,0 +1,4699 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="question_multia.js"></script>
+  <script src="question_resident.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=0.8">
+  <title>Test Étudiant Civique - Association Mille Voiles</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+  /* Variables et reset */
+  :root {
+    --primary-blue: #004080;
+    --primary-light-blue: #0066cc;
+    --primary-yellow: #ffd633;
+    --primary-light-yellow: #ffe066;
+    --dark-gray: #333333;
+    --medium-gray: #666666;
+    --light-gray: #f5f7fa;
+    --white: #ffffff;
+    --green: #27ae60;
+    --red: #e74c3c;
+    --orange: #f39c12;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.12);
+    --border-radius: 12px;
+    --transition: all 0.3s ease;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: var(--dark-gray);
+    background-color: var(--light-gray);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--primary-blue);
+  }
+
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 16px 36px;
+    background-color: var(--primary-yellow);
+    color: var(--primary-blue);
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;
+    box-shadow: var(--shadow);
+  }
+
+  .btn:hover {
+    background-color: var(--primary-light-yellow);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .btn-primary {
+    background-color: var(--primary-blue);
+    color: var(--white);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--primary-light-blue);
+  }
+
+  .btn-success {
+    background-color: var(--green);
+    color: var(--white);
+  }
+
+  .btn-success:hover {
+    background-color: #229954;
+  }
+
+  .btn-danger {
+    background-color: var(--red);
+    color: var(--white);
+  }
+
+  .btn-danger:hover {
+    background-color: #c0392b;
+  }
+
+  /* ==================== 自定义确认弹窗 ==================== */
+  .confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    z-index: 9999;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease-out;
+    padding: 20px;
+  }
+
+  .confirm-modal {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    padding: 40px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .confirm-modal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(to right, var(--primary-blue), var(--primary-light-blue));
+  }
+
+  .confirm-modal.warning::before {
+    background: linear-gradient(to right, var(--orange), #ff9f43);
+  }
+
+  .confirm-modal.danger::before {
+    background: linear-gradient(to right, var(--red), #ff6b6b);
+  }
+
+  .confirm-modal.success::before {
+    background: linear-gradient(to right, var(--green), #27ae60);
+  }
+
+  .confirm-icon {
+    font-size: 4.5rem;
+    margin-bottom: 20px;
+    color: var(--primary-blue);
+  }
+
+  .confirm-modal.warning .confirm-icon {
+    color: var(--orange);
+  }
+
+  .confirm-modal.danger .confirm-icon {
+    color: var(--red);
+  }
+
+  .confirm-modal.success .confirm-icon {
+    color: var(--green);
+  }
+
+  .confirm-title {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: var(--dark-gray);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+  }
+
+  .confirm-message {
+    margin-bottom: 30px;
+    color: var(--medium-gray);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    padding: 0 10px;
+  }
+
+  .confirm-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 25px;
+  }
+
+  .confirm-btn {
+    padding: 14px 35px;
+    min-width: 140px;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .confirm-btn.cancel {
+    background-color: var(--light-gray);
+    color: var(--dark-gray);
+  }
+
+  .confirm-btn.cancel:hover {
+    background-color: #e0e0e0;
+  }
+
+  .confirm-btn.confirm {
+    background-color: var(--red);
+    color: white;
+  }
+
+  .confirm-modal.success .confirm-btn.confirm {
+    background-color: var(--green);
+  }
+
+  .confirm-modal.warning .confirm-btn.confirm {
+    background-color: var(--orange);
+  }
+
+  /* 自动消失的提示消息 */
+  .toast-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: var(--primary-blue);
+    color: white;
+    padding: 18px 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-hover);
+    z-index: 10000;
+    max-width: 350px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideInRight 0.3s ease-out, fadeOut 0.3s ease-out 2.7s;
+    border-left: 5px solid var(--primary-yellow);
+  }
+
+  .toast-notification.success {
+    background-color: var(--green);
+    border-left-color: #2ecc71;
+  }
+
+  .toast-notification.error {
+    background-color: var(--red);
+    border-left-color: #ff6b6b;
+  }
+
+  .toast-notification.warning {
+    background-color: var(--orange);
+    border-left-color: #feca57;
+  }
+
+  .toast-notification.info {
+    background-color: var(--primary-blue);
+    border-left-color: var(--primary-yellow);
+  }
+
+  .toast-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .toast-content {
+    flex: 1;
+  }
+
+  .toast-title {
+    font-weight: 600;
+    margin-bottom: 3px;
+    font-size: 1rem;
+  }
+
+  .toast-message {
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
+
+  @keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes modalFade {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Custom Alert Modal */
+  .alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 4000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .alert-content {
+    background-color: var(--white);
+    padding: 40px;
+    border-radius: var(--border-radius);
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalFade 0.4s ease-out;
+    text-align: center;
+  }
+
+  .alert-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+  }
+
+  .alert-icon.success {
+    color: var(--green);
+  }
+
+  .alert-icon.warning {
+    color: var(--orange);
+  }
+
+  .alert-icon.error {
+    color: var(--red);
+  }
+
+  .alert-icon.info {
+    color: var(--primary-blue);
+  }
+
+  .alert-content h2 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: var(--primary-blue);
+  }
+
+  .alert-content p {
+    margin-bottom: 25px;
+    color: var(--medium-gray);
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+
+  .alert-btns {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 25px;
+  }
+
+  /* Login Modal */
+  .login-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 3000;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .login-content {
+    background-color: var(--white);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    max-width: 500px;
+    width: 100%;
+    margin: 40px auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalFade 0.4s ease-out;
+  }
+
+  .login-content h2 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: var(--primary-blue);
+    text-align: center;
+  }
+
+  .login-content p {
+    margin-bottom: 20px;
+    color: var(--medium-gray);
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .login-form {
+    text-align: left;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--primary-blue);
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    transition: var(--transition);
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1);
+  }
+
+  .form-error {
+    color: var(--red);
+    margin-top: 10px;
+    font-weight: 600;
+    display: none;
+    font-size: 0.9rem;
+  }
+
+  .login-btns {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 25px;
+  }
+
+  .btn-modal {
+    padding: 14px 30px;
+    min-width: 140px;
+  }
+
+  /* ==================== 修复：Test Selection Modal 卡片布局 ==================== */
+  .selection-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 3001;
+    display: none;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .selection-content {
+    background-color: var(--white);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalFade 0.4s ease-out;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    min-height: 80vh;
+  }
+
+  .selection-header {
+    flex-shrink: 0;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .selection-content h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: var(--primary-blue);
+  }
+
+  .selection-content p {
+    margin-bottom: 15px;
+    color: var(--medium-gray);
+    font-size: 1.1rem;
+    line-height: 1.4;
+  }
+
+  /* 天数信息 */
+  .days-left-info {
+    background-color: rgba(0, 100, 255, 0.1);
+    border-left: 4px solid var(--primary-blue);
+    padding: 15px;
+    border-radius: 0 8px 8px 0;
+    margin: 15px 0;
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .days-left-info i {
+    color: var(--primary-blue);
+    margin-right: 8px;
+  }
+
+  /* 卡片容器 - 修复布局 */
+  .test-types-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 5px 10px 0;
+    margin-bottom: 20px;
+  }
+
+  .test-types-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    padding: 5px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* 卡片设计 */
+  .test-type-card {
+    background-color: var(--white);
+    border: 2px solid #e0e0e0;
+    border-radius: var(--border-radius);
+    padding: 25px;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    min-height: 380px;
+  }
+
+  .test-type-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .test-type-card.allowed {
+    border-color: var(--primary-blue);
+    cursor: pointer;
+  }
+
+  .test-type-card.allowed:hover {
+    border-color: var(--primary-light-blue);
+    background-color: rgba(0, 64, 128, 0.03);
+  }
+
+  .test-type-card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f9f9f9;
+    border-color: #cccccc;
+  }
+
+  .test-type-card.disabled:hover {
+    transform: none;
+    box-shadow: none;
+    background-color: #f9f9f9;
+  }
+
+  .test-type-card.disabled::after {
+    content: "⛔";
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 1.2rem;
+    color: #999;
+  }
+
+  .test-type-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    flex-shrink: 0;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .test-type-card.allowed .test-type-icon {
+    color: var(--primary-blue);
+  }
+
+  .test-type-card.disabled .test-type-icon {
+    color: var(--medium-gray);
+  }
+
+  .test-type-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+    color: var(--primary-blue);
+    text-align: center;
+    flex-shrink: 0;
+    line-height: 1.3;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .test-type-card.disabled h3 {
+    color: var(--medium-gray);
+  }
+
+  .test-type-card p {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    color: var(--medium-gray);
+    text-align: center;
+    line-height: 1.4;
+    flex-shrink: 0;
+  }
+
+  .test-info {
+    background-color: var(--light-gray);
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: auto;
+    width: 100%;
+    text-align: left;
+    font-size: 0.9rem;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 180px;
+    max-height: 220px;
+  }
+
+  .test-type-card.disabled .test-info {
+    background-color: #f0f0f0;
+    color: #888;
+  }
+
+  .test-info-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  .test-info-item i {
+    margin-right: 8px;
+    color: var(--primary-blue);
+    margin-top: 2px;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    min-width: 20px;
+  }
+
+  .test-type-card.disabled .test-info-item i {
+    color: #888;
+  }
+
+  .test-info-item span {
+    flex: 1;
+    word-break: break-word;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .test-info-item .fr-text {
+    font-style: italic;
+    color: var(--primary-blue);
+  }
+
+  .test-info-item .zh-text {
+    color: var(--dark-gray);
+  }
+
+  /* 滚动条样式 */
+  .test-info::-webkit-scrollbar,
+  .test-types-wrapper::-webkit-scrollbar,
+  .theme-stat-list::-webkit-scrollbar,
+  .chart-container::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .test-info::-webkit-scrollbar-track,
+  .test-types-wrapper::-webkit-scrollbar-track,
+  .theme-stat-list::-webkit-scrollbar-track,
+  .chart-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  .test-info::-webkit-scrollbar-thumb,
+  .test-types-wrapper::-webkit-scrollbar-thumb,
+  .theme-stat-list::-webkit-scrollbar-thumb,
+  .chart-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+  }
+
+  .test-info::-webkit-scrollbar-thumb:hover,
+  .test-types-wrapper::-webkit-scrollbar-thumb:hover,
+  .theme-stat-list::-webkit-scrollbar-thumb:hover,
+  .chart-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+
+  .selection-footer {
+    flex-shrink: 0;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: center;
+  }
+
+  .selection-footer .btn {
+    width: 100%;
+    max-width: 300px;
+    padding: 15px 30px;
+  }
+
+  /* ==================== 错题集筛选器样式 ==================== */
+  .mistakes-filter {
+    background-color: var(--white);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    margin: 30px 0;
+  }
+
+  .mistakes-filter h3 {
+    color: var(--primary-blue);
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mistakes-filter p {
+    color: var(--medium-gray);
+    margin-bottom: 20px;
+    font-size: 1rem;
+  }
+
+  .theme-filter-select {
+    margin-top: 20px;
+  }
+
+  .theme-filter-select select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--primary-blue);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Open Sans', sans-serif;
+    background-color: white;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .theme-filter-select select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1);
+  }
+
+  .filter-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    padding: 10px 20px;
+    background-color: var(--light-gray);
+    color: var(--dark-gray);
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .filter-btn:hover {
+    background-color: #e0e0e0;
+  }
+
+  .filter-btn.active {
+    background-color: var(--primary-blue);
+    color: white;
+  }
+
+  .filter-btn.active:hover {
+    background-color: var(--primary-light-blue);
+  }
+
+  /* ==================== 主题分布分析样式 ==================== */
+  .theme-analysis-container {
+    display: none;
+    margin: 40px 0;
+  }
+
+  .theme-analysis-container.show {
+    display: block;
+  }
+
+  .theme-analysis-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 25px;
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+  }
+
+  .theme-analysis-header h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: var(--primary-blue);
+  }
+
+  .theme-analysis-header p {
+    color: var(--medium-gray);
+    margin-bottom: 20px;
+  }
+
+  .theme-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+  }
+
+  .theme-stat-card {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: var(--shadow);
+  }
+
+  .theme-stat-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: var(--primary-blue);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .theme-stat-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+
+  .theme-stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--light-gray);
+  }
+
+  .theme-stat-item:last-child {
+    border-bottom: none;
+  }
+
+  .theme-name {
+    flex: 1;
+    font-weight: 500;
+    color: var(--dark-gray);
+    font-size: 0.9rem;
+  }
+
+  .theme-count {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .theme-number {
+    font-weight: bold;
+    color: var(--primary-blue);
+    min-width: 30px;
+    text-align: right;
+    font-size: 0.9rem;
+  }
+
+  .theme-bar {
+    width: 150px;
+    height: 10px;
+    background-color: var(--light-gray);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  .theme-bar-fill {
+    height: 100%;
+    background-color: var(--primary-blue);
+    border-radius: 5px;
+  }
+
+  .accuracy-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--light-gray);
+  }
+
+  .accuracy-name {
+    flex: 1;
+    font-weight: 500;
+    color: var(--dark-gray);
+    font-size: 0.9rem;
+  }
+
+  .accuracy-value {
+    font-weight: bold;
+    min-width: 50px;
+    text-align: right;
+    font-size: 0.9rem;
+  }
+
+  .accuracy-value.high {
+    color: var(--green);
+  }
+
+  .accuracy-value.medium {
+    color: var(--orange);
+  }
+
+  .accuracy-value.low {
+    color: var(--red);
+  }
+
+  .theme-distribution-chart {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: var(--shadow);
+    margin-bottom: 30px;
+  }
+
+  .chart-container {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+    position: relative;
+    margin-top: 20px;
+  }
+
+  .chart-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    min-height: 30px;
+  }
+
+  .chart-label {
+    width: 200px;
+    font-size: 0.85rem;
+    color: var(--dark-gray);
+    text-align: right;
+    padding-right: 15px;
+    flex-shrink: 0;
+  }
+
+  .chart-bar-container {
+    flex: 1;
+    height: 20px;
+    background-color: var(--light-gray);
+    border-radius: 5px;
+    overflow: hidden;
+    min-width: 100px;
+  }
+
+  .chart-bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--primary-blue), var(--primary-light-blue));
+    border-radius: 5px;
+    transition: width 1s ease;
+  }
+
+  .chart-value {
+    width: 60px;
+    text-align: right;
+    font-weight: bold;
+    color: var(--primary-blue);
+    padding-left: 15px;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  /* ==================== 错题地图样式 ==================== */
+  .mistakes-map-container {
+    display: none;
+    margin: 40px 0;
+  }
+
+  .mistakes-map-container.show {
+    display: block;
+  }
+
+  .map-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .map-item {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 2px solid transparent;
+  }
+
+  .map-item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary-blue);
+  }
+
+  .map-item.correct {
+    background-color: rgba(39, 174, 96, 0.1);
+  }
+
+  .map-item.incorrect {
+    background-color: rgba(231, 76, 60, 0.1);
+  }
+
+  .map-item-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .map-item.correct .map-item-number {
+    color: var(--green);
+  }
+
+  .map-item.incorrect .map-item-number {
+    color: var(--red);
+  }
+
+  .map-item-status {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .map-item-theme {
+    font-size: 0.9rem;
+    color: var(--medium-gray);
+    margin-bottom: 10px;
+  }
+
+  .map-item-difficulty {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 5px;
+  }
+
+  .map-item.correct .map-item-difficulty {
+    background-color: rgba(39, 174, 96, 0.2);
+    color: var(--green);
+  }
+
+  .map-item.incorrect .map-item-difficulty {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: var(--red);
+  }
+
+  /* ==================== 题目详情查看样式 ==================== */
+  .question-detail-container {
+    display: none;
+    margin: 40px 0;
+  }
+
+  .question-detail-container.show {
+    display: block;
+  }
+
+  .question-detail-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 30px;
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+  }
+
+  .question-detail-header h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: var(--primary-blue);
+  }
+
+  .question-detail-header .question-meta {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+
+  .question-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: var(--light-gray);
+    border-radius: 20px;
+    font-size: 0.9rem;
+  }
+
+  .question-detail-content {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow);
+  }
+
+  .detail-question-text {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 30px;
+    color: var(--dark-gray);
+    line-height: 1.5;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--light-gray);
+  }
+
+  .detail-options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+
+  .detail-option {
+    padding: 18px 20px;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    display: flex;
+    align-items: flex-start;
+    transition: var(--transition);
+  }
+
+  .detail-option.correct-answer {
+    background-color: rgba(39, 174, 96, 0.1);
+    border-color: var(--green);
+  }
+
+  .detail-option.user-answer {
+    background-color: rgba(231, 76, 60, 0.1);
+    border-color: var(--red);
+  }
+
+  .detail-option.correct-answer.user-answer {
+    background-color: rgba(39, 174, 96, 0.2);
+    border-color: var(--green);
+  }
+
+  .detail-option-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-color: var(--primary-blue);
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+    font-size: 1rem;
+  }
+
+  .detail-option.correct-answer .detail-option-label {
+    background-color: var(--green);
+  }
+
+  .detail-option.user-answer .detail-option-label {
+    background-color: var(--red);
+  }
+
+  .detail-option.correct-answer.user-answer .detail-option-label {
+    background-color: var(--green);
+  }
+
+  .detail-option-text {
+    flex: 1;
+    font-size: 1.1rem;
+    line-height: 1.5;
+  }
+
+  .answer-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 15px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .answer-status.correct {
+    color: var(--green);
+  }
+
+  .answer-status.incorrect {
+    color: var(--red);
+  }
+
+  .detail-explanation {
+    background-color: rgba(255, 214, 51, 0.1);
+    padding: 25px;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-yellow);
+    margin-top: 30px;
+  }
+
+  .detail-explanation h5 {
+    color: var(--primary-blue);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .detail-explanation p {
+    color: var(--dark-gray);
+    line-height: 1.6;
+    white-space: pre-line;
+  }
+
+  /* ==================== 响应式设计 ==================== */
+  @media (min-width: 1200px) {
+    .test-types-container {
+      grid-template-columns: repeat(2, 1fr);
+      max-width: 1100px;
+    }
+    
+    .test-type-card {
+      min-height: 400px;
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1199px) {
+    .selection-content {
+      max-width: 900px;
+      padding: 25px;
+    }
+    
+    .test-types-container {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-width: 800px;
+    }
+    
+    .test-type-card {
+      padding: 20px;
+      min-height: 380px;
+    }
+    
+    .test-type-icon {
+      font-size: 2.5rem;
+      height: 60px;
+    }
+    
+    .test-type-card h3 {
+      font-size: 1.4rem;
+      min-height: 55px;
+    }
+    
+    .test-info {
+      padding: 12px;
+      font-size: 0.85rem;
+      min-height: 160px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .selection-overlay {
+      padding: 10px;
+    }
+    
+    .selection-content {
+      padding: 20px;
+      margin: 10px auto;
+      max-height: 95vh;
+    }
+    
+    .test-types-container {
+      grid-template-columns: 1fr;
+      gap: 15px;
+      max-width: 500px;
+    }
+    
+    .test-type-card {
+      padding: 20px;
+      min-height: 360px;
+    }
+    
+    .selection-content h2 {
+      font-size: 1.6rem;
+    }
+    
+    .selection-content p {
+      font-size: 1rem;
+    }
+    
+    .chart-label {
+      width: 120px;
+      font-size: 0.8rem;
+    }
+    
+    .chart-bar-container {
+      min-width: 80px;
+    }
+    
+    .chart-value {
+      width: 50px;
+      font-size: 0.8rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .selection-content {
+      padding: 15px;
+    }
+    
+    .test-type-card {
+      padding: 15px;
+      min-height: 340px;
+    }
+    
+    .test-type-icon {
+      font-size: 2.2rem;
+      height: 50px;
+    }
+    
+    .test-type-card h3 {
+      font-size: 1.3rem;
+      min-height: 50px;
+    }
+    
+    .test-info {
+      padding: 10px;
+      font-size: 0.8rem;
+      min-height: 140px;
+    }
+    
+    .test-info-item {
+      margin-bottom: 6px;
+    }
+    
+    .test-info-item i {
+      font-size: 0.8rem;
+    }
+    
+    .test-info-item span {
+      font-size: 0.8rem;
+    }
+    
+    .chart-label {
+      width: 100px;
+      font-size: 0.75rem;
+    }
+    
+    .chart-bar-container {
+      min-width: 60px;
+    }
+    
+    .chart-value {
+      width: 40px;
+      font-size: 0.75rem;
+    }
+  }
+
+  /* Test Container */
+  .test-container {
+    display: none;
+  }
+
+  .test-container.show {
+    display: block;
+  }
+
+  /* Timer */
+  .timer-container {
+    background-color: var(--white);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    margin-bottom: 30px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  .timer-display {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 10px;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .timer-label {
+    font-size: 1.1rem;
+    color: var(--medium-gray);
+    margin-bottom: 15px;
+  }
+
+  .timer-progress {
+    height: 10px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 15px;
+  }
+
+  .timer-progress-fill {
+    height: 100%;
+    background-color: var(--primary-blue);
+    width: 100%;
+    transition: width 1s linear;
+  }
+
+  .timer-warning {
+    color: var(--orange);
+    font-weight: 600;
+    margin-top: 10px;
+    display: none;
+  }
+
+  .timer-critical {
+    color: var(--red);
+    font-weight: 600;
+    margin-top: 10px;
+    display: none;
+  }
+
+  /* Question Counter */
+  .question-counter {
+    background-color: var(--white);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    margin-bottom: 30px;
+    box-shadow: var(--shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .counter-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .progress-container {
+    flex-grow: 1;
+    max-width: 400px;
+    min-width: 200px;
+  }
+
+  .progress-bar {
+    height: 10px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 5px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background-color: var(--primary-blue);
+    width: 0%;
+    transition: width 0.5s ease;
+  }
+
+  /* Question Card */
+  .question-card {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+  }
+
+  .question-text {
+    font-size: 1.4rem;
+    margin-bottom: 25px;
+    color: var(--primary-blue);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  /* Options with ABCD labels */
+  .options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px;
+  }
+
+  .option {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+    background-color: #f9f9f9;
+  }
+
+  .option:hover {
+    background-color: #f0f7ff;
+    border-color: var(--primary-light-blue);
+  }
+
+  .option.selected {
+    background-color: #e6f2ff;
+    border-color: var(--primary-blue);
+  }
+
+  .option-letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background-color: var(--primary-blue);
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    margin-right: 12px;
+    flex-shrink: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+  }
+
+  .option input {
+    display: none;
+  }
+
+  .option label {
+    cursor: pointer;
+    font-size: 1.1rem;
+    flex-grow: 1;
+    display: flex;
+    align-items: flex-start;
+    line-height: 1.4;
+  }
+
+  /* Navigation */
+  .navigation-btns {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .nav-btn {
+    padding: 14px 30px;
+    min-width: 150px;
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Results */
+  .results-container {
+    display: none;
+  }
+
+  .results-container.show {
+    display: block;
+  }
+
+  .results-content {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    padding: 40px;
+    margin-top: 40px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  .results-header {
+    margin-bottom: 40px;
+  }
+
+  .score-display {
+    font-size: 4rem;
+    font-weight: 800;
+    color: var(--primary-blue);
+    margin-bottom: 10px;
+  }
+
+  .score-text {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+    line-height: 1.3;
+  }
+
+  .score-bar {
+    height: 20px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 30px 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .score-fill {
+    height: 100%;
+    background-color: var(--green);
+    width: 0%;
+    transition: width 1.5s ease;
+  }
+
+  /* 错题集样式 */
+  .mistakes-container {
+    display: none;
+    margin: 40px 0;
+  }
+
+  .mistakes-container.show {
+    display: block;
+  }
+
+  .mistakes-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 30px;
+    background-color: var(--primary-blue);
+    color: white;
+    border-radius: var(--border-radius);
+  }
+
+  .mistakes-header h2 {
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+
+  .mistakes-stats {
+    background-color: var(--white);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 30px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    text-align: center;
+  }
+
+  .stat-item {
+    padding: 20px;
+  }
+
+  .stat-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  .stat-label {
+    color: var(--medium-gray);
+    font-size: 0.9rem;
+  }
+
+  .stat-value.total {
+    color: var(--red);
+  }
+
+  .stat-value.themes {
+    color: var(--orange);
+  }
+
+  .stat-value.improvement {
+    color: var(--green);
+  }
+
+  .mistake-item {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    border-left: 5px solid var(--red);
+    transition: var(--transition);
+  }
+
+  .mistake-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .mistake-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .mistake-theme {
+    background-color: var(--primary-blue);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .mistake-difficulty {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .difficulty-easy {
+    background-color: var(--green);
+    color: white;
+  }
+
+  .difficulty-medium {
+    background-color: var(--orange);
+    color: white;
+  }
+
+  .difficulty-hard {
+    background-color: var(--red);
+    color: white;
+  }
+
+  .mistake-question {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--dark-gray);
+    line-height: 1.4;
+  }
+
+  .mistake-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .mistake-option {
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .mistake-option.correct {
+    background-color: rgba(39, 174, 96, 0.1);
+    border-color: var(--green);
+  }
+
+  .mistake-option.incorrect {
+    background-color: rgba(231, 76, 60, 0.1);
+    border-color: var(--red);
+  }
+
+  .mistake-option-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    background-color: var(--primary-blue);
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    margin-right: 10px;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+  }
+
+  .mistake-option.correct .mistake-option-label {
+    background-color: var(--green);
+  }
+
+  .mistake-option.incorrect .mistake-option-label {
+    background-color: var(--red);
+  }
+
+  .mistake-explanation {
+    background-color: rgba(255, 214, 51, 0.1);
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-yellow);
+    margin-top: 20px;
+  }
+
+  .mistake-explanation h5 {
+    color: var(--primary-blue);
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+  }
+
+  .mistake-explanation p {
+    color: var(--dark-gray);
+    line-height: 1.5;
+    white-space: pre-line;
+  }
+
+  .mistake-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--light-gray);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .mistake-count {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--medium-gray);
+    font-size: 0.9rem;
+  }
+
+  /* Footer */
+  .test-footer {
+    background-color: var(--primary-blue);
+    color: var(--white);
+    padding: 40px 0;
+    margin-top: 80px;
+    text-align: center;
+    display: none;
+  }
+
+  .test-footer a {
+    color: var(--primary-yellow);
+    font-weight: 600;
+  }
+
+  /* Loading Spinner */
+  .loading-spinner {
+    display: none;
+    text-align: center;
+    padding: 30px;
+  }
+
+  .spinner {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid var(--primary-blue);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Test Header */
+  .test-header {
+    display: none;
+    background-color: var(--white);
+    padding: 20px 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+
+  .test-header .container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .test-header h1 {
+    font-size: 1.8rem;
+    margin: 0;
+  }
+
+  .test-header p {
+    color: var(--medium-gray);
+    margin: 0;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .header-actions .btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+  </style>
+</head>
+<body>
+
+<!-- Custom Alert Modal -->
+<div id="alertModal" class="alert-overlay">
+  <div class="alert-content">
+    <div class="alert-icon info" id="alertIcon">
+      <i class="fas fa-info-circle"></i>
+    </div>
+    <h2 id="alertTitle">Information</h2>
+    <p id="alertMessage">Message d'information</p>
+    <div class="alert-btns">
+      <button class="btn btn-primary" onclick="closeAlert()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- 自定义确认弹窗 -->
+<div id="confirmModal" class="confirm-overlay">
+  <div class="confirm-modal" id="confirmModalContent">
+    <div class="confirm-icon" id="confirmIcon">
+      <i class="fas fa-question-circle"></i>
+    </div>
+    <h3 class="confirm-title" id="confirmTitle">Confirmation</h3>
+    <p class="confirm-message" id="confirmMessage">Êtes-vous sûr de vouloir effectuer cette action?</p>
+    <div class="confirm-buttons">
+      <button class="confirm-btn cancel" id="confirmCancelBtn">
+        <i class="fas fa-times"></i> Annuler
+      </button>
+      <button class="confirm-btn confirm" id="confirmOkBtn">
+        <i class="fas fa-check"></i> Confirmer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div id="loginModal" class="login-overlay">
+  <div class="login-content">
+    <h2>Accès Test Étudiant</h2>
+    <p>Veuillez entrer vos informations d'étudiant</p>
+    
+    <form id="loginForm" class="login-form">
+      <div class="form-group">
+        <label for="studentName">Nom de l'étudiant *</label>
+        <input type="text" id="studentName" placeholder="Votre nom complet" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="studentPassword">Mot de passe *</label>
+        <input type="password" id="studentPassword" placeholder="Mot de passe fourni" required>
+        <div class="form-error" id="loginError">Nom ou mot de passe incorrect</div>
+      </div>
+      
+      <div style="background-color: rgba(243,156,18,0.1); border-left: 4px solid var(--orange); padding: 12px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 0.9rem;">
+        <p><i class="fas fa-info-circle"></i> Tous les tests : 40 questions - 45 minutes</p>
+        <p><i class="fas fa-check-circle"></i> Seuil de réussite : 32/40 (80%)</p>
+      </div>
+    </form>
+    
+    <div class="loading-spinner" id="loginSpinner" style="display: none;">
+      <div class="spinner"></div>
+      <p>Connexion en cours...</p>
+    </div>
+    
+    <div class="login-btns" id="loginButtons">
+      <button class="btn btn-primary btn-modal" id="loginButton">
+        <i class="fas fa-sign-in-alt"></i> Se connecter
+      </button>
+   <button class="btn btn-modal" onclick="window.location.href='index.html';">
+    <i class="fas fa-home"></i> Accueil
+  </button>
+    </div>
+  </div>
+</div>
+
+<!-- Test Selection Modal -->
+<div id="selectionModal" class="selection-overlay">
+  <div class="selection-content">
+    <div class="selection-header">
+      <h2>Choisissez votre test</h2>
+      <p id="selectionMessage">Cliquez sur une option pour commencer immédiatement</p>
+      
+      <div id="daysLeftInfo" class="days-left-info" style="display: none;">
+        <p><i class="fas fa-calendar-check"></i> <span id="daysLeftText">Votre accès est valide pour X jours.</span></p>
+      </div>
+    </div>
+    
+    <div class="test-types-wrapper">
+      <div class="test-types-container">
+        <div class="test-type-card allowed" id="mistakesCard" onclick="showMistakesCollection()">
+
+          <div class="test-type-icon">
+            <i class="fas fa-book-medical"></i>
+          </div>
+          <h3>Mes Erreurs / 我的错题</h3>
+          <p>Pratiquez vos questions ratées / 练习你做错的题目</p>
+          <div class="test-info">
+            <div class="test-info-item">
+              <i class="fas fa-chart-line"></i>
+              <span><span class="fr-text">Améliorez votre score</span> <span class="zh-text">/ 提高你的分数</span></span>
+            </div>
+            <div class="test-info-item">
+              <i class="fas fa-lightbulb"></i>
+              <span><span class="fr-text">Revoir les explications détaillées</span> <span class="zh-text">/ 查看详细解释</span></span>
+            </div>
+            <div class="test-info-item">
+              <i class="fas fa-filter"></i>
+              <span><span class="fr-text">Filtrez par thème ou difficulté</span> <span class="zh-text">/ 按主题或难度筛选</span></span>
+            </div>
+            <div class="test-info-item">
+              <i class="fas fa-check-circle"></i>
+              <span><span class="fr-text">Marquez les questions comme maîtrisées</span> <span class="zh-text">/ 标记已掌握的题目</span></span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="test-type-card" id="multiYearCard" onclick="startTestIfAllowed('multi_year')">
+          <div class="test-type-icon">
+            <i class="fas fa-passport"></i>
+          </div>
+          <h3>Titre de Séjour 2-4 Ans / 2-4年居留许可</h3>
+          <p>Test pour titre de séjour pluriannuel / 多年期居留许可测试</p>
+          <div class="test-info">
+            <div class="test-info-item">
+              <i class="fas fa-users"></i>
+              <span><span class="fr-text">Public visé : Étudiants diplômés</span> <span class="zh-text">/ 适用人群：毕业生</span></span>
+            </div>
+            <div class="test-info-item">
+              <i class="fas fa-graduation-cap"></i>
+              <span><span class="fr-text">Passage étudiant à travailleur</span> <span class="zh-text">/ 学生身份转工作身份</span></span>
+            </div>
+            <div class="test-info-item">
+              <i class="fas fa-question-circle"></i>
+              <span><span class="fr-text">40 questions</span> <span class="zh-text">/ 40道题</span></span>
+            </div>
+            <div class="test-info-item">
+              <i class="fas fa-clock"></i>
+              <span><span class="fr-text">45 minutes</span> <span class="zh-text">/ 45分钟</span></span>
+            </div>
+            <div class="test-info-item">
+              <i class="fas fa-check-double"></i>
+              <span><span class="fr-text">Seuil : 32/40 (80%)</span> <span class="zh-text">/ 通过标准：32/40 (80%)</span></span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="test-type-card" id="tenYearCard" onclick="startTestIfAllowed('ten_year')">
+          <div class="test-type-icon">
+            <i class="fas fa-id-card-alt"></i>
+          </div>
+          <h3>Carte de Résident 10 Ans / 10年长期居留卡</h3>
+          <p>Test pour carte de résident de 10 ans / 10年长期居留卡测试</p>
+          <div class="test-info">
+            <div class="test-info-item">
+              <i class="fas fa-users"></i>
+              <span><span class="fr-text">Public visé : Résidents longue durée</span> <span class="zh-text">/ 适用人群：长期居民</span></span>
+            </div>
+            <div class="test-info-item">
+              <i class="fas fa-home"></i>
+              <span><span class="fr-text">Résidence continue de 5 ans</span> <span class="zh-text">/ 连续居住5年</span></span>
+            </div>
+            <div class="test-info-item">
+              <i class="fas fa-question-circle"></i>
+              <span><span class="fr-text">40 questions</span> <span class="zh-text">/ 40道题</span></span>
+            </div>
+            <div class="test-info-item">
+              <i class="fas fa-clock"></i>
+              <span><span class="fr-text">45 minutes</span> <span class="zh-text">/ 45分钟</span></span>
+            </div>
+            <div class="test-info-item">
+              <i class="fas fa-check-double"></i>
+              <span><span class="fr-text">Seuil : 32/40 (80%)</span> <span class="zh-text">/ 通过标准：32/40 (80%)</span></span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="test-type-card" id="nationalityCard" onclick="startTestIfAllowed('nationality')">
+          <div class="test-type-icon">
+            <i class="fas fa-flag"></i>
+          </div>
+          <h3>Nationalité Française / 法国国籍</h3>
+          <p>Test pour accès à la nationalité française / 法国国籍获取测试</p>
+          <div class="test-info">
+            <div class="test-info-item">
+              <i class="fas fa-users"></i>
+              <span><span class="fr-text">Public visé : Demandeurs de nationalité</span> <span class="zh-text">/ 适用人群：国籍申请者</span></span>
+            </div>
+            <div class="test-info-item">
+              <i class="fas fa-calendar-alt"></i>
+              <span><span class="fr-text">Résidence légale de 5 ans</span> <span class="zh-text">/ 合法居住5年</span></span>
+            </div>
+            <div class="test-info-item">
+              <i class="fas fa-question-circle"></i>
+              <span><span class="fr-text">40 questions</span> <span class="zh-text">/ 40道题</span></span>
+            </div>
+            <div class="test-info-item">
+              <i class="fas fa-clock"></i>
+              <span><span class="fr-text">45 minutes</span> <span class="zh-text">/ 45分钟</span></span>
+            </div>
+            <div class="test-info-item">
+              <i class="fas fa-check-double"></i>
+              <span><span class="fr-text">Seuil : 32/40 (80%)</span> <span class="zh-text">/ 通过标准：32/40 (80%)</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="selection-footer">
+      <button class="btn btn-modal" onclick="goBackToLogin()">
+        <i class="fas fa-sign-out-alt"></i> Déconnexion
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Test Header -->
+<header class="test-header" style="display: none;">
+  <div class="container">
+    <h1 id="testTitle">Test Civique</h1>
+    <p id="testSubtitle">40 questions - 45 minutes</p>
+    <div class="header-actions">
+      <button class="btn" onclick="showInstructions()">
+        <i class="fas fa-info-circle"></i> Instructions
+      </button>
+     <!-- 在results-content中找到这个按钮，确保是这样的： -->
+
+      <button class="btn btn-primary" onclick="goBackToHome()">
+        <i class="fas fa-home"></i> Accueil
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Test Container -->
+<main class="container">
+  <div id="testContainer" class="test-container">
+    <!-- Timer -->
+    <div class="timer-container">
+      <div class="timer-display" id="timerDisplay">45:00</div>
+      <div class="timer-label">Temps restant</div>
+      <div class="timer-progress">
+        <div class="timer-progress-fill" id="timerProgress"></div>
+      </div>
+      <div class="timer-warning" id="timerWarning">
+        <i class="fas fa-exclamation-triangle"></i> Plus que 10 minutes!
+      </div>
+      <div class="timer-critical" id="timerCritical">
+        <i class="fas fa-skull-crossbones"></i> Dernières 5 minutes!
+      </div>
+    </div>
+    
+    <!-- Question Counter -->
+    <div class="question-counter">
+      <div class="counter-info">
+        <div>
+          <h3>Question <span id="currentQuestion">1</span> sur <span id="totalQuestions">40</span></h3>
+          <p id="testTypeInfo">Test en cours</p>
+        </div>
+        <div class="progress-container">
+          <div>Progression: <span id="progressPercent">0%</span></div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Question -->
+    <div class="question-card">
+      <div class="question-text" id="questionText">Chargement de la question...</div>
+      
+      <div class="options-container" id="optionsContainer">
+        <!-- Options will be inserted here by JavaScript -->
+      </div>
+      
+      <div class="navigation-btns">
+        <button class="btn nav-btn" id="prevBtn" onclick="previousQuestion()" disabled>
+          <i class="fas fa-arrow-left"></i> Précédente
+        </button>
+        <button class="btn btn-primary nav-btn" id="nextBtn" onclick="nextQuestion()">
+          Suivante <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Submit Button -->
+    <div style="text-align: center; margin-top: 40px;">
+      <button class="btn btn-primary" id="submitBtn" onclick="submitTest()" style="padding: 18px 50px; font-size: 1.2rem; display: none;">
+        <i class="fas fa-paper-plane"></i> Terminer le test
+      </button>
+    </div>
+  </div>
+  
+  <!-- Results Container -->
+  <div id="resultsContainer" class="results-container">
+    <div class="results-content">
+      <div class="results-header">
+        <div class="score-display" id="scoreDisplay">0/40</div>
+        <div class="score-text" id="scoreText">Chargement du résultat...</div>
+        
+        <div class="score-bar">
+          <div class="score-fill" id="scoreFill"></div>
+        </div>
+      </div>
+      
+      <!-- 分析按钮 -->
+      <div style="text-align: center; margin-top: 30px;">
+        <button class="btn" onclick="showThemeAnalysis()" style="background-color: var(--primary-blue); color: white; margin: 10px;">
+          <i class="fas fa-chart-pie"></i> Analyse par thème
+        </button>
+        <button class="btn" onclick="showMistakesMap()" style="background-color: var(--orange); color: white; margin: 10px;">
+          <i class="fas fa-map"></i> Carte des questions
+        </button>
+        <button class="btn" onclick="showMistakesCollection()" style="background-color: var(--red); color: white; margin: 10px;">
+          <i class="fas fa-book-medical"></i> Voir mes erreurs
+        </button>
+      </div>
+      
+      <div style="text-align: center; margin-top: 40px;">
+<!-- 在results-content中找到这个按钮，确保是这样的： -->
+<button class="btn" onclick="restartTest()">
+    <i class="fas fa-redo"></i> Nouveau test / 新测试
+</button>
+        <button class="btn btn-primary" onclick="goBackToHome()">
+          <i class="fas fa-home"></i> Accueil
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 主题分布分析容器 -->
+  <div id="themeAnalysisContainer" class="theme-analysis-container">
+    <!-- 主题分布内容将由JavaScript动态生成 -->
+  </div>
+  
+  <!-- 错题地图容器 -->
+  <div id="mistakesMapContainer" class="mistakes-map-container">
+    <!-- 错题地图内容将由JavaScript动态生成 -->
+  </div>
+  
+  <!-- 题目详情查看容器 -->
+  <div id="questionDetailContainer" class="question-detail-container">
+    <!-- 题目详情内容将由JavaScript动态生成 -->
+  </div>
+  
+  <!-- 错题集容器 -->
+  <div id="mistakesContainer" class="mistakes-container">
+    <div class="mistakes-header">
+      <h2><i class="fas fa-book-medical"></i> Mes Erreurs / 我的错题</h2>
+      <p>Pratiquez vos questions ratées pour améliorer votre score / 练习你做错的题目以提高分数</p>
+    </div>
+    
+    <div class="mistakes-stats">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value total" id="totalMistakes">0</div>
+          <div class="stat-label">Erreurs totales / 总错题数</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value themes" id="mistakesByTheme">0</div>
+          <div class="stat-label">Thèmes différents / 不同主题</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value improvement" id="improvementScore">0%</div>
+          <div class="stat-label">Taux d'amélioration / 进步率</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 错题筛选器 -->
+    <div id="mistakesFilterContainer" class="mistakes-filter">
+      <!-- 筛选器内容将由JavaScript动态生成 -->
+    </div>
+    
+    <div class="mistakes-list" id="mistakesList">
+      <!-- 错题列表将在这里动态生成 -->
+    </div>
+    
+    <div style="text-align: center; margin-top: 40px;">
+      <button class="btn btn-danger" onclick="clearAllMistakes()">
+        <i class="fas fa-trash"></i> Effacer toutes les erreurs
+      </button>
+      <!-- 在错题集容器底部找到这个按钮，修改为： -->
+<button class="btn" onclick="goBackToSelection()">
+    <i class="fas fa-arrow-left"></i> Retour aux tests / 返回测试
+</button>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="test-footer">
+  <div class="container">
+    <p>© 2026 Association Mille Voiles</p>
+    <p id="footerTestInfo">Test civique - Simulation officielle</p>
+    <p><a href="index.html">Retour au site principal</a></p>
+  </div>
+</footer>
+
+<script>
+// ==================== 全局配置 ====================
+const themeDistribution = {
+    "Accès aux soins": 1,
+    "Autorité parentale et système éducatif": 1,
+    "Devise et symboles de la République": 3,
+    "Droits fondamentaux": 2,
+    "Démocratie et droit de vote": 3,
+    "Grandes périodes et personnages historiques": 3,
+    "Institutions": 2,
+    "Laïcité": 2,
+    "Mises en situation": 12,
+    "Obligations et devoirs des personnes résidant en France": 3,
+    "Patrimoine français": 2,
+    "S'installer et résider en France": 1,
+    "Territoires et géographie": 3,
+    "Travail": 1,
+    "UnionEuropéenne": 1
+};
+
+const testTypes = {
+    multi_year: {
+        name: "Titre de Séjour 2-4 Ans",
+        name_zh: "2-4年居留许可",
+        threshold: 32,
+        duration: 45,
+        description: "Test pour titre de séjour pluriannuel",
+        description_zh: "多年期居留许可测试",
+        source: "multi_only",
+        audience_fr: "Étudiants diplômés souhaitant travailler en France",
+        audience_zh: "希望在法国工作的毕业生",
+        requirements_fr: "Diplôme reconnu, offre d'emploi",
+        requirements_zh: "认可文凭，工作邀请"
+    },
+    ten_year: {
+        name: "Carte de Résident 10 Ans",
+        name_zh: "10年长期居留卡",
+        threshold: 32,
+        duration: 45,
+        description: "Test pour carte de résident de 10 ans",
+        description_zh: "10年长期居留卡测试",
+        source: "both",
+        audience_fr: "Résidents en France depuis 5 ans",
+        audience_zh: "在法国居住5年以上的居民",
+        requirements_fr: "Résidence continue de 5 ans, ressources stables",
+        requirements_zh: "连续居住5年，稳定收入"
+    },
+    nationality: {
+        name: "Nationalité Française",
+        name_zh: "法国国籍",
+        threshold: 32,
+        duration: 45,
+        description: "Test pour accès à la nationalité française",
+        description_zh: "法国国籍获取测试",
+        source: "both",
+        audience_fr: "Demandeurs de nationalité française",
+        audience_zh: "法国国籍申请者",
+        requirements_fr: "Résidence légale de 5 ans, assimilation à la communauté française",
+        requirements_zh: "合法居住5年，融入法国社会"
+    }
+};
+
+// ==================== 全局变量 ====================
+let selectedTestType = null;
+let studentInfo = { name: "", testDate: "", testType: "", type: "", daysLeft: 0 };
+let selectedQuestions = [];
+let currentQuestionIndex = 0;
+let userAnswers = [];
+let totalTime = 45 * 60;
+let timeLeft = totalTime;
+let timerInterval = null;
+let currentScore = 0;
+let currentPercentage = 0;
+let currentScoreText = "";
+let allQuestions = [];
+let themePerformance = {};
+let questionAccuracy = [];
+let mistakes = [];
+let currentMistakesFilter = { theme: 'all', difficulty: 'all', mastered: 'all' };
+let currentDetailQuestionIndex = null;
+let currentView = 'results'; // 'results', 'themeAnalysis', 'mistakesMap', 'questionDetail'
+
+// ==================== 自定义确认弹窗功能 ====================
+// ==================== 返回主页 ====================
+
+function showConfirm(title, message, type = 'warning', onConfirm) {
+    const modal = document.getElementById('confirmModal');
+    const modalContent = document.getElementById('confirmModalContent');
+    const icon = document.getElementById('confirmIcon');
+    const titleEl = document.getElementById('confirmTitle');
+    const messageEl = document.getElementById('confirmMessage');
+    const cancelBtn = document.getElementById('confirmCancelBtn');
+    const okBtn = document.getElementById('confirmOkBtn');
+    
+    // 设置内容
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    
+    // 设置样式类型
+    modalContent.className = 'confirm-modal ' + type;
+    
+    // 设置图标
+    icon.innerHTML = '';
+    switch(type) {
+        case 'danger':
+            icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+            break;
+        case 'warning':
+            icon.innerHTML = '<i class="fas fa-question-circle"></i>';
+            break;
+        case 'success':
+            icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            break;
+        case 'info':
+            icon.innerHTML = '<i class="fas fa-info-circle"></i>';
+            break;
+    }
+    
+    // 清除之前的监听器
+    const newCancelBtn = cancelBtn.cloneNode(true);
+    const newOkBtn = okBtn.cloneNode(true);
+    cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+    okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+    
+    // 设置新监听器
+    newCancelBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+    
+    newOkBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+        if (onConfirm && typeof onConfirm === 'function') {
+            onConfirm();
+        }
+    });
+    
+    // 显示弹窗
+    modal.style.display = 'flex';
+}
+
+// 显示自动消失的提示消息
+function showToast(title, message, type = 'info') {
+    // 移除之前的toast
+    const existingToast = document.getElementById('customToast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    // 创建新的toast
+    const toast = document.createElement('div');
+    toast.id = 'customToast';
+    toast.className = `toast-notification ${type}`;
+    
+    const iconMap = {
+        'success': 'check-circle',
+        'error': 'times-circle',
+        'warning': 'exclamation-triangle',
+        'info': 'info-circle'
+    };
+    
+    toast.innerHTML = `
+        <div class="toast-icon">
+            <i class="fas fa-${iconMap[type] || 'info-circle'}"></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">${title}</div>
+            <div class="toast-message">${message}</div>
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // 3秒后自动移除
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.style.animation = 'fadeOut 0.3s ease-out';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 300);
+        }
+    }, 3000);
+}
+
+// ==================== 主题分布分析功能 ====================
+
+// 显示主题分布分析
+function showThemeAnalysis() {
+    hideAllContainers();
+    document.getElementById('themeAnalysisContainer').style.display = 'block';
+    document.getElementById('themeAnalysisContainer').classList.add('show');
+    currentView = 'themeAnalysis';
+    
+    displayThemeAnalysis();
+}
+
+// 显示主题分布分析内容
+function displayThemeAnalysis() {
+    const container = document.getElementById('themeAnalysisContainer');
+    
+    // 计算主题统计数据
+    const themeStats = calculateThemeStats();
+    
+    // 生成HTML
+    let html = `
+        <div class="theme-analysis-header">
+            <h2><i class="fas fa-chart-pie"></i> Analyse par thème / 主题分析</h2>
+            <p>Analyse de votre performance par thème / 按主题分析您的表现</p>
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+                <button class="btn" onclick="showResults()">
+                    <i class="fas fa-arrow-left"></i> Retour aux résultats / 返回结果
+                </button>
+                <button class="btn btn-primary" onclick="showMistakesMap()">
+                    <i class="fas fa-map"></i> Voir la carte des questions / 查看题目地图
+                </button>
+            </div>
+        </div>
+        
+        <div class="theme-stats-grid">
+            <div class="theme-stat-card">
+                <h3><i class="fas fa-tags"></i> Distribution par thème / 主题分布</h3>
+                <div class="theme-stat-list">
+    `;
+    
+    // 主题分布列表
+    Object.entries(themeStats.distribution).sort((a, b) => b[1] - a[1]).forEach(([theme, count]) => {
+        const percentage = Math.round((count / selectedQuestions.length) * 100);
+        html += `
+            <div class="theme-stat-item">
+                <span class="theme-name">${theme}</span>
+                <div class="theme-count">
+                    <span class="theme-number">${count}</span>
+                    <div class="theme-bar">
+                        <div class="theme-bar-fill" style="width: ${percentage}%"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += `
+                </div>
+            </div>
+            
+            <div class="theme-stat-card">
+                <h3><i class="fas fa-chart-line"></i> Précision par thème / 主题准确率</h3>
+                <div class="theme-stat-list">
+    `;
+    
+    // 准确率列表
+    Object.entries(themeStats.accuracy).sort((a, b) => b[1] - a[1]).forEach(([theme, accuracy]) => {
+        const accuracyClass = accuracy >= 80 ? 'high' : accuracy >= 60 ? 'medium' : 'low';
+        html += `
+            <div class="accuracy-item">
+                <span class="accuracy-name">${theme}</span>
+                <span class="accuracy-value ${accuracyClass}">${accuracy}%</span>
+            </div>
+        `;
+    });
+    
+    html += `
+                </div>
+            </div>
+        </div>
+        
+        <div class="theme-distribution-chart">
+            <h3><i class="fas fa-chart-bar"></i> Distribution des questions / 题目分布</h3>
+            <p style="color: var(--medium-gray); margin-bottom: 15px; font-size: 0.9rem;">
+                Comparaison entre la distribution cible et réelle / 目标分布与实际分布对比
+            </p>
+            <div class="chart-container">
+    `;
+    
+    // 图表 - 添加滚动功能
+    Object.entries(themeDistribution).forEach(([theme, targetCount]) => {
+        const actualCount = themeStats.distribution[theme] || 0;
+        const percentage = actualCount > 0 ? Math.round((actualCount / targetCount) * 100) : 0;
+        const barWidth = Math.min(percentage, 100);
+        
+        html += `
+            <div class="chart-bar">
+                <div class="chart-label" title="${theme}">${theme.length > 20 ? theme.substring(0, 20) + '...' : theme}</div>
+                <div class="chart-bar-container">
+                    <div class="chart-bar-fill" style="width: ${barWidth}%"></div>
+                </div>
+                <div class="chart-value">${actualCount}/${targetCount}</div>
+            </div>
+        `;
+    });
+    
+    html += `
+            </div>
+            <div style="text-align: center; margin-top: 15px; color: var(--medium-gray); font-size: 0.85rem;">
+                <i class="fas fa-info-circle"></i> ${Object.keys(themeDistribution).length} thèmes au total / 共${Object.keys(themeDistribution).length}个主题
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn btn-primary" onclick="showMistakesCollection()">
+                <i class="fas fa-book-medical"></i> Voir les erreurs détaillées / 查看详细错题
+            </button>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+// 计算主题统计数据
+function calculateThemeStats() {
+    const themeStats = {
+        distribution: {},
+        accuracy: {},
+        correctByTheme: {},
+        totalByTheme: {}
+    };
+    
+    // 初始化
+    Object.keys(themeDistribution).forEach(theme => {
+        themeStats.distribution[theme] = 0;
+        themeStats.correctByTheme[theme] = 0;
+        themeStats.totalByTheme[theme] = 0;
+    });
+    
+    // 统计分布和正确率
+    selectedQuestions.forEach((question, index) => {
+        const theme = question.theme || question.category || "Autre";
+        
+        if (themeStats.distribution[theme] !== undefined) {
+            themeStats.distribution[theme]++;
+            themeStats.totalByTheme[theme]++;
+            
+            if (userAnswers[index] === question.answer) {
+                themeStats.correctByTheme[theme]++;
+            }
+        }
+    });
+    
+    // 计算准确率
+    Object.keys(themeStats.correctByTheme).forEach(theme => {
+        const correct = themeStats.correctByTheme[theme];
+        const total = themeStats.totalByTheme[theme];
+        
+        if (total > 0) {
+            themeStats.accuracy[theme] = Math.round((correct / total) * 100);
+        } else {
+            themeStats.accuracy[theme] = 0;
+        }
+    });
+    
+    return themeStats;
+}
+
+// ==================== 错题地图功能 ====================
+
+// 显示错题地图
+function showMistakesMap() {
+    hideAllContainers();
+    document.getElementById('mistakesMapContainer').style.display = 'block';
+    document.getElementById('mistakesMapContainer').classList.add('show');
+    currentView = 'mistakesMap';
+    
+    displayMistakesMap();
+}
+
+// 显示错题地图内容
+function displayMistakesMap() {
+    const container = document.getElementById('mistakesMapContainer');
+    
+    let html = `
+        <div class="theme-analysis-header">
+            <h2><i class="fas fa-map"></i> Carte des questions / 题目地图</h2>
+            <p>Visualisation de toutes les questions du test / 可视化所有测试题目</p>
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+                <button class="btn" onclick="showResults()">
+                    <i class="fas fa-arrow-left"></i> Retour aux résultats / 返回结果
+                </button>
+                <button class="btn btn-primary" onclick="showThemeAnalysis()">
+                    <i class="fas fa-chart-pie"></i> Analyse par thème / 主题分析
+                </button>
+            </div>
+        </div>
+        
+        <div class="map-grid">
+    `;
+    
+    // 生成题目地图
+    selectedQuestions.forEach((question, index) => {
+        const isCorrect = userAnswers[index] === question.answer;
+        const theme = question.theme || question.category || "Autre";
+        const difficulty = question['difficulté'];
+        const difficultyClass = getDifficultyClass(difficulty);
+        
+        html += `
+            <div class="map-item ${isCorrect ? 'correct' : 'incorrect'}" onclick="viewQuestionDetail(${index})">
+                <div class="map-item-number">${index + 1}</div>
+                <div class="map-item-status">
+                    ${isCorrect ? '<i class="fas fa-check"></i> Correct / 正确' : '<i class="fas fa-times"></i> Incorrect / 错误'}
+                </div>
+                <div class="map-item-theme" title="${theme}">${theme.length > 25 ? theme.substring(0, 25) + '...' : theme}</div>
+                <div class="map-item-difficulty difficulty-${difficultyClass}">${difficulty}</div>
+            </div>
+        `;
+    });
+    
+    html += `
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <div style="display: inline-flex; align-items: center; gap: 20px; background-color: var(--white); padding: 15px 30px; border-radius: var(--border-radius); box-shadow: var(--shadow);">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 20px; height: 20px; background-color: var(--green); border-radius: 4px;"></div>
+                    <span>Correct / 正确 (${selectedQuestions.filter((q, i) => userAnswers[i] === q.answer).length})</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 20px; height: 20px; background-color: var(--red); border-radius: 4px;"></div>
+                    <span>Incorrect / 错误 (${selectedQuestions.filter((q, i) => userAnswers[i] !== q.answer).length})</span>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px;">
+            <button class="btn btn-primary" onclick="showMistakesCollection()">
+                <i class="fas fa-book-medical"></i> Voir les erreurs détaillées / 查看详细错题
+            </button>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+// ==================== 题目详情查看功能 ====================
+
+// 查看题目详情
+function viewQuestionDetail(index) {
+    hideAllContainers();
+    document.getElementById('questionDetailContainer').style.display = 'block';
+    document.getElementById('questionDetailContainer').classList.add('show');
+    currentView = 'questionDetail';
+    currentDetailQuestionIndex = index;
+    
+    displayQuestionDetail(index);
+}
+
+// 显示题目详情
+function displayQuestionDetail(index) {
+    const container = document.getElementById('questionDetailContainer');
+    const question = selectedQuestions[index];
+    const userAnswer = userAnswers[index];
+    const isCorrect = userAnswer === question.answer;
+    const theme = question.theme || question.category || "Autre";
+    const difficulty = question['difficulté'];
+    const difficultyClass = getDifficultyClass(difficulty);
+    const optionLetters = ['A', 'B', 'C', 'D'];
+    
+    let html = `
+        <div class="question-detail-header">
+            <h2><i class="fas fa-question-circle"></i> Question ${index + 1} / 第${index + 1}题</h2>
+            <div style="margin-top: 20px;">
+                <span class="${isCorrect ? 'correct' : 'incorrect'}" style="font-size: 1.2rem; font-weight: 600;">
+                    ${isCorrect ? 
+                        '<i class="fas fa-check-circle" style="color: var(--green);"></i> Réponse correcte / 回答正确' : 
+                        '<i class="fas fa-times-circle" style="color: var(--red);"></i> Réponse incorrecte / 回答错误'}
+                </span>
+            </div>
+            <div class="question-meta">
+                <div class="question-meta-item">
+                    <i class="fas fa-tag"></i>
+                    <span>${theme}</span>
+                </div>
+                <div class="question-meta-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="difficulty-${difficultyClass}">${difficulty}</span>
+                </div>
+                <div class="question-meta-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Question ${index + 1}/40</span>
+                </div>
+            </div>
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px;">
+                <button class="btn" onclick="goBackToMap()">
+                    <i class="fas fa-arrow-left"></i> Retour à la carte / 返回地图
+                </button>
+                ${index > 0 ? `
+                <button class="btn" onclick="viewQuestionDetail(${index - 1})">
+                    <i class="fas fa-chevron-left"></i> Précédente / 上一题
+                </button>
+                ` : ''}
+                ${index < selectedQuestions.length - 1 ? `
+                <button class="btn" onclick="viewQuestionDetail(${index + 1})">
+                    Suivante / 下一题 <i class="fas fa-chevron-right"></i>
+                </button>
+                ` : ''}
+            </div>
+        </div>
+        
+        <div class="question-detail-content">
+            <div class="detail-question-text">
+                ${question.question}
+            </div>
+            
+            <div class="detail-options-container">
+    `;
+    
+    // 显示选项
+    question.options.forEach((option, optionIndex) => {
+        const isCorrectAnswer = optionIndex === question.answer;
+        const isUserAnswer = optionIndex === userAnswer;
+        let optionClass = 'detail-option';
+        
+        if (isCorrectAnswer) {
+            optionClass += ' correct-answer';
+        }
+        if (isUserAnswer) {
+            optionClass += ' user-answer';
+        }
+        
+        html += `
+            <div class="${optionClass}">
+                <span class="detail-option-label">${optionLetters[optionIndex]}</span>
+                <div class="detail-option-text">${option}</div>
+                <div class="answer-status ${isCorrectAnswer ? 'correct' : 'incorrect'}">
+                    ${isCorrectAnswer ? 
+                        '<i class="fas fa-check"></i> Correct / 正确答案' : 
+                        isUserAnswer ? 
+                            '<i class="fas fa-times"></i> Votre réponse / 您的答案' : 
+                            ''}
+                </div>
+            </div>
+        `;
+    });
+    
+    html += `
+            </div>
+            
+            ${question.explanation ? `
+            <div class="detail-explanation">
+                <h5><i class="fas fa-lightbulb"></i> Explication / 解释</h5>
+                <p>${formatExplanation(question.explanation)}</p>
+            </div>
+            ` : ''}
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn btn-primary" onclick="goBackToMap()">
+                <i class="fas fa-map"></i> Retour à la carte des questions / 返回题目地图
+            </button>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+// 返回地图
+function goBackToMap() {
+    if (currentView === 'questionDetail') {
+        showMistakesMap();
+    }
+}
+// 添加清理所有模态框的函数
+function hideAllModals() {
+    // 隐藏所有模态框
+    const modals = [
+        'loginModal',
+        'selectionModal',
+        'alertModal',
+        'confirmModal'
+    ];
+    
+    modals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    });
+}
+// ==================== 隐藏所有容器 ====================
+// 修改 hideAllContainers 函数，确保隐藏所有可能的视图
+// ==================== 隐藏所有容器 ====================
+function hideAllContainers() {
+    // 隐藏主要测试容器
+    const testContainer = document.getElementById('testContainer');
+    if (testContainer) {
+        testContainer.style.display = 'none';
+        testContainer.classList.remove('show');
+    }
+    
+    // 隐藏结果容器
+    const resultsContainer = document.getElementById('resultsContainer');
+    if (resultsContainer) {
+        resultsContainer.style.display = 'none';
+        resultsContainer.classList.remove('show');
+    }
+    
+    // 确保所有分析容器都被隐藏
+    const containers = [
+        'themeAnalysisContainer',
+        'mistakesMapContainer', 
+        'questionDetailContainer',
+        'mistakesContainer'
+    ];
+    
+    containers.forEach(containerId => {
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.style.display = 'none';
+            container.classList.remove('show');
+        }
+    });
+}
+// 显示结果页面
+function showResults() {
+    hideAllContainers();
+    document.getElementById('resultsContainer').style.display = 'block';
+    document.getElementById('resultsContainer').classList.add('show');
+    currentView = 'results';
+}
+
+// ==================== 错题集主题筛选功能 ====================
+
+// 设置主题筛选器
+function setupThemeFilter() {
+    const filterContainer = document.getElementById('mistakesFilterContainer');
+    if (!filterContainer) return;
+    
+    // 获取所有主题
+    const themes = [...new Set(mistakes.map(m => m.category || m.theme || 'Autre'))];
+    themes.sort();
+    
+    // 获取所有难度级别
+    const difficulties = [...new Set(mistakes.map(m => m.difficulty || '中等'))];
+    difficulties.sort();
+    
+    // 创建筛选器UI
+    filterContainer.innerHTML = `
+        <h3><i class="fas fa-filter"></i> Filtrer les erreurs / 筛选错题</h3>
+        <p>Sélectionnez des critères pour afficher uniquement les erreurs correspondantes / 选择筛选条件以显示对应的错题</p>
+        
+        <div class="theme-filter-select">
+            <label for="themeFilter"><i class="fas fa-tags"></i> Filtrer par thème / 按主题筛选:</label>
+            <select id="themeFilter" onchange="applyThemeFilter()">
+                <option value="all">Tous les thèmes / 所有主题</option>
+                ${themes.map(theme => `<option value="${theme}">${theme}</option>`).join('')}
+            </select>
+        </div>
+        
+        <div class="theme-filter-select" style="margin-top: 15px;">
+            <label for="difficultyFilter"><i class="fas fa-chart-line"></i> Filtrer par difficulté / 按难度筛选:</label>
+            <select id="difficultyFilter" onchange="applyDifficultyFilter()">
+                <option value="all">Toutes les difficultés / 所有难度</option>
+                ${difficulties.map(diff => `<option value="${diff}">${diff}</option>`).join('')}
+            </select>
+        </div>
+        
+        <div class="theme-filter-select" style="margin-top: 15px;">
+            <label><i class="fas fa-check-circle"></i> Filtrer par statut / 按状态筛选:</label>
+            <div class="filter-actions">
+                <button class="filter-btn ${currentMistakesFilter.mastered === 'all' ? 'active' : ''}" 
+                        onclick="setMasteredFilter('all')">Tous / 全部</button>
+                <button class="filter-btn ${currentMistakesFilter.mastered === 'mastered' ? 'active' : ''}" 
+                        onclick="setMasteredFilter('mastered')">Maîtrisés / 已掌握</button>
+                <button class="filter-btn ${currentMistakesFilter.mastered === 'not_mastered' ? 'active' : ''}" 
+                        onclick="setMasteredFilter('not_mastered')">Non maîtrisés / 未掌握</button>
+            </div>
+        </div>
+        
+        <div class="filter-actions" style="margin-top: 20px;">
+            <button class="btn" onclick="clearAllFilters()">
+                <i class="fas fa-times"></i> Effacer tous les filtres / 清除所有筛选
+            </button>
+            <button class="btn btn-primary" onclick="applyAllFilters()">
+                <i class="fas fa-check"></i> Appliquer les filtres / 应用筛选
+            </button>
+        </div>
+    `;
+}
+
+// 应用主题筛选
+function applyThemeFilter() {
+    const themeFilter = document.getElementById('themeFilter');
+    if (themeFilter) {
+        currentMistakesFilter.theme = themeFilter.value;
+        displayFilteredMistakesList();
+    }
+}
+
+// 应用难度筛选
+function applyDifficultyFilter() {
+    const difficultyFilter = document.getElementById('difficultyFilter');
+    if (difficultyFilter) {
+        currentMistakesFilter.difficulty = difficultyFilter.value;
+        displayFilteredMistakesList();
+    }
+}
+
+// 设置掌握状态筛选
+function setMasteredFilter(status) {
+    currentMistakesFilter.mastered = status;
+    displayFilteredMistakesList();
+}
+
+// 清除所有筛选
+function clearAllFilters() {
+    currentMistakesFilter = { theme: 'all', difficulty: 'all', mastered: 'all' };
+    
+    if (document.getElementById('themeFilter')) {
+        document.getElementById('themeFilter').value = 'all';
+    }
+    if (document.getElementById('difficultyFilter')) {
+        document.getElementById('difficultyFilter').value = 'all';
+    }
+    
+    // 更新按钮状态
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        if (btn.textContent.includes('Tous') || btn.textContent.includes('全部')) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    
+    displayFilteredMistakesList();
+}
+
+// 应用所有筛选
+function applyAllFilters() {
+    displayFilteredMistakesList();
+}
+
+// 显示筛选后的错题列表
+function displayFilteredMistakesList() {
+    // 获取筛选后的错题
+    const filteredMistakes = mistakes.filter(mistake => {
+        // 主题筛选
+        if (currentMistakesFilter.theme !== 'all') {
+            const theme = mistake.category || mistake.theme || 'Autre';
+            if (theme !== currentMistakesFilter.theme) return false;
+        }
+        
+        // 难度筛选
+        if (currentMistakesFilter.difficulty !== 'all') {
+            const difficulty = mistake['difficulté'] || mistake.difficulty || 'moyen';
+            if (difficulty !== currentMistakesFilter.difficulty) return false;
+        }
+        
+        // 掌握状态筛选
+        if (currentMistakesFilter.mastered !== 'all') {
+            const isMastered = mistake.mastered || false;
+            if (currentMistakesFilter.mastered === 'mastered' && !isMastered) return false;
+            if (currentMistakesFilter.mastered === 'not_mastered' && isMastered) return false;
+        }
+        
+        return true;
+    });
+    
+    displayMistakesList(filteredMistakes);
+}
+
+// ==================== 错题集删除功能 ====================
+
+// 删除错题 - 使用自定义确认弹窗
+async function deleteMistake(mistakeId) {
+    showConfirm(
+        'Supprimer l\'erreur / 删除错题',
+        'Voulez-vous vraiment supprimer cette erreur de votre collection? / 您确定要从您的错题集中删除此错题吗？',
+        'danger',
+        async () => {
+            try {
+                console.log('开始删除错题:', mistakeId);
+                
+                // 调用数据库删除函数
+                let success = false;
+                if (window.supabaseAuth && window.supabaseAuth.deleteMistake) {
+                    success = await window.supabaseAuth.deleteMistake(mistakeId);
+                }
+                
+                if (!success) {
+                    throw new Error('删除失败');
+                }
+                
+                // 从本地数据中移除
+                mistakes = mistakes.filter(m => m.id !== mistakeId);
+                
+                // 重新显示列表和统计
+                setupThemeFilter();
+                displayFilteredMistakesList();
+                updateMistakesStats();
+                
+                // 显示成功提示
+                showToast('✅ Erreur supprimée / 错题已删除', 'L\'erreur a été retirée de votre collection. / 错题已从您的错题集中移除。', 'success');
+                
+            } catch (error) {
+                console.error('删除错题失败:', error);
+                showToast('❌ Erreur / 错误', 'Impossible de supprimer l\'erreur. / 无法删除错题。', 'error');
+            }
+        }
+    );
+}
+
+// 清空所有错题
+async function clearAllMistakes() {
+    if (mistakes.length === 0) {
+        showToast('ℹ️ Aucune erreur / 没有错题', 'Votre collection d\'erreurs est déjà vide. / 您的错题集已经是空的。', 'info');
+        return;
+    }
+    
+    showConfirm(
+        'Effacer toutes les erreurs / 清空所有错题',
+        `Êtes-vous sûr de vouloir effacer toutes vos ${mistakes.length} erreurs?\nCette action est irréversible. / 您确定要清空所有${mistakes.length}道错题吗？此操作不可撤销。`,
+        'danger',
+        async () => {
+            try {
+                console.log('开始清空所有错题');
+                
+                let success = false;
+                if (window.supabaseAuth && window.supabaseAuth.clearAllMistakes) {
+                    success = await window.supabaseAuth.clearAllMistakes(studentInfo.name);
+                }
+                
+                if (!success) {
+                    throw new Error('清空失败');
+                }
+                
+                mistakes = [];
+                setupThemeFilter();
+                displayFilteredMistakesList();
+                updateMistakesStats();
+                
+                showToast('✅ Collection vidée / 错题集已清空', 'Toutes vos erreurs ont été effacées. / 所有错题已被清空。', 'success');
+                
+            } catch (error) {
+                console.error('清空错题失败:', error);
+                showToast('❌ Erreur / 错误', 'Impossible de vider la collection. / 无法清空错题集。', 'error');
+            }
+        }
+    );
+}
+
+// 标记错题为已掌握
+async function markMistakeAsMastered(mistakeId, mastered) {
+    const action = mastered ? 'maîtrisée' : 'non maîtrisée';
+    const action_zh = mastered ? '已掌握' : '未掌握';
+    
+    showConfirm(
+        mastered ? 'Marquer comme maîtrisé / 标记为已掌握' : 'Marquer comme non maîtrisé / 标记为未掌握',
+        `Voulez-vous marquer cette question comme ${action}? / 您要将此题目标记为${action_zh}吗？`,
+        mastered ? 'success' : 'warning',
+        async () => {
+            try {
+                console.log('标记错题:', mistakeId, mastered);
+                
+                let success = false;
+                if (window.supabaseAuth && window.supabaseAuth.markMistakeAsMastered) {
+                    success = await window.supabaseAuth.markMistakeAsMastered(mistakeId, mastered);
+                }
+                
+                if (!success) {
+                    throw new Error('标记失败');
+                }
+                
+                // 更新本地数据
+                const mistakeIndex = mistakes.findIndex(m => m.id === mistakeId);
+                if (mistakeIndex >= 0) {
+                    mistakes[mistakeIndex].mastered = mastered;
+                    mistakes[mistakeIndex].last_practiced = new Date().toISOString();
+                }
+                
+                setupThemeFilter();
+                displayFilteredMistakesList();
+                updateMistakesStats();
+                
+                showToast(
+                    mastered ? '✅ Marqué comme maîtrisé / 已标记为掌握' : 'ℹ️ Marqué comme non maîtrisé / 已标记为未掌握',
+                    mastered ? 
+                        'Cette question est maintenant marquée comme maîtrisée. / 此题目现已标记为已掌握。' :
+                        'Cette question est maintenant marquée comme non maîtrisée. / 此题目现已标记为未掌握。',
+                    mastered ? 'success' : 'info'
+                );
+                
+            } catch (error) {
+                console.error('更新错题状态失败:', error);
+                showToast('❌ Erreur / 错误', 'Impossible de mettre à jour le statut. / 无法更新状态。', 'error');
+            }
+        }
+    );
+}
+
+// ==================== 自定义提示窗口 ====================
+function showAlert(title, message, type = 'info') {
+    const alertModal = document.getElementById('alertModal');
+    const alertTitle = document.getElementById('alertTitle');
+    const alertMessage = document.getElementById('alertMessage');
+    const alertIcon = document.getElementById('alertIcon');
+    
+    alertTitle.textContent = title;
+    alertMessage.textContent = message;
+    
+    alertIcon.className = 'alert-icon';
+    switch(type) {
+        case 'success':
+            alertIcon.classList.add('success');
+            alertIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            break;
+        case 'warning':
+            alertIcon.classList.add('warning');
+            alertIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+            break;
+        case 'error':
+            alertIcon.classList.add('error');
+            alertIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
+            break;
+        case 'info':
+        default:
+            alertIcon.classList.add('info');
+            alertIcon.innerHTML = '<i class="fas fa-info-circle"></i>';
+            break;
+    }
+    
+    alertModal.style.display = 'flex';
+}
+
+function closeAlert() {
+    document.getElementById('alertModal').style.display = 'none';
+}
+
+// ==================== 登录验证 ====================
+function validateLogin() {
+    const studentName = document.getElementById('studentName').value.trim();
+    const studentPassword = document.getElementById('studentPassword').value;
+    const loginError = document.getElementById('loginError');
+    const loginSpinner = document.getElementById('loginSpinner');
+    const loginButtons = document.getElementById('loginButtons');
+    
+    if (!studentName || !studentPassword) {
+        showAlert("Champs requis / 必填字段", "Veuillez remplir tous les champs. / 请填写所有字段。", 'warning');
+        return;
+    }
+    
+    loginSpinner.style.display = 'block';
+    loginButtons.style.display = 'none';
+    loginError.style.display = 'none';
+    
+    console.log("尝试登录:", studentName);
+    
+    window.supabaseAuth.validateStudent(studentName, studentPassword)
+        .then(student => {
+            if (student) {
+                console.log("登录成功:", student);
+                
+                const accessCheck = window.supabaseAuth.checkAccess(student);
+                
+                if (!accessCheck.valid) {
+                    showAlert("Accès expiré / 访问已过期", accessCheck.message || "Votre période d'accès a expiré. / 您的访问权限已过期。", 'error');
+                    resetLoginForm();
+                    return;
+                }
+                
+                studentInfo = {
+                    name: student.name,
+                    testDate: student.testDate || "",
+                    testType: "",
+                    type: student.type || "t",
+                    daysLeft: accessCheck.daysLeft
+                };
+                
+                console.log("学生信息保存:", studentInfo);
+                
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('selectionModal').style.display = 'flex';
+                
+                updateTestCardPermissions();
+                showDaysLeftInfo();
+                
+            } else {
+                console.log("登录失败: 用户名或密码错误");
+                showAlert("Échec de connexion / 登录失败", "Nom d'étudiant ou mot de passe incorrect. / 学生姓名或密码不正确。", 'error');
+                resetLoginForm();
+            }
+        })
+        .catch(error => {
+            console.error("登录错误:", error);
+            showAlert("Erreur de connexion / 连接错误", "Une erreur est survenue. Veuillez réessayer. / 发生错误，请重试。", 'error');
+            resetLoginForm();
+        });
+}
+
+function resetLoginForm() {
+    const loginSpinner = document.getElementById('loginSpinner');
+    const loginButtons = document.getElementById('loginButtons');
+    
+    loginSpinner.style.display = 'none';
+    loginButtons.style.display = 'flex';
+}
+
+// ==================== 显示剩余天数信息 ====================
+function showDaysLeftInfo() {
+    const daysLeftInfo = document.getElementById('daysLeftInfo');
+    const daysLeftText = document.getElementById('daysLeftText');
+    
+    if (studentInfo.daysLeft > 0) {
+        daysLeftInfo.style.display = 'block';
+        if (studentInfo.daysLeft === 1) {
+            daysLeftText.textContent = `Votre accès est valide pour encore 1 jour. / 您的访问权限还剩1天。`;
+        } else {
+            daysLeftText.textContent = `Votre accès est valide pour encore ${studentInfo.daysLeft} jours. / 您的访问权限还剩${studentInfo.daysLeft}天。`;
+        }
+    } else if (studentInfo.daysLeft === -1) {
+        daysLeftInfo.style.display = 'block';
+        daysLeftText.textContent = `Votre accès est valide sans limitation de durée. / 您的访问权限没有时间限制。`;
+    } else {
+        daysLeftInfo.style.display = 'none';
+    }
+}
+
+// ==================== 更新测试卡片权限状态 ====================
+function updateTestCardPermissions() {
+    const multiYearCard = document.getElementById('multiYearCard');
+    const tenYearCard = document.getElementById('tenYearCard');
+    const nationalityCard = document.getElementById('nationalityCard');
+    const mistakesCard = document.getElementById('mistakesCard');
+    
+    multiYearCard.className = 'test-type-card';
+    tenYearCard.className = 'test-type-card';
+    nationalityCard.className = 'test-type-card';
+    mistakesCard.className = 'test-type-card';
+    
+    mistakesCard.classList.add('allowed');
+    
+    switch(studentInfo.type) {
+        case 'm':
+            multiYearCard.classList.add('allowed');
+            tenYearCard.classList.add('disabled');
+            nationalityCard.classList.add('disabled');
+            break;
+        case 'n':
+            multiYearCard.classList.add('disabled');
+            tenYearCard.classList.add('disabled');
+            nationalityCard.classList.add('allowed');
+            break;
+        case 'r':
+            multiYearCard.classList.add('disabled');
+            tenYearCard.classList.add('allowed');
+            nationalityCard.classList.add('disabled');
+            break;
+        case 't':
+            multiYearCard.classList.add('allowed');
+            tenYearCard.classList.add('allowed');
+            nationalityCard.classList.add('allowed');
+            break;
+    }
+    
+    const selectionMessage = document.getElementById('selectionMessage');
+    if (studentInfo.type === 't') {
+        selectionMessage.textContent = "Vous avez accès à tous les tests. Cliquez sur une option pour commencer. / 您有权访问所有测试。点击选项开始。";
+    } else {
+        selectionMessage.textContent = "Votre compte a des restrictions d'accès. Seuls les tests autorisés sont activés. / 您的账户有访问限制。仅启用授权的测试。";
+    }
+}
+
+// ==================== 检查权限并开始测试 ====================
+// ==================== 检查权限并开始测试 ====================
+function startTestIfAllowed(type) {
+    console.log("尝试开始测试:", type, "学生类型:", studentInfo.type);
+    
+    let hasAccess = false;
+    let errorTitle = "";
+    let errorMessage = "";
+    
+    switch(studentInfo.type) {
+        case 'm':
+            hasAccess = (type === 'multi_year');
+            if (!hasAccess) {
+                errorTitle = "Accès refusé / 访问被拒绝";
+                errorMessage = "Votre compte est réservé au test 'Titre de Séjour 2-4 Ans' uniquement. / 您的账户仅限用于'2-4年居留许可'测试。";
+            }
+            break;
+        case 'n':
+            hasAccess = (type === 'nationality');
+            if (!hasAccess) {
+                errorTitle = "Accès refusé / 访问被拒绝";
+                errorMessage = "Votre compte est réservé au test 'Nationalité Française' uniquement. / 您的账户仅限用于'法国国籍'测试。";
+            }
+            break;
+        case 'r':
+            hasAccess = (type === 'ten_year');
+            if (!hasAccess) {
+                errorTitle = "Accès refusé / 访问被拒绝";
+                errorMessage = "Votre compte est réservé au test 'Carte de Résident 10 Ans' uniquement. / 您的账户仅限用于'10年长期居留卡'测试。";
+            }
+            break;
+        case 't':
+            hasAccess = true;
+            break;
+        default:
+            errorTitle = "Type inconnu / 未知类型";
+            errorMessage = "Type d'étudiant non reconnu. / 学生类型不被识别。";
+            hasAccess = false;
+    }
+    
+    if (!hasAccess) {
+        showAlert(errorTitle, errorMessage, 'error');
+        return;
+    }
+    
+    // 立即开始测试，不显示加载状态
+    startTest(type);
+}
+// ==================== 开始测试 ====================
+// ==================== 开始测试 ====================
+function startTest(type) {
+    selectedTestType = type;
+    
+    // 保存选择模态框内容以便恢复
+    const selectionContent = document.querySelector('.selection-content');
+    const originalContent = selectionContent.innerHTML;
+    
+    // 显示加载状态
+    selectionContent.innerHTML = `
+        <div class="loading-spinner" style="display: block;">
+            <div class="spinner"></div>
+            <p>Préparation du test... / 准备测试中...</p>
+        </div>
+    `;
+    
+    // 设置超时确保UI更新
+    setTimeout(async () => {
+        try {
+            // 1. 更新学生信息
+            studentInfo.testType = selectedTestType;
+            
+            // 2. 检查题库
+            if (typeof question_multi === 'undefined' || question_multi.length === 0) {
+                throw new Error("题库 'question_multia.js' 未正确加载或为空");
+            }
+            
+            // 3. 加载题库
+            if (testTypes[selectedTestType].source === "both") {
+                allQuestions = [...question_multi];
+                if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+                    allQuestions = allQuestions.concat(question_resident);
+                    console.log("使用两个题库，总数:", allQuestions.length);
+                }
+            } else {
+                allQuestions = [...question_multi];
+                console.log("使用question_multi题库，总数:", allQuestions.length);
+            }
+            
+            if (allQuestions.length === 0) {
+                throw new Error("题库为空，请检查题库文件");
+            }
+            
+            // 4. 隐藏所有模态框和容器
+            hideAllModals();
+            hideAllContainers();
+            
+            // 5. 显示测试界面
+            document.querySelector('.test-header').style.display = 'block';
+            document.getElementById('testContainer').style.display = 'block';
+            document.getElementById('testContainer').classList.add('show');
+            document.querySelector('.test-footer').style.display = 'block';
+            
+            // 6. 更新页面标题和说明
+            const testType = testTypes[selectedTestType];
+            document.getElementById('testTitle').textContent = testType.name;
+            document.getElementById('testSubtitle').textContent = testType.description;
+            document.getElementById('testTypeInfo').textContent = testType.description;
+            document.getElementById('footerTestInfo').textContent = 
+                `${testType.name} - 40 questions - ${testType.duration} minutes`;
+            
+            // 7. 初始化并开始测试
+            initializeTest();
+            
+            // 8. 滚动到顶部
+            window.scrollTo(0, 0);
+            
+        } catch (error) {
+            console.error("初始化测试失败:", error);
+            showAlert("Erreur d'initialisation / 初始化错误", 
+                error.message || "Erreur lors de l'initialisation du test. / 初始化测试时出错。", 
+                'error');
+            
+            // 恢复选择模态框
+            selectionContent.innerHTML = originalContent;
+            document.getElementById('selectionModal').style.display = 'flex';
+        }
+    }, 1000);
+}
+// ==================== 根据主题分布选择题目 ====================
+function selectQuestionsByTheme() {
+    console.log("开始按主题分布选择题目...");
+    
+    const questionsByTheme = {};
+    
+    allQuestions.forEach((question) => {
+        const theme = question.theme || question.category || "Autre";
+        if (!questionsByTheme[theme]) {
+            questionsByTheme[theme] = [];
+        }
+        questionsByTheme[theme].push(question);
+    });
+    
+    selectedQuestions = [];
+    let totalSelected = 0;
+    
+    for (const [theme, targetCount] of Object.entries(themeDistribution)) {
+        const themeQuestions = questionsByTheme[theme] || [];
+        
+        if (themeQuestions.length === 0) {
+            console.warn(`警告: 主题 "${theme}" 中没有题目！`);
+            continue;
+        }
+        
+        if (themeQuestions.length <= targetCount) {
+            selectedQuestions.push(...themeQuestions);
+            totalSelected += themeQuestions.length;
+        } else {
+            const shuffled = shuffleArray([...themeQuestions]);
+            const selected = shuffled.slice(0, targetCount);
+            selectedQuestions.push(...selected);
+            totalSelected += targetCount;
+        }
+    }
+    
+    if (totalSelected < 40) {
+        const needed = 40 - totalSelected;
+        
+        const selectedSet = new Set(selectedQuestions);
+        const availableQuestions = allQuestions.filter(q => !selectedSet.has(q));
+        
+        if (availableQuestions.length > 0) {
+            const shuffled = shuffleArray([...availableQuestions]);
+            const toAdd = shuffled.slice(0, Math.min(needed, availableQuestions.length));
+            selectedQuestions.push(...toAdd);
+            totalSelected += toAdd.length;
+        }
+    }
+    
+    if (selectedQuestions.length > 40) {
+        selectedQuestions = selectedQuestions.slice(0, 40);
+    }
+    
+    selectedQuestions = shuffleArray(selectedQuestions);
+    
+    console.log(`最终选择 ${selectedQuestions.length} 题`);
+}
+
+// Fisher-Yates 洗牌算法
+function shuffleArray(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+}
+
+// ==================== 显示题目 ====================
+function showQuestion(index) {
+    if (!selectedQuestions[index]) {
+        console.error("题目不存在:", index);
+        return;
+    }
+    
+    const question = selectedQuestions[index];
+    
+    document.getElementById('questionText').textContent = `${index + 1}. ${question.question}`;
+    
+    const optionsContainer = document.getElementById('optionsContainer');
+    optionsContainer.innerHTML = '';
+    
+    if (!question.options || question.options.length === 0) {
+        console.error("题目选项为空:", question);
+        return;
+    }
+    
+    const optionLetters = ['A', 'B', 'C', 'D'];
+    
+    question.options.forEach((option, optionIndex) => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'option';
+        if (userAnswers[index] === optionIndex) {
+            optionDiv.classList.add('selected');
+        }
+        
+        const letterSpan = document.createElement('span');
+        letterSpan.className = 'option-letter';
+        letterSpan.textContent = optionLetters[optionIndex];
+        
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'question';
+        input.id = `option${index}_${optionIndex}`;
+        input.value = optionIndex;
+        if (userAnswers[index] === optionIndex) {
+            input.checked = true;
+        }
+        
+        const label = document.createElement('label');
+        label.htmlFor = `option${index}_${optionIndex}`;
+        
+        label.appendChild(letterSpan);
+        label.appendChild(document.createTextNode(option));
+        
+        optionDiv.appendChild(input);
+        optionDiv.appendChild(label);
+        
+        optionDiv.addEventListener('click', () => {
+            userAnswers[index] = optionIndex;
+            showQuestion(index);
+            updateQuestionCounter();
+        });
+        
+        optionsContainer.appendChild(optionDiv);
+    });
+    
+    document.getElementById('prevBtn').disabled = index === 0;
+    document.getElementById('nextBtn').disabled = index === selectedQuestions.length - 1;
+    
+    document.getElementById('submitBtn').style.display = 
+        (index === selectedQuestions.length - 1) ? 'block' : 'none';
+}
+
+// ==================== 提交和评分 ====================
+// ==================== 提交和评分 ====================
+function submitTest() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    
+    // 检查未回答的题目
+    const unanswered = userAnswers.filter(answer => answer === null).length;
+    
+    if (unanswered > 0) {
+        // 使用自定义确认弹窗而不是alert
+        showConfirm(
+            "Questions non répondues / 未回答的题目",
+            `${unanswered} question(s) non répondues. Souhaitez-vous soumettre quand même? / ${unanswered}道题未回答。您仍然要提交吗？`,
+            'warning',
+            () => {
+                // 用户确认提交
+                proceedWithSubmission();
+            }
+        );
+        return;
+    }
+    
+    proceedWithSubmission();
+}
+
+function proceedWithSubmission() {
+    // 计算分数
+    calculateScore();
+    
+    // 记录错题
+    recordMistakesToDatabase().then(() => {
+        // 显示结果
+        displayResults();
+    }).catch(error => {
+        console.error("记录错题失败:", error);
+        // 即使记录失败也显示结果
+        displayResults();
+    });
+}
+
+function displayResults() {
+    // 1. 隐藏测试容器
+    document.getElementById('testContainer').style.display = 'none';
+    document.getElementById('testContainer').classList.remove('show');
+    
+    // 2. 显示结果容器
+    document.getElementById('resultsContainer').style.display = 'block';
+    document.getElementById('resultsContainer').classList.add('show');
+    
+    // 3. 更新分数显示
+    document.getElementById('scoreDisplay').style.display = 'block';
+    document.getElementById('scoreDisplay').textContent = `${currentScore}/40`;
+    
+    document.getElementById('scoreText').textContent = currentScoreText;
+    document.getElementById('scoreText').style.fontSize = '1.8rem';
+    document.getElementById('scoreText').style.fontWeight = 'bold';
+    document.getElementById('scoreText').style.marginTop = '10px';
+    document.getElementById('scoreText').style.marginBottom = '20px';
+    
+    // 4. 动画显示进度条
+    setTimeout(() => {
+        document.getElementById('scoreFill').style.width = currentPercentage + '%';
+    }, 300);
+    
+    // 5. 确保页脚和导航仍然显示
+    document.querySelector('.test-header').style.display = 'block';
+    document.querySelector('.test-footer').style.display = 'block';
+    
+    // 6. 滚动到结果区域
+    setTimeout(() => {
+        document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth' });
+    }, 500);
+}
+
+
+function calculateScore() {
+    let correct = 0;
+    
+    selectedQuestions.forEach((question, index) => {
+        if (userAnswers[index] === question.answer) {
+            correct++;
+        }
+    });
+    
+    currentScore = correct;
+    currentPercentage = Math.round((correct / selectedQuestions.length) * 100);
+    
+    const testType = testTypes[selectedTestType];
+    const threshold = testType.threshold;
+    
+    const passed = correct >= threshold;
+    
+    if (passed) {
+        currentScoreText = `🎉 Félicitations! Vous avez réussi le test! / 恭喜！您通过了测试！ 🎉`;
+    } else {
+        currentScoreText = `💔 Désolé, vous n'avez pas réussi le test. / 抱歉，您没有通过测试。 💔`;
+    }
+}
+
+
+// ==================== 错题集功能 ====================
+// 修改 showMistakesCollection 函数，添加状态管理
+// ==================== 显示错题集 ====================
+async function showMistakesCollection() {
+    // 1. 隐藏所有容器和模态框
+    hideAllContainers();
+    hideAllModals();
+    
+    // 2. 停止计时器（如果有）
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    
+    // 3. 显示错题集容器
+    document.getElementById('mistakesContainer').style.display = 'block';
+    document.getElementById('mistakesContainer').classList.add('show');
+    
+    // 4. 更新头部显示
+    document.querySelector('.test-header').style.display = 'block';
+    document.querySelector('.test-footer').style.display = 'block';
+    
+    document.getElementById('testTitle').textContent = 'Mes Erreurs / 我的错题';
+    document.getElementById('testSubtitle').textContent = 'Pratiquez vos questions ratées / 练习你做错的题目';
+    
+    // 5. 加载数据
+    try {
+        await loadMistakes();
+        await updateMistakesStats();
+        setupThemeFilter();
+        displayFilteredMistakesList();
+        
+        // 6. 滚动到顶部
+        window.scrollTo(0, 0);
+    } catch (error) {
+        console.error('加载错题集失败:', error);
+        showToast('❌ Erreur / 错误', 'Impossible de charger les erreurs. / 无法加载错题。', 'error');
+    }
+}
+// 加载错题
+async function loadMistakes() {
+    try {
+        if (window.supabaseAuth && window.supabaseAuth.getStudentMistakes) {
+            const data = await window.supabaseAuth.getStudentMistakes(studentInfo.name);
+            mistakes = data || [];
+            console.log(`错题加载成功: ${mistakes.length} 条记录`);
+        } else {
+            console.warn('Supabase错题功能不可用');
+            mistakes = [];
+        }
+    } catch (error) {
+        console.error('加载错题失败:', error);
+        mistakes = [];
+    }
+}
+
+async function updateMistakesStats() {
+    try {
+        let stats = { total: 0, themes: 0, improvement: 0 };
+        
+        stats.total = mistakes.length;
+        
+        const themes = [...new Set(mistakes.map(m => m.category || m.theme || 'Autre'))];
+        stats.themes = themes.length;
+        
+        if (mistakes.length > 0) {
+            const mastered = mistakes.filter(m => m.mastered).length;
+            stats.improvement = Math.round((mastered / mistakes.length) * 100);
+        }
+        
+        document.getElementById('totalMistakes').textContent = stats.total;
+        document.getElementById('mistakesByTheme').textContent = stats.themes;
+        document.getElementById('improvementScore').textContent = stats.improvement + '%';
+        
+        return stats;
+    } catch (error) {
+        console.error('更新统计失败:', error);
+        return { total: 0, themes: 0, improvement: 0 };
+    }
+}
+
+// 显示错题列表
+function displayMistakesList(filteredMistakes = null) {
+    const mistakesList = document.getElementById('mistakesList');
+    const mistakesToDisplay = filteredMistakes || mistakes;
+    
+    if (mistakesToDisplay.length === 0) {
+        mistakesList.innerHTML = `
+            <div style="text-align: center; padding: 60px 20px;">
+                <i class="fas fa-check-circle" style="font-size: 4rem; color: var(--green); margin-bottom: 20px;"></i>
+                <h3 style="color: var(--primary-blue); margin-bottom: 10px;">Aucune erreur / 没有错题</h3>
+                <p style="color: var(--medium-gray); max-width: 500px; margin: 0 auto 20px;">
+                    ${mistakes.length === 0 ? 
+                        'Vous n\'avez pas encore d\'erreurs enregistrées. / 您还没有记录任何错题。' : 
+                        'Aucune erreur ne correspond à vos critères de filtrage. / 没有符合您筛选条件的错题。'}
+                </p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    const optionLetters = ['A', 'B', 'C', 'D'];
+    
+    mistakesToDisplay.forEach((mistake, index) => {
+        const difficultyClass = getDifficultyClass(mistake.difficulty);
+        const timesWrong = mistake.times_wrong || 1;
+        
+        html += `
+            <div class="mistake-item" data-id="${mistake.id}">
+                <div class="mistake-meta">
+                    <div>
+                        <span class="mistake-theme">${mistake.category || mistake.theme || 'Autre'}</span>
+                        <span class="mistake-difficulty difficulty-${difficultyClass}">
+                            ${mistake.difficulty || '中等'}
+                        </span>
+                    </div>
+                    <div class="mistake-count">
+                        <i class="fas fa-times-circle" style="color: var(--red);"></i>
+                        Erreur ${timesWrong} fois / 错误${timesWrong}次
+                        ${mistake.mastered ? '<i class="fas fa-check-circle" style="color: var(--green); margin-left: 10px;"></i>' : ''}
+                    </div>
+                </div>
+                
+                <div class="mistake-question">${index + 1}. ${mistake.question}</div>
+                
+                <div class="mistake-options">
+        `;
+        
+        const options = mistake.options || [];
+        options.forEach((option, optIndex) => {
+            const isCorrect = optIndex === mistake.correct_answer;
+            const isUserAnswer = optIndex === mistake.user_answer;
+            let optionClass = 'mistake-option';
+            
+            if (isCorrect) {
+                optionClass += ' correct';
+            } else if (isUserAnswer) {
+                optionClass += ' incorrect';
+            }
+            
+            html += `
+                <div class="${optionClass}">
+                    <span class="mistake-option-label">${optionLetters[optIndex]}</span>
+                    <div>${option}</div>
+                </div>
+            `;
+        });
+        
+        html += `
+                </div>
+                
+                ${mistake.explanation ? `
+                <div class="mistake-explanation">
+                    <h5><i class="fas fa-lightbulb"></i> Explication / 解释</h5>
+                    <p>${formatExplanation(mistake.explanation)}</p>
+                </div>
+                ` : ''}
+                
+                <div class="mistake-actions">
+                    <button class="btn" onclick="markMistakeAsMastered('${mistake.id}', ${!mistake.mastered})">
+                        ${mistake.mastered ? 
+                            '<i class="fas fa-times"></i> Marquer comme non maîtrisé / 标记为未掌握' : 
+                            '<i class="fas fa-check"></i> Marquer comme maîtrisé / 标记为已掌握'}
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteMistake('${mistake.id}')">
+                        <i class="fas fa-trash"></i> Supprimer / 删除
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    mistakesList.innerHTML = html;
+}
+
+// 格式化解释文本
+function formatExplanation(explanation) {
+    if (!explanation) return '';
+    return explanation.replace(/\n/g, '<br>');
+}
+
+// 获取难度对应的CSS类
+// 获取难度对应的CSS类
+function getDifficultyClass(difficulty) {
+    if (!difficulty) return 'medium';
+    
+    // 将难度值转为小写并去除空格
+    const difficultyStr = String(difficulty).toLowerCase().trim();
+    
+    // 检查各种可能的难度值
+    if (difficultyStr === 'simple' || difficultyStr === 'facile' || difficultyStr === 'easy' || difficultyStr === '简单') {
+        return 'easy';
+    }
+    if (difficultyStr === 'moyen' || difficultyStr === 'medium' || difficultyStr === '中等') {
+        return 'medium';
+    }
+    if (difficultyStr === 'difficile' || difficultyStr === 'hard' || difficultyStr === '困难') {
+        return 'hard';
+    }
+    
+    // 默认返回中等
+    console.warn(`未知的难度值: "${difficulty}"，返回中等`);
+    return 'medium';
+}
+// 记录错题到数据库
+async function recordMistakesToDatabase() {
+    console.log('开始记录错题到数据库...');
+    
+    try {
+        if (!window.supabaseAuth || !window.supabaseAuth.recordMistake) {
+            console.warn('Supabase错题记录功能不可用');
+            return;
+        }
+        
+        let recordedCount = 0;
+        let errors = [];
+        
+        for (let i = 0; i < selectedQuestions.length; i++) {
+            if (userAnswers[i] !== selectedQuestions[i].answer) {
+                try {
+                    const userAnswer = userAnswers[i] !== null ? userAnswers[i] : -1;
+                    
+                  const questionToSave = { ...selectedQuestions[i] };
+                  // 确保有 difficulty 属性
+                  if (!questionToSave.difficulty && questionToSave['difficulté']) {
+                      questionToSave.difficulty = questionToSave['difficulté'];
+                  }
+
+                  const result = await window.supabaseAuth.recordMistake(
+                      studentInfo,
+                      questionToSave,
+                      userAnswer,
+                      selectedTestType
+                  );
+                    if (result) {
+                        recordedCount++;
+                    }
+                } catch (err) {
+                    console.error(`记录错题 ${i + 1} 失败:`, err);
+                    errors.push({
+                        questionIndex: i,
+                        error: err.message
+                    });
+                }
+            }
+        }
+        
+        console.log(`错题记录完成: ${recordedCount} 题`);
+        
+    } catch (error) {
+        console.error('记录错题过程失败:', error);
+    }
+}
+
+// ==================== 其他功能 ====================
+// ==================== 返回主页（从错题集或结果页面） ====================
+function goBackToHome() {
+    showConfirm(
+        "Retour à l'accueil / 返回主页", 
+        "Êtes-vous sûr de vouloir retourner à l'accueil? / 您确定要返回主页吗？", 
+        'warning',
+        () => {
+            // 停止计时器（如果有）
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            // 重置测试相关状态
+            resetTestState();
+            
+            // 隐藏所有容器
+            hideAllContainers();
+            
+            // 隐藏页脚和导航
+            document.querySelector('.test-header').style.display = 'none';
+            document.querySelector('.test-footer').style.display = 'none';
+            
+            // 显示选择模态框（主页）
+            showSelectionScreen();
+        }
+    );
+}
+
+// ==================== 返回选择界面（从错题集） ====================
+function goBackToSelection() {
+    // 停止计时器（如果有）
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    
+    // 重置测试相关状态
+    resetTestState();
+    
+    // 隐藏所有容器
+    hideAllContainers();
+    
+    // 隐藏页脚和导航
+    document.querySelector('.test-header').style.display = 'none';
+    document.querySelector('.test-footer').style.display = 'none';
+    
+    // 显示选择界面
+    showSelectionScreen();
+}
+
+// ==================== 显示选择界面 ====================
+function showSelectionScreen() {
+    // 隐藏所有模态框
+    hideAllModals();
+    
+    // 显示选择模态框
+    document.getElementById('selectionModal').style.display = 'flex';
+    
+    // 确保内容是正确的（不是加载状态）
+    const selectionContent = document.querySelector('.selection-content');
+    
+    // 重新创建选择界面内容（确保不是加载状态）
+    if (selectionContent.innerHTML.includes('loading-spinner') || 
+        selectionContent.innerHTML.includes('Préparation du test')) {
+        // 重新加载选择界面内容
+        loadSelectionScreen();
+    }
+}
+
+// ==================== 加载选择界面内容 ====================
+function loadSelectionScreen() {
+    const selectionContent = document.querySelector('.selection-content');
+    
+    selectionContent.innerHTML = `
+        <div class="selection-header">
+            <h2>Choisissez votre test</h2>
+            <p id="selectionMessage">Cliquez sur une option pour commencer immédiatement</p>
+            
+            <div id="daysLeftInfo" class="days-left-info" style="display: none;">
+                <p><i class="fas fa-calendar-check"></i> <span id="daysLeftText">Votre accès est valide pour X jours.</span></p>
+            </div>
+        </div>
+        
+        <div class="test-types-wrapper">
+            <div class="test-types-container">
+                <div class="test-type-card allowed" id="mistakesCard" onclick="showMistakesCollection()">
+                    <div class="test-type-icon">
+                        <i class="fas fa-book-medical"></i>
+                    </div>
+                    <h3>Mes Erreurs / 我的错题</h3>
+                    <p>Pratiquez vos questions ratées / 练习你做错的题目</p>
+                    <div class="test-info">
+                        <div class="test-info-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span><span class="fr-text">Améliorez votre score</span> <span class="zh-text">/ 提高你的分数</span></span>
+                        </div>
+                        <div class="test-info-item">
+                            <i class="fas fa-lightbulb"></i>
+                            <span><span class="fr-text">Revoir les explications détaillées</span> <span class="zh-text">/ 查看详细解释</span></span>
+                        </div>
+                        <div class="test-info-item">
+                            <i class="fas fa-filter"></i>
+                            <span><span class="fr-text">Filtrez par thème ou difficulté</span> <span class="zh-text">/ 按主题或难度筛选</span></span>
+                        </div>
+                        <div class="test-info-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span><span class="fr-text">Marquez les questions comme maîtrisées</span> <span class="zh-text">/ 标记已掌握的题目</span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="test-type-card" id="multiYearCard" onclick="startTestIfAllowed('multi_year')">
+                    <div class="test-type-icon">
+                        <i class="fas fa-passport"></i>
+                    </div>
+                    <h3>Titre de Séjour 2-4 Ans / 2-4年居留许可</h3>
+                    <p>Test pour titre de séjour pluriannuel / 多年期居留许可测试</p>
+                    <div class="test-info">
+                        <div class="test-info-item">
+                            <i class="fas fa-users"></i>
+                            <span><span class="fr-text">Public visé : Étudiants diplômés</span> <span class="zh-text">/ 适用人群：毕业生</span></span>
+                        </div>
+                        <div class="test-info-item">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span><span class="fr-text">Passage étudiant à travailleur</span> <span class="zh-text">/ 学生身份转工作身份</span></span>
+                        </div>
+                        <div class="test-info-item">
+                            <i class="fas fa-question-circle"></i>
+                            <span><span class="fr-text">40 questions</span> <span class="zh-text">/ 40道题</span></span>
+                        </div>
+                        <div class="test-info-item">
+                            <i class="fas fa-clock"></i>
+                            <span><span class="fr-text">45 minutes</span> <span class="zh-text">/ 45分钟</span></span>
+                        </div>
+                        <div class="test-info-item">
+                            <i class="fas fa-check-double"></i>
+                            <span><span class="fr-text">Seuil : 32/40 (80%)</span> <span class="zh-text">/ 通过标准：32/40 (80%)</span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="test-type-card" id="tenYearCard" onclick="startTestIfAllowed('ten_year')">
+                    <div class="test-type-icon">
+                        <i class="fas fa-id-card-alt"></i>
+                    </div>
+                    <h3>Carte de Résident 10 Ans / 10年长期居留卡</h3>
+                    <p>Test pour carte de résident de 10 ans / 10年长期居留卡测试</p>
+                    <div class="test-info">
+                        <div class="test-info-item">
+                            <i class="fas fa-users"></i>
+                            <span><span class="fr-text">Public visé : Résidents longue durée</span> <span class="zh-text">/ 适用人群：长期居民</span></span>
+                        </div>
+                        <div class="test-info-item">
+                            <i class="fas fa-home"></i>
+                            <span><span class="fr-text">Résidence continue de 5 ans</span> <span class="zh-text">/ 连续居住5年</span></span>
+                        </div>
+                        <div class="test-info-item">
+                            <i class="fas fa-question-circle"></i>
+                            <span><span class="fr-text">40 questions</span> <span class="zh-text">/ 40道题</span></span>
+                        </div>
+                        <div class="test-info-item">
+                            <i class="fas fa-clock"></i>
+                            <span><span class="fr-text">45 minutes</span> <span class="zh-text">/ 45分钟</span></span>
+                        </div>
+                        <div class="test-info-item">
+                            <i class="fas fa-check-double"></i>
+                            <span><span class="fr-text">Seuil : 32/40 (80%)</span> <span class="zh-text">/ 通过标准：32/40 (80%)</span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="test-type-card" id="nationalityCard" onclick="startTestIfAllowed('nationality')">
+                    <div class="test-type-icon">
+                        <i class="fas fa-flag"></i>
+                    </div>
+                    <h3>Nationalité Française / 法国国籍</h3>
+                    <p>Test pour accès à la nationalité française / 法国国籍获取测试</p>
+                    <div class="test-info">
+                        <div class="test-info-item">
+                            <i class="fas fa-users"></i>
+                            <span><span class="fr-text">Public visé : Demandeurs de nationalité</span> <span class="zh-text">/ 适用人群：国籍申请者</span></span>
+                        </div>
+                        <div class="test-info-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span><span class="fr-text">Résidence légale de 5 ans</span> <span class="zh-text">/ 合法居住5年</span></span>
+                        </div>
+                        <div class="test-info-item">
+                            <i class="fas fa-question-circle"></i>
+                            <span><span class="fr-text">40 questions</span> <span class="zh-text">/ 40道题</span></span>
+                        </div>
+                        <div class="test-info-item">
+                            <i class="fas fa-clock"></i>
+                            <span><span class="fr-text">45 minutes</span> <span class="zh-text">/ 45分钟</span></span>
+                        </div>
+                        <div class="test-info-item">
+                            <i class="fas fa-check-double"></i>
+                            <span><span class="fr-text">Seuil : 32/40 (80%)</span> <span class="zh-text">/ 通过标准：32/40 (80%)</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="selection-footer">
+            <button class="btn btn-modal" onclick="goBackToLogin()">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </button>
+        </div>
+    `;
+    
+    // 重新设置卡片权限
+    updateTestCardPermissions();
+    showDaysLeftInfo();
+}
+// ==================== 重置测试状态 ====================
+function resetTestState() {
+    // 重置所有测试相关变量
+    selectedTestType = null;
+    selectedQuestions = [];
+    currentQuestionIndex = 0;
+    userAnswers = [];
+    timeLeft = totalTime;
+    currentScore = 0;
+    currentPercentage = 0;
+    currentScoreText = "";
+    allQuestions = [];
+    
+    // 停止计时器
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+// ==================== 返回登录页面 ====================
+// ==================== 返回登录页面 ====================
+function goBackToLogin() {
+    // 停止计时器
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    
+    // 重置所有状态
+    selectedTestType = null;
+    selectedQuestions = [];
+    currentQuestionIndex = 0;
+    userAnswers = [];
+    timeLeft = totalTime;
+    currentScore = 0;
+    mistakes = [];
+    
+    // 隐藏所有容器和模态框
+    hideAllContainers();
+    hideAllModals();
+    
+    // 显示登录模态框
+    document.getElementById('loginModal').style.display = 'flex';
+    
+    // 重置登录表单
+    document.getElementById('studentName').value = '';
+    document.getElementById('studentPassword').value = '';
+    document.getElementById('loginError').style.display = 'none';
+    document.getElementById('loginSpinner').style.display = 'none';
+    document.getElementById('loginButtons').style.display = 'flex';
+    
+    // 隐藏页脚和导航
+    document.querySelector('.test-header').style.display = 'none';
+    document.querySelector('.test-footer').style.display = 'none';
+}
+// ==================== 重新开始测试 ====================
+// ==================== 重新开始测试 ====================
+function restartTest() {
+    console.log("点击 Nouveau test 按钮");
+    
+    showConfirm(
+        "Nouveau test / 新测试", 
+        "Voulez-vous commencer un nouveau test avec de nouvelles questions? / 您要开始一个包含新题目的测试吗？", 
+        'info',
+        () => {
+            // 用户确认，开始新测试
+            startNewTest();
+        }
+    );
+}
+
+// ==================== 开始新测试 ====================
+function startNewTest() {
+    console.log("开始新测试流程...");
+    
+    // 1. 停止所有计时器
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    
+    // 2. 完全重置所有状态
+    resetAllTestState();
+    
+    // 3. 隐藏所有其他容器
+    hideAllContainers();
+    hideAllModals();
+    
+    // 4. 确保测试容器显示
+    document.getElementById('testContainer').style.display = 'block';
+    document.getElementById('testContainer').classList.add('show');
+    
+    // 5. 重新加载题库（关键步骤！）
+    reloadQuestionBank();
+    
+    // 6. 重新选择题目
+    if (!reselectQuestions()) {
+        console.error("重新选择题目失败");
+        showAlert("题目错误", "无法生成新题目，请返回主页重试。", "error");
+        return;
+    }
+    
+    // 7. 初始化测试UI
+    initTestUI();
+    
+    // 8. 开始计时器
+    startTimer();
+    
+    // 9. 滚动到顶部
+    window.scrollTo(0, 0);
+    
+    console.log("新测试开始完成");
+    debugTestState();
+}
+
+// ==================== 重置所有测试状态 ====================
+function resetAllTestState() {
+    console.log("重置所有测试状态");
+    
+    // 重置测试变量
+    selectedQuestions = [];
+    currentQuestionIndex = 0;
+    userAnswers = [];
+    timeLeft = totalTime;
+    currentScore = 0;
+    currentPercentage = 0;
+    currentScoreText = "";
+    
+    // 注意：不要重置 selectedTestType 和 allQuestions！
+    // 这两个变量需要保留当前测试类型和题库
+}
+
+// ==================== 重新加载题库 ====================
+function reloadQuestionBank() {
+    console.log("重新加载题库...");
+    
+    if (!selectedTestType) {
+        console.error("无法重新加载题库：测试类型未定义");
+        return false;
+    }
+    
+    // 根据测试类型重新加载题库
+    if (testTypes[selectedTestType].source === "both") {
+        allQuestions = [...question_multi];
+        if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+            allQuestions = allQuestions.concat(question_resident);
+            console.log("加载两个题库，总数:", allQuestions.length);
+        } else {
+            console.log("仅加载question_multi题库，总数:", allQuestions.length);
+        }
+    } else {
+        allQuestions = [...question_multi];
+        console.log("加载question_multi题库，总数:", allQuestions.length);
+    }
+    
+    return allQuestions.length > 0;
+}
+
+// ==================== 重新选择题目 ====================
+function reselectQuestions() {
+    console.log("重新选择题目...");
+    
+    if (!allQuestions || allQuestions.length === 0) {
+        console.error("题库为空，无法选择题目");
+        return false;
+    }
+    
+    // 使用简单的随机选择算法（更可靠）
+    const shuffledQuestions = shuffleArray([...allQuestions]);
+    selectedQuestions = shuffledQuestions.slice(0, 40);
+    
+    console.log("选择了", selectedQuestions.length, "道题目");
+    
+    if (selectedQuestions.length === 0) {
+        console.error("没有选择到题目");
+        return false;
+    }
+    
+    // 初始化用户答案数组
+    userAnswers = new Array(selectedQuestions.length).fill(null);
+    
+    return true;
+}
+
+// ==================== 初始化测试UI ====================
+function initTestUI() {
+    console.log("初始化测试UI...");
+    
+    // 重置计时器显示
+    document.getElementById('timerDisplay').textContent = "45:00";
+    document.getElementById('timerProgress').style.width = "100%";
+    document.getElementById('timerWarning').style.display = 'none';
+    document.getElementById('timerCritical').style.display = 'none';
+    
+    // 更新题目计数器
+    document.getElementById('currentQuestion').textContent = "1";
+    document.getElementById('totalQuestions').textContent = selectedQuestions.length.toString();
+    document.getElementById('progressPercent').textContent = "0%";
+    document.getElementById('progressFill').style.width = "0%";
+    
+    // 重置导航按钮
+    document.getElementById('prevBtn').disabled = true;
+    document.getElementById('nextBtn').disabled = false;
+    document.getElementById('submitBtn').style.display = 'none';
+    
+    // 显示第一题
+    showQuestion(currentQuestionIndex);
+    
+    // 更新进度
+    updateQuestionCounter();
+    
+    // 确保头部和页脚显示
+    document.querySelector('.test-header').style.display = 'block';
+    document.querySelector('.test-footer').style.display = 'block';
+}
+function proceedWithRestart() {
+    // 1. 停止计时器
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    
+    // 2. 重置测试状态
+    resetTestState();
+    
+    // 3. 隐藏结果页面和所有分析页面
+    hideAllContainers();
+    
+    // 4. 确保显示测试容器
+    document.getElementById('testContainer').style.display = 'block';
+    document.getElementById('testContainer').classList.add('show');
+    
+    // 5. 重置测试UI
+    resetTestUI();
+    
+    // 6. 重新初始化测试
+    initializeNewTest();
+    
+    // 7. 滚动到顶部
+    window.scrollTo(0, 0);
+}
+
+// ==================== 重置测试UI ====================
+function resetTestUI() {
+    // 重置计时器显示
+    document.getElementById('timerDisplay').textContent = "45:00";
+    document.getElementById('timerProgress').style.width = "100%";
+    document.getElementById('timerWarning').style.display = 'none';
+    document.getElementById('timerCritical').style.display = 'none';
+    
+    // 重置进度显示
+    document.getElementById('currentQuestion').textContent = "1";
+    document.getElementById('progressPercent').textContent = "0%";
+    document.getElementById('progressFill').style.width = "0%";
+    
+    // 隐藏提交按钮
+    document.getElementById('submitBtn').style.display = 'none';
+    
+    // 确保导航按钮状态正确
+    document.getElementById('prevBtn').disabled = true;
+    document.getElementById('nextBtn').disabled = false;
+}
+
+// ==================== 初始化新测试 ====================
+function initializeNewTest() {
+    // 1. 重新选择题目
+    selectQuestionsByTheme();
+    
+    // 2. 初始化用户答案数组
+    userAnswers = new Array(selectedQuestions.length).fill(null);
+    
+    // 3. 更新总题目数显示
+    document.getElementById('totalQuestions').textContent = selectedQuestions.length;
+    
+    // 4. 显示第一题
+    showQuestion(currentQuestionIndex);
+    updateQuestionCounter();
+    
+    // 5. 启动计时器
+    startTimer();
+    
+    // 6. 确保页面布局正确
+    document.querySelector('.test-header').style.display = 'block';
+    document.querySelector('.test-footer').style.display = 'block';
+}
+function showInstructions() {
+    showAlert("Instructions du test / 测试说明",
+        "1. 40 questions à choix multiples / 40道选择题\n" +
+        "2. Durée: 45 minutes / 时间：45分钟\n" +
+        "3. Seuil de réussite: 32/40 (80%) / 通过标准：32/40 (80%)\n" +
+        "4. Cliquez sur une réponse pour la sélectionner / 点击答案进行选择\n" +
+        "5. Utilisez les boutons 'Précédente' et 'Suivante' / 使用'上一题'和'下一题'按钮\n" +
+        "6. Le timer s'affiche en haut / 计时器显示在顶部\n" +
+        "7. Cliquez sur 'Terminer le test' quand vous avez fini / 完成后点击'完成测试'\n\n" +
+        "Bonne chance! / 祝你好运！", 'info');
+}
+
+// ==================== 导航函数 ====================
+function nextQuestion() {
+    if (currentQuestionIndex < selectedQuestions.length - 1) {
+        currentQuestionIndex++;
+        showQuestion(currentQuestionIndex);
+        updateQuestionCounter();
+    }
+}
+
+function previousQuestion() {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        showQuestion(currentQuestionIndex);
+        updateQuestionCounter();
+    }
+}
+
+function updateQuestionCounter() {
+    const answeredCount = userAnswers.filter(answer => answer !== null).length;
+    const answeredPercent = Math.round((answeredCount / selectedQuestions.length) * 100);
+    
+    document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+    document.getElementById('progressPercent').textContent = answeredPercent + '%';
+    document.getElementById('progressFill').style.width = answeredPercent + '%';
+}
+
+// ==================== 计时器 ====================
+function startTimer() {
+    updateTimerDisplay();
+    
+    timerInterval = setInterval(() => {
+        if (timeLeft > 0) {
+            timeLeft--;
+            updateTimerDisplay();
+            
+            if (timeLeft === 10 * 60) {
+                document.getElementById('timerWarning').style.display = 'block';
+            } else if (timeLeft === 5 * 60) {
+                document.getElementById('timerWarning').style.display = 'none';
+                document.getElementById('timerCritical').style.display = 'block';
+            }
+        } else {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            showAlert("Temps écoulé / 时间到", "Le temps est écoulé! Votre test sera soumis automatiquement. / 时间到！您的测试将自动提交。", 'warning');
+            submitTest();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    
+    document.getElementById('timerDisplay').textContent = 
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    const progressPercent = (timeLeft / totalTime) * 100;
+    document.getElementById('timerProgress').style.width = `${progressPercent}%`;
+}
+
+// ==================== 初始化 ====================
+// ==================== 初始化测试 ====================
+
+// ==================== 初始化测试 ====================
+function initializeTest() {
+    // 重置所有测试相关状态
+    currentQuestionIndex = 0;
+    userAnswers = [];
+    timeLeft = totalTime;
+    currentScore = 0;
+    currentPercentage = 0;
+    currentScoreText = "";
+    
+    // 停止之前的计时器
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    
+    // 选择题目
+    selectQuestionsByTheme();
+    
+    // 初始化用户答案数组
+    userAnswers = new Array(selectedQuestions.length).fill(null);
+    
+    // 更新UI
+    document.getElementById('totalQuestions').textContent = selectedQuestions.length;
+    document.getElementById('timerDisplay').textContent = "45:00";
+    document.getElementById('timerProgress').style.width = "100%";
+    document.getElementById('timerWarning').style.display = 'none';
+    document.getElementById('timerCritical').style.display = 'none';
+    
+    // 显示第一题
+    showQuestion(currentQuestionIndex);
+    updateQuestionCounter();
+    
+    // 启动计时器
+    startTimer();
+    
+    // 确保页面显示正确
+    document.getElementById('testContainer').style.display = 'block';
+    document.getElementById('resultsContainer').style.display = 'none';
+}
+// ==================== 页面加载完成 ====================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("页面加载完成");
+    console.log("Supabase功能检查:", window.supabaseAuth ? "可用" : "不可用");
+    if (window.supabaseAuth) {
+        console.log("可用方法:", Object.keys(window.supabaseAuth));
+    }
+    
+    // 绑定登录按钮事件
+    document.getElementById('loginButton').addEventListener('click', validateLogin);
+    
+    // 在登录页面按Enter键提交
+    document.getElementById('studentPassword').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            validateLogin();
+        }
+    });
+    
+    // 检查题库是否加载
+    setTimeout(() => {
+        if (typeof question_multi === 'undefined') {
+            console.error("错误: question_multia.js 未正确加载");
+            showAlert("Erreur de chargement / 加载错误", "Le fichier de questions n'a pas pu être chargé. Veuillez vérifier la console. / 题目文件无法加载，请检查控制台。", 'error');
+        }
+    }, 2000);
+});
+</script>
+</body>
+</html>
+

@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histoire, Géographie et Culture - Association Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variables et reset */
+        :root {
+            --primary-blue: #004080;
+            --primary-light-blue: #0066cc;
+            --primary-yellow: #ffd633;
+            --primary-light-yellow: #ffe066;
+            --dark-gray: #333333;
+            --medium-gray: #666666;
+            --light-gray: #f5f7fa;
+            --white: #ffffff;
+            --green: #27ae60;
+            --orange: #f39c12;
+            --purple: #8e44ad;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--dark-gray);
+            background-color: var(--light-gray);
+            line-height: 1.7;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            line-height: 1.3;
+            color: var(--primary-blue);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .main-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light-blue) 100%);
+            color: var(--white);
+            padding: 30px 0;
+            text-align: center;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .main-header h1 {
+            color: var(--white);
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+
+        .main-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Language Toggle */
+        .language-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+
+        .lang-btn {
+            background: var(--white);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 70px;
+            justify-content: center;
+        }
+
+        .lang-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .lang-btn.active {
+            background: var(--primary-yellow);
+            color: var(--primary-blue);
+        }
+
+        /* Navigation */
+        .main-nav {
+            background-color: var(--white);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--primary-yellow);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-blue);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 20px 0;
+            background-color: var(--white);
+            border-bottom: 1px solid #eee;
+        }
+
+        .breadcrumb-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+
+        .breadcrumb-links a {
+            color: var(--medium-gray);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .breadcrumb-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        .breadcrumb-links i {
+            font-size: 0.8rem;
+            color: var(--medium-gray);
+        }
+
+        /* Theme Hero */
+        .theme-hero {
+            padding: 60px 0;
+            background: linear-gradient(rgba(0, 64, 128, 0.05), rgba(0, 102, 204, 0.05));
+            text-align: center;
+        }
+
+        .theme-icon {
+            font-size: 4rem;
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+        }
+
+        .theme-hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .theme-hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            color: var(--medium-gray);
+        }
+
+        /* Content Section */
+        .content-section {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .article-content {
+            background: var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 50px;
+            box-shadow: var(--shadow);
+            line-height: 1.8;
+        }
+
+        .article-header {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--primary-yellow);
+            text-align: center;
+        }
+
+        .article-header h2 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+        }
+
+        .article-header p {
+            color: var(--medium-gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Highlighted Terms - Tooltip Style */
+        .highlight-term {
+            background-color: rgba(0, 64, 128, 0.1);
+            color: var(--primary-blue);
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: help;
+            position: relative;
+            border-bottom: 2px dotted var(--primary-blue);
+            transition: var(--transition);
+        }
+
+        .highlight-term:hover {
+            background-color: rgba(0, 102, 204, 0.15);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 400;
+            width: 220px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .tooltip:after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -8px;
+            border-width: 8px;
+            border-style: solid;
+            border-color: var(--primary-blue) transparent transparent transparent;
+        }
+
+        .highlight-term:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Content Sections */
+        .content-section h3 {
+            font-size: 1.8rem;
+            margin: 40px 0 20px;
+            color: var(--primary-blue);
+            padding-left: 15px;
+            border-left: 4px solid var(--primary-yellow);
+        }
+
+        .content-section h4 {
+            font-size: 1.4rem;
+            margin: 30px 0 15px;
+            color: var(--primary-blue);
+        }
+
+        .content-section p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .content-section ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .content-section li {
+            margin-bottom: 10px;
+            padding-left: 10px;
+        }
+
+        .important-note {
+            background-color: rgba(255, 214, 51, 0.1);
+            border-left: 4px solid var(--primary-yellow);
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 25px 0;
+        }
+
+        /* Action Cards */
+        .action-cards {
+            padding: 60px 0;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light-blue) 100%);
+        }
+
+        .action-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .action-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .action-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .action-card-icon {
+            font-size: 3rem;
+            margin-bottom: 25px;
+        }
+
+        .action-card-1 .action-card-icon {
+            color: var(--orange);
+        }
+
+        .action-card-2 .action-card-icon {
+            color: var(--purple);
+        }
+
+        .action-card h3 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .action-card p {
+            color: var(--medium-gray);
+            margin-bottom: 25px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 16px 36px;
+            background-color: var(--primary-yellow);
+            color: var(--primary-blue);
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            box-shadow: var(--shadow);
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-light-yellow);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-light-blue);
+        }
+
+        .btn-orange {
+            background-color: var(--orange);
+            color: var(--white);
+        }
+
+        .btn-orange:hover {
+            background-color: #e67e22;
+        }
+
+        .btn-purple {
+            background-color: var(--purple);
+            color: var(--white);
+        }
+
+        .btn-purple:hover {
+            background-color: #7d3c98;
+        }
+
+        /* Footer */
+        .main-footer {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h4 {
+            color: var(--primary-yellow);
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-yellow);
+            padding-left: 5px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-item i {
+            color: var(--primary-yellow);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Back to Top */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--primary-blue);
+            color: var(--white);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            text-decoration: none;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 99;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background-color: var(--primary-light-blue);
+            transform: translateY(-5px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .theme-hero h2 {
+                font-size: 2rem;
+            }
+            
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .article-content {
+                padding: 30px 20px;
+            }
+            
+            .article-header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .language-toggle {
+                position: relative;
+                top: 0;
+                right: 0;
+                justify-content: center;
+                margin: 20px auto;
+                width: 100%;
+            }
+            
+            .lang-btn {
+                padding: 8px 16px;
+            }
+            
+            .action-cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .tooltip {
+                width: 180px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .theme-hero h2 {
+                font-size: 1.6rem;
+            }
+            
+            .btn {
+                padding: 14px 25px;
+                font-size: 1rem;
+            }
+            
+            .language-toggle {
+                flex-direction: row;
+                gap: 10px;
+            }
+            
+            .tooltip {
+                width: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Toggle -->
+    <div class="language-toggle">
+        <button class="lang-btn active" id="langFr" onclick="switchLanguage('fr')">
+            <i class="fas fa-language"></i> FR
+        </button>
+        <button class="lang-btn" id="langZh" onclick="switchLanguage('zh')">
+            <i class="fas fa-language"></i> 中文
+        </button>
+    </div>
+
+    <!-- Header -->
+    <header class="main-header">
+        <div class="container">
+            <h1 id="mainTitle">Histoire, Géographie et Culture</h1>
+            <p id="mainSubtitle">Évolution historique, territoires français et patrimoine culturel - Préparation à l'examen civique</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-landmark"></i>
+                <span id="logoText">Mille Voiles</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" id="navHome">Accueil</a>
+                <a href="#content" id="navContent">Contenu</a>
+                <a href="#astuces" id="navAstuces">Astuces</a>
+                <a href="#test" id="navTest">Test</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="container">
+            <div class="breadcrumb-links">
+                <a href="index.html">Accueil</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="test-civique.html">Test Civique</a>
+                <i class="fas fa-chevron-right"></i>
+                <span id="breadcrumbCurrent">Histoire, Géographie et Culture</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Hero -->
+    <section class="theme-hero">
+        <div class="container">
+            <div class="theme-icon">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <h2 id="themeTitle">Histoire, Géographie et Culture Française</h2>
+            <p id="themeDescription">Découvrez l'évolution historique de la France, ses territoires, sa géographie et son riche patrimoine culturel</p>
+        </div>
+    </section>
+
+    <!-- Content Section -->
+    <section class="content-section" id="content">
+        <div class="container">
+            <div class="article-content">
+                <div class="article-header">
+                    <h2 id="articleTitle">Révision pour l'examen civique : Histoire, Géographie et Culture</h2>
+                    <p id="articleSubtitle">Survolez les termes en <span class="highlight-term">gras et soulignés<span class="tooltip">粗体下划线术语</span></span> pour voir leur traduction en chinois</p>
+                </div>
+
+                <h3 id="section1Title">I. Histoire</h3>
+                
+                <h4 id="section1_1Title">1. Évolution des régimes politiques en France (1789 - aujourd'hui)</h4>
+                <p id="section1_1Text1"><span class="highlight-term">1789<span class="tooltip">1789年</span></span> : Révolution française → chute de l'<span class="highlight-term">Ancien Régime<span class="tooltip">旧制度</span></span>, affirmation de <span class="highlight-term">liberté, égalité, fraternité<span class="tooltip">自由、平等、博爱</span></span>. <span class="highlight-term">Louis XVI<span class="tooltip">路易十六</span></span> est renversé.</p>
+                
+                <p id="section1_1Text2"><span class="highlight-term">1791<span class="tooltip">1791年</span></span> : <span class="highlight-term">Monarchie constitutionnelle<span class="tooltip">君主立宪制</span></span> instaurée, mais rapidement supprimée. <span class="highlight-term">La Fayette<span class="tooltip">拉法耶特侯爵</span></span> joue un rôle important dans la Révolution.</p>
+                
+                <p id="section1_1Text3"><span class="highlight-term">1792-1804<span class="tooltip">1792-1804年</span></span> : <span class="highlight-term">Première République<span class="tooltip">第一共和国</span></span>, période de <span class="highlight-term">Terreur<span class="tooltip">恐怖统治时期</span></span>. <span class="highlight-term">Robespierre<span class="tooltip">罗伯斯庇尔</span></span> dirige la Terreur.</p>
+                
+                <p id="section1_1Text4"><span class="highlight-term">1799-1804<span class="tooltip">1799-1804年</span></span> : <span class="highlight-term">Consulat<span class="tooltip">执政府时期</span></span>, pouvoir fortement centralisé. <span class="highlight-term">Napoléon Bonaparte<span class="tooltip">拿破仑·波拿巴</span></span> devient Premier consul.</p>
+                
+                <p id="section1_1Text5"><span class="highlight-term">1804-1815<span class="tooltip">1804-1815年</span></span> : <span class="highlight-term">Premier Empire<span class="tooltip">第一帝国</span></span>, adoption du <span class="highlight-term">Code civil<span class="tooltip">民法典</span></span>. <span class="highlight-term">Napoléon Ier<span class="tooltip">拿破仑一世</span></span> est empereur.</p>
+                
+                <p id="section1_1Text6"><span class="highlight-term">1815-1848<span class="tooltip">1815-1848年</span></span> : <span class="highlight-term">Restauration<span class="tooltip">复辟时期</span></span> et <span class="highlight-term">Monarchie de Juillet<span class="tooltip">七月王朝</span></span>, régime progressivement libéral. <span class="highlight-term">Louis XVIII<span class="tooltip">路易十八</span></span>, <span class="highlight-term">Charles X<span class="tooltip">查理十世</span></span> et <span class="highlight-term">Louis-Philippe<span class="tooltip">路易-菲利普</span></span> se succèdent.</p>
+                
+                <p id="section1_1Text7"><span class="highlight-term">1848-1851<span class="tooltip">1848-1851年</span></span> : <span class="highlight-term">Deuxième République<span class="tooltip">第二共和国</span></span>, <span class="highlight-term">suffrage universel masculin<span class="tooltip">男性普选</span></span>. <span class="highlight-term">Louis-Napoléon Bonaparte<span class="tooltip">路易-拿破仑·波拿巴</span></span> est président.</p>
+                
+                <p id="section1_1Text8"><span class="highlight-term">1852-1870<span class="tooltip">1852-1870年</span></span> : <span class="highlight-term">Second Empire<span class="tooltip">第二帝国</span></span>, régime autoritaire puis libéralisé. <span class="highlight-term">Napoléon III<span class="tooltip">拿破仑三世</span></span> est empereur.</p>
+                
+                <p id="section1_1Text9"><span class="highlight-term">1870-1940<span class="tooltip">1870-1940年</span></span> : <span class="highlight-term">Troisième République<span class="tooltip">第三共和国</span></span>, consolidation de la <span class="highlight-term">République<span class="tooltip">共和制</span></span> et de l'<span class="highlight-term">école laïque<span class="tooltip">世俗学校</span></span>. <span class="highlight-term">Jules Ferry<span class="tooltip">朱尔·费里</span></span> réforme l'école, <span class="highlight-term">Léon Gambetta<span class="tooltip">莱昂·甘必大</span></span> et <span class="highlight-term">Adolphe Thiers<span class="tooltip">阿道夫·梯也尔</span></span> sont des figures importantes.</p>
+                
+                <p id="section1_1Text10"><span class="highlight-term">1940-1944<span class="tooltip">1940-1944年</span></span> : <span class="highlight-term">Régime de Vichy<span class="tooltip">维希政权</span></span>, collaboration avec l'Allemagne nazie, rupture avec les valeurs républicaines. <span class="highlight-term">Philippe Pétain<span class="tooltip">菲利普·贝当</span></span> dirige le régime. <span class="highlight-term">18 juin 1940<span class="tooltip">1940年6月18日</span></span> <span class="highlight-term">Charles de Gaulle<span class="tooltip">夏尔·戴高乐</span></span> lance <span class="highlight-term">l'appel à la résistance<span class="tooltip">抵抗运动号召</span></span> depuis Londres.</p>
+                
+                <p id="section1_1Text11"><span class="highlight-term">1944-1946<span class="tooltip">1944-1946年</span></span> : <span class="highlight-term">Gouvernement provisoire<span class="tooltip">临时政府</span></span>, restauration de la République et réformes. <span class="highlight-term">Charles de Gaulle<span class="tooltip">夏尔·戴高乐</span></span> dirige la Libération.</p>
+                
+                <p id="section1_1Text12"><span class="highlight-term">1946-1958<span class="tooltip">1946-1958年</span></span> : <span class="highlight-term">Quatrième République<span class="tooltip">第四共和国</span></span>, instabilité politique. <span class="highlight-term">Vincent Auriol<span class="tooltip">樊尚·奥里奥尔</span></span> et <span class="highlight-term">René Coty<span class="tooltip">勒内·科蒂</span></span> sont présidents.</p>
+                
+                <p id="section1_1Text13"><span class="highlight-term">1958-aujourd'hui<span class="tooltip">1958年至今</span></span> : <span class="highlight-term">Cinquième République<span class="tooltip">第五共和国</span></span>, régime à <span class="highlight-term">président fort<span class="tooltip">强总统制</span></span>, stabilité politique. <span class="highlight-term">Charles de Gaulle<span class="tooltip">夏尔·戴高乐</span></span> fonde la Vᵉ République, <span class="highlight-term">Valéry Giscard d'Estaing<span class="tooltip">瓦莱里·吉斯卡尔·德斯坦</span></span> légalise la majorité à 18 ans, <span class="highlight-term">François Mitterrand<span class="tooltip">弗朗索瓦·密特朗</span></span> abolitionne la peine de mort, <span class="highlight-term">François Hollande<span class="tooltip">弗朗索瓦·奥朗德</span></span> légalise le mariage pour tous, <span class="highlight-term">Emmanuel Macron<span class="tooltip">埃马纽埃尔·马克龙</span></span> est président actuel.</p>
+
+                <h4 id="section1_2Title">2. Réformes importantes (Cinquième République)</h4>
+                <p id="section1_2Text1"><span class="highlight-term">1944<span class="tooltip">1944年</span></span> : <span class="highlight-term">droit de vote des femmes<span class="tooltip">妇女投票权</span></span> (suffrage féminin) accordé par le Gouvernement provisoire.</p>
+                
+                <p id="section1_2Text2"><span class="highlight-term">1975<span class="tooltip">1975年</span></span> : <span class="highlight-term">dépénalisation de l'IVG<span class="tooltip">堕胎去罪化</span></span> (loi Veil), reconnaissance du droit à l'avortement. <span class="highlight-term">Valéry Giscard d'Estaing<span class="tooltip">瓦莱里·吉斯卡尔·德斯坦</span></span> est président.</p>
+                
+                <p id="section1_2Text3"><span class="highlight-term">1981<span class="tooltip">1981年</span></span> : <span class="highlight-term">abolition de la peine de mort<span class="tooltip">废除死刑</span></span> (loi Badinter). <span class="highlight-term">François Mitterrand<span class="tooltip">弗朗索瓦·密特朗</span></span> est président.</p>
+                
+                <p id="section1_2Text4"><span class="highlight-term">2013<span class="tooltip">2013年</span></span> : <span class="highlight-term">mariage pour tous<span class="tooltip">全民婚姻(同性婚姻)</span></span> (loi Taubira). <span class="highlight-term">François Hollande<span class="tooltip">弗朗索瓦·奥朗德</span></span> est président.</p>
+
+                <h4 id="section1_3Title">3. Les deux guerres mondiales (pays belligérants)</h4>
+                
+                <h5 id="section1_3_1Title">3.1 Première Guerre mondiale (1914-1918)</h5>
+                <p id="section1_3_1Text1"><span class="highlight-term">Alliés<span class="tooltip">协约国</span></span> : <span class="highlight-term">France<span class="tooltip">法国</span></span>, <span class="highlight-term">Royaume-Uni<span class="tooltip">英国</span></span>, <span class="highlight-term">Russie<span class="tooltip">俄国</span></span>, <span class="highlight-term">Italie<span class="tooltip">意大利</span></span> (à partir de 1915), <span class="highlight-term">États-Unis<span class="tooltip">美国</span></span> (à partir de 1917).</p>
+                
+                <p id="section1_3_1Text2"><span class="highlight-term">Empires centraux<span class="tooltip">同盟国</span></span> : <span class="highlight-term">Allemagne<span class="tooltip">德国</span></span>, <span class="highlight-term">Autriche-Hongrie<span class="tooltip">奥匈帝国</span></span>, <span class="highlight-term">Empire ottoman<span class="tooltip">奥斯曼帝国</span></span>, <span class="highlight-term">Bulgarie<span class="tooltip">保加利亚</span></span>.</p>
+                
+                <p id="section1_3_1Text3">Personnage clé : <span class="highlight-term">Georges Clemenceau<span class="tooltip">乔治·克列孟梭</span></span>, dirige le gouvernement français à la fin de la guerre.</p>
+
+                <h5 id="section1_3_2Title">3.2 Seconde Guerre mondiale (1939-1945)</h5>
+                <p id="section1_3_2Text1"><span class="highlight-term">Alliés<span class="tooltip">同盟国</span></span> : <span class="highlight-term">France<span class="tooltip">法国</span></span>, <span class="highlight-term">Royaume-Uni<span class="tooltip">英国</span></span>, <span class="highlight-term">États-Unis<span class="tooltip">美国</span></span> (à partir de 1941), <span class="highlight-term">URSS<span class="tooltip">苏联</span></span> (à partir de 1941), <span class="highlight-term">Chine<span class="tooltip">中国</span></span>.</p>
+                
+                <p id="section1_3_2Text2"><span class="highlight-term">Axe<span class="tooltip">轴心国</span></span> : <span class="highlight-term">Allemagne<span class="tooltip">德国</span></span>, <span class="highlight-term">Italie<span class="tooltip">意大利</span></span>, <span class="highlight-term">Japon<span class="tooltip">日本</span></span>.</p>
+                
+                <p id="section1_3_2Text3"><span class="highlight-term">18 juin 1940<span class="tooltip">1940年6月18日</span></span> : <span class="highlight-term">Charles de Gaulle<span class="tooltip">夏尔·戴高乐</span></span> lance l'<span class="highlight-term">appel à la résistance<span class="tooltip">抵抗运动号召</span></span> depuis Londres.</p>
+                
+                <p id="section1_3_2Text4"><span class="highlight-term">6 juin 1944<span class="tooltip">1944年6月6日</span></span> : <span class="highlight-term">Débarquement en Normandie<span class="tooltip">诺曼底登陆</span></span>, début de la libération de l'Europe.</p>
+                
+                <p id="section1_3_2Text5"><span class="highlight-term">25 août 1944<span class="tooltip">1944年8月25日</span></span> : <span class="highlight-term">Libération de Paris<span class="tooltip">巴黎解放</span></span> par les Forces françaises libres et les Alliés.</p>
+                
+                <p id="section1_3_2Text6"><span class="highlight-term">La Shoah<span class="tooltip">犹太人大屠杀</span></span> : pendant la guerre, l'Allemagne nazie organise la Shoah, un génocide visant principalement les <span class="highlight-term">Juifs<span class="tooltip">犹太人</span></span>, mais aussi les <span class="highlight-term">Roms<span class="tooltip">罗姆人</span></span> et les <span class="highlight-term">personnes handicapées<span class="tooltip">残疾人</span></span>. Des <span class="highlight-term">millions de personnes<span class="tooltip">数百万人</span></span> sont exterminées dans des camps.</p>
+                
+                <p id="section1_3_2Text7">Personnages clés : <span class="highlight-term">Adolf Hitler<span class="tooltip">阿道夫·希特勒</span></span> (dictateur nazi), <span class="highlight-term">Charles de Gaulle<span class="tooltip">夏尔·戴高乐</span></span> (chef de la France libre), <span class="highlight-term">Jean Moulin<span class="tooltip">让·穆兰</span></span> (résistant).</p>
+
+                <div class="important-note">
+                    <p id="importantNote1"><strong>À retenir :</strong> La France a connu plusieurs régimes politiques depuis 1789. La Cinquième République, instaurée en 1958, est le régime actuel et a apporté d'importantes réformes sociales.</p>
+                </div>
+
+                <h3 id="section2Title">II. Territoires et géographie</h3>
+                
+                <h4 id="section2_1Title">1. Organisation territoriale</h4>
+                <p id="section2_1Text1">La France est composée de la <span class="highlight-term">France métropolitaine (Hexagone)<span class="tooltip">法国本土(六边形)</span></span> et de <span class="highlight-term">territoires d'outre-mer<span class="tooltip">海外领土</span></span>.</p>
+                
+                <p id="section2_1Text2">Les territoires sont administrativement divisés en <span class="highlight-term">régions, départements et communes<span class="tooltip">大区、省和市镇</span></span>. La France est un <span class="highlight-term">État unitaire<span class="tooltip">单一制国家</span></span>, donc les lois s'appliquent de manière uniforme sur tout le territoire.</p>
+
+                <h4 id="section2_2Title">2. DROM (Départements et Régions d'Outre-Mer)</h4>
+                <p id="section2_2Text1">Les <span class="highlight-term">DROM<span class="tooltip">海外省和海外大区</span></span> sont la <span class="highlight-term">Guadeloupe<span class="tooltip">瓜德罗普</span></span>, la <span class="highlight-term">Guyane<span class="tooltip">圭亚那</span></span>, la <span class="highlight-term">Martinique<span class="tooltip">马提尼克</span></span>, <span class="highlight-term">La Réunion<span class="tooltip">留尼汪</span></span> et <span class="highlight-term">Mayotte<span class="tooltip">马约特</span></span>.</p>
+                
+                <p id="section2_2Text2">La <span class="highlight-term">Guadeloupe et la Martinique<span class="tooltip">瓜德罗普和马提尼克</span></span> sont situées dans l'<span class="highlight-term">océan Atlantique (Caraïbes)<span class="tooltip">大西洋(加勒比海)</span></span>, la <span class="highlight-term">Guyane<span class="tooltip">圭亚那</span></span> est en <span class="highlight-term">Amérique du Sud<span class="tooltip">南美洲</span></span> et bordée par l'<span class="highlight-term">Atlantique<span class="tooltip">大西洋</span></span>, tandis que <span class="highlight-term">La Réunion<span class="tooltip">留尼汪</span></span> et <span class="highlight-term">Mayotte<span class="tooltip">马约特</span></span> se trouvent dans l'<span class="highlight-term">océan Indien<span class="tooltip">印度洋</span></span>.</p>
+
+                <h4 id="section2_3Title">3. COM (Collectivités d'Outre-Mer)</h4>
+                <p id="section2_3Text1">Les <span class="highlight-term">COM<span class="tooltip">海外集体</span></span> sont <span class="highlight-term">Saint-Pierre-et-Miquelon<span class="tooltip">圣皮埃尔和密克隆</span></span>, <span class="highlight-term">Saint-Barthélemy<span class="tooltip">圣巴泰勒米</span></span>, <span class="highlight-term">Saint-Martin<span class="tooltip">圣马丁</span></span>, <span class="highlight-term">Polynésie française<span class="tooltip">法属波利尼西亚</span></span>, <span class="highlight-term">Nouvelle-Calédonie<span class="tooltip">新喀里多尼亚</span></span>, <span class="highlight-term">Wallis-et-Futuna<span class="tooltip">瓦利斯和富图纳</span></span> et les <span class="highlight-term">TAAF<span class="tooltip">法国南部和南极领地</span></span>.</p>
+                
+                <p id="section2_3Text2">Elles ont une <span class="highlight-term">autonomie plus grande<span class="tooltip">更大的自治权</span></span> et des lois adaptées aux spécificités locales.</p>
+
+                <h4 id="section2_4Title">4. Données générales</h4>
+                <p id="section2_4Text1">La France couvre environ <span class="highlight-term">667 000 km²<span class="tooltip">66.7万平方公里</span></span> et compte <span class="highlight-term">68,6 millions d'habitants (2025)<span class="tooltip">6860万居民(2025年)</span></span>, <span class="highlight-term">18 régions<span class="tooltip">18个大区</span></span> et <span class="highlight-term">101 départements<span class="tooltip">101个省</span></span>.</p>
+
+                <h4 id="section2_5Title">5. Frontières terrestres</h4>
+                <p id="section2_5Text1">La France possède des <span class="highlight-term">frontières terrestres<span class="tooltip">陆地边界</span></span> et <span class="highlight-term">maritimes<span class="tooltip">海上边界</span></span>.</p>
+                
+                <p id="section2_5Text2">En Europe, elle partage des frontières terrestres avec <span class="highlight-term">Belgique, Luxembourg, Allemagne, Suisse, Italie, Espagne, Andorre et Monaco<span class="tooltip">比利时、卢森堡、德国、瑞士、意大利、西班牙、安道尔和摩纳哥</span></span>.</p>
+                
+                <p id="section2_5Text3">En Amérique du Sud, elle a des frontières avec <span class="highlight-term">le Brésil et le Suriname<span class="tooltip">巴西和苏里南</span></span> grâce à la <span class="highlight-term">Guyane<span class="tooltip">圭亚那</span></span>.</p>
+
+                <h4 id="section2_6Title">6. Frontières maritimes</h4>
+                <p id="section2_6Text1">Les frontières maritimes s'étendent sur <span class="highlight-term">plus de 5 500 km<span class="tooltip">超过5500公里</span></span> et donnent accès à la <span class="highlight-term">mer du Nord, la Manche, l'océan Atlantique et la mer Méditerranée<span class="tooltip">北海、英吉利海峡、大西洋和地中海</span></span>.</p>
+                
+                <p id="section2_6Text2">Grâce aux territoires d'outre-mer, la France est aussi présente dans les <span class="highlight-term">océans Pacifique, Atlantique et Indien<span class="tooltip">太平洋、大西洋和印度洋</span></span>, ce qui lui donne une influence mondiale.</p>
+
+                <h4 id="section2_7Title">7. Frontières naturelles</h4>
+                <p id="section2_7Text1">Les frontières naturelles principales sont les montagnes (<span class="highlight-term">Pyrénées, Alpes, Jura, Vosges<span class="tooltip">比利牛斯山脉、阿尔卑斯山脉、汝拉山脉、孚日山脉</span></span>) et les fleuves (<span class="highlight-term">Rhin<span class="tooltip">莱茵河</span></span>).</p>
+
+                <h4 id="section2_8Title">8. Fleuves principaux</h4>
+                <p id="section2_8Text1">Les cinq fleuves principaux sont <span class="highlight-term">la Seine<span class="tooltip">塞纳河</span></span> (Bourgogne → Manche), <span class="highlight-term">la Loire<span class="tooltip">卢瓦尔河</span></span> (Massif central → Atlantique), <span class="highlight-term">la Garonne<span class="tooltip">加龙河</span></span> (Pyrénées → Atlantique), <span class="highlight-term">le Rhône<span class="tooltip">罗讷河</span></span> (Suisse → Méditerranée) et <span class="highlight-term">le Rhin<span class="tooltip">莱茵河</span></span> (Suisse → mer du Nord).</p>
+                
+                <p id="section2_8Text2">Ils traversent les grandes villes françaises et jouent un rôle important pour l'économie et les transports.</p>
+
+                <h4 id="section2_9Title">9. Grandes métropoles</h4>
+                <p id="section2_9Text1">Les grandes métropoles françaises sont <span class="highlight-term">Paris, Marseille, Lyon, Lille, Bordeaux, Toulouse, Nantes, Nice, Montpellier et Strasbourg<span class="tooltip">巴黎、马赛、里昂、里尔、波尔多、图卢兹、南特、尼斯、蒙彼利埃和斯特拉斯堡</span></span>.</p>
+                
+                <p id="section2_9Text2">Elles concentrent la population, les activités économiques, les emplois et les services.</p>
+
+                <h4 id="section2_10Title">10. Ports français</h4>
+                <p id="section2_10Text1">Les grands ports français en métropole sont <span class="highlight-term">Dunkerque, Le Havre, Rouen, Nantes-Saint-Nazaire, La Rochelle, Bordeaux et Marseille<span class="tooltip">敦刻尔克、勒阿弗尔、鲁昂、南特-圣纳泽尔、拉罗谢尔、波尔多和马赛</span></span>.</p>
+                
+                <p id="section2_10Text2">Les ports d'outre-mer importants sont <span class="highlight-term">Guyane, Martinique, Guadeloupe et Port-Réunion<span class="tooltip">圭亚那、马提尼克、瓜德罗普和留尼汪港</span></span>, et <span class="highlight-term">Saint-Pierre-et-Miquelon<span class="tooltip">圣皮埃尔和密克隆</span></span> est un port d'intérêt national.</p>
+
+                <h4 id="section2_11Title">11. Économie et agriculture</h4>
+                <p id="section2_11Text1">La France est la <span class="highlight-term">première puissance agricole de l'Union européenne<span class="tooltip">欧盟第一大农业强国</span></span>.</p>
+                
+                <p id="section2_11Text2">L'industrie française est diversifiée : <span class="highlight-term">aéronautique, automobile, chimie, pharmacie, agroalimentaire, luxe<span class="tooltip">航空、汽车、化工、制药、食品加工、奢侈品</span></span>.</p>
+                
+                <p id="section2_11Text3">La France est la <span class="highlight-term">7ᵉ puissance économique mondiale<span class="tooltip">世界第七大经济体</span></span>. Elle est un pays <span class="highlight-term">ouvert sur l'Europe<span class="tooltip">对欧洲开放的国家</span></span>, avec <span class="highlight-term">70% des échanges commerciaux<span class="tooltip">70%的贸易往来</span></span> réalisés avec des pays européens.</p>
+                
+                <p id="section2_11Text4">La majorité des emplois est dans le <span class="highlight-term">secteur tertiaire (80%)<span class="tooltip">第三产业(80%)</span></span>.</p>
+
+                <h4 id="section2_12Title">12. Tourisme et environnement</h4>
+                <p id="section2_12Text1">La France est la <span class="highlight-term">première destination touristique mondiale<span class="tooltip">世界第一大旅游目的地</span></span>.</p>
+                
+                <p id="section2_12Text2">La France possède une grande diversité de paysages et une biodiversité riche. Elle protège la nature avec des dispositifs comme <span class="highlight-term">Natura 2000<span class="tooltip">自然2000网络</span></span> et la <span class="highlight-term">trame verte et bleue<span class="tooltip">绿色和蓝色网络</span></span>.</p>
+                
+                <p id="section2_12Text3">Les défis sont la <span class="highlight-term">pollution<span class="tooltip">污染</span></span>, le <span class="highlight-term">changement climatique<span class="tooltip">气候变化</span></span> et la préservation des espaces naturels.</p>
+
+                <div class="important-note">
+                    <p id="importantNote2"><strong>Important :</strong> La France possède un territoire diversifié avec la métropole et les territoires d'outre-mer. C'est la première puissance agricole de l'UE et la première destination touristique mondiale.</p>
+                </div>
+
+                <h3 id="section3Title">III. Patrimoine français</h3>
+                
+                <h4 id="section3_1Title">1. Puissance culturelle</h4>
+                <p id="section3_1Text1">La France est reconnue dans le monde entier comme une <span class="highlight-term">puissance culturelle majeure<span class="tooltip">主要文化强国</span></span>.</p>
+                
+                <p id="section3_1Text2">Son influence repose sur une histoire intellectuelle et artistique très riche, portée par de grands <span class="highlight-term">écrivains<span class="tooltip">作家</span></span>, <span class="highlight-term">poètes<span class="tooltip">诗人</span></span> et <span class="highlight-term">peintres<span class="tooltip">画家</span></span>, ainsi que par un patrimoine culturel et architectural exceptionnel qui participe à l'identité nationale.</p>
+
+                <h4 id="section3_2Title">2. Littérature française</h4>
+                <p id="section3_2Text1"><span class="highlight-term">Jean de La Fontaine<span class="tooltip">让·德·拉封丹</span></span> (XVIIᵉ siècle) : poète et fabuliste incontournable, transmet des leçons morales à travers ses fables.</p>
+                
+                <p id="section3_2Text2"><span class="highlight-term">Molière<span class="tooltip">莫里哀</span></span> (XVIIᵉ siècle) : comédien, auteur et metteur en scène, renouvelle profondément le théâtre français grâce à la comédie de mœurs.</p>
+                
+                <p id="section3_2Text3"><span class="highlight-term">Victor Hugo<span class="tooltip">维克多·雨果</span></span> (XIXᵉ siècle) : figure majeure du romantisme, défend la liberté et dénonce les injustices sociales (<em>Les Misérables</em>, <em>Notre-Dame de Paris</em>).</p>
+                
+                <p id="section3_2Text4"><span class="highlight-term">Charles Baudelaire<span class="tooltip">夏尔·波德莱尔</span></span> (XIXᵉ siècle) : poète majeur, modernise la poésie française (<em>Les Fleurs du Mal</em>, <em>Le Spleen de Paris</em>).</p>
+                
+                <p id="section3_2Text5"><span class="highlight-term">George Sand<span class="tooltip">乔治·桑</span></span> (XIXᵉ siècle) : écrivaine engagée, défend les droits des femmes et des classes populaires.</p>
+                
+                <p id="section3_2Text6"><span class="highlight-term">Simone de Beauvoir<span class="tooltip">西蒙娜·德·波伏娃</span></span> (XXᵉ siècle) : écrivaine et philosophe, figure centrale du <span class="highlight-term">féminisme<span class="tooltip">女权主义</span></span> (<em>Le Deuxième Sexe</em>).</p>
+                
+                <p id="section3_2Text7"><span class="highlight-term">Albert Camus<span class="tooltip">阿尔贝·加缪</span></span> (XXᵉ siècle) : écrivain, philosophe et journaliste, développe la notion de l'absurde, reçoit le <span class="highlight-term">prix Nobel de littérature en 1957<span class="tooltip">1957年诺贝尔文学奖</span></span> (<em>L'Étranger</em>, <em>La Peste</em>).</p>
+                
+                <p id="section3_2Text8"><span class="highlight-term">Marguerite Yourcenar<span class="tooltip">玛格丽特·尤瑟纳尔</span></span> (XXᵉ siècle) : auteure de romans historiques profonds, devient en 1980 la <span class="highlight-term">première femme élue à l'Académie française<span class="tooltip">第一位当选法兰西学术院院士的女性</span></span>.</p>
+
+                <h4 id="section3_3Title">3. Peinture française</h4>
+                <p id="section3_3Text1"><span class="highlight-term">Eugène Delacroix<span class="tooltip">欧仁·德拉克洛瓦</span></span> : grand représentant du romantisme (<em>La Liberté guidant le peuple</em>).</p>
+                
+                <p id="section3_3Text2"><span class="highlight-term">Claude Monet<span class="tooltip">克洛德·莫奈</span></span> : figure fondatrice de l'<span class="highlight-term">impressionnisme<span class="tooltip">印象派</span></span> (<em>Impression, Soleil levant</em>, <em>Nymphéas</em>).</p>
+                
+                <p id="section3_3Text3"><span class="highlight-term">Auguste Renoir<span class="tooltip">奥古斯特·雷诺阿</span></span> : peintre impressionniste majeur, s'intéresse aux scènes de la vie quotidienne.</p>
+                
+                <p id="section3_3Text4"><span class="highlight-term">Paul Cézanne<span class="tooltip">保罗·塞尚</span></span> : souvent considéré comme le <span class="highlight-term">père de la peinture moderne<span class="tooltip">现代绘画之父</span></span>.</p>
+                
+                <p id="section3_3Text5"><span class="highlight-term">Marc Chagall<span class="tooltip">马克·夏加尔</span></span> : artiste d'origine russe devenu français, apporte une dimension poétique et colorée à l'art français (plafond de l'<span class="highlight-term">Opéra Garnier<span class="tooltip">加尼叶歌剧院</span></span> à Paris).</p>
+
+                <h4 id="section3_4Title">4. Sculpture française</h4>
+                <p id="section3_4Text1"><span class="highlight-term">Auguste Rodin<span class="tooltip">奥古斯特·罗丹</span></span> : révolutionne la sculpture en mettant en valeur les émotions et le mouvement du corps (<em>Le Penseur</em>, <em>Le Baiser</em>).</p>
+                
+                <p id="section3_4Text2"><span class="highlight-term">Camille Claudel<span class="tooltip">卡米耶·克洛岱尔</span></span> : sculptrice de grand talent, exprime avec sensibilité la douleur, l'amour et la solitude.</p>
+
+                <h4 id="section3_5Title">5. Musique française</h4>
+                <p id="section3_5Text1"><span class="highlight-term">Claude Debussy<span class="tooltip">克洛德·德彪西</span></span> : compositeur majeur, considéré comme le père de la <span class="highlight-term">musique moderne<span class="tooltip">现代音乐</span></span>.</p>
+                
+                <p id="section3_5Text2"><span class="highlight-term">Édith Piaf<span class="tooltip">艾迪特·皮雅芙</span></span> : chanteuse emblématique du XXᵉ siècle, icône mondiale de la chanson française (<em>La Vie en rose</em>, <em>L'Hymne à l'amour</em>).</p>
+
+                <h4 id="section3_6Title">6. Patrimoine architectural parisien</h4>
+                <p id="section3_6Text1"><span class="highlight-term">Tour Eiffel<span class="tooltip">埃菲尔铁塔</span></span> : symbole universel de <span class="highlight-term">Paris<span class="tooltip">巴黎</span></span>.</p>
+                
+                <p id="section3_6Text2"><span class="highlight-term">Cathédrale Notre-Dame de Paris<span class="tooltip">巴黎圣母院</span></span> : incarne l'histoire médiévale et religieuse du pays.</p>
+                
+                <p id="section3_6Text3"><span class="highlight-term">Musée du Louvre<span class="tooltip">卢浮宫博物馆</span></span> : ancien palais royal devenu l'un des musées les plus visités au monde.</p>
+                
+                <p id="section3_6Text4"><span class="highlight-term">Opéra Garnier<span class="tooltip">加尼叶歌剧院</span></span>, <span class="highlight-term">Arc de Triomphe<span class="tooltip">凯旋门</span></span>, <span class="highlight-term">Sacré-Cœur de Montmartre<span class="tooltip">蒙马特圣心大教堂</span></span> et <span class="highlight-term">Champs-Élysées<span class="tooltip">香榭丽舍大街</span></span> : lieux emblématiques de la capitale.</p>
+
+                <h4 id="section3_7Title">7. Accès à la culture</h4>
+                <p id="section3_7Text1">Des dispositifs permettent à tous de découvrir le patrimoine.</p>
+                
+                <p id="section3_7Text2">Les <span class="highlight-term">Journées européennes du patrimoine<span class="tooltip">欧洲文化遗产日</span></span>, organisées chaque année en septembre, offrent un <span class="highlight-term">accès gratuit<span class="tooltip">免费开放</span></span> à de nombreux <span class="highlight-term">monuments<span class="tooltip">古迹</span></span>, <span class="highlight-term">musées<span class="tooltip">博物馆</span></span> et <span class="highlight-term">expositions<span class="tooltip">展览</span></span>, parfois habituellement fermés au public.</p>
+
+                <div class="important-note">
+                    <p id="importantNote3"><strong>À retenir :</strong> La France possède un riche patrimoine culturel avec de grands écrivains, peintres, musiciens et des monuments emblématiques. L'accès à la culture est une priorité, notamment grâce aux Journées européennes du patrimoine.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Action Cards -->
+    <section class="action-cards" id="astuces">
+        <div class="container">
+            <h2 style="color: white; text-align: center; margin-bottom: 50px;" id="actionTitle">Passez à l'action</h2>
+            
+            <div class="action-cards-container">
+                <!-- Card 1: Astuces d'examen -->
+                <div class="action-card action-card-1">
+                    <div class="action-card-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3 id="astuceTitle">Astuces pour l'examen</h3>
+                    <p id="astuceDescription">Découvrez les conseils et techniques pour réussir votre examen civique. Apprenez comment aborder les questions, gérer votre temps et maximiser vos chances de réussite.</p>
+                    <a href="astuces-examen-culture.html" class="btn btn-orange" id="astuceBtn">
+                        <i class="fas fa-graduation-cap"></i> Voir les astuces
+                    </a>
+                </div>
+                
+                <!-- Card 2: Test rapide -->
+                <div class="action-card action-card-2">
+                    <div class="action-card-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 id="testTitle">Test rapide</h3>
+                    <p id="testDescription">Testez vos connaissances sur l'histoire, la géographie et la culture françaises avec ce quiz de 10 questions. Obtenez des corrections instantanées et découvrez vos points forts et faibles.</p>
+                    <a href="test-rapide-histoire.html" class="btn btn-purple" id="testBtn">
+                        <i class="fas fa-play-circle"></i> Commencer le test
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <!-- About Column -->
+                <div class="footer-column">
+                    <h4 id="footerAbout">À propos</h4>
+                    <p id="footerAboutText">
+                        L'association Mille Voiles accompagne les communautés chinoises en France dans leurs démarches d'intégration, d'apprentissage du français et de préparation aux examens officiels.
+                    </p>
+                </div>
+                
+                <!-- Quick Links Column -->
+                <div class="footer-column">
+                    <h4 id="footerLinks">Thématiques</h4>
+                    <ul class="footer-links">
+                        <li><a href="thematique-valeurs.html"><i class="fas fa-chevron-right"></i> <span id="footerLink1">Valeurs de la République</span></a></li>
+                        <li><a href="thematique-institutions.html"><i class="fas fa-chevron-right"></i> <span id="footerLink2">Institutions françaises</span></a></li>
+                        <li><a href="thematique-droits.html"><i class="fas fa-chevron-right"></i> <span id="footerLink3">Droits et devoirs</span></a></li>
+                        <li><a href="thematique-culture.html"><i class="fas fa-chevron-right"></i> <span id="footerLink4">Histoire, Géographie et Culture</span></a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact Column -->
+                <div class="footer-column">
+                    <h4 id="footerContact">Contact</h4>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span id="footerEmail">2025qianfan@gmail.com</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-globe"></i>
+                            <span id="footerWebsite">Association Mille Voiles</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="footerAddress"> 94800 Villejuif</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p id="footerCopyright">&copy; 2025 Association Mille Voiles / 千帆协会 - Tous droits réservés. | <a href="#" style="color: var(--primary-yellow);" id="footerPrivacy">Mentions légales</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top -->
+    <a href="#" class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+
+    <!-- JavaScript -->
+    <script>
+        // 语言切换数据
+        const translations = {
+            fr: {
+                // Header
+                mainTitle: "Histoire, Géographie et Culture",
+                mainSubtitle: "Évolution historique, territoires français et patrimoine culturel - Préparation à l'examen civique",
+                logoText: "Mille Voiles",
+                
+                // Navigation
+                navHome: "Accueil",
+                navContent: "Contenu",
+                navAstuces: "Astuces",
+                navTest: "Test",
+                
+                // Breadcrumb
+                breadcrumbCurrent: "Histoire, Géographie et Culture",
+                
+                // Theme Hero
+                themeTitle: "Histoire, Géographie et Culture Française",
+                themeDescription: "Découvrez l'évolution historique de la France, ses territoires, sa géographie et son riche patrimoine culturel",
+                
+                // Article
+                articleTitle: "Révision pour l'examen civique : Histoire, Géographie et Culture",
+                articleSubtitle: "Survolez les termes en gras et soulignés pour voir leur traduction en chinois",
+                
+                // Section Titles
+                section1Title: "I. Histoire",
+                section1_1Title: "1. Évolution des régimes politiques en France (1789 - aujourd'hui)",
+                section1_2Title: "2. Réformes importantes (Cinquième République)",
+                section1_3Title: "3. Les deux guerres mondiales (pays belligérants)",
+                section1_3_1Title: "3.1 Première Guerre mondiale (1914-1918)",
+                section1_3_2Title: "3.2 Seconde Guerre mondiale (1939-1945)",
+                section2Title: "II. Territoires et géographie",
+                section2_1Title: "1. Organisation territoriale",
+                section2_2Title: "2. DROM (Départements et Régions d'Outre-Mer)",
+                section2_3Title: "3. COM (Collectivités d'Outre-Mer)",
+                section2_4Title: "4. Données générales",
+                section2_5Title: "5. Frontières terrestres",
+                section2_6Title: "6. Frontières maritimes",
+                section2_7Title: "7. Frontières naturelles",
+                section2_8Title: "8. Fleuves principaux",
+                section2_9Title: "9. Grandes métropoles",
+                section2_10Title: "10. Ports français",
+                section2_11Title: "11. Économie et agriculture",
+                section2_12Title: "12. Tourisme et environnement",
+                section3Title: "III. Patrimoine français",
+                section3_1Title: "1. Puissance culturelle",
+                section3_2Title: "2. Littérature française",
+                section3_3Title: "3. Peinture française",
+                section3_4Title: "4. Sculpture française",
+                section3_5Title: "5. Musique française",
+                section3_6Title: "6. Patrimoine architectural parisien",
+                section3_7Title: "7. Accès à la culture",
+                
+                // Important Notes
+                importantNote1: "À retenir : La France a connu plusieurs régimes politiques depuis 1789. La Cinquième République, instaurée en 1958, est le régime actuel et a apporté d'importantes réformes sociales.",
+                importantNote2: "Important : La France possède un territoire diversifié avec la métropole et les territoires d'outre-mer. C'est la première puissance agricole de l'UE et la première destination touristique mondiale.",
+                importantNote3: "À retenir : La France possède un riche patrimoine culturel avec de grands écrivains, peintres, musiciens et des monuments emblématiques. L'accès à la culture est une priorité, notamment grâce aux Journées européennes du patrimoine.",
+                
+                // Action Cards
+                actionTitle: "Passez à l'action",
+                astuceTitle: "Astuces pour l'examen",
+                astuceDescription: "Découvrez les conseils et techniques pour réussir votre examen civique. Apprenez comment aborder les questions, gérer votre temps et maximiser vos chances de réussite.",
+                astuceBtn: '<i class="fas fa-graduation-cap"></i> Voir les astuces',
+                testTitle: "Test rapide",
+                testDescription: "Testez vos connaissances sur l'histoire, la géographie et la culture françaises avec ce quiz de 20 questions. Obtenez des corrections instantanées et découvrez vos points forts et faibles.",
+                testBtn: '<i class="fas fa-play-circle"></i> Commencer le test',
+                
+                // Footer
+                footerAbout: "À propos",
+                footerAboutText: "L'association Mille Voiles accompagne les communautés chinoises en France dans leurs démarches d'intégration, d'apprentissage du français et de préparation aux examens officiels.",
+                footerLinks: "Thématiques",
+                footerLink1: "Valeurs de la République",
+                footerLink2: "Institutions françaises",
+                footerLink3: "Droits et devoirs",
+                footerLink4: "Histoire, Géographie et Culture",
+                footerContact: "Contact",
+                footerEmail: "2025qianfan@gmail.com",
+                footerWebsite: "Association Mille Voiles",
+                footerAddress: "94800 Villejuif",
+                footerCopyright: "© 2025 Association Mille Voiles / 千帆协会 - Tous droits réservés. | ",
+                footerPrivacy: "Mentions légales"
+            },
+            zh: {
+                // Header
+                mainTitle: "历史、地理与文化",
+                mainSubtitle: "历史演变、法国领土与文化传承 - 公民考试准备",
+                logoText: "千帆协会",
+                
+                // Navigation
+                navHome: "首页",
+                navContent: "内容",
+                navAstuces: "考试技巧",
+                navTest: "测试",
+                
+                // Breadcrumb
+                breadcrumbCurrent: "历史、地理与文化",
+                
+                // Theme Hero
+                themeTitle: "法国历史、地理与文化",
+                themeDescription: "了解法国的历史演变、领土分布、地理特征以及丰富的文化遗产",
+                
+                // Article
+                articleTitle: "公民考试复习：历史、地理与文化",
+                articleSubtitle: "将鼠标悬停在粗体下划线术语上查看中文翻译",
+                
+                // Section Titles
+                section1Title: "一、历史",
+                section1_1Title: "1. 法国政治体制的演变(1789年至今)",
+                section1_2Title: "2. 重要改革(第五共和国时期)",
+                section1_3Title: "3. 两次世界大战(参战国)",
+                section1_3_1Title: "3.1 第一次世界大战(1914-1918年)",
+                section1_3_2Title: "3.2 第二次世界大战(1939-1945年)",
+                section2Title: "二、领土与地理",
+                section2_1Title: "1. 领土组织",
+                section2_2Title: "2. 海外省和海外大区(DROM)",
+                section2_3Title: "3. 海外集体(COM)",
+                section2_4Title: "4. 基本数据",
+                section2_5Title: "5. 陆地边界",
+                section2_6Title: "6. 海上边界",
+                section2_7Title: "7. 自然边界",
+                section2_8Title: "8. 主要河流",
+                section2_9Title: "9. 主要大都市",
+                section2_10Title: "10. 法国港口",
+                section2_11Title: "11. 经济与农业",
+                section2_12Title: "12. 旅游与环境",
+                section3Title: "三、法国文化遗产",
+                section3_1Title: "1. 文化强国",
+                section3_2Title: "2. 法国文学",
+                section3_3Title: "3. 法国绘画",
+                section3_4Title: "4. 法国雕塑",
+                section3_5Title: "5. 法国音乐",
+                section3_6Title: "6. 巴黎建筑遗产",
+                section3_7Title: "7. 文化开放",
+                
+                // Important Notes
+                importantNote1: "需要记住：自1789年以来，法国经历了多种政治体制。1958年建立的第五共和国是现行体制，并带来了重要的社会改革。",
+                importantNote2: "重要提示：法国拥有多样化的领土，包括本土和海外领土。它是欧盟第一大农业强国和世界第一大旅游目的地。",
+                importantNote3: "需要记住：法国拥有丰富的文化遗产，包括伟大的作家、画家、音乐家和标志性建筑。文化开放是一项优先事项，尤其是通过欧洲文化遗产日活动。",
+                
+                // Action Cards
+                actionTitle: "采取行动",
+                astuceTitle: "考试技巧",
+                astuceDescription: "了解通过公民考试的技巧和方法。学习如何应对问题、管理时间并最大化您的成功机会。",
+                astuceBtn: '<i class="fas fa-graduation-cap"></i> 查看技巧',
+                testTitle: "快速测试",
+                testDescription: "通过20道题的测验测试您对法国历史、地理和文化的了解。获得即时批改并发现您的优点和不足。",
+                testBtn: '<i class="fas fa-play-circle"></i> 开始测试',
+                
+                // Footer
+                footerAbout: "关于我们",
+                footerAboutText: "千帆协会协助在法华人社区进行融合程序、法语学习以及官方考试准备。",
+                footerLinks: "主题",
+                footerLink1: "共和国价值观",
+                footerLink2: "法国机构",
+                footerLink3: "权利与义务",
+                footerLink4: "历史、地理与文化",
+                footerContact: "联系我们",
+                footerEmail: "2025qianfan@gmail.com",
+                footerWebsite: "千帆协会",
+                footerAddress: "94800 维勒瑞夫",
+                footerCopyright: "© 2025 千帆协会 / Association Mille Voiles - 版权所有。 | ",
+                footerPrivacy: "法律声明"
+            }
+        };
+
+        // 当前语言
+        let currentLang = 'fr';
+
+        // 切换语言函数
+        function switchLanguage(lang) {
+            currentLang = lang;
+            
+            // 更新语言按钮状态
+            document.getElementById('langFr').classList.toggle('active', lang === 'fr');
+            document.getElementById('langZh').classList.toggle('active', lang === 'zh');
+            
+            // 获取翻译数据
+            const data = translations[lang];
+            
+            // 遍历所有数据项并更新页面
+            for (const [key, value] of Object.entries(data)) {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (key.includes('Btn') || key.includes('Title') || key.includes('Text')) {
+                        element.innerHTML = value;
+                    } else {
+                        element.textContent = value;
+                    }
+                }
+            }
+        }
+
+        // Back to Top功能
+        const backToTopBtn = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
+        
+        backToTopBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置默认语言
+            switchLanguage('fr');
+            
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    if (this.getAttribute('href') !== '#') {
+                        e.preventDefault();
+                        
+                        const targetId = this.getAttribute('href');
+                        const targetElement = document.querySelector(targetId);
+                        
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 80,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

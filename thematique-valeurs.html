@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valeurs de la République - Association Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variables et reset */
+        :root {
+            --primary-blue: #004080;
+            --primary-light-blue: #0066cc;
+            --primary-yellow: #ffd633;
+            --primary-light-yellow: #ffe066;
+            --dark-gray: #333333;
+            --medium-gray: #666666;
+            --light-gray: #f5f7fa;
+            --white: #ffffff;
+            --green: #27ae60;
+            --orange: #f39c12;
+            --purple: #8e44ad;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--dark-gray);
+            background-color: var(--light-gray);
+            line-height: 1.7;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            line-height: 1.3;
+            color: var(--primary-blue);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .main-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light-blue) 100%);
+            color: var(--white);
+            padding: 30px 0;
+            text-align: center;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .main-header h1 {
+            color: var(--white);
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+
+        .main-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Language Toggle */
+        .language-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+
+        .lang-btn {
+            background: var(--white);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 70px;
+            justify-content: center;
+        }
+
+        .lang-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .lang-btn.active {
+            background: var(--primary-yellow);
+            color: var(--primary-blue);
+        }
+
+        /* Navigation */
+        .main-nav {
+            background-color: var(--white);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--primary-yellow);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-blue);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 20px 0;
+            background-color: var(--white);
+            border-bottom: 1px solid #eee;
+        }
+
+        .breadcrumb-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+
+        .breadcrumb-links a {
+            color: var(--medium-gray);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .breadcrumb-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        .breadcrumb-links i {
+            font-size: 0.8rem;
+            color: var(--medium-gray);
+        }
+
+        /* Theme Hero */
+        .theme-hero {
+            padding: 60px 0;
+            background: linear-gradient(rgba(0, 64, 128, 0.05), rgba(0, 102, 204, 0.05));
+            text-align: center;
+        }
+
+        .theme-icon {
+            font-size: 4rem;
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+        }
+
+        .theme-hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .theme-hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            color: var(--medium-gray);
+        }
+
+        /* Content Section */
+        .content-section {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .article-content {
+            background: var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 50px;
+            box-shadow: var(--shadow);
+            line-height: 1.8;
+        }
+
+        .article-header {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--primary-yellow);
+            text-align: center;
+        }
+
+        .article-header h2 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+        }
+
+        .article-header p {
+            color: var(--medium-gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Highlighted Terms - Tooltip Style */
+        .highlight-term {
+            background-color: rgba(0, 64, 128, 0.1);
+            color: var(--primary-blue);
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: help;
+            position: relative;
+            border-bottom: 2px dotted var(--primary-blue);
+            transition: var(--transition);
+        }
+
+        .highlight-term:hover {
+            background-color: rgba(0, 102, 204, 0.15);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 400;
+            width: 220px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .tooltip:after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -8px;
+            border-width: 8px;
+            border-style: solid;
+            border-color: var(--primary-blue) transparent transparent transparent;
+        }
+
+        .highlight-term:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Content Sections */
+        .content-section h3 {
+            font-size: 1.8rem;
+            margin: 40px 0 20px;
+            color: var(--primary-blue);
+            padding-left: 15px;
+            border-left: 4px solid var(--primary-yellow);
+        }
+
+        .content-section h4 {
+            font-size: 1.4rem;
+            margin: 30px 0 15px;
+            color: var(--primary-blue);
+        }
+
+        .content-section p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .content-section ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .content-section li {
+            margin-bottom: 10px;
+            padding-left: 10px;
+        }
+
+        .important-note {
+            background-color: rgba(255, 214, 51, 0.1);
+            border-left: 4px solid var(--primary-yellow);
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 25px 0;
+        }
+
+        /* Action Cards */
+        .action-cards {
+            padding: 60px 0;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light-blue) 100%);
+        }
+
+        .action-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .action-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .action-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .action-card-icon {
+            font-size: 3rem;
+            margin-bottom: 25px;
+        }
+
+        .action-card-1 .action-card-icon {
+            color: var(--orange);
+        }
+
+        .action-card-2 .action-card-icon {
+            color: var(--purple);
+        }
+
+        .action-card h3 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .action-card p {
+            color: var(--medium-gray);
+            margin-bottom: 25px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 16px 36px;
+            background-color: var(--primary-yellow);
+            color: var(--primary-blue);
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            box-shadow: var(--shadow);
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-light-yellow);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-light-blue);
+        }
+
+        .btn-orange {
+            background-color: var(--orange);
+            color: var(--white);
+        }
+
+        .btn-orange:hover {
+            background-color: #e67e22;
+        }
+
+        .btn-purple {
+            background-color: var(--purple);
+            color: var(--white);
+        }
+
+        .btn-purple:hover {
+            background-color: #7d3c98;
+        }
+
+        /* Footer */
+        .main-footer {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h4 {
+            color: var(--primary-yellow);
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-yellow);
+            padding-left: 5px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-item i {
+            color: var(--primary-yellow);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Back to Top */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--primary-blue);
+            color: var(--white);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            text-decoration: none;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 99;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background-color: var(--primary-light-blue);
+            transform: translateY(-5px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .theme-hero h2 {
+                font-size: 2rem;
+            }
+            
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .article-content {
+                padding: 30px 20px;
+            }
+            
+            .article-header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .language-toggle {
+                position: relative;
+                top: 0;
+                right: 0;
+                justify-content: center;
+                margin: 20px auto;
+                width: 100%;
+            }
+            
+            .lang-btn {
+                padding: 8px 16px;
+            }
+            
+            .action-cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .tooltip {
+                width: 180px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .theme-hero h2 {
+                font-size: 1.6rem;
+            }
+            
+            .btn {
+                padding: 14px 25px;
+                font-size: 1rem;
+            }
+            
+            .language-toggle {
+                flex-direction: row;
+                gap: 10px;
+            }
+            
+            .tooltip {
+                width: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Toggle -->
+    <div class="language-toggle">
+        <button class="lang-btn active" id="langFr" onclick="switchLanguage('fr')">
+            <i class="fas fa-language"></i> FR
+        </button>
+        <button class="lang-btn" id="langZh" onclick="switchLanguage('zh')">
+            <i class="fas fa-language"></i> 中文
+        </button>
+    </div>
+
+    <!-- Header -->
+    <header class="main-header">
+        <div class="container">
+            <h1 id="mainTitle">Valeurs de la République</h1>
+            <p id="mainSubtitle">Principes et symboles - Préparation à l'examen civique français</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span id="logoText">Mille Voiles</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" id="navHome">Accueil</a>
+                <a href="#content" id="navContent">Contenu</a>
+                <a href="#astuces" id="navAstuces">Astuces</a>
+                <a href="#test" id="navTest">Test</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="container">
+            <div class="breadcrumb-links">
+                <a href="index.html">Accueil</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="test-civique.html">Test Civique</a>
+                <i class="fas fa-chevron-right"></i>
+                <span id="breadcrumbCurrent">Valeurs de la République</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Hero -->
+    <section class="theme-hero">
+        <div class="container">
+            <div class="theme-icon">
+                <i class="fas fa-balance-scale"></i>
+            </div>
+            <h2 id="themeTitle">Principes et valeurs de la République</h2>
+            <p id="themeDescription">Découvrez les symboles, la devise et le principe de laïcité qui fondent l'identité républicaine française</p>
+        </div>
+    </section>
+
+    <!-- Content Section -->
+    <section class="content-section" id="content">
+        <div class="container">
+            <div class="article-content">
+                <div class="article-header">
+                    <h2 id="articleTitle">Révision pour l'examen civique</h2>
+                    <p id="articleSubtitle">Survolez les termes en <span class="highlight-term">gras et soulignés<span class="tooltip">粗体下划线术语</span></span> pour voir leur traduction en chinois</p>
+                </div>
+
+                <h3 id="section1Title">I. Les symboles de la République</h3>
+                
+                <h4 id="section1_1Title">1. La devise de la République</h4>
+                <p id="section1_1Text1">La devise de la République française est <span class="highlight-term">« Liberté, Égalité, Fraternité »<span class="tooltip">"自由、平等、博爱"</span></span>.</p>
+                
+                <p id="section1_1Text2">La <span class="highlight-term">liberté<span class="tooltip">自由</span></span> comprend les <span class="highlight-term">libertés individuelles<span class="tooltip">个人自由</span></span> (liberté d'opinion, d'expression, de religion) et les <span class="highlight-term">libertés collectives<span class="tooltip">集体自由</span></span> (liberté de réunion, de manifestation, d'association). Cependant, l'exercice de la liberté doit <span class="highlight-term">respecter la loi<span class="tooltip">尊重法律</span></span> et <span class="highlight-term">ne pas porter atteinte aux autres<span class="tooltip">不损害他人</span></span>.</p>
+                
+                <p id="section1_1Text3">L'<span class="highlight-term">égalité<span class="tooltip">平等</span></span> signifie l'<span class="highlight-term">égalité devant la loi<span class="tooltip">法律面前人人平等</span></span> ainsi que l'égalité des <span class="highlight-term">droits civiques et sociaux<span class="tooltip">公民和社会权利</span></span>. La République lutte contre toute forme de <span class="highlight-term">discrimination<span class="tooltip">歧视</span></span>. Les comportements discriminatoires sont punis par des <span class="highlight-term">sanctions<span class="tooltip">制裁/处罚</span></span>, par exemple <span class="highlight-term">insulter une personne en raison de sa religion<span class="tooltip">因宗教信仰侮辱他人</span></span>.</p>
+                
+                <p id="section1_1Text4">La <span class="highlight-term">fraternité<span class="tooltip">博爱</span></span> repose sur la <span class="highlight-term">solidarité<span class="tooltip">团结</span></span> entre les citoyens. Elle peut être <span class="highlight-term">collective<span class="tooltip">集体的</span></span>, à travers les <span class="highlight-term">impôts<span class="tooltip">税收</span></span> et les <span class="highlight-term">cotisations sociales<span class="tooltip">社会分摊金</span></span>, ou <span class="highlight-term">intergénérationnelle<span class="tooltip">代际的</span></span>, comme le système des <span class="highlight-term">retraites<span class="tooltip">退休制度</span></span>. Elle s'exprime aussi par les <span class="highlight-term">associations<span class="tooltip">协会/社团</span></span>, qui peuvent être créées par <span class="highlight-term">au moins deux personnes<span class="tooltip">至少两人</span></span>.</p>
+                
+                <p id="section1_1Text5">La devise est visible dans de nombreux lieux et supports : les <span class="highlight-term">bâtiments publics<span class="tooltip">公共建筑</span></span> (comme la <span class="highlight-term">mairie<span class="tooltip">市政府</span></span>), la <span class="highlight-term">monnaie<span class="tooltip">货币</span></span>, les <span class="highlight-term">timbres<span class="tooltip">邮票</span></span> et les <span class="highlight-term">documents officiels<span class="tooltip">官方文件</span></span> (par exemple l'<span class="highlight-term">acte de naissance<span class="tooltip">出生证明</span></span>). Elle trouve son origine dans la <span class="highlight-term">Révolution française de 1789<span class="tooltip">1789年法国大革命</span></span> et est inscrite dans la <span class="highlight-term">Constitution de 1958<span class="tooltip">1958年宪法</span></span>.</p>
+
+                <div class="important-note">
+                    <p id="importantNote1"><strong>À retenir :</strong> La devise "Liberté, Égalité, Fraternité" est présente partout dans la vie quotidienne française et est protégée par la Constitution.</p>
+                </div>
+
+                <h4 id="section1_2Title">2. Les symboles officiels</h4>
+                
+                <p id="section1_2Text1">Le <span class="highlight-term">drapeau tricolore<span class="tooltip">三色旗</span></span>, composé du <span class="highlight-term">bleu<span class="tooltip">蓝色</span></span>, du <span class="highlight-term">blanc<span class="tooltip">白色</span></span> et du <span class="highlight-term">rouge<span class="tooltip">红色</span></span>, est un symbole officiel de la République. Il est interdit de l'<span class="highlight-term">outrager<span class="tooltip">侮辱/亵渎</span></span>, par exemple en le <span class="highlight-term">brûlant<span class="tooltip">焚烧</span></span> dans l'espace public.</p>
+                
+                <p id="section1_2Text2">L'<span class="highlight-term">hymne national<span class="tooltip">国歌</span></span> de la France est <span class="highlight-term">La Marseillaise<span class="tooltip">《马赛曲》</span></span>.</p>
+                
+                <p id="section1_2Text3"><span class="highlight-term">Marianne<span class="tooltip">玛丽安娜(法国象征)</span></span> représente la <span class="highlight-term">République<span class="tooltip">共和国</span></span> et le <span class="highlight-term">peuple français<span class="tooltip">法国人民</span></span>. Elle porte le <span class="highlight-term">bonnet phrygien<span class="tooltip">弗里吉亚帽(自由象征)</span></span>, symbole de liberté. On la trouve dans les <span class="highlight-term">institutions publiques<span class="tooltip">公共机构</span></span> (mairies), sur les <span class="highlight-term">documents officiels<span class="tooltip">官方文件</span></span>, la <span class="highlight-term">monnaie<span class="tooltip">货币</span></span>, les <span class="highlight-term">timbres<span class="tooltip">邮票</span></span> et les <span class="highlight-term">sites internet gouvernementaux<span class="tooltip">政府网站</span></span>.</p>
+                
+                <p id="section1_2Text4">La <span class="highlight-term">fête nationale<span class="tooltip">国庆日</span></span> a lieu le <span class="highlight-term">14 juillet<span class="tooltip">7月14日</span></span> et est marquée notamment par un <span class="highlight-term">défilé militaire<span class="tooltip">阅兵式</span></span>.</p>
+                
+                <p id="section1_2Text5">Enfin, le <span class="highlight-term">coq gaulois<span class="tooltip">高卢雄鸡</span></span> est un <span class="highlight-term">symbole non officiel<span class="tooltip">非官方象征</span></span> de la France.</p>
+
+                <h3 id="section2Title">II. La laïcité</h3>
+                
+                <p id="section2Text1">La <span class="highlight-term">laïcité<span class="tooltip">世俗主义/政教分离</span></span> est un principe fondamental de la République française.</p>
+                
+                <p id="section2Text2">Elle repose d'abord sur la <span class="highlight-term">liberté de conscience<span class="tooltip">信仰自由</span></span> : chacun est libre de <span class="highlight-term">croire<span class="tooltip">信仰</span></span>, de <span class="highlight-term">ne pas croire<span class="tooltip">不信仰</span></span> ou de <span class="highlight-term">changer de religion<span class="tooltip">改变宗教信仰</span></span>.</p>
+                
+                <p id="section2Text3">Elle implique aussi la <span class="highlight-term">neutralité de l'État<span class="tooltip">国家中立</span></span>, qui ne <span class="highlight-term">soutient<span class="tooltip">支持</span></span> aucune religion et ne <span class="highlight-term">finance<span class="tooltip">资助</span></span> aucune religion.</p>
+                
+                <p id="section2Text4">La laïcité a une valeur constitutionnelle. L'<span class="highlight-term">article 1 de la Constitution<span class="tooltip">宪法第1条</span></span> affirme que : <span class="highlight-term">« La France est une République indivisible, laïque, démocratique et sociale »<span class="tooltip">"法国是一个不可分割、世俗、民主和社会的共和国"</span></span>.</p>
+                
+                <p id="section2Text5">Son origine historique se trouve dans la <span class="highlight-term">loi de 1905<span class="tooltip">1905年法律</span></span>, qui établit la <span class="highlight-term">séparation des Églises et de l'État<span class="tooltip">政教分离</span></span>.</p>
+                
+                <p id="section2Text6">Dans l'<span class="highlight-term">espace public<span class="tooltip">公共空间</span></span>, l'expression des convictions religieuses est autorisée, mais elle doit <span class="highlight-term">respecter la loi<span class="tooltip">尊重法律</span></span> et <span class="highlight-term">ne pas troubler autrui<span class="tooltip">不打扰他人</span></span>. Certaines pratiques sont encadrées, comme les <span class="highlight-term">prières de rue<span class="tooltip">街头祈祷</span></span>, et la <span class="highlight-term">dissimulation du visage<span class="tooltip">遮盖面部</span></span> est interdite.</p>
+                
+                <p id="section2Text7">Dans les <span class="highlight-term">services publics<span class="tooltip">公共服务</span></span>, les <span class="highlight-term">usagers<span class="tooltip">用户/使用者</span></span> ne peuvent pas exiger d'adaptations au nom de la religion. Les <span class="highlight-term">agents publics<span class="tooltip">公务人员</span></span> ont une <span class="highlight-term">obligation stricte de neutralité<span class="tooltip">严格的中立义务</span></span> et ne peuvent porter de <span class="highlight-term">signes religieux ostensibles<span class="tooltip">明显的宗教标志</span></span>.</p>
+                
+                <p id="section2Text8">Dans le <span class="highlight-term">monde du travail<span class="tooltip">工作场所</span></span>, les <span class="highlight-term">fonctionnaires<span class="tooltip">公务员</span></span> doivent respecter la neutralité. Dans les <span class="highlight-term">entreprises privées<span class="tooltip">私营企业</span></span>, des restrictions peuvent être imposées pour des raisons d'<span class="highlight-term">hygiène<span class="tooltip">卫生</span></span> ou de <span class="highlight-term">sécurité<span class="tooltip">安全</span></span>.</p>
+                
+                <p id="section2Text9">À l'<span class="highlight-term">école publique<span class="tooltip">公立学校</span></span> et dans les établissements <span class="highlight-term">sous contrat<span class="tooltip">签约学校</span></span>, la <span class="highlight-term">Charte de la laïcité à l'école<span class="tooltip">学校世俗主义宪章</span></span> s'applique. Les <span class="highlight-term">élèves<span class="tooltip">学生</span></span>, les <span class="highlight-term">enseignants<span class="tooltip">教师</span></span> et les <span class="highlight-term">parents<span class="tooltip">家长</span></span> ne peuvent porter de <span class="highlight-term">signes religieux ostensibles<span class="tooltip">明显的宗教标志</span></span>, et les <span class="highlight-term">enseignants<span class="tooltip">教师</span></span> doivent rester <span class="highlight-term">neutres<span class="tooltip">中立</span></span>.</p>
+                
+                <p id="section2Text10">Enfin, la laïcité garantit certaines libertés : le <span class="highlight-term">prosélytisme<span class="tooltip">传教/劝诱改宗</span></span> est <span class="highlight-term">légal<span class="tooltip">合法的</span></span>, mais interdit sur le <span class="highlight-term">lieu de travail<span class="tooltip">工作场所</span></span>, et le <span class="highlight-term">blasphème<span class="tooltip">亵渎神明</span></span> est <span class="highlight-term">légal<span class="tooltip">合法的</span></span> en France.</p>
+
+                <div class="important-note">
+                    <p id="importantNote2"><strong>Important :</strong> La laïcité est un pilier de la République française. Elle garantit à la fois la liberté de conscience et la neutralité de l'État en matière religieuse.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Action Cards -->
+    <section class="action-cards" id="astuces">
+        <div class="container">
+            <h2 style="color: white; text-align: center; margin-bottom: 50px;" id="actionTitle">Passez à l'action</h2>
+            
+            <div class="action-cards-container">
+                <!-- Card 1: Astuces d'examen -->
+                <div class="action-card action-card-1">
+                    <div class="action-card-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3 id="astuceTitle">Astuces pour l'examen</h3>
+                    <p id="astuceDescription">Découvrez les conseils et techniques pour réussir votre examen civique. Apprenez comment aborder les questions, gérer votre temps et maximiser vos chances de réussite.</p>
+                    <a href="astuces-examen-valeur.html" class="btn btn-orange" id="astuceBtn">
+                        <i class="fas fa-graduation-cap"></i> Voir les astuces
+                    </a>
+                </div>
+                
+                <!-- Card 2: Test rapide -->
+                <div class="action-card action-card-2">
+                    <div class="action-card-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 id="testTitle">Test rapide</h3>
+                    <p id="testDescription">Testez vos connaissances sur les valeurs de la République avec ce quiz de 20 questions. Obtenez des corrections instantanées et découvrez vos points forts et faibles.</p>
+                    <a href="test-rapide-valeurs.html" class="btn btn-purple" id="testBtn">
+                        <i class="fas fa-play-circle"></i> Commencer le test
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <!-- About Column -->
+                <div class="footer-column">
+                    <h4 id="footerAbout">À propos</h4>
+                    <p id="footerAboutText">
+                        L'association Mille Voiles accompagne les communautés chinoises en France dans leurs démarches d'intégration, d'apprentissage du français et de préparation aux examens officiels.
+                    </p>
+                </div>
+                
+                <!-- Quick Links Column -->
+                <div class="footer-column">
+                    <h4 id="footerLinks">Thématiques</h4>
+                    <ul class="footer-links">
+                        <li><a href="thematique-valeurs.html"><i class="fas fa-chevron-right"></i> <span id="footerLink1">Valeurs de la République</span></a></li>
+                        <li><a href="thematique-institutions.html"><i class="fas fa-chevron-right"></i> <span id="footerLink2">Institutions françaises</span></a></li>
+                        <li><a href="thematique-droits.html"><i class="fas fa-chevron-right"></i> <span id="footerLink3">Droits et devoirs</span></a></li>
+                        <li><a href="thematique-culture.html"><i class="fas fa-chevron-right"></i> <span id="footerLink4">Culture française</span></a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact Column -->
+                <div class="footer-column">
+                    <h4 id="footerContact">Contact</h4>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span id="footerEmail">2025qianfan@gmail.com</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-globe"></i>
+                            <span id="footerWebsite">Association Mille Voiles</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="footerAddress">94800 Villejuif</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p id="footerCopyright">&copy; 2025 Association Mille Voiles / 千帆协会 - Tous droits réservés. | <a href="#" style="color: var(--primary-yellow);" id="footerPrivacy">Mentions légales</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top -->
+    <a href="#" class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+
+    <!-- JavaScript -->
+    <script>
+         document.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+    });
+
+    // 禁止常见快捷键
+    document.addEventListener('keydown', function (e) {
+        // Ctrl + C / Ctrl + U / Ctrl + S
+        if (e.ctrlKey && ['c', 'u', 's', 'x', 'v', 'a'].includes(e.key.toLowerCase())) {
+            e.preventDefault();
+        }
+
+        // F12
+        if (e.key === 'F12') {
+            e.preventDefault();
+        }
+    });
+        // 语言切换数据
+        const translations = {
+            fr: {
+                // Header
+                mainTitle: "Valeurs de la République",
+                mainSubtitle: "Principes et symboles - Préparation à l'examen civique français",
+                logoText: "Mille Voiles",
+                
+                // Navigation
+                navHome: "Accueil",
+                navContent: "Contenu",
+                navAstuces: "Astuces",
+                navTest: "Test",
+                
+                // Breadcrumb
+                breadcrumbCurrent: "Valeurs de la République",
+                
+                // Theme Hero
+                themeTitle: "Principes et valeurs de la République",
+                themeDescription: "Découvrez les symboles, la devise et le principe de laïcité qui fondent l'identité républicaine française",
+                
+                // Article
+                articleTitle: "Révision pour l'examen civique",
+                articleSubtitle: "Survolez les termes en gras et soulignés pour voir leur traduction en chinois",
+                
+                // Section Titles
+                section1Title: "I. Les symboles de la République",
+                section1_1Title: "1. La devise de la République",
+                section1_2Title: "2. Les symboles officiels",
+                section2Title: "II. La laïcité",
+                
+                // Important Notes
+                importantNote1: "À retenir : La devise \"Liberté, Égalité, Fraternité\" est présente partout dans la vie quotidienne française et est protégée par la Constitution.",
+                importantNote2: "Important : La laïcité est un pilier de la République française. Elle garantit à la fois la liberté de conscience et la neutralité de l'État en matière religieuse.",
+                
+                // Action Cards
+                actionTitle: "Passez à l'action",
+                astuceTitle: "Astuces pour l'examen",
+                astuceDescription: "Découvrez les conseils et techniques pour réussir votre examen civique. Apprenez comment aborder les questions, gérer votre temps et maximiser vos chances de réussite.",
+                astuceBtn: '<i class="fas fa-graduation-cap"></i> Voir les astuces',
+                testTitle: "Test rapide",
+                testDescription: "Testez vos connaissances sur les valeurs de la République avec ce quiz de 10 questions. Obtenez des corrections instantanées et découvrez vos points forts et faibles.",
+                testBtn: '<i class="fas fa-play-circle"></i> Commencer le test',
+                
+                // Footer
+                footerAbout: "À propos",
+                footerAboutText: "L'association Mille Voiles accompagne les communautés chinoises en France dans leurs démarches d'intégration, d'apprentissage du français et de préparation aux examens officiels.",
+                footerLinks: "Thématiques",
+                footerLink1: "Valeurs de la République",
+                footerLink2: "Institutions françaises",
+                footerLink3: "Droits et devoirs",
+                footerLink4: "Culture française",
+                footerContact: "Contact",
+                footerEmail: "2025qianfan@gmail.com",
+                footerWebsite: "Association Mille Voiles",
+                footerAddress: "94800 Villejuif",
+                footerCopyright: "© 2025 Association Mille Voiles / 千帆协会 - Tous droits réservés. | ",
+                footerPrivacy: "Mentions légales"
+            },
+            zh: {
+                // Header
+                mainTitle: "共和国价值观",
+                mainSubtitle: "原则与象征 - 法国公民考试准备",
+                logoText: "千帆协会",
+                
+                // Navigation
+                navHome: "首页",
+                navContent: "内容",
+                navAstuces: "考试技巧",
+                navTest: "测试",
+                
+                // Breadcrumb
+                breadcrumbCurrent: "共和国价值观",
+                
+                // Theme Hero
+                themeTitle: "共和国的原则与价值观",
+                themeDescription: "了解构成法国共和认同的象征、格言和政教分离原则",
+                
+                // Article
+                articleTitle: "公民考试复习",
+                articleSubtitle: "将鼠标悬停在粗体下划线术语上查看中文翻译",
+                
+                // Section Titles
+                section1Title: "一、共和国的象征",
+                section1_1Title: "1. 共和国格言",
+                section1_2Title: "2. 官方象征",
+                section2Title: "二、政教分离原则",
+                
+                // Important Notes
+                importantNote1: "需要记住：\"自由、平等、博爱\"的格言在法国日常生活中无处不在，并受到宪法保护。",
+                importantNote2: "重要提示：政教分离是法兰西共和国的支柱。它既保障信仰自由，又确保国家在宗教事务上保持中立。",
+                
+                // Action Cards
+                actionTitle: "采取行动",
+                astuceTitle: "考试技巧",
+                astuceDescription: "了解通过公民考试的技巧和方法。学习如何应对问题、管理时间并最大化您的成功机会。",
+                astuceBtn: '<i class="fas fa-graduation-cap"></i> 查看技巧',
+                testTitle: "快速测试",
+                testDescription: "通过20道题的测验测试您对共和国价值观的了解。获得即时批改并发现您的优点和不足。",
+                testBtn: '<i class="fas fa-play-circle"></i> 开始测试',
+                
+                // Footer
+                footerAbout: "关于我们",
+                footerAboutText: "千帆协会协助在法华人社区进行融合程序、法语学习以及官方考试准备。",
+                footerLinks: "主题",
+                footerLink1: "共和国价值观",
+                footerLink2: "法国机构",
+                footerLink3: "权利与义务",
+                footerLink4: "法国文化",
+                footerContact: "联系我们",
+                footerEmail: "2025qianfan@gmail.com",
+                footerWebsite: "千帆协会",
+                footerAddress: "94800 维勒瑞夫",
+                footerCopyright: "© 2025 千帆协会 / Association Mille Voiles - 版权所有。 | ",
+                footerPrivacy: "法律声明"
+            }
+        };
+
+        // 当前语言
+        let currentLang = 'fr';
+
+        // 切换语言函数
+        function switchLanguage(lang) {
+            currentLang = lang;
+            
+            // 更新语言按钮状态
+            document.getElementById('langFr').classList.toggle('active', lang === 'fr');
+            document.getElementById('langZh').classList.toggle('active', lang === 'zh');
+            
+            // 获取翻译数据
+            const data = translations[lang];
+            
+            // 遍历所有数据项并更新页面
+            for (const [key, value] of Object.entries(data)) {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (key.includes('Btn') || key.includes('Title') || key.includes('Text')) {
+                        element.innerHTML = value;
+                    } else {
+                        element.textContent = value;
+                    }
+                }
+            }
+        }
+
+        // Back to Top功能
+        const backToTopBtn = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
+        
+        backToTopBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置默认语言
+            switchLanguage('fr');
+            
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    if (this.getAttribute('href') !== '#') {
+                        e.preventDefault();
+                        
+                        const targetId = this.getAttribute('href');
+                        const targetElement = document.querySelector(targetId);
+                        
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 80,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+            
+            // 为所有高亮术语添加中文翻译提示
+            const highlightTerms = document.querySelectorAll('.highlight-term');
+            highlightTerms.forEach(term => {
+                // 已经通过HTML data属性设置了翻译，这里不需要额外处理
+            });
+        });
+    </script>
+</body>
+</html>
+
+

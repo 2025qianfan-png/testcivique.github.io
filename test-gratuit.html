@@ -1,0 +1,2314 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Civique - Association Mille Voiles</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- EmailJS库 -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+      // 禁止右键
+    document.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+    });
+
+    // 禁止常见快捷键
+    document.addEventListener('keydown', function (e) {
+        // Ctrl + C / Ctrl + U / Ctrl + S
+        if (e.ctrlKey && ['c', 'u', 's', 'x', 'v', 'a'].includes(e.key.toLowerCase())) {
+            e.preventDefault();
+        }
+
+        // F12
+        if (e.key === 'F12') {
+            e.preventDefault();
+        }
+    });
+  // 初始化EmailJS - 使用您的public key
+  (function() {
+    emailjs.init("D2jk67ERbrJZSUyvC"); // 您需要在EmailJS获取并替换这个key
+  })();
+</script>
+<style>
+/* Variables et reset */
+:root {
+  --primary-blue: #004080;
+  --primary-light-blue: #0066cc;
+  --primary-yellow: #ffd633;
+  --primary-light-yellow: #ffe066;
+  --dark-gray: #333333;
+  --medium-gray: #666666;
+  --light-gray: #f5f7fa;
+  --white: #ffffff;
+  --green: #27ae60;
+  --red: #e74c3c;
+  --orange: #f39c12;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.12);
+  --border-radius: 12px;
+  --transition: all 0.3s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  color: var(--dark-gray);
+  background-color: var(--light-gray);
+  line-height: 1.7;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--primary-blue);
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 16px 36px;
+  background-color: var(--primary-yellow);
+  color: var(--primary-blue);
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  box-shadow: var(--shadow);
+}
+
+.btn:hover {
+  background-color: var(--primary-light-yellow);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+}
+
+.btn-primary {
+  background-color: var(--primary-blue);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-light-blue);
+}
+
+.btn-success {
+  background-color: var(--green);
+  color: var(--white);
+}
+
+.btn-success:hover {
+  background-color: #229954;
+}
+
+/* Disclaimer Modal */
+.disclaimer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: 3000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.disclaimer-content {
+  background-color: var(--white);
+  padding: 40px;
+  border-radius: var(--border-radius);
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalFade 0.4s ease-out;
+}
+
+@keyframes modalFade {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.disclaimer-header {
+  text-align: center;
+  margin-bottom: 30px;
+  border-bottom: 3px solid var(--primary-yellow);
+  padding-bottom: 20px;
+}
+
+.disclaimer-header h2 {
+  color: var(--primary-blue);
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+}
+
+.disclaimer-subtitle {
+  color: var(--medium-gray);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.disclaimer-body {
+  margin-bottom: 30px;
+}
+
+.disclaimer-section {
+  margin-bottom: 25px;
+}
+
+.disclaimer-section h3 {
+  color: var(--primary-blue);
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.disclaimer-section h3 i {
+  color: var(--primary-yellow);
+}
+
+.disclaimer-text {
+  color: var(--dark-gray);
+  line-height: 1.8;
+  margin-bottom: 15px;
+  text-align: justify;
+}
+
+.disclaimer-warning {
+  background-color: rgba(231, 76, 60, 0.1);
+  border-left: 4px solid var(--red);
+  padding: 15px;
+  border-radius: 0 8px 8px 0;
+  margin: 20px 0;
+}
+
+.disclaimer-warning p {
+  color: var(--dark-gray);
+  margin: 0;
+  font-weight: 600;
+}
+
+.disclaimer-recommendations {
+  background-color: rgba(52, 152, 219, 0.1);
+  border-left: 4px solid #3498db;
+  padding: 20px;
+  border-radius: 0 8px 8px 0;
+  margin: 25px 0;
+}
+
+.disclaimer-recommendations h4 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.recommendation-item {
+  margin-bottom: 15px;
+  padding-left: 10px;
+}
+
+.recommendation-item strong {
+  color: var(--primary-blue);
+}
+
+.disclaimer-agreement {
+  background-color: rgba(46, 204, 113, 0.1);
+  border: 2px solid var(--green);
+  border-radius: var(--border-radius);
+  padding: 25px;
+  text-align: center;
+  margin: 30px 0;
+}
+
+.agreement-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.agreement-checkbox input {
+  transform: scale(1.5);
+}
+
+.agreement-checkbox label {
+  font-weight: 600;
+  color: var(--dark-gray);
+  font-size: 1.1rem;
+}
+
+.disclaimer-footer {
+  text-align: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.disclaimer-footer p {
+  color: var(--medium-gray);
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.disclaimer-btns {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.btn-disclaimer {
+  padding: 14px 40px;
+  min-width: 180px;
+}
+
+/* Name Collection Modal - FIXED */
+.name-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: 2500;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Changed from center to flex-start */
+  padding: 20px;
+  overflow-y: auto; /* Added for scrolling */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+.name-content {
+  background-color: var(--white);
+  padding: 30px; /* Reduced padding */
+  border-radius: var(--border-radius);
+  max-width: 500px;
+  width: 100%;
+  margin: 40px auto; /* Added margin for mobile */
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalFade 0.4s ease-out;
+}
+
+.name-content h2 {
+  font-size: 1.8rem; /* Reduced size */
+  margin-bottom: 15px;
+  color: var(--primary-blue);
+}
+
+.name-content p {
+  margin-bottom: 20px;
+  color: var(--medium-gray);
+  font-size: 1rem; /* Reduced size */
+}
+
+.name-form {
+  text-align: left;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--primary-blue);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px; /* Fixed for iOS */
+  transition: var(--transition);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1);
+}
+
+.email-info {
+  background-color: rgba(52, 152, 219, 0.1);
+  border-left: 4px solid #3498db;
+  padding: 12px;
+  border-radius: 0 8px 8px 0;
+  margin: 20px 0;
+  font-size: 0.9rem; /* Reduced size */
+}
+
+.email-info p {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  font-size: 0.9rem; /* Reduced size */
+}
+
+.email-info p:last-child {
+  margin-bottom: 0;
+}
+
+.form-error {
+  color: var(--red);
+  margin-top: 10px;
+  font-weight: 600;
+  display: none;
+  font-size: 0.9rem;
+}
+
+.name-btns {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+/* Password Modal */
+.password-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.password-content {
+  background-color: var(--white);
+  padding: 40px;
+  border-radius: var(--border-radius);
+  max-width: 500px;
+  width: 100%;
+  margin: auto;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalFade 0.4s ease-out;
+}
+
+.password-content h2 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  color: var(--primary-blue);
+}
+
+.password-content p {
+  margin-bottom: 25px;
+  color: var(--medium-gray);
+  font-size: 1rem;
+}
+
+.password-input {
+  width: 100%;
+  padding: 16px 20px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+  transition: var(--transition);
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 1px;
+}
+
+.password-input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.2);
+}
+
+.password-error {
+  color: var(--red);
+  margin-top: 10px;
+  font-weight: 600;
+  display: none;
+  font-size: 1rem;
+}
+
+.password-btns {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.btn-modal {
+  padding: 14px 30px;
+  min-width: 140px;
+}
+
+/* Email Sending Status */
+.email-status-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: 1500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.email-status-content {
+  background-color: var(--white);
+  padding: 40px;
+  border-radius: var(--border-radius);
+  max-width: 500px;
+  width: 100%;
+  margin: auto;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalFade 0.4s ease-out;
+}
+
+.email-status-content h3 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: var(--primary-blue);
+}
+
+.email-status-content p {
+  margin-bottom: 30px;
+  color: var(--medium-gray);
+  font-size: 1.1rem;
+}
+
+.status-icon {
+  font-size: 4rem;
+  margin-bottom: 30px;
+}
+
+.status-success {
+  color: var(--green);
+}
+
+.status-error {
+  color: var(--red);
+}
+
+/* Test Container */
+.test-container {
+  display: none;
+}
+
+.test-container.show {
+  display: block;
+}
+
+/* Timer */
+.timer-container {
+  background-color: var(--white);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  margin-bottom: 30px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.timer-display {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  margin-bottom: 10px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.timer-label {
+  font-size: 1.1rem;
+  color: var(--medium-gray);
+  margin-bottom: 15px;
+}
+
+.timer-progress {
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 15px;
+}
+
+.timer-progress-fill {
+  height: 100%;
+  background-color: var(--primary-blue);
+  width: 100%;
+  transition: width 1s linear;
+}
+
+.timer-warning {
+  color: var(--orange);
+  font-weight: 600;
+  margin-top: 10px;
+  display: none;
+}
+
+.timer-critical {
+  color: var(--red);
+  font-weight: 600;
+  margin-top: 10px;
+  display: none;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* Questions */
+.question-counter {
+  background-color: var(--white);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  margin-bottom: 30px;
+  box-shadow: var(--shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.counter-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.progress-container {
+  flex-grow: 1;
+  max-width: 400px;
+}
+
+.progress-bar {
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 5px;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: var(--primary-blue);
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+.question-card {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  padding: 40px;
+  margin-bottom: 30px;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.question-text {
+  font-size: 1.4rem;
+  margin-bottom: 30px;
+  color: var(--primary-blue);
+  font-weight: 600;
+}
+
+.options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  padding: 18px 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: var(--transition);
+  background-color: #f9f9f9;
+}
+
+.option:hover {
+  background-color: #f0f7ff;
+  border-color: var(--primary-light-blue);
+}
+
+.option.selected {
+  background-color: #e6f2ff;
+  border-color: var(--primary-blue);
+}
+
+.option input {
+  margin-right: 15px;
+  transform: scale(1.3);
+}
+
+.option label {
+  cursor: pointer;
+  font-size: 1.1rem;
+  flex-grow: 1;
+}
+
+/* Navigation */
+.navigation-btns {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  gap: 20px;
+}
+
+.nav-btn {
+  padding: 14px 30px;
+  min-width: 150px;
+}
+
+.nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Results */
+.results-container {
+  display: none;
+}
+
+.results-container.show {
+  display: block;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.results-content {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  padding: 50px;
+  margin-top: 40px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.results-header {
+  margin-bottom: 40px;
+}
+
+.score-display {
+  font-size: 4rem;
+  font-weight: 800;
+  color: var(--primary-blue);
+  margin-bottom: 10px;
+}
+
+.score-text {
+  font-size: 1.8rem;
+  margin-bottom: 30px;
+}
+
+.recommendation-result {
+  background-color: rgba(52, 152, 219, 0.1);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  margin: 25px 0;
+  text-align: left;
+}
+
+.recommendation-result h4 {
+  color: var(--primary-blue);
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+}
+
+.recommendation-result p {
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+
+.score-bar {
+  height: 20px;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 30px 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.score-fill {
+  height: 100%;
+  background-color: var(--green);
+  width: 0%;
+  transition: width 1.5s ease;
+}
+
+.results-details {
+  text-align: left;
+  max-width: 800px;
+  margin: 40px auto 0;
+}
+
+.result-item {
+  padding: 25px;
+  border-radius: var(--border-radius);
+  margin-bottom: 20px;
+  background-color: var(--light-gray);
+}
+
+.result-item.correct {
+  border-left: 5px solid var(--green);
+}
+
+.result-item.incorrect {
+  border-left: 5px solid var(--red);
+}
+
+.result-question {
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.result-answer {
+  margin-bottom: 8px;
+  padding-left: 20px;
+}
+
+.result-explanation {
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 10px;
+  font-style: italic;
+  border-left: 3px solid var(--primary-yellow);
+}
+
+.results-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 50px;
+  flex-wrap: wrap;
+}
+
+/* Footer */
+.test-footer {
+  background-color: var(--primary-blue);
+  color: var(--white);
+  padding: 40px 0;
+  margin-top: 80px;
+  text-align: center;
+}
+
+.test-footer a {
+  color: var(--primary-yellow);
+  font-weight: 600;
+}
+
+/* Responsive - UPDATED */
+@media (max-width: 768px) {
+  /* General responsive */
+  .test-header h1 {
+    font-size: 2.2rem;
+  }
+  
+  .question-card {
+    padding: 25px;
+  }
+  
+  .question-text {
+    font-size: 1.2rem;
+  }
+  
+  .option {
+    padding: 15px;
+  }
+  
+  .results-content {
+    padding: 30px 20px;
+  }
+  
+  .score-display {
+    font-size: 3rem;
+  }
+  
+  .navigation-btns {
+    flex-direction: column;
+  }
+  
+  .nav-btn {
+    width: 100%;
+  }
+  
+  /* Modal fixes for mobile */
+  .disclaimer-overlay,
+  .name-overlay,
+  .password-overlay,
+  .email-status-overlay {
+    padding: 10px;
+    align-items: flex-start;
+  }
+  
+  .disclaimer-content {
+    padding: 25px 20px;
+    margin: 20px auto;
+    max-height: 85vh;
+  }
+  
+  .disclaimer-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .name-content,
+  .password-content,
+  .email-status-content {
+    padding: 25px 20px;
+    margin: 30px auto;
+    width: calc(100% - 20px);
+  }
+  
+  .name-content h2,
+  .password-content h2,
+  .email-status-content h3 {
+    font-size: 1.5rem;
+  }
+  
+  /* Form improvements for mobile */
+  .form-group input {
+    padding: 16px;
+    font-size: 16px;
+    min-height: 50px;
+  }
+  
+  .email-info {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+  
+  /* Button improvements for mobile */
+  .name-btns,
+  .password-btns,
+  .disclaimer-btns {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .btn-modal,
+  .btn-disclaimer {
+    width: 100%;
+    padding: 16px;
+  }
+  
+  .timer-display {
+    font-size: 2rem;
+  }
+  
+  /* Fix for small screens */
+  .disclaimer-agreement {
+    padding: 20px 15px;
+  }
+  
+  .agreement-checkbox {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .agreement-checkbox label {
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .name-content,
+  .password-content {
+    padding: 20px 15px;
+  }
+  
+  .name-content h2 {
+    font-size: 1.3rem;
+  }
+  
+  .name-content p {
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+  }
+  
+  .email-info {
+    font-size: 0.8rem;
+    padding: 8px 10px;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group input {
+    padding: 14px;
+  }
+  
+  .results-actions {
+    flex-direction: column;
+  }
+  
+  .results-actions .btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .score-display {
+    font-size: 2.5rem;
+  }
+  
+  .score-text {
+    font-size: 1.3rem;
+  }
+}
+
+/* Landscape mode */
+@media (max-height: 600px) and (orientation: landscape) {
+  .name-overlay {
+    align-items: flex-start;
+    padding-top: 10px;
+  }
+  
+  .name-content {
+    margin: 10px auto;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* Fix for iOS input zoom */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Disclaimer Modal -->
+<div id="disclaimerModal" class="disclaimer-overlay">
+  <div class="disclaimer-content">
+    <div class="disclaimer-header">
+      <h2>Examen blanc pour Examen civique</h2>
+      <p class="disclaimer-subtitle">多年卡公民考试模拟测试</p>
+    </div>
+    
+    <div class="disclaimer-body">
+      <div class="disclaimer-section">
+        <h3><i class="fas fa-exclamation-triangle"></i> Attention</h3>
+        <div class="disclaimer-warning">
+          <p>Cet examen est un test blanc à visée prédictive, destiné à évaluer le niveau des apprenants de l'association Qianfan afin de recommander le cours le plus approprié. Il est strictement interdit de le divulguer ou de l'utiliser à d'autres fins.</p>
+        </div>
+        <p class="disclaimer-text">本考试为模拟预测，旨在评估千帆协会学员水平以推荐适合的课程，严谨外泄和其他用途。</p>
+      </div>
+      
+      <div class="disclaimer-section">
+        <h3><i class="fas fa-clock"></i> Durée recommandée</h3>
+        <p class="disclaimer-text">Durée recommandée : 20 minutes.<br>本考试建议时间 20mins</p>
+        
+        <h3><i class="fas fa-question-circle"></i> Nombre de questions</h3>
+        <p class="disclaimer-text">Nombre de questions : 16 toutes correctes pour réussir.<br>16 题即为通过</p>
+      </div>
+      
+      <div class="disclaimer-recommendations">
+        <h4><i class="fas fa-graduation-cap"></i> Recommandations / 课程推荐</h4>
+        
+        <div class="recommendation-item">
+          <p><strong>Moins de 14 réponses correctes : </strong> il est conseillé de suivre le cours complet avec explications détaillées, afin d'aider les candidats à réussir l'examen civique de manière efficace et sereine.</p>
+
+          
+          <p><strong>正确率少于 14 题：</strong> 建议报名全能讲解课程，以帮助考生顺利且高效地通过公民考试</p>
+        </div>
+        <div class="recommendation-item">
+          <p><strong>Entre 14 — 18 réponses correctes :</strong> il est conseillé de s'inscrire au cours accéléré du centre d'examen.</p>
+
+         
+          <p><strong>正确率 14-18 题： </strong> 建议报名考点速通课程</p>
+        
+        </div>
+        
+        <div class="recommendation-item">
+          <p><strong>Plus de 18 réponses correctes :</strong> votre niveau est excellent, vous êtes prêt pour l'examen officiel !</p>
+          <p><strong>正确率超过 18 题：</strong> 您的水平非常优秀，已准备好参加正式考试！</p>
+        </div>
+      </div>
+      
+      <div class="disclaimer-agreement">
+        <div class="agreement-checkbox">
+          <input type="checkbox" id="agreeCheckbox">
+          <label for="agreeCheckbox">J'ai lu et compris toutes les informations ci-dessus, et j'accepte les conditions.</label>
+        </div>
+        <p>我已阅读并理解以上所有信息，并同意相关条件。</p>
+      </div>
+    </div>
+    
+    <div class="disclaimer-footer">
+      <p>© 2026 Association Mille Voiles / Qianfan Association</p>
+      <div class="disclaimer-btns">
+        <button class="btn btn-primary btn-disclaimer" id="agreeBtn" onclick="acceptDisclaimer()" disabled>
+          <i class="fas fa-check-circle"></i> J'accepte et je continue
+        </button>
+        <button class="btn btn-disclaimer" onclick="rejectDisclaimer()">
+          <i class="fas fa-times-circle"></i> Je refuse et je quitte
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Name Collection Modal -->
+<div id="nameModal" class="name-overlay" style="display: none;">
+  <div class="name-content">
+    <h2>Informations du candidat</h2>
+    <p>Veuillez entrer vos informations personnelles pour que nous puissions vous envoyer vos résultats.</p>
+    
+    <form id="nameForm" class="name-form">
+      <div class="form-group">
+        <label for="firstName">Prénom *</label>
+        <input type="text" id="firstName" placeholder="Votre prénom" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="lastName">Nom de famille *</label>
+        <input type="text" id="lastName" placeholder="Votre nom de famille" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="studentEmail">Votre email *</label>
+        <input type="email" id="studentEmail" placeholder="votre.email@exemple.com" required>
+        <div class="form-error" id="emailError">Veuillez entrer une adresse email valide</div>
+      </div>
+      
+      <div class="email-info">
+        <p><strong>Note importante :</strong> Une copie de vos résultats sera automatiquement envoyée à <strong>2025qianfan@gmail.com</strong> pour archivage par l'association.</p>
+        <p>重要提示：您的成绩副本将自动发送至 <strong>2025qianfan@gmail.com</strong> 供协会存档。</p>
+      </div>
+    </form>
+    
+    <div class="name-btns">
+      <button class="btn btn-primary btn-modal" onclick="saveStudentInfo()">
+        <i class="fas fa-save"></i> Enregistrer et continuer
+      </button>
+      <button class="btn btn-modal" onclick="goBackToDisclaimer()">
+        <i class="fas fa-arrow-left"></i> Retour
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Password Modal -->
+<div id="passwordModal" class="password-overlay" style="display: none;">
+  <div class="password-content">
+    <h2>Accès au Test Civique</h2>
+    <p>Pour accéder au Test Civique, veuillez entrer le mot de passe fourni par l'association Mille Voiles.</p>
+    
+    <input type="password" id="passwordInput" class="password-input" placeholder="Entrez le mot de passe" autofocus>
+    
+    <div id="passwordError" class="password-error">
+      <i class="fas fa-exclamation-circle"></i> Mot de passe incorrect. Veuillez réessayer.
+    </div>
+    
+    <div class="password-btns">
+      <button class="btn btn-primary btn-modal" onclick="validatePassword()">Accéder au test</button>
+      <button class="btn btn-modal" onclick="goBackToName()">
+        <i class="fas fa-arrow-left"></i> Retour
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Email Sending Status Modal -->
+<div id="emailStatusModal" class="email-status-overlay" style="display: none;">
+  <div class="email-status-content">
+    <div class="status-icon" id="statusIcon">
+      <i class="fas fa-envelope"></i>
+    </div>
+    <h3 id="statusTitle">Envoi des résultats</h3>
+    <p id="statusMessage">Vos résultats sont en cours d'envoi à 2025qianfan@gmail.com...</p>
+    <button class="btn btn-primary" id="statusButton" onclick="closeStatusModal()" style="display: none;">
+      <i class="fas fa-check"></i> Continuer
+    </button>
+  </div>
+</div>
+
+<!-- Test Header -->
+<header class="test-header" style="display: none;">
+  <div class="container">
+    <h1>Test Civique Français</h1>
+    <p>Examen blanc pour la carte de séjour pluriannuelle</p>
+    <div class="header-actions">
+      <button class="btn" onclick="showInstructions()">
+        <i class="fas fa-info-circle"></i> Instructions
+      </button>
+      <button class="btn" onclick="restartTest()">
+        <i class="fas fa-redo"></i> Recommencer
+      </button>
+      <button class="btn btn-primary" onclick="goBackToHome()">
+        <i class="fas fa-home"></i> Retour à l'accueil
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Test Container -->
+<main class="container">
+  <div id="testContainer" class="test-container">
+    <!-- Timer -->
+    <div class="timer-container">
+      <div class="timer-display" id="timerDisplay">20:00</div>
+      <div class="timer-label">Temps restant</div>
+      <div class="timer-progress">
+        <div class="timer-progress-fill" id="timerProgress"></div>
+      </div>
+      <div class="timer-warning" id="timerWarning">
+        <i class="fas fa-exclamation-triangle"></i> Plus que 5 minutes!
+      </div>
+      <div class="timer-critical" id="timerCritical">
+        <i class="fas fa-skull-crossbones"></i> Dernière minute!
+      </div>
+    </div>
+    
+    <!-- Question Counter -->
+    <div class="question-counter">
+      <div class="counter-info">
+        <div>
+          <h3>Question <span id="currentQuestion">1</span> sur <span id="totalQuestions">20</span></h3>
+          <p>Examen civique pour carte de séjour pluriannuelle</p>
+        </div>
+        <div class="progress-container">
+          <div>Progression: <span id="progressPercent">0%</span></div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Question -->
+    <div class="question-card">
+      <div class="question-text" id="questionText">Chargement de la question...</div>
+      
+      <div class="options-container" id="optionsContainer">
+        <!-- Options will be inserted here by JavaScript -->
+      </div>
+      
+      <div class="navigation-btns">
+        <button class="btn nav-btn" id="prevBtn" onclick="previousQuestion()" disabled>
+          <i class="fas fa-arrow-left"></i> Question précédente
+        </button>
+        <button class="btn btn-primary nav-btn" id="nextBtn" onclick="nextQuestion()">
+          Question suivante <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Submit Button -->
+    <div style="text-align: center; margin-top: 40px;">
+      <button class="btn btn-primary" id="submitBtn" onclick="submitTest()" style="padding: 18px 50px; font-size: 1.2rem; display: none;">
+        <i class="fas fa-paper-plane"></i> Soumettre le test
+      </button>
+    </div>
+  </div>
+  
+  <!-- Results Container -->
+  <div id="resultsContainer" class="results-container">
+    <div class="results-content">
+      <div class="results-header">
+        <div class="score-display" id="scoreDisplay">0/20</div>
+        <div class="score-text" id="scoreText">Chargement de votre résultat...</div>
+        
+        <div class="recommendation-result" id="courseRecommendation">
+          <h4><i class="fas fa-graduation-cap"></i> Recommandation de cours</h4>
+          <p id="recommendationText">Calcul en cours...</p>
+          <p id="recommendationDetails"></p>
+        </div>
+        
+        <div class="score-bar">
+          <div class="score-fill" id="scoreFill"></div>
+        </div>
+      </div>
+      
+      <div id="resultsDetails" class="results-details">
+        <!-- Results will be inserted here by JavaScript -->
+      </div>
+      
+      <div class="results-actions">
+  <button class="btn" onclick="restartTest()">
+    <i class="fas fa-redo"></i> Refaire le test
+  </button>
+  <button class="btn btn-primary" onclick="goBackToHome()">
+    <i class="fas fa-home"></i> Retour à l'accueil
+  </button>
+</div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="test-footer" style="display: none;">
+  <div class="container">
+    <p>© 2026 Association Mille Voiles - Examen blanc civique</p>
+    <p>Ce test est un examen blanc à visée prédictive pour la carte de séjour pluriannuelle. Temps limité: 20 minutes.</p>
+    <p><a href="index.html">Retour au site principal</a></p>
+  </div>
+</footer>
+
+<script>
+// 学生信息
+let studentInfo = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  testDate: ""
+};
+
+// Questions avec réponses et explications
+const questions = [
+  {
+    question: "De quelle année date la Constitution française ?",
+    options: ["1798", "1958", "1962", "1944"],
+    answer: 1,
+    explanation: "La Constitution actuelle de la France date de 1958 et fonde la Ve République."
+  },
+  {
+    question: "Quelles sont les couleurs du drapeau français ?",
+    options: ["rouge, blanc et bleu", "rouge, vert et bleu", "blanc, noir et rouge", "rouge, blanc et vert"],
+    answer: 0,
+    explanation: "Le drapeau français est composé de trois couleurs : bleu, blanc et rouge."
+  },
+  {
+    question: "Qu'est-ce que la laïcité ?",
+    options: [
+      "une religion officielle de la France",
+      "la séparation de l’État et des religions",
+      "une fête nationale française",
+      "une loi sur la langue française"
+    ],
+    answer: 1,
+    explanation: "La laïcité garantit la séparation de l’État et des religions ainsi que la liberté de conscience."
+  },
+  {
+    question: "En France, avoir plusieurs femmes est :",
+    options: ["obligatoire", "autorisé", "interdit", "normal"],
+    answer: 2,
+    explanation: "La polygamie est interdite par la loi en France."
+  },
+  {
+    question: "Madame X et Monsieur Y font le même travail dans une entreprise. En France, leur salaire est :",
+    options: [
+      "le même",
+      "différent parce qu’ils n’ont pas le même âge",
+      "différent parce qu’ils n’ont pas le même sexe",
+      "différent sans raison"
+    ],
+    answer: 0,
+    explanation: "En France, l’égalité salariale entre les femmes et les hommes est un principe légal."
+  },
+  {
+    question: "Le Parlement est composé :",
+    options: [
+      "de députés et de sénateurs",
+      "de juges et de policiers",
+      "de professeurs et d’élèves",
+      "du président et du Premier ministre"
+    ],
+    answer: 0,
+    explanation: "Le Parlement français est composé de l’Assemblée nationale (députés) et du Sénat (sénateurs)."
+  },
+  {
+    question: "Un ministre ne respecte pas la loi. En France :",
+    options: [
+      "il ne reçoit pas de punition",
+      "il reçoit une punition seulement dans certains cas",
+      "il peut décider de ne pas recevoir de punition",
+      "il reçoit la même punition que les citoyens"
+    ],
+    answer: 3,
+    explanation: "En France, tous les citoyens sont égaux devant la loi, y compris les ministres."
+  },
+  {
+    question: "Quel traité a permis la création officielle de l’Union européenne ?",
+    options: [
+      "le traité de Rome",
+      "le traité de Maastricht",
+      "le traité de Lisbonne",
+      "le traité de Paris"
+    ],
+    answer: 1,
+    explanation: "Le traité de Maastricht (1992) a officiellement créé l’Union européenne."
+  },
+  {
+    question: "De quelle année date la Déclaration des droits de l’homme et du citoyen ?",
+    options: ["1789", "1905", "1944", "1952"],
+    answer: 0,
+    explanation: "La Déclaration des droits de l’homme et du citoyen date de 1789, pendant la Révolution française."
+  },
+  {
+    question: "Que doit faire une personne en cas d’accident ?",
+    options: [
+      "partir sans aider",
+      "demander de l’aide à des amis",
+      "prendre une photo et poster sur les réseaux sociaux",
+      "appeler les secours (le 15, le 17 ou le 18)"
+    ],
+    answer: 3,
+    explanation: "En cas d’accident, il faut appeler les secours : 15 (SAMU), 17 (police) ou 18 (pompiers)."
+  },
+  {
+    question: "Une femme peut avorter :",
+    options: [
+      "seulement si elle est mariée",
+      "quand elle veut, sans limite",
+      "seulement si elle a un enfant",
+      "légalement en France jusqu’à 14 semaines de grossesse"
+    ],
+    answer: 3,
+    explanation: "En France, l’IVG est autorisée jusqu’à 14 semaines de grossesse."
+  },
+  {
+    question: "Madame X a insulté Madame Y. Que peut faire Madame Y ?",
+    options: [
+      "Porter plainte auprès de la police.",
+      "Demander à son mari d’intervenir.",
+      "Insulter Madame X en retour.",
+      "Demander à son père d’intervenir."
+    ],
+    answer: 0,
+    explanation: "En cas d’insulte, une personne peut porter plainte auprès de la police."
+  },
+  {
+    question: "Jeter des déchets dans la rue :",
+    options: [
+      "est interdit",
+      "est permis dans le parc",
+      "est permis quand il n’y a personne",
+      "est permis à certaines heures"
+    ],
+    answer: 0,
+    explanation: "Jeter des déchets dans la rue est interdit et puni par la loi."
+  },
+  {
+    question: "Madame X refuse de payer sa facture d’impôts. En France :",
+    options: [
+      "c’est illégal et elle peut être punie",
+      "c’est possible si son père est d’accord",
+      "c’est possible si son mari est d’accord",
+      "c’est possible si son entreprise est d’accord"
+    ],
+    answer: 0,
+    explanation: "Le paiement des impôts est obligatoire en France. Refuser de payer est illégal."
+  },
+  {
+    question: "Le 11 novembre est un jour férié. À quoi correspond cette date ?",
+    options: [
+      "le jour de Noël",
+      "l’anniversaire de la Révolution française",
+      "la fête des mères",
+      "la fin de la Première Guerre mondiale"
+    ],
+    answer: 3,
+    explanation: "Le 11 novembre commémore l’armistice de 1918, marquant la fin de la Première Guerre mondiale."
+  },
+  {
+    question: "Quelle île française se trouve dans l'océan Indien ?",
+    options: ["Guadeloupe", "La Corse", "La Réunion", "Guyane"],
+    answer: 2,
+    explanation: "La Réunion est une île française située dans l’océan Indien."
+  },
+  {
+    question: "Qui était Molière ?",
+    options: [
+      "un écrivain et dramaturge français",
+      "un peintre",
+      "un écrivain",
+      "un scientifique"
+    ],
+    answer: 0,
+    explanation: "Molière était un célèbre écrivain et dramaturge français du XVIIe siècle."
+  },
+  {
+    question: "Qu’est-ce que le Louvre ?",
+    options: [
+      "un musée à Paris",
+      "un château où vit le président",
+      "un stade de football",
+      "une grande école"
+    ],
+    answer: 0,
+    explanation: "Le Louvre est un grand musée situé à Paris."
+  },
+  {
+    question: "Ne pas envoyer un enfant de 8 ans à l’école en France :",
+    options: [
+      "est possible si l’enfant ne veut pas y aller",
+      "est possible si les parents peuvent l’enseigner à la maison",
+      "est interdit",
+      "est possible si l’enfant ne parle pas français"
+    ],
+    answer: 2,
+    explanation: "L’instruction est obligatoire en France pour les enfants de 3 à 16 ans."
+  },
+  {
+    question: "En France, pour le travail, quelle phrase est correcte ?",
+    options: [
+      "On peut travailler sans dire à l’administration",
+      "Tout salarié doit être déclaré par son employeur",
+      "On peut travailler sans contrat si on est adulte",
+      "Les heures supplémentaires ne doivent jamais être déclarées"
+    ],
+    answer: 1,
+    explanation: "Tout salarié doit être déclaré légalement par son employeur."
+  }
+];
+
+let currentQuestionIndex = 0;
+let userAnswers = new Array(questions.length).fill(null);
+
+// Variables du timer
+let totalTime = 20 * 60; // 20 minutes en secondes
+let timeLeft = totalTime;
+let timerInterval = null;
+let isTimerRunning = false;
+
+// Variables des résultats
+let currentScore = 0;
+let currentPercentage = 0;
+let currentScoreText = "";
+
+// Fonctions pour le disclaimer
+document.getElementById('agreeCheckbox').addEventListener('change', function() {
+  document.getElementById('agreeBtn').disabled = !this.checked;
+});
+
+// 添加移动端优化函数
+function optimizeForMobile() {
+  // 检测是否是移动设备
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  
+  if (isMobile) {
+    // 为所有模态框添加触摸优化
+    const modals = document.querySelectorAll('.disclaimer-overlay, .name-overlay, .password-overlay');
+    modals.forEach(modal => {
+      modal.style.webkitOverflowScrolling = 'touch';
+    });
+    
+    // 确保输入框在iOS上不被缩放
+    const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
+    inputs.forEach(input => {
+      input.style.fontSize = '16px';
+    });
+  }
+}
+
+// 页面加载完成后运行优化
+window.addEventListener('DOMContentLoaded', function() {
+  optimizeForMobile();
+});
+
+function acceptDisclaimer() {
+  if (!document.getElementById('agreeCheckbox').checked) {
+    alert("Veuillez cocher la case pour accepter les conditions.");
+    return;
+  }
+  
+  // Masquer le disclaimer
+  document.getElementById('disclaimerModal').style.display = 'none';
+  
+  // Afficher le modal de collecte de nom
+  document.getElementById('nameModal').style.display = 'flex';
+  
+  // 滚动到顶部
+  setTimeout(() => {
+    document.querySelector('.name-overlay').scrollTop = 0;
+    document.getElementById('firstName').focus();
+  }, 100);
+}
+
+function rejectDisclaimer() {
+  if (confirm("Êtes-vous sûr de vouloir quitter? Vous ne pourrez pas passer le test sans accepter les conditions.")) {
+    window.location.href = "index.html";
+  }
+}
+
+function goBackToDisclaimer() {
+  document.getElementById('nameModal').style.display = 'none';
+  document.getElementById('disclaimerModal').style.display = 'flex';
+}
+
+function goBackToName() {
+  document.getElementById('passwordModal').style.display = 'none';
+  document.getElementById('nameModal').style.display = 'flex';
+  
+  // 滚动到顶部
+  setTimeout(() => {
+    document.querySelector('.name-overlay').scrollTop = 0;
+  }, 100);
+}
+
+function saveStudentInfo() {
+  const firstName = document.getElementById('firstName').value.trim();
+  const lastName = document.getElementById('lastName').value.trim();
+  const email = document.getElementById('studentEmail').value.trim();
+  const emailError = document.getElementById('emailError');
+  
+  // Validation
+  if (!firstName || !lastName || !email) {
+    alert("Veuillez remplir tous les champs obligatoires.");
+    return;
+  }
+  
+  if (!isValidEmail(email)) {
+    emailError.style.display = 'block';
+    return;
+  } else {
+    emailError.style.display = 'none';
+  }
+  
+  // Sauvegarder les informations
+  studentInfo.firstName = firstName;
+  studentInfo.lastName = lastName;
+  studentInfo.email = email;
+  studentInfo.testDate = new Date().toLocaleString('fr-FR');
+  
+  // Masquer le modal de nom et afficher le modal de mot de passe
+  document.getElementById('nameModal').style.display = 'none';
+  document.getElementById('passwordModal').style.display = 'flex';
+  
+  // 滚动到顶部并聚焦
+  setTimeout(() => {
+    document.querySelector('.password-overlay').scrollTop = 0;
+    document.getElementById('passwordInput').focus();
+  }, 100);
+}
+
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+// Fonctions principales
+function validatePassword() {
+  const password = document.getElementById('passwordInput').value;
+  const errorElement = document.getElementById('passwordError');
+  
+  if (password === 'pretest2026') {
+    document.getElementById('passwordModal').style.display = 'none';
+    document.getElementById('testContainer').classList.add('show');
+    
+    // Afficher l'en-tête et le pied de page
+    document.querySelector('.test-header').style.display = 'block';
+    document.querySelector('.test-footer').style.display = 'block';
+    
+    // 滚动到顶部
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 100);
+    
+    initializeTest();
+  } else {
+    errorElement.style.display = 'block';
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('passwordInput').focus();
+  }
+}
+
+function initializeTest() {
+  document.getElementById('totalQuestions').textContent = questions.length;
+  showQuestion(currentQuestionIndex);
+  updateQuestionCounter();
+  startTimer();
+}
+
+function showQuestion(index) {
+  const question = questions[index];
+  
+  document.getElementById('questionText').textContent = question.question;
+  
+  const optionsContainer = document.getElementById('optionsContainer');
+  optionsContainer.innerHTML = '';
+  
+  question.options.forEach((option, optionIndex) => {
+    const optionDiv = document.createElement('div');
+    optionDiv.className = 'option';
+    if (userAnswers[index] === optionIndex) {
+      optionDiv.classList.add('selected');
+    }
+    
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'question';
+    input.id = `option${optionIndex}`;
+    input.value = optionIndex;
+    if (userAnswers[index] === optionIndex) {
+      input.checked = true;
+    }
+    
+    const label = document.createElement('label');
+    label.htmlFor = `option${optionIndex}`;
+    label.textContent = option;
+    
+    optionDiv.appendChild(input);
+    optionDiv.appendChild(label);
+    
+    optionDiv.addEventListener('click', () => {
+      userAnswers[index] = optionIndex;
+      showQuestion(index);
+    });
+    
+    optionsContainer.appendChild(optionDiv);
+  });
+  
+  document.getElementById('prevBtn').disabled = index === 0;
+  document.getElementById('nextBtn').disabled = index === questions.length - 1;
+  document.getElementById('submitBtn').style.display = 
+    (index === questions.length - 1) ? 'block' : 'none';
+}
+
+function nextQuestion() {
+  if (currentQuestionIndex < questions.length - 1) {
+    currentQuestionIndex++;
+    showQuestion(currentQuestionIndex);
+    updateQuestionCounter();
+  }
+}
+
+function previousQuestion() {
+  if (currentQuestionIndex > 0) {
+    currentQuestionIndex--;
+    showQuestion(currentQuestionIndex);
+    updateQuestionCounter();
+  }
+}
+
+function updateQuestionCounter() {
+  const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+  
+  document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+  document.getElementById('progressPercent').textContent = Math.round(progress) + '%';
+  document.getElementById('progressFill').style.width = progress + '%';
+}
+
+// Timer functions
+function startTimer() {
+  isTimerRunning = true;
+  updateTimerDisplay();
+  
+  timerInterval = setInterval(() => {
+    if (timeLeft > 0) {
+      timeLeft--;
+      updateTimerDisplay();
+      
+      // Afficher les avertissements
+      if (timeLeft === 5 * 60) { // 5 minutes restantes
+        document.getElementById('timerWarning').style.display = 'block';
+      } else if (timeLeft === 60) { // 1 minute restante
+        document.getElementById('timerWarning').style.display = 'none';
+        document.getElementById('timerCritical').style.display = 'block';
+      } else if (timeLeft <= 10) { // Dernières 10 secondes
+        document.getElementById('timerDisplay').style.color = 'var(--red)';
+        document.getElementById('timerDisplay').style.animation = 'pulse 0.5s infinite';
+      }
+    } else {
+      timeUp();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+  
+  document.getElementById('timerDisplay').textContent = 
+    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  
+  // Mettre à jour la barre de progression
+  const progressPercent = (timeLeft / totalTime) * 100;
+  document.getElementById('timerProgress').style.width = `${progressPercent}%`;
+  
+  // Changer la couleur selon le temps restant
+  if (timeLeft <= 60) {
+    document.getElementById('timerProgress').style.backgroundColor = 'var(--red)';
+  } else if (timeLeft <= 5 * 60) {
+    document.getElementById('timerProgress').style.backgroundColor = 'var(--orange)';
+  }
+}
+
+function timeUp() {
+  clearInterval(timerInterval);
+  isTimerRunning = false;
+  
+  // Afficher un message que le temps est écoulé
+  alert("Le temps est écoulé! Votre test sera soumis automatiquement.");
+  
+  // Soumettre automatiquement le test
+  submitTestAuto();
+}
+
+function submitTestAuto() {
+  // Calculer le score
+  calculateScore();
+  
+  // Afficher les résultats
+  displayResults(true);
+}
+
+function submitTest() {
+  // Arrêter le timer
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    isTimerRunning = false;
+  }
+  
+  // Calculer le score
+  let unanswered = 0;
+  
+  questions.forEach((question, index) => {
+    if (userAnswers[index] === null) {
+      unanswered++;
+    }
+  });
+  
+  if (unanswered > 0) {
+    if (!confirm(`${unanswered} question(s) non répondues. Soumettre quand même?`)) {
+      if (isTimerRunning) {
+        startTimer(); // Redémarrer le timer si l'utilisateur annule
+      }
+      return;
+    }
+  }
+  
+  // Afficher les résultats
+  calculateScore();
+  displayResults(false);
+}
+
+function calculateScore() {
+  currentScore = 0;
+  
+  questions.forEach((question, index) => {
+    if (userAnswers[index] === question.answer) {
+      currentScore++;
+    }
+  });
+  
+  currentPercentage = (currentScore / questions.length) * 100;
+  
+  // Déterminer le texte du score
+  if (currentPercentage >= 90) {
+    currentScoreText = "Excellent! Votre niveau est excellent, vous êtes prêt pour l'examen officiel !";
+  } else if (currentPercentage >= 70) {
+    currentScoreText = "Très bien! Vous avez de bonnes connaissances civiques.";
+  } else if (currentPercentage >= 50) {
+    currentScoreText = "Bon travail! Vous avez des bases solides.";
+  } else {
+    currentScoreText = "Continuez à apprendre! La culture civique est importante.";
+  }
+}
+
+function getCourseRecommendation(score) {
+  let recommendation = "";
+  let details = "";
+  
+  if (score >= 14 && score <= 18) {
+    recommendation = "Cours accéléré du centre d'examen";
+    details = "Il est conseillé de s'inscrire au cours accéléré du centre d'examen. 正确率 14-18 题：建议报名考点速通课程";
+  } else if (score < 14 ) {
+    recommendation = "Cours complet avec explications détaillées";
+    details = "Il est conseillé de suivre le cours complet avec explications détaillées, afin d'aider les candidats à réussir l'examen civique de manière efficace et sereine.  正确率少于 14 题：建议报名全能讲解课程，以帮助考生顺利且高效地通过公民考试";
+  } else {
+    recommendation = "Prêt pour l'examen officiel";
+    details = "Votre niveau est excellent! Vous êtes prêt pour l'examen officiel de la carte de séjour pluriannuelle. 正确率超过 18 题：您的水平非常优秀，已准备好参加正式考试！";
+  }
+  
+  return { recommendation, details };
+}
+
+function displayResults(isAutoSubmit) {
+  // Masquer le test
+  document.getElementById('testContainer').style.display = 'none';
+  
+  // Mettre à jour le score
+  document.getElementById('scoreDisplay').textContent = `${currentScore}/${questions.length}`;
+  
+  // Texte selon le score
+  let displayText = isAutoSubmit ? "Temps écoulé! " : "";
+  displayText += currentScoreText;
+  
+  document.getElementById('scoreText').textContent = displayText;
+  
+  // Afficher la recommandation de cours
+  const recommendation = getCourseRecommendation(currentScore);
+  document.getElementById('recommendationText').textContent = recommendation.recommendation;
+  document.getElementById('recommendationDetails').textContent = recommendation.details;
+  
+  // Animer la barre de score
+  setTimeout(() => {
+    document.getElementById('scoreFill').style.width = currentPercentage + '%';
+  }, 300);
+  
+  // Afficher les détails des réponses
+  const resultsDetails = document.getElementById('resultsDetails');
+  resultsDetails.innerHTML = '';
+  
+  questions.forEach((question, index) => {
+    const userAnswerIndex = userAnswers[index];
+    const isCorrect = userAnswerIndex === question.answer;
+    const userAnswer = userAnswerIndex !== null ? 
+      question.options[userAnswerIndex] : "Non répondue";
+    const correctAnswer = question.options[question.answer];
+    
+    const resultItem = document.createElement('div');
+    resultItem.className = `result-item ${isCorrect ? 'correct' : 'incorrect'}`;
+    
+    const icon = isCorrect ? 
+      '<i class="fas fa-check-circle" style="color:var(--green); margin-right:8px;"></i>' : 
+      '<i class="fas fa-times-circle" style="color:var(--red); margin-right:8px;"></i>';
+    
+    resultItem.innerHTML = `
+      <div class="result-question">${icon} Question ${index + 1}: ${question.question}</div>
+      <div class="result-answer">
+        <strong>Votre réponse:</strong> ${userAnswer}
+      </div>
+      ${!isCorrect ? `<div class="result-answer"><strong>Réponse correcte:</strong> ${correctAnswer}</div>` : ''}
+      <div class="result-explanation">
+        <strong>Explication:</strong> ${question.explanation}
+      </div>
+    `;
+    
+    resultsDetails.appendChild(resultItem);
+  });
+  
+  // Afficher les résultats
+  document.getElementById('resultsContainer').classList.add('show');
+  
+  // ==================== 新增：自动发送邮件 ====================
+  // 延迟一点时间，让用户先看到结果
+  setTimeout(() => {
+    console.log("自动发送邮件中...");
+    sendResultsToEmail();
+  }, 1500);
+  
+  // Défiler vers les résultats
+  setTimeout(() => {
+    document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth' });
+  }, 500);
+}
+// Email sending functions
+function sendResultsToEmail() {
+  console.log("自动发送邮件...");
+  
+  // 检查是否有学生信息
+  if (!studentInfo.email) {
+    console.warn("没有学生邮箱信息，跳过邮件发送");
+    return;
+  }
+  
+  // 显示发送状态（修改标题为"自动发送"）
+  showEmailStatus("auto_sending");
+  
+  // Construire le contenu de l'email
+  const emailData = prepareEmailData();
+  
+  // Envoyer l'email via EmailJS
+  sendEmailWithEmailJS(emailData);
+}
+function prepareEmailData() {
+  const fullName = `${studentInfo.firstName} ${studentInfo.lastName}`;
+  const recommendation = getCourseRecommendation(currentScore);
+  
+  // Construire le corps de l'email
+  let emailBody = `RÉSULTATS DU TEST CIVIQUE - ${fullName}\n`;
+  emailBody += `Date du test: ${studentInfo.testDate}\n\n`;
+  emailBody += `INFORMATIONS DU CANDIDAT:\n`;
+  emailBody += `Nom: ${fullName}\n`;
+  emailBody += `Email: ${studentInfo.email}\n\n`;
+  emailBody += `RÉSULTATS:\n`;
+  emailBody += `Score: ${currentScore}/${questions.length} (${Math.round(currentPercentage)}%)\n`;
+  emailBody += `Évaluation: ${currentScoreText}\n\n`;
+  emailBody += `RECOMMANDATION DE COURS:\n`;
+  emailBody += `${recommendation.recommendation}\n`;
+  emailBody += `${recommendation.details}\n\n`;
+  emailBody += `DÉTAIL DES RÉPONSES:\n`;
+  emailBody += `====================\n\n`;
+  
+  questions.forEach((question, index) => {
+    const userAnswerIndex = userAnswers[index];
+    const isCorrect = userAnswerIndex === question.answer;
+    const userAnswer = userAnswerIndex !== null ? 
+      question.options[userAnswerIndex] : "Non répondue";
+    const correctAnswer = question.options[question.answer];
+    
+    emailBody += `Question ${index + 1}: ${question.question}\n`;
+    emailBody += `Votre réponse: ${userAnswer} ${isCorrect ? '✓' : '✗'}\n`;
+    if (!isCorrect) {
+      emailBody += `Réponse correcte: ${correctAnswer}\n`;
+    }
+    emailBody += `Explication: ${question.explanation}\n`;
+    emailBody += `---\n\n`;
+  });
+  
+  emailBody += `\n---\n`;
+  emailBody += `Ce message a été envoyé automatiquement depuis le système de test de l'Association Mille Voiles / Qianfan Association.\n`;
+  emailBody += `Email de l'association: 2025qianfan@gmail.com\n`;
+  
+  return {
+    to_email: "2025qianfan@gmail.com", // Email fixe pour l'association
+    cc_email: studentInfo.email, // Copie à l'étudiant
+    subject: `Résultats Test Civique - ${fullName}`,
+    student_name: fullName,
+    student_email: studentInfo.email,
+    test_date: studentInfo.testDate,
+    score: `${currentScore}/${questions.length}`,
+    percentage: `${Math.round(currentPercentage)}%`,
+    recommendation: recommendation.recommendation,
+    details: recommendation.details,
+    body: emailBody
+  };
+}
+
+function sendEmailWithEmailJS(emailData) {
+  console.log("开始发送EmailJS邮件...");
+  
+  // 使用您的实际配置
+  const serviceID = "service_5i2hyhb";
+  const templateID = "template_72yeiak";
+  
+  console.log("配置检查:");
+  console.log("- Service ID:", serviceID);
+  console.log("- Template ID:", templateID);
+  console.log("- Public Key: D2jk67ERbrJZSUyvC");
+  
+  // 构建模板参数 - 与您的模板变量完全匹配
+  const templateParams = {
+    // 必需字段（根据EmailJS要求）
+    from_name: "Association Mille Voiles",
+    reply_to: studentInfo.email,
+    
+    // 模板变量（必须与模板中的 {{variable}} 完全一致）
+    student_name: emailData.student_name || `${studentInfo.firstName} ${studentInfo.lastName}`,
+    student_email: emailData.student_email || studentInfo.email,
+    test_date: emailData.test_date || studentInfo.testDate,
+    score: emailData.score || `${currentScore}/${questions.length}`,
+    percentage: emailData.percentage || `${Math.round(currentPercentage)}%`,
+    recommendation: emailData.recommendation || getCourseRecommendation(currentScore).recommendation,
+    details: emailData.details || getCourseRecommendation(currentScore).details,
+    
+    // 邮件基本信息
+    to_email: emailData.to_email || "2025qianfan@gmail.com",
+    subject: emailData.subject || `Résultats Test Civique - ${studentInfo.firstName} ${studentInfo.lastName}`
+  };
+  
+  console.log("发送参数检查:", templateParams);
+  
+  // 验证所有必需的模板变量都有值
+  const requiredVars = ['student_name', 'student_email', 'test_date', 'score', 'percentage', 'recommendation', 'details'];
+  const missingVars = requiredVars.filter(varName => !templateParams[varName]);
+  
+  if (missingVars.length > 0) {
+    console.error("缺少必要的模板变量:", missingVars);
+    showEmailStatus("error", `缺少必要的邮件数据: ${missingVars.join(', ')}`);
+    return;
+  }
+  
+  // 发送邮件
+  emailjs.send(serviceID, templateID, templateParams)
+    .then(function(response) {
+      console.log('✅ 邮件发送成功!', response);
+      console.log('状态码:', response.status);
+      console.log('响应文本:', response.text);
+      
+      showEmailStatus("success");
+    })
+    .catch(function(error) {
+      console.error('❌ 邮件发送失败:', error);
+      
+      // 分析错误类型
+      let errorMsg = "邮件发送失败";
+      let errorDetails = "";
+      
+      if (error.text) {
+        errorDetails = error.text;
+        
+        if (error.text.includes("Invalid template ID")) {
+          errorMsg = "模板ID无效，请检查Template ID";
+        } else if (error.text.includes("Invalid service ID")) {
+          errorMsg = "服务ID无效，请检查Service ID";
+        } else if (error.text.includes("Public Key")) {
+          errorMsg = "Public Key错误";
+        } else if (error.text.includes("user_id")) {
+          errorMsg = "用户ID错误，请检查Public Key";
+        }
+      }
+      
+      if (error.status) {
+        console.error("HTTP状态码:", error.status);
+        
+        switch(error.status) {
+          case 0:
+            errorMsg = "网络错误，请检查网络连接";
+            break;
+          case 400:
+            errorMsg = "请求参数错误";
+            break;
+          case 401:
+            errorMsg = "认证失败，请检查Public Key";
+            break;
+          case 404:
+            errorMsg = "服务或模板不存在";
+            break;
+          case 429:
+            errorMsg = "发送次数过多，请稍后重试";
+            break;
+          case 500:
+            errorMsg = "服务器错误";
+            break;
+        }
+      }
+      
+      console.error("详细错误信息:", errorMsg, errorDetails);
+      
+      // 显示详细的错误信息
+      showEmailStatus("error", `${errorMsg}${errorDetails ? `: ${errorDetails}` : ''}`);
+      
+      // 提供备选方案
+      setTimeout(function() {
+        if (confirm(`邮件发送失败 (${errorMsg})。\n\n是否使用备选方法发送邮件？`)) {
+          sendEmailFallback(emailData);
+        }
+      }, 1500);
+    });
+}
+function sendEmailFallback(emailData) {
+  // Fallback: utiliser mailto: pour envoyer l'email
+  const subject = encodeURIComponent(emailData.subject);
+  const body = encodeURIComponent(emailData.body);
+  
+  const mailtoLink = `mailto:${emailData.to_email}?cc=${emailData.cc_email}&subject=${subject}&body=${body}`;
+  
+  // Ouvrir le client mail par défaut
+  window.open(mailtoLink, '_blank');
+  
+  showEmailStatus("fallback");
+}
+
+function showEmailStatus(status, errorDetails = "") {
+  const modal = document.getElementById('emailStatusModal');
+  const icon = document.getElementById('statusIcon');
+  const title = document.getElementById('statusTitle');
+  const message = document.getElementById('statusMessage');
+  const button = document.getElementById('statusButton');
+  
+  modal.style.display = 'flex';
+  
+  switch(status) {
+    case "sending":
+      icon.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      icon.style.color = 'var(--primary-blue)';
+      title.textContent = "Envoi en cours";
+      message.innerHTML = `
+        <div style="text-align: left; background: rgba(0,64,128,0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
+          <p><strong>Destinataire :</strong> 2025qianfan@gmail.com</p>
+          <p><strong>Copie à :</strong> ${studentInfo.email}</p>
+          <p><strong>Étudiant :</strong> ${studentInfo.firstName} ${studentInfo.lastName}</p>
+          <p><strong>Score :</strong> ${currentScore}/${questions.length}</p>
+        </div>
+        <p>Envoi des résultats via EmailJS...</p>
+      `;
+      button.style.display = 'none';
+      break;
+      
+    case "success":
+      icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+      icon.className = "status-icon status-success";
+      title.textContent = "Succès !";
+      message.innerHTML = `
+        <p style="color: var(--green); font-weight: bold;">✅ Email envoyé avec succès !</p>
+        <div style="text-align: left; background: rgba(39,174,96,0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
+          <p><strong>Destinataire :</strong> 2025qianfan@gmail.com</p>
+          <p><strong>Copie envoyée à :</strong> ${studentInfo.email}</p>
+          <p><strong>Score :</strong> ${currentScore}/${questions.length}</p>
+          <p><strong>Recommandation :</strong> ${getCourseRecommendation(currentScore).recommendation}</p>
+        </div>
+        <p style="font-size: 0.9em; color: #666;">L'association recevra vos résultats sous peu.</p>
+      `;
+      button.textContent = "Fermer";
+      button.style.display = 'block';
+      button.onclick = closeStatusModal;
+      break;
+      
+    case "error":
+      icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+      icon.className = "status-icon status-error";
+      title.textContent = "Erreur d'envoi";
+      message.innerHTML = `
+        <p style="color: var(--red); font-weight: bold;">❌ L'envoi a échoué</p>
+        <div style="text-align: left; background: rgba(231,76,60,0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
+          <p><strong>Erreur :</strong> ${errorDetails || "Erreur inconnue"}</p>
+          <p><strong>Veuillez contacter :</strong> 2025qianfan@gmail.com</p>
+          <p><strong>Score à rapporter :</strong> ${currentScore}/${questions.length}</p>
+        </div>
+        <p style="font-size: 0.9em; color: #666;">
+          Conseil : Prenez une capture d'écran de vos résultats pour référence.
+        </p>
+      `;
+      button.textContent = "Réessayer";
+      button.style.display = 'block';
+      button.onclick = function() {
+        closeStatusModal();
+        setTimeout(() => sendResultsToEmail(), 500);
+      };
+      break;
+      
+    case "fallback":
+      icon.innerHTML = '<i class="fas fa-envelope-open"></i>';
+      icon.className = "status-icon";
+      icon.style.color = 'var(--orange)';
+      title.textContent = "Envoi manuel";
+      message.innerHTML = `
+        <p>Veuillez utiliser votre client email :</p>
+        <div style="text-align: left; background: rgba(243,156,18,0.1); padding: 15px; border-radius: 8px; margin: 15px 0;">
+          <p><strong>Destinataire :</strong> 2025qianfan@gmail.com</p>
+          <p><strong>Copie à :</strong> ${studentInfo.email}</p>
+          <p><strong>Sujet :</strong> Résultats Test Civique - ${studentInfo.firstName} ${studentInfo.lastName}</p>
+          <p><strong>Votre score :</strong> ${currentScore}/${questions.length}</p>
+        </div>
+        <p style="font-size: 0.9em; color: #666;">Votre client email va s'ouvrir automatiquement...</p>
+      `;
+      button.textContent = "Ouvrir maintenant";
+      button.style.display = 'block';
+      button.onclick = function() {
+        const emailData = prepareEmailData();
+        const subject = encodeURIComponent(emailData.subject);
+        const body = encodeURIComponent(emailData.body);
+        const mailtoLink = `mailto:2025qianfan@gmail.com?cc=${studentInfo.email}&subject=${subject}&body=${body}`;
+        window.open(mailtoLink, '_blank');
+        closeStatusModal();
+      };
+      break;
+  }
+}
+
+function closeStatusModal() {
+  document.getElementById('emailStatusModal').style.display = 'none';
+}
+
+function restartTest() {
+  if (confirm("Voulez-vous vraiment recommencer le test? Vos réponses actuelles seront perdues.")) {
+    currentQuestionIndex = 0;
+    userAnswers = new Array(questions.length).fill(null);
+    
+    // Réinitialiser le timer
+    timeLeft = totalTime;
+    if (timerInterval) {
+      clearInterval(timerInterval);
+    }
+    isTimerRunning = false;
+    
+    // Réinitialiser l'affichage du timer
+    document.getElementById('timerDisplay').textContent = "20:00";
+    document.getElementById('timerDisplay').style.color = "";
+    document.getElementById('timerDisplay').style.animation = "";
+    document.getElementById('timerProgress').style.width = "100%";
+    document.getElementById('timerProgress').style.backgroundColor = "var(--primary-blue)";
+    document.getElementById('timerWarning').style.display = 'none';
+    document.getElementById('timerCritical').style.display = 'none';
+    
+    document.getElementById('resultsContainer').classList.remove('show');
+    document.getElementById('testContainer').style.display = 'block';
+    document.getElementById('testContainer').classList.add('show');
+    
+    // 滚动到顶部
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 100);
+    
+    initializeTest();
+  }
+}
+
+function goBackToHome() {
+  window.location.href = "index.html";
+}
+
+function showInstructions() {
+  alert("Instructions du test:\n\n1. Vous avez 20 minutes pour répondre à 20 questions.\n2. Le timer en haut de la page indique le temps restant.\n3. Vous recevrez des avertissements à 5 minutes et 1 minute de la fin.\n4. Si le temps expire, votre test sera soumis automatiquement.\n5. Vous pouvez naviguer entre les questions avec les boutons 'Question précédente' et 'Question suivante'.\n6. Cliquez sur 'Soumettre le test' quand vous avez terminé.\n7. Seuil de réussite : 16 réponses correctes sur 20.\n8. Vos résultats seront automatiquement envoyés à 2025qianfan@gmail.com.\n\nBonne chance!");
+}
+
+// Permettre l'appui sur Entrée dans le champ de mot de passe
+document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    validatePassword();
+  }
+});
+
+// 为输入框添加Enter键支持
+document.addEventListener('DOMContentLoaded', function() {
+  const inputs = document.querySelectorAll('#firstName, #lastName, #studentEmail');
+  inputs.forEach(input => {
+    input.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        saveStudentInfo();
+      }
+    });
+  });
+});
+</script>
+
+</body>
+
+</html>
+
+
+

@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S'installer et résider en France - Association Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variables et reset */
+        :root {
+            --primary-blue: #004080;
+            --primary-light-blue: #0066cc;
+            --primary-yellow: #ffd633;
+            --primary-light-yellow: #ffe066;
+            --dark-gray: #333333;
+            --medium-gray: #666666;
+            --light-gray: #f5f7fa;
+            --white: #ffffff;
+            --green: #27ae60;
+            --orange: #f39c12;
+            --purple: #8e44ad;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--dark-gray);
+            background-color: var(--light-gray);
+            line-height: 1.7;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            line-height: 1.3;
+            color: var(--primary-blue);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .main-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light-blue) 100%);
+            color: var(--white);
+            padding: 30px 0;
+            text-align: center;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .main-header h1 {
+            color: var(--white);
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+
+        .main-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Language Toggle */
+        .language-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+
+        .lang-btn {
+            background: var(--white);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 70px;
+            justify-content: center;
+        }
+
+        .lang-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .lang-btn.active {
+            background: var(--primary-yellow);
+            color: var(--primary-blue);
+        }
+
+        /* Navigation */
+        .main-nav {
+            background-color: var(--white);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--primary-yellow);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-blue);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 20px 0;
+            background-color: var(--white);
+            border-bottom: 1px solid #eee;
+        }
+
+        .breadcrumb-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+
+        .breadcrumb-links a {
+            color: var(--medium-gray);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .breadcrumb-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        .breadcrumb-links i {
+            font-size: 0.8rem;
+            color: var(--medium-gray);
+        }
+
+        /* Theme Hero */
+        .theme-hero {
+            padding: 60px 0;
+            background: linear-gradient(rgba(0, 64, 128, 0.05), rgba(0, 102, 204, 0.05));
+            text-align: center;
+        }
+
+        .theme-icon {
+            font-size: 4rem;
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+        }
+
+        .theme-hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .theme-hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            color: var(--medium-gray);
+        }
+
+        /* Content Section */
+        .content-section {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .article-content {
+            background: var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 50px;
+            box-shadow: var(--shadow);
+            line-height: 1.8;
+        }
+
+        .article-header {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--primary-yellow);
+            text-align: center;
+        }
+
+        .article-header h2 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+        }
+
+        .article-header p {
+            color: var(--medium-gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Highlighted Terms - Tooltip Style */
+        .highlight-term {
+            background-color: rgba(0, 64, 128, 0.1);
+            color: var(--primary-blue);
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: help;
+            position: relative;
+            border-bottom: 2px dotted var(--primary-blue);
+            transition: var(--transition);
+        }
+
+        .highlight-term:hover {
+            background-color: rgba(0, 102, 204, 0.15);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 400;
+            width: 220px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .tooltip:after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -8px;
+            border-width: 8px;
+            border-style: solid;
+            border-color: var(--primary-blue) transparent transparent transparent;
+        }
+
+        .highlight-term:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Content Sections */
+        .content-section h3 {
+            font-size: 1.8rem;
+            margin: 40px 0 20px;
+            color: var(--primary-blue);
+            padding-left: 15px;
+            border-left: 4px solid var(--primary-yellow);
+        }
+
+        .content-section h4 {
+            font-size: 1.4rem;
+            margin: 30px 0 15px;
+            color: var(--primary-blue);
+        }
+
+        .content-section p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .content-section ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .content-section li {
+            margin-bottom: 10px;
+            padding-left: 10px;
+        }
+
+        .important-note {
+            background-color: rgba(255, 214, 51, 0.1);
+            border-left: 4px solid var(--primary-yellow);
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 25px 0;
+        }
+
+        /* Action Cards */
+        .action-cards {
+            padding: 60px 0;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light-blue) 100%);
+        }
+
+        .action-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .action-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .action-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .action-card-icon {
+            font-size: 3rem;
+            margin-bottom: 25px;
+        }
+
+        .action-card-1 .action-card-icon {
+            color: var(--orange);
+        }
+
+        .action-card-2 .action-card-icon {
+            color: var(--purple);
+        }
+
+        .action-card h3 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .action-card p {
+            color: var(--medium-gray);
+            margin-bottom: 25px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 16px 36px;
+            background-color: var(--primary-yellow);
+            color: var(--primary-blue);
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            box-shadow: var(--shadow);
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-light-yellow);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-light-blue);
+        }
+
+        .btn-orange {
+            background-color: var(--orange);
+            color: var(--white);
+        }
+
+        .btn-orange:hover {
+            background-color: #e67e22;
+        }
+
+        .btn-purple {
+            background-color: var(--purple);
+            color: var(--white);
+        }
+
+        .btn-purple:hover {
+            background-color: #7d3c98;
+        }
+
+        /* Footer */
+        .main-footer {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h4 {
+            color: var(--primary-yellow);
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-yellow);
+            padding-left: 5px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-item i {
+            color: var(--primary-yellow);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Back to Top */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--primary-blue);
+            color: var(--white);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            text-decoration: none;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 99;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background-color: var(--primary-light-blue);
+            transform: translateY(-5px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .theme-hero h2 {
+                font-size: 2rem;
+            }
+            
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .article-content {
+                padding: 30px 20px;
+            }
+            
+            .article-header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .language-toggle {
+                position: relative;
+                top: 0;
+                right: 0;
+                justify-content: center;
+                margin: 20px auto;
+                width: 100%;
+            }
+            
+            .lang-btn {
+                padding: 8px 16px;
+            }
+            
+            .action-cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .tooltip {
+                width: 180px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .theme-hero h2 {
+                font-size: 1.6rem;
+            }
+            
+            .btn {
+                padding: 14px 25px;
+                font-size: 1rem;
+            }
+            
+            .language-toggle {
+                flex-direction: row;
+                gap: 10px;
+            }
+            
+            .tooltip {
+                width: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Toggle -->
+    <div class="language-toggle">
+        <button class="lang-btn active" id="langFr" onclick="switchLanguage('fr')">
+            <i class="fas fa-language"></i> FR
+        </button>
+        <button class="lang-btn" id="langZh" onclick="switchLanguage('zh')">
+            <i class="fas fa-language"></i> 中文
+        </button>
+    </div>
+
+    <!-- Header -->
+    <header class="main-header">
+        <div class="container">
+            <h1 id="mainTitle">S'installer et résider en France</h1>
+            <p id="mainSubtitle">Guide pratique pour l'installation et la vie quotidienne en France</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span id="logoText">Mille Voiles</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" id="navHome">Accueil</a>
+                <a href="#content" id="navContent">Contenu</a>
+                <a href="#astuces" id="navAstuces">Astuces</a>
+                <a href="#test" id="navTest">Test</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="container">
+            <div class="breadcrumb-links">
+                <a href="index.html">Accueil</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="test-civique.html">Test Civique</a>
+                <i class="fas fa-chevron-right"></i>
+                <span id="breadcrumbCurrent">S'installer en France</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Hero -->
+    <section class="theme-hero">
+        <div class="container">
+            <div class="theme-icon">
+                <i class="fas fa-home"></i>
+            </div>
+            <h2 id="themeTitle">S'installer et résider en France</h2>
+            <p id="themeDescription">Découvrez les démarches essentielles pour s'installer, travailler et vivre en France</p>
+        </div>
+    </section>
+
+    <!-- Content Section -->
+    <section class="content-section" id="content">
+        <div class="container">
+            <div class="article-content">
+                <div class="article-header">
+                    <h2 id="articleTitle">Guide pratique pour l'installation en France</h2>
+                    <p id="articleSubtitle">Survolez les termes en <span class="highlight-term">gras et soulignés<span class="tooltip">粗体下划线术语</span></span> pour voir leur traduction en chinois</p>
+                </div>
+
+                <h3 id="section1Title">I. Domiciliation et vie quotidienne</h3>
+                
+                <h4 id="section1_1Title">1. Domiciliation</h4>
+                <p id="section1_1Text1">La <span class="highlight-term">domiciliation<span class="tooltip">落户登记</span></span> est une <span class="highlight-term">adresse administrative<span class="tooltip">行政地址</span></span> pour les personnes sans <span class="highlight-term">domicile fixe<span class="tooltip">固定住所</span></span> ou en <span class="highlight-term">situation précaire<span class="tooltip">不稳定状况</span></span>. Elle permet de recevoir du <span class="highlight-term">courrier<span class="tooltip">邮件</span></span>, accéder aux <span class="highlight-term">droits sociaux<span class="tooltip">社会权利</span></span>, réaliser des <span class="highlight-term">démarches professionnelles<span class="tooltip">职业手续</span></span>, <span class="highlight-term">fiscales<span class="tooltip">税务的</span></span> et <span class="highlight-term">préfectorales<span class="tooltip">警察局的</span></span>, ouvrir un <span class="highlight-term">compte bancaire<span class="tooltip">银行账户</span></span>, souscrire des <span class="highlight-term">assurances<span class="tooltip">保险</span></span> et inscrire ses enfants à l'<span class="highlight-term">école<span class="tooltip">学校</span></span>.</p>
+                
+                <p id="section1_1Text2">En cas de <span class="highlight-term">changement d'adresse<span class="tooltip">地址变更</span></span>, il faut informer rapidement <span class="highlight-term">service public<span class="tooltip">公共服务部门</span></span>, la <span class="highlight-term">banque<span class="tooltip">银行</span></span>, l'<span class="highlight-term">assurance<span class="tooltip">保险公司</span></span>, l'<span class="highlight-term">employeur<span class="tooltip">雇主</span></span> et mettre à jour ses <span class="highlight-term">papiers officiels<span class="tooltip">官方文件</span></span>.</p>
+
+                <div class="important-note">
+                    <p id="importantNote1"><strong>À retenir :</strong> La domiciliation est essentielle pour accéder à de nombreux droits et services en France, même sans logement stable.</p>
+                </div>
+
+                <h4 id="section1_2Title">2. Compte bancaire</h4>
+                <p id="section1_2Text1">Le <span class="highlight-term">compte bancaire<span class="tooltip">银行账户</span></span> sécurise l'<span class="highlight-term">argent<span class="tooltip">金钱</span></span>, permet de recevoir son <span class="highlight-term">salaire<span class="tooltip">工资</span></span> et de faire des <span class="highlight-term">démarches<span class="tooltip">手续</span></span>. Pour l'ouvrir : fournir une <span class="highlight-term">pièce d'identité<span class="tooltip">身份证明文件</span></span>, un <span class="highlight-term">justificatif de domicile<span class="tooltip">住址证明</span></span> récent et une <span class="highlight-term">signature<span class="tooltip">签名</span></span>. Si la banque refuse, la <span class="highlight-term">Banque de France<span class="tooltip">法兰西银行</span></span> peut garantir le <span class="highlight-term">droit au compte<span class="tooltip">开户权</span></span>.</p>
+
+                <h4 id="section1_3Title">3. Permis de conduire et assurance</h4>
+                <p id="section1_3Text1">Pour <span class="highlight-term">conduire<span class="tooltip">驾驶</span></span>, il faut un <span class="highlight-term">permis valide<span class="tooltip">有效驾照</span></span>, une <span class="highlight-term">carte grise<span class="tooltip">车辆登记证</span></span> et une <span class="highlight-term">assurance<span class="tooltip">保险</span></span>. Le <span class="highlight-term">permis<span class="tooltip">驾照</span></span> nécessite <span class="highlight-term">17 ans<span class="tooltip">17岁</span></span>, une formation <span class="highlight-term">théorique<span class="tooltip">理论</span></span> et <span class="highlight-term">pratique<span class="tooltip">实践</span></span>. Les <span class="highlight-term">permis étrangers<span class="tooltip">外国驾照</span></span> sont valables selon la <span class="highlight-term">durée du séjour<span class="tooltip">居留期限</span></span> et les <span class="highlight-term">échanges en préfecture<span class="tooltip">警察局换证</span></span>. L'<span class="highlight-term">assurance responsabilité civile<span class="tooltip">民事责任保险</span></span> couvre les <span class="highlight-term">dommages<span class="tooltip">损害</span></span> causés à <span class="highlight-term">autrui<span class="tooltip">他人</span></span> dans la <span class="highlight-term">vie quotidienne<span class="tooltip">日常生活</span></span> ou sur la <span class="highlight-term">route<span class="tooltip">道路</span></span>.</p>
+
+                <h4 id="section1_4Title">4. Impôts et déclaration de revenus</h4>
+                <p id="section1_4Text1">L'<span class="highlight-term">impôt<span class="tooltip">税收</span></span> finance les <span class="highlight-term">services publics<span class="tooltip">公共服务</span></span> et réduit les <span class="highlight-term">inégalités<span class="tooltip">不平等</span></span>. Toute personne de plus de <span class="highlight-term">18 ans<span class="tooltip">18岁</span></span> en France doit <span class="highlight-term">déclarer ses revenus<span class="tooltip">申报收入</span></span> chaque année, même si ceux-ci sont <span class="highlight-term">nuls<span class="tooltip">为零/没有收入</span></span>, via <span class="highlight-term">impots.gouv.fr<span class="tooltip">法国税务局网站</span></span>.</p>
+
+                <h4 id="section1_5Title">5. Séjour et nationalité</h4>
+                <p id="section1_5Text1">Les <span class="highlight-term">étrangers<span class="tooltip">外国人</span></span> doivent posséder un <span class="highlight-term">titre de séjour<span class="tooltip">居留证</span></span> valide. Le <span class="highlight-term">renouvellement<span class="tooltip">续签</span></span> se fait avant la <span class="highlight-term">fin de validité<span class="tooltip">有效期结束</span></span> avec un <span class="highlight-term">dossier complet<span class="tooltip">完整材料</span></span>. La <span class="highlight-term">nationalité française<span class="tooltip">法国国籍</span></span> peut s'obtenir par <span class="highlight-term">naturalisation<span class="tooltip">入籍</span></span> après <span class="highlight-term">5 ans de résidence<span class="tooltip">5年居住</span></span> ou par <span class="highlight-term">déclaration<span class="tooltip">声明</span></span> (mariage, lien familial), après <span class="highlight-term">entretien d'assimilation<span class="tooltip">融入面谈</span></span>.</p>
+
+                <h4 id="section1_6Title">6. Déclarations d'état civil</h4>
+                <p id="section1_6Text1">La <span class="highlight-term">naissance<span class="tooltip">出生</span></span> doit être déclarée en <span class="highlight-term">5 jours<span class="tooltip">5天内</span></span> à la <span class="highlight-term">mairie<span class="tooltip">市政府</span></span>. Elle permet d'obtenir <span class="highlight-term">droits sociaux<span class="tooltip">社会权利</span></span>, <span class="highlight-term">identité<span class="tooltip">身份</span></span> et <span class="highlight-term">école<span class="tooltip">学校</span></span>. Le <span class="highlight-term">mariage civil<span class="tooltip">民事婚姻</span></span> est obligatoire pour être <span class="highlight-term">reconnu<span class="tooltip">被承认</span></span> : <span class="highlight-term">18 ans<span class="tooltip">18岁</span></span>, <span class="highlight-term">consentement libre<span class="tooltip">自由同意</span></span>, pas de <span class="highlight-term">lien de parenté interdit<span class="tooltip">禁止的亲缘关系</span></span>. Le <span class="highlight-term">décès<span class="tooltip">死亡</span></span> doit être déclaré à la <span class="highlight-term">mairie<span class="tooltip">市政府</span></span> et constaté par un <span class="highlight-term">professionnel de santé<span class="tooltip">医疗专业人员</span></span> ou les <span class="highlight-term">autorités<span class="tooltip">当局</span></span> selon le lieu.</p>
+
+                <h4 id="section1_7Title">7. Logement</h4>
+                <p id="section1_7Text1">Pour un <span class="highlight-term">logement privé<span class="tooltip">私人住房</span></span>, consulter <span class="highlight-term">agences<span class="tooltip">中介机构</span></span> ou <span class="highlight-term">sites spécialisés<span class="tooltip">专业网站</span></span>. Pour un <span class="highlight-term">logement social<span class="tooltip">社会住房</span></span>, faire une demande en ligne. Le <span class="highlight-term">bail<span class="tooltip">租约</span></span> fixe les <span class="highlight-term">droits<span class="tooltip">权利</span></span> et <span class="highlight-term">obligations<span class="tooltip">义务</span></span> du <span class="highlight-term">propriétaire<span class="tooltip">房东</span></span> et du <span class="highlight-term">locataire<span class="tooltip">租客</span></span>. Le <span class="highlight-term">locataire<span class="tooltip">租客</span></span> paie le <span class="highlight-term">loyer<span class="tooltip">租金</span></span>, souscrit une <span class="highlight-term">assurance<span class="tooltip">保险</span></span> et entretient le <span class="highlight-term">logement<span class="tooltip">住房</span></span>. Le <span class="highlight-term">préavis<span class="tooltip">提前通知期</span></span> est généralement de <span class="highlight-term">3 mois<span class="tooltip">3个月</span></span>.</p>
+
+                <h4 id="section1_8Title">8. Numéros d'urgence</h4>
+                <p id="section1_8Text1">En urgence, contacter : <span class="highlight-term">15 (SAMU)<span class="tooltip">医疗急救</span></span>, <span class="highlight-term">17 (police)<span class="tooltip">警察</span></span>, <span class="highlight-term">18 (pompiers)<span class="tooltip">消防队</span></span>, <span class="highlight-term">112 (Europe)<span class="tooltip">欧洲通用急救</span></span>, <span class="highlight-term">114 (sourds/malentendants)<span class="tooltip">聋哑人急救</span></span>, <span class="highlight-term">115 (SDF)<span class="tooltip">无家可归者</span></span>, <span class="highlight-term">116 000 (enfants disparus)<span class="tooltip">失踪儿童</span></span>. Chaque numéro correspond à une <span class="highlight-term">situation spécifique<span class="tooltip">特定情况</span></span>.</p>
+
+                <div class="important-note">
+                    <p id="importantNote2"><strong>Important :</strong> Connaître ces numéros d'urgence est essentiel pour réagir rapidement en cas de situation critique.</p>
+                </div>
+
+                <h3 id="section2Title">II. Accès aux soins de santé</h3>
+                
+                <p id="section2Text1">Pour un <span class="highlight-term">problème de santé<span class="tooltip">健康问题</span></span>, on consulte d'abord le <span class="highlight-term">médecin traitant<span class="tooltip">主治医生</span></span> dans le <span class="highlight-term">parcours de soins coordonnés<span class="tooltip">协调医疗路径</span></span>. En cas de <span class="highlight-term">problème grave<span class="tooltip">严重问题</span></span>, on va à l'<span class="highlight-term">hôpital<span class="tooltip">医院</span></span>, aux <span class="highlight-term">urgences<span class="tooltip">急诊</span></span> ou chez un <span class="highlight-term">spécialiste<span class="tooltip">专科医生</span></span>. Pour les <span class="highlight-term">douleurs simples<span class="tooltip">简单疼痛</span></span> ou les <span class="highlight-term">médicaments<span class="tooltip">药物</span></span>, on va à la <span class="highlight-term">pharmacie<span class="tooltip">药店</span></span>.</p>
+                
+                <p id="section2Text2">Le <span class="highlight-term">médecin généraliste<span class="tooltip">全科医生</span></span> assure les <span class="highlight-term">premiers soins<span class="tooltip">初级护理</span></span>, la <span class="highlight-term">prévention<span class="tooltip">预防</span></span> et le <span class="highlight-term">dépistage<span class="tooltip">筛查</span></span>. Le <span class="highlight-term">médecin traitant<span class="tooltip">主治医生</span></span> suit le patient, organise les soins, gère le <span class="highlight-term">dossier médical<span class="tooltip">医疗档案</span></span> et donne des conseils personnalisés. Les rendez-vous se prennent au <span class="highlight-term">cabinet<span class="tooltip">诊所</span></span> ou en ligne (ex. <span class="highlight-term">Doctolib<span class="tooltip">法国医疗预约平台</span></span>).</p>
+                
+                <p id="section2Text3">Le <span class="highlight-term">médecin spécialiste<span class="tooltip">专科医生</span></span> traite des problèmes <span class="highlight-term">spécifiques<span class="tooltip">特定的</span></span> ou <span class="highlight-term">plus complexes<span class="tooltip">更复杂的</span></span>. Il est souvent consulté avec une <span class="highlight-term">prescription<span class="tooltip">处方</span></span> du médecin traitant, mais parfois directement. Exemples : <span class="highlight-term">ophtalmologue<span class="tooltip">眼科医生</span></span>, <span class="highlight-term">gynécologue<span class="tooltip">妇科医生</span></span>, <span class="highlight-term">pédiatre<span class="tooltip">儿科医生</span></span>, <span class="highlight-term">psychiatre<span class="tooltip">精神科医生</span></span>.</p>
+                
+                <p id="section2Text4">Les <span class="highlight-term">PASS<span class="tooltip">医疗急救中心</span></span> et les <span class="highlight-term">PMI<span class="tooltip">母婴保护中心</span></span> proposent des <span class="highlight-term">soins gratuits<span class="tooltip">免费医疗</span></span>. D'autres structures spécialisées prennent en charge les <span class="highlight-term">IST<span class="tooltip">性传播感染</span></span>, les <span class="highlight-term">addictions<span class="tooltip">成瘾</span></span>, la <span class="highlight-term">tuberculose<span class="tooltip">肺结核</span></span> et la <span class="highlight-term">santé mentale<span class="tooltip">心理健康</span></span>.</p>
+                
+                <p id="section2Text5">Les <span class="highlight-term">urgences hospitalières<span class="tooltip">医院急诊</span></span> sont ouvertes <span class="highlight-term">24h/24 et 7j/7<span class="tooltip">24小时/7天</span></span> pour les situations <span class="highlight-term">vitales<span class="tooltip">危及生命的</span></span>. <span class="highlight-term">SOS Médecins<span class="tooltip">紧急医疗救助</span></span> s'occupe des urgences non vitales. En cas de <span class="highlight-term">danger vital<span class="tooltip">生命危险</span></span>, on appelle le <span class="highlight-term">SAMU<span class="tooltip">医疗急救服务</span></span>. Autres numéros : <span class="highlight-term">119<span class="tooltip">儿童危险</span></span> (enfant en danger), <span class="highlight-term">3919<span class="tooltip">家庭暴力</span></span> (violences), <span class="highlight-term">3114<span class="tooltip">自杀预防</span></span> (prévention du suicide).</p>
+                
+                <p id="section2Text6">La <span class="highlight-term">PUMa<span class="tooltip">全民医疗保险</span></span> rembourse les <span class="highlight-term">soins de base<span class="tooltip">基本医疗</span></span>. La <span class="highlight-term">mutuelle<span class="tooltip">补充医疗保险</span></span> complète ce remboursement. La <span class="highlight-term">C2S<span class="tooltip">国家医疗救助</span></span> aide les personnes avec peu de ressources.</p>
+                
+                <p id="section2Text7">Les <span class="highlight-term">médecins de garde<span class="tooltip">值班医生</span></span> consultent le soir, la nuit et le week-end. Les <span class="highlight-term">pharmacies de garde<span class="tooltip">值班药店</span></span> permettent d'avoir des <span class="highlight-term">médicaments en urgence<span class="tooltip">紧急药物</span></span>.</p>
+                
+                <p id="section2Text8">Après la fin du <span class="highlight-term">titre de séjour<span class="tooltip">居留证</span></span>, la <span class="highlight-term">PUMa<span class="tooltip">全民医疗保险</span></span> reste valable <span class="highlight-term">6 mois + 45 jours<span class="tooltip">6个月+45天</span></span>. La <span class="highlight-term">C2S<span class="tooltip">国家医疗救助</span></span> reste valable <span class="highlight-term">6 mois<span class="tooltip">6个月</span></span>.</p>
+                
+                <p id="section2Text9">La <span class="highlight-term">carte Vitale<span class="tooltip">医保卡</span></span> et le <span class="highlight-term">numéro de sécurité sociale<span class="tooltip">社会保险号码</span></span> sont obligatoires. Le <span class="highlight-term">tiers payant<span class="tooltip">第三方支付</span></span> permet de ne pas avancer l'argent. Les remboursements sont visibles sur le <span class="highlight-term">compte Ameli<span class="tooltip">医保账户</span></span>.</p>
+                
+                <p id="section2Text10">Pendant la <span class="highlight-term">grossesse<span class="tooltip">怀孕</span></span> et jusqu'à <span class="highlight-term">12 jours après l'accouchement<span class="tooltip">产后12天</span></span>, les frais médicaux sont pris en charge à <span class="highlight-term">100 %<span class="tooltip">100%</span></span>, avec <span class="highlight-term">tiers payant<span class="tooltip">第三方支付</span></span>. Le suivi peut être fait par un <span class="highlight-term">médecin<span class="tooltip">医生</span></span> ou une <span class="highlight-term">sage-femme<span class="tooltip">助产士</span></span>.</p>
+
+                <p id="section2Text11">Le patient peut <span class="highlight-term">choisir son médecin<span class="tooltip">选择医生</span></span> et l'endroit où il se soigne. Il a le <span class="highlight-term">secret médical<span class="tooltip">医疗保密</span></span>, qui protège toutes ses informations de santé. Il a aussi le <span class="highlight-term">droit à l'information<span class="tooltip">知情权</span></span> : connaître son état de santé, les soins, les risques et les options possibles. Il peut voir son <span class="highlight-term">dossier médical<span class="tooltip">医疗档案</span></span> et demander une copie. Le patient doit respecter les <span class="highlight-term">règles médicales<span class="tooltip">医疗规则</span></span> et le <span class="highlight-term">principe de laïcité<span class="tooltip">政教分离原则</span></span>.</p>
+                
+                <p id="section2Text12">Le <span class="highlight-term">dépistage<span class="tooltip">筛查</span></span> permet de trouver une maladie tôt. La <span class="highlight-term">vaccination<span class="tooltip">疫苗接种</span></span> protège la population. <span class="highlight-term">Mon Bilan Prévention<span class="tooltip">我的预防评估</span></span> aide à évaluer ses <span class="highlight-term">habitudes de vie<span class="tooltip">生活习惯</span></span> et à améliorer sa santé.</p>
+                
+                <p id="section2Text13">La <span class="highlight-term">santé mentale<span class="tooltip">心理健康</span></span> concerne le <span class="highlight-term">bien-être psychique et social<span class="tooltip">心理和社会福祉</span></span>. On peut consulter le <span class="highlight-term">médecin traitant<span class="tooltip">主治医生</span></span>, un <span class="highlight-term">psychologue<span class="tooltip">心理学家</span></span>, un <span class="highlight-term">psychiatre<span class="tooltip">精神科医生</span></span> ou les <span class="highlight-term">CMP<span class="tooltip">医疗心理中心</span></span>.</p>
+
+                <h3 id="section3Title">III. Travailler en France</h3>
+                
+                <p id="section3Text1">Les personnes <span class="highlight-term">sans travail<span class="tooltip">无工作</span></span> et en situation régulière doivent s'inscrire à <span class="highlight-term">France Travail<span class="tooltip">法国就业局</span></span>. Cet organisme public aide à trouver un <span class="highlight-term">emploi<span class="tooltip">工作</span></span> ou une <span class="highlight-term">formation<span class="tooltip">培训</span></span> adaptée. Après l'inscription, on remplit le <span class="highlight-term">questionnaire d'orientation<span class="tooltip">导向问卷</span></span> pour dire sa situation familiale, son niveau de <span class="highlight-term">français<span class="tooltip">法语</span></span>, ses compétences informatiques et son expérience professionnelle. L'application <span class="highlight-term">Travailler en France<span class="tooltip">在法国工作</span></span> propose des <span class="highlight-term">offres d'emploi<span class="tooltip">工作机会</span></span> traduites et des conseils pour faire un <span class="highlight-term">CV<span class="tooltip">简历</span></span> ou postuler. Certaines personnes, comme celles qui reçoivent le <span class="highlight-term">RSA<span class="tooltip">积极团结收入</span></span> ou sont suivies par une <span class="highlight-term">Mission Locale<span class="tooltip">地方就业机构</span></span>, sont inscrites automatiquement mais doivent répondre au questionnaire pour recevoir de l'aide.</p>
+                
+                <p id="section3Text2">Les salariés peuvent suivre une <span class="highlight-term">formation<span class="tooltip">培训</span></span>, surtout en français, soit avec l'aide de l'<span class="highlight-term">employeur<span class="tooltip">雇主</span></span> pendant le <span class="highlight-term">temps de travail<span class="tooltip">工作时间</span></span>, soit avec le <span class="highlight-term">Compte Personnel de Formation (CPF)<span class="tooltip">个人培训账户</span></span>. La <span class="highlight-term">VAE<span class="tooltip">经验认证</span></span> (Validation des Acquis de l'Expérience) permet de faire reconnaître ses <span class="highlight-term">compétences<span class="tooltip">能力</span></span> comme un diplôme. Les diplômes étrangers peuvent être <span class="highlight-term">reconnus<span class="tooltip">被承认</span></span> en France grâce à <span class="highlight-term">Enic-Naric<span class="tooltip">学历认证机构</span></span> pour travailler ou étudier.</p>
+                
+                <p id="section3Text3">Un <span class="highlight-term">contrat de travail<span class="tooltip">劳动合同</span></span> est nécessaire pour toute personne salariée. Il indique le <span class="highlight-term">salaire<span class="tooltip">工资</span></span>, les <span class="highlight-term">heures de travail<span class="tooltip">工作时间</span></span>, les tâches et les droits et devoirs du salarié et de l'employeur. Le <span class="highlight-term">CDI<span class="tooltip">长期合同</span></span> est le contrat le plus courant et n'a pas de date de fin. Le <span class="highlight-term">CDD (max 18 mois)<span class="tooltip">短期合同(最长18个月)</span></span> a une date de fin et sert pour une mission précise. Il existe aussi des contrats comme l'<span class="highlight-term">intérim<span class="tooltip">临时工作</span></span>, la <span class="highlight-term">professionnalisation<span class="tooltip">职业化合同</span></span> ou le <span class="highlight-term">CDD d'usage<span class="tooltip">常规短期合同</span></span>. Un salarié peut avoir plusieurs contrats, mais doit respecter les <span class="highlight-term">heures maximales<span class="tooltip">最长工作时间</span></span> et les clauses d'exclusivité.</p>
+                
+                <p id="section3Text4">Le salarié a des droits importants : recevoir un <span class="highlight-term">salaire<span class="tooltip">工资</span></span> au moins égal au <span class="highlight-term">SMIC<span class="tooltip">最低工资</span></span>, un <span class="highlight-term">bulletin de paie<span class="tooltip">工资单</span></span>, des <span class="highlight-term">congés payés (2,5 jours par mois)<span class="tooltip">带薪休假(每月2.5天)</span></span>, et suivre une <span class="highlight-term">formation<span class="tooltip">培训</span></span>. On peut commencer à travailler dès <span class="highlight-term">16 ans<span class="tooltip">16岁</span></span>. Les règles pour protéger les salariés sont dans le <span class="highlight-term">Code du travail<span class="tooltip">劳动法</span></span>, les <span class="highlight-term">conventions collectives<span class="tooltip">集体协议</span></span> et le <span class="highlight-term">règlement intérieur<span class="tooltip">内部规章</span></span> des entreprises de plus de 50 salariés. Le salarié peut exercer son <span class="highlight-term">droit syndical<span class="tooltip">工会权利</span></span> et saisir le <span class="highlight-term">Conseil de Prud'hommes<span class="tooltip">劳资调解委员会</span></span> en cas de conflit avec l'employeur. Il est protégé contre la <span class="highlight-term">discrimination<span class="tooltip">歧视</span></span>. L'<span class="highlight-term">inspection du travail<span class="tooltip">劳动监察</span></span> veille au respect du <span class="highlight-term">droit du travail<span class="tooltip">劳动法</span></span>.</p>
+                
+                <p id="section3Text5">Le <span class="highlight-term">travail non déclaré<span class="tooltip">未申报工作</span></span> est interdit. L'employeur peut être puni et le salarié perd ses droits à la <span class="highlight-term">sécurité sociale<span class="tooltip">社会保险</span></span>, aux <span class="highlight-term">congés payés<span class="tooltip">带薪休假</span></span> et à la <span class="highlight-term">retraite<span class="tooltip">退休</span></span>.</p>
+                
+                <p id="section3Text6">Tout le monde peut créer une entreprise en France, même sans <span class="highlight-term">nationalité française<span class="tooltip">法国国籍</span></span>. Il faut définir le projet, vérifier les <span class="highlight-term">brevets<span class="tooltip">专利</span></span>, faire une <span class="highlight-term">étude de marché<span class="tooltip">市场研究</span></span>, rédiger les <span class="highlight-term">statuts<span class="tooltip">公司章程</span></span> et faire l'<span class="highlight-term">immatriculation<span class="tooltip">注册</span></span> pour commencer.</p>
+                
+                <h3 id="section4Title">IV. Autorité parentale et système éducatif</h3>
+                
+                <h4 id="section4_1Title">1. Les droits de l'enfant</h4>
+                <p id="section4_1Text1">En <span class="highlight-term">1989<span class="tooltip">1989年</span></span>, les pays de l'<span class="highlight-term">ONU<span class="tooltip">联合国</span></span> ont signé la <span class="highlight-term">Convention internationale des droits de l'enfant<span class="tooltip">儿童权利国际公约</span></span>. Ce texte protège les <span class="highlight-term">droits fondamentaux<span class="tooltip">基本权利</span></span> des enfants et oblige les États à les respecter.</p>
+                
+                <p id="section4_1Text2">Un principe essentiel est <span class="highlight-term">l'intérêt supérieur de l'enfant<span class="tooltip">儿童最高利益</span></span>. Cela signifie que l'intérêt de l'enfant est plus important que celui des parents. L'enfant peut donner son avis, mais les décisions ne doivent jamais le mettre en <span class="highlight-term">danger<span class="tooltip">危险</span></span>.</p>
+                
+                <p id="section4_1Text3">Les enfants ont des droits importants : <span class="highlight-term">égalité<span class="tooltip">平等</span></span>, <span class="highlight-term">identité<span class="tooltip">身份</span></span>, <span class="highlight-term">famille<span class="tooltip">家庭</span></span>, <span class="highlight-term">santé<span class="tooltip">健康</span></span>, <span class="highlight-term">éducation<span class="tooltip">教育</span></span>, <span class="highlight-term">loisirs<span class="tooltip">休闲</span></span>, <span class="highlight-term">protection contre la violence et l'exploitation<span class="tooltip">免遭暴力和剥削的保护</span></span>, <span class="highlight-term">vie privée<span class="tooltip">隐私</span></span>, <span class="highlight-term">liberté d'expression<span class="tooltip">言论自由</span></span>. Les enfants en <span class="highlight-term">situation de handicap<span class="tooltip">残疾状况</span></span> ont les mêmes droits que les autres.</p>
+
+                <h4 id="section4_2Title">2. L'autorité parentale</h4>
+                <p id="section4_2Text1">L'<span class="highlight-term">autorité parentale<span class="tooltip">父母权利</span></span> regroupe les <span class="highlight-term">droits et devoirs<span class="tooltip">权利和义务</span></span> des parents envers leur enfant de <span class="highlight-term">moins de 18 ans<span class="tooltip">18岁以下</span></span>. Les deux parents ont les mêmes responsabilités, qu'ils soient <span class="highlight-term">mariés<span class="tooltip">已婚</span></span>, <span class="highlight-term">séparés<span class="tooltip">分居</span></span> ou non.</p>
+                
+                <p id="section4_2Text2">Dans le cadre de l'<span class="highlight-term">autorité parentale<span class="tooltip">父母权利</span></span>, les parents ont le <span class="highlight-term">droit de surveiller leur enfant<span class="tooltip">监督孩子的权利</span></span>. Ils peuvent contrôler ses <span class="highlight-term">déplacements<span class="tooltip">出行</span></span>, ses <span class="highlight-term">relations<span class="tooltip">人际关系</span></span>, ses <span class="highlight-term">communications<span class="tooltip">通讯</span></span> et son usage des <span class="highlight-term">réseaux sociaux<span class="tooltip">社交媒体</span></span>, afin d'assurer sa <span class="highlight-term">sécurité<span class="tooltip">安全</span></span> et sa <span class="highlight-term">protection<span class="tooltip">保护</span></span>.</p>
+                
+                <p id="section4_2Text3">Les parents ont aussi le <span class="highlight-term">droit et le devoir de gérer les biens de leur enfant<span class="tooltip">管理孩子财产的权利和义务</span></span>.</p>
+                
+                <p id="section4_2Text4">Les parents doivent protéger la <span class="highlight-term">sécurité<span class="tooltip">安全</span></span> de l'enfant, éviter toute <span class="highlight-term">violence<span class="tooltip">暴力</span></span>, et respecter l'enfant. Ils doivent assurer son <span class="highlight-term">éducation<span class="tooltip">教育</span></span>, sa <span class="highlight-term">santé<span class="tooltip">健康</span></span>, son <span class="highlight-term">entretien<span class="tooltip">抚养</span></span> (nourriture, logement, loisirs) et sa <span class="highlight-term">vie privée<span class="tooltip">隐私</span></span>. L'<span class="highlight-term">instruction est obligatoire<span class="tooltip">教育是强制的</span></span> pour les enfants de <span class="highlight-term">3 à 16 ans<span class="tooltip">3至16岁</span></span>.</p>
+
+                <h4 id="section4_3Title">3. La loi et l'intérêt de l'enfant</h4>
+                <p id="section4_3Text1">La <span class="highlight-term">loi française<span class="tooltip">法国法律</span></span> est toujours prioritaire sur les traditions familiales ou culturelles. Par exemple, l'<span class="highlight-term">égalité entre les filles et les garçons<span class="tooltip">男女平等</span></span> doit être respectée.</p>
+                
+                <p id="section4_3Text2">Les parents gèrent aussi les <span class="highlight-term">biens de l'enfant<span class="tooltip">孩子的财产</span></span> et peuvent utiliser les revenus jusqu'à ses <span class="highlight-term">16 ans<span class="tooltip">16岁</span></span>. L'autorité parentale se termine à <span class="highlight-term">18 ans<span class="tooltip">18岁</span></span>, en cas d'<span class="highlight-term">émancipation<span class="tooltip">解放/成年</span></span> ou de <span class="highlight-term">retrait<span class="tooltip">撤销</span></span> décidé par un tribunal.</p>
+
+                <h4 id="section4_4Title">4. Le retrait de l'autorité parentale</h4>
+                <p id="section4_4Text1">Le <span class="highlight-term">tribunal<span class="tooltip">法庭</span></span> peut retirer l'autorité parentale en cas de <span class="highlight-term">danger<span class="tooltip">危险</span></span>, de <span class="highlight-term">désintérêt<span class="tooltip">不关心/漠视</span></span> ou de <span class="highlight-term">condamnation pénale<span class="tooltip">刑事定罪</span></span>. Le retrait peut être <span class="highlight-term">total<span class="tooltip">全部</span></span> ou <span class="highlight-term">partiel<span class="tooltip">部分</span></span>. Même en cas de retrait, le parent doit continuer à participer à l'<span class="highlight-term">entretien<span class="tooltip">抚养</span></span> de l'enfant.</p>
+
+                <h4 id="section4_5Title">5. Le système scolaire</h4>
+                <p id="section4_5Text1">En France, tous les enfants de <span class="highlight-term">3 à 16 ans<span class="tooltip">3至16岁</span></span> doivent aller à l'<span class="highlight-term">école<span class="tooltip">学校</span></span>. Le système scolaire comprend la <span class="highlight-term">maternelle<span class="tooltip">幼儿园</span></span>, l'<span class="highlight-term">école élémentaire<span class="tooltip">小学</span></span>, le <span class="highlight-term">collège<span class="tooltip">初中</span></span> (avec le <span class="highlight-term">brevet<span class="tooltip">初中毕业证书</span></span>) et le <span class="highlight-term">lycée<span class="tooltip">高中</span></span> (avec le <span class="highlight-term">baccalauréat<span class="tooltip">高中毕业会考</span></span>).</p>
+                
+                <p id="section4_5Text2">Après <span class="highlight-term">16 ans<span class="tooltip">16岁</span></span>, l'école n'est plus obligatoire, mais les jeunes peuvent continuer leurs études ou suivre une <span class="highlight-term">formation professionnelle<span class="tooltip">职业培训</span></span>.</p>
+
+                <h4 id="section4_6Title">6. Le choix de l'école</h4>
+                <p id="section4_6Text1">Les parents peuvent choisir une <span class="highlight-term">école publique<span class="tooltip">公立学校</span></span> ou une <span class="highlight-term">école privée<span class="tooltip">私立学校</span></span>. L'<span class="highlight-term">école publique<span class="tooltip">公立学校</span></span> est gratuite, laïque et délivre des diplômes officiels. L'<span class="highlight-term">école à la maison<span class="tooltip">在家教育</span></span> est possible seulement avec une <span class="highlight-term">autorisation spéciale<span class="tooltip">特殊许可</span></span>.</p>
+
+                <h4 id="section4_7Title">7. Les enfants allophones</h4>
+                <p id="section4_7Text1">Les enfants dont la langue maternelle n'est pas le français ont le <span class="highlight-term">droit d'aller à l'école<span class="tooltip">上学权利</span></span>. Ils peuvent suivre des cours adaptés comme les <span class="highlight-term">UPE2A<span class="tooltip">非母语法语学生教学单元</span></span> pour apprendre le <span class="highlight-term">français<span class="tooltip">法语</span></span>. Quand leur niveau est suffisant, ils suivent les mêmes cours que les autres élèves.</p>
+
+                <h4 id="section4_8Title">8. Le rôle des parents à l'école</h4>
+                <p id="section4_8Text1">L'école informe les parents des <span class="highlight-term">résultats<span class="tooltip">成绩</span></span> et du <span class="highlight-term">comportement<span class="tooltip">行为</span></span> de leur enfant. Les parents doivent suivre la scolarité, communiquer avec les enseignants et participer aux <span class="highlight-term">réunions<span class="tooltip">会议</span></span>. Ils peuvent aussi s'engager dans une <span class="highlight-term">association de parents d'élèves<span class="tooltip">家长协会</span></span>.</p>
+
+                <h4 id="section4_9Title">9. Le dispositif OEPRE et le soutien à la parentalité</h4>
+                <p id="section4_9Text1">Le dispositif <span class="highlight-term">OEPRE<span class="tooltip">外来家长学校开放与融入计划</span></span> aide les <span class="highlight-term">parents étrangers<span class="tooltip">外国父母</span></span> à comprendre l'école, apprendre le <span class="highlight-term">français<span class="tooltip">法语</span></span> et connaître les <span class="highlight-term">valeurs de la République<span class="tooltip">共和国价值观</span></span>. L'État propose aussi des actions de <span class="highlight-term">soutien à la parentalité<span class="tooltip">育儿支持</span></span> pour aider les familles, prévenir les difficultés et <span class="highlight-term">protéger l'enfant<span class="tooltip">保护儿童</span></span>.</p>
+
+                <div class="important-note">
+                    <p id="importantNote3"><strong>Conseil :</strong> L'éducation est un droit fondamental en France. Les parents étrangers peuvent bénéficier de dispositifs spécifiques pour accompagner la scolarité de leurs enfants.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Action Cards -->
+    <section class="action-cards" id="astuces">
+        <div class="container">
+            <h2 style="color: white; text-align: center; margin-bottom: 50px;" id="actionTitle">Passez à l'action</h2>
+            
+            <div class="action-cards-container">
+                <!-- Card 1: Astuces d'examen -->
+                <div class="action-card action-card-1">
+                    <div class="action-card-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3 id="astuceTitle">Astuces pour l'examen</h3>
+                    <p id="astuceDescription">Découvrez les conseils et techniques pour réussir votre examen d'intégration. Apprenez comment aborder les questions pratiques sur la vie en France.</p>
+                    <a href="astuces-examen-societe.html" class="btn btn-orange" id="astuceBtn">
+                        <i class="fas fa-graduation-cap"></i> Voir les astuces
+                    </a>
+                </div>
+                
+                <!-- Card 2: Test rapide -->
+                <div class="action-card action-card-2">
+                    <div class="action-card-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 id="testTitle">Test rapide</h3>
+                    <p id="testDescription">Testez vos connaissances sur les démarches d'installation en France avec ce quiz de 20 questions. Vérifiez votre compréhension des procédures essentielles.</p>
+                    <a href="test-rapide-installation.html" class="btn btn-purple" id="testBtn">
+                        <i class="fas fa-play-circle"></i> Commencer le test
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <!-- About Column -->
+                <div class="footer-column">
+                    <h4 id="footerAbout">À propos</h4>
+                    <p id="footerAboutText">
+                        L'association Mille Voiles accompagne les communautés chinoises en France dans leurs démarches d'intégration, d'apprentissage du français et de préparation aux examens officiels.
+                    </p>
+                </div>
+                
+                <!-- Quick Links Column -->
+                <div class="footer-column">
+                    <h4 id="footerLinks">Thématiques</h4>
+                    <ul class="footer-links">
+                        <li><a href="thematique-installation.html"><i class="fas fa-chevron-right"></i> <span id="footerLink1">S'installer en France</span></a></li>
+                        <li><a href="thematique-sante.html"><i class="fas fa-chevron-right"></i> <span id="footerLink2">Santé et soins</span></a></li>
+                        <li><a href="thematique-travail.html"><i class="fas fa-chevron-right"></i> <span id="footerLink3">Travail et emploi</span></a></li>
+                        <li><a href="thematique-education.html"><i class="fas fa-chevron-right"></i> <span id="footerLink4">Éducation et famille</span></a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact Column -->
+                <div class="footer-column">
+                    <h4 id="footerContact">Contact</h4>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span id="footerEmail">2025qianfan@gmail.com</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-globe"></i>
+                            <span id="footerWebsite">Association Mille Voiles</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="footerAddress">94800 Villejuif</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p id="footerCopyright">&copy; 2025 Association Mille Voiles / 千帆协会 - Tous droits réservés. | <a href="#" style="color: var(--primary-yellow);" id="footerPrivacy">Mentions légales</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top -->
+    <a href="#" class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+
+    <!-- JavaScript -->
+    <script>
+         document.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+    });
+
+    // 禁止常见快捷键
+    document.addEventListener('keydown', function (e) {
+        // Ctrl + C / Ctrl + U / Ctrl + S
+        if (e.ctrlKey && ['c', 'u', 's', 'x', 'v', 'a'].includes(e.key.toLowerCase())) {
+            e.preventDefault();
+        }
+
+        // F12
+        if (e.key === 'F12') {
+            e.preventDefault();
+        }
+    });
+        // 语言切换数据
+        const translations = {
+            fr: {
+                // Header
+                mainTitle: "S'installer et résider en France",
+                mainSubtitle: "Guide pratique pour l'installation et la vie quotidienne en France",
+                logoText: "Mille Voiles",
+                
+                // Navigation
+                navHome: "Accueil",
+                navContent: "Contenu",
+                navAstuces: "Astuces",
+                navTest: "Test",
+                
+                // Breadcrumb
+                breadcrumbCurrent: "S'installer en France",
+                
+                // Theme Hero
+                themeTitle: "S'installer et résider en France",
+                themeDescription: "Découvrez les démarches essentielles pour s'installer, travailler et vivre en France",
+                
+                // Article
+                articleTitle: "Guide pratique pour l'installation en France",
+                articleSubtitle: "Survolez les termes en gras et soulignés pour voir leur traduction en chinois",
+                
+                // Section Titles
+                section1Title: "I. Domiciliation et vie quotidienne",
+                section1_1Title: "1. Domiciliation",
+                section1_2Title: "2. Compte bancaire",
+                section1_3Title: "3. Permis de conduire et assurance",
+                section1_4Title: "4. Impôts et déclaration de revenus",
+                section1_5Title: "5. Séjour et nationalité",
+                section1_6Title: "6. Déclarations d'état civil",
+                section1_7Title: "7. Logement",
+                section1_8Title: "8. Numéros d'urgence",
+                section2Title: "II. Accès aux soins de santé",
+                section3Title: "III. Travailler en France",
+                section4Title: "IV. Autorité parentale et système éducatif",
+                section4_1Title: "1. Les droits de l'enfant",
+                section4_2Title: "2. L'autorité parentale",
+                section4_3Title: "3. La loi et l'intérêt de l'enfant",
+                section4_4Title: "4. Le retrait de l'autorité parentale",
+                section4_5Title: "5. Le système scolaire",
+                section4_6Title: "6. Le choix de l'école",
+                section4_7Title: "7. Les enfants allophones",
+                section4_8Title: "8. Le rôle des parents à l'école",
+                section4_9Title: "9. Le dispositif OEPRE et le soutien à la parentalité",
+                
+                // Important Notes
+                importantNote1: "À retenir : La domiciliation est essentielle pour accéder à de nombreux droits et services en France, même sans logement stable.",
+                importantNote2: "Important : Connaître ces numéros d'urgence est essentiel pour réagir rapidement en cas de situation critique.",
+                importantNote3: "Conseil : L'éducation est un droit fondamental en France. Les parents étrangers peuvent bénéficier de dispositifs spécifiques pour accompagner la scolarité de leurs enfants.",
+                
+                // Action Cards
+                actionTitle: "Passez à l'action",
+                astuceTitle: "Astuces pour l'examen",
+                astuceDescription: "Découvrez les conseils et techniques pour réussir votre examen d'intégration. Apprenez comment aborder les questions pratiques sur la vie en France.",
+                astuceBtn: '<i class="fas fa-graduation-cap"></i> Voir les astuces',
+                testTitle: "Test rapide",
+                testDescription: "Testez vos connaissances sur les démarches d'installation en France avec ce quiz de 10 questions. Vérifiez votre compréhension des procédures essentielles.",
+                testBtn: '<i class="fas fa-play-circle"></i> Commencer le test',
+                
+                // Footer
+                footerAbout: "À propos",
+                footerAboutText: "L'association Mille Voiles accompagne les communautés chinoises en France dans leurs démarches d'intégration, d'apprentissage du français et de préparation aux examens officiels.",
+                footerLinks: "Thématiques",
+                footerLink1: "S'installer en France",
+                footerLink2: "Santé et soins",
+                footerLink3: "Travail et emploi",
+                footerLink4: "Éducation et famille",
+                footerContact: "Contact",
+                footerEmail: "2025qianfan@gmail.com",
+                footerWebsite: "Association Mille Voiles",
+                footerAddress: "94800 Villejuif",
+                footerCopyright: "© 2025 Association Mille Voiles / 千帆协会 - Tous droits réservés. | ",
+                footerPrivacy: "Mentions légales"
+            },
+            zh: {
+                // Header
+                mainTitle: "在法国定居与居住",
+                mainSubtitle: "法国安装与日常生活实用指南",
+                logoText: "千帆协会",
+                
+                // Navigation
+                navHome: "首页",
+                navContent: "内容",
+                navAstuces: "考试技巧",
+                navTest: "测试",
+                
+                // Breadcrumb
+                breadcrumbCurrent: "在法国定居",
+                
+                // Theme Hero
+                themeTitle: "在法国定居与居住",
+                themeDescription: "了解在法国定居、工作和生活的基本程序",
+                
+                // Article
+                articleTitle: "法国安装实用指南",
+                articleSubtitle: "将鼠标悬停在粗体下划线术语上查看中文翻译",
+                
+                // Section Titles
+                section1Title: "一、落户登记与日常生活",
+                section1_1Title: "1. 落户登记",
+                section1_2Title: "2. 银行账户",
+                section1_3Title: "3. 驾照和保险",
+                section1_4Title: "4. 税收和收入申报",
+                section1_5Title: "5. 居留和国籍",
+                section1_6Title: "6. 民事状况声明",
+                section1_7Title: "7. 住房",
+                section1_8Title: "8. 紧急电话号码",
+                section2Title: "二、医疗服务获取",
+                section3Title: "三、在法国工作",
+                section4Title: "四、父母权利与教育体系",
+                section4_1Title: "1. 儿童权利",
+                section4_2Title: "2. 父母权利",
+                section4_3Title: "3. 法律与儿童利益",
+                section4_4Title: "4. 父母权利的撤销",
+                section4_5Title: "5. 学校体系",
+                section4_6Title: "6. 学校选择",
+                section4_7Title: "7. 非法语母语儿童",
+                section4_8Title: "8. 父母在学校中的作用",
+                section4_9Title: "9. OEPRE计划与育儿支持",
+                
+                // Important Notes
+                importantNote1: "需要记住：落户登记对于在法国获取许多权利和服务至关重要，即使没有稳定的住房。",
+                importantNote2: "重要提示：了解这些紧急电话号码对于在危急情况下快速反应至关重要。",
+                importantNote3: "建议：教育是法国的一项基本权利。外国父母可以利用特定计划来支持子女的学业。",
+                
+                // Action Cards
+                actionTitle: "采取行动",
+                astuceTitle: "考试技巧",
+                astuceDescription: "了解通过融合考试的技巧和方法。学习如何应对关于法国生活的实际问题。",
+                astuceBtn: '<i class="fas fa-graduation-cap"></i> 查看技巧',
+                testTitle: "快速测试",
+                testDescription: "通过20道题的测验测试您对法国安装程序的理解。检查您对基本程序的理解。",
+                testBtn: '<i class="fas fa-play-circle"></i> 开始测试',
+                
+                // Footer
+                footerAbout: "关于我们",
+                footerAboutText: "千帆协会协助在法华人社区进行融合程序、法语学习以及官方考试准备。",
+                footerLinks: "主题",
+                footerLink1: "在法国定居",
+                footerLink2: "健康与医疗",
+                footerLink3: "工作与就业",
+                footerLink4: "教育与家庭",
+                footerContact: "联系我们",
+                footerEmail: "2025qianfan@gmail.com",
+                footerWebsite: "千帆协会",
+                footerAddress: "94800 维勒瑞夫",
+                footerCopyright: "© 2025 千帆协会 / Association Mille Voiles - 版权所有。 | ",
+                footerPrivacy: "法律声明"
+            }
+        };
+
+        // 当前语言
+        let currentLang = 'fr';
+
+        // 切换语言函数
+        function switchLanguage(lang) {
+            currentLang = lang;
+            
+            // 更新语言按钮状态
+            document.getElementById('langFr').classList.toggle('active', lang === 'fr');
+            document.getElementById('langZh').classList.toggle('active', lang === 'zh');
+            
+            // 获取翻译数据
+            const data = translations[lang];
+            
+            // 遍历所有数据项并更新页面
+            for (const [key, value] of Object.entries(data)) {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (key.includes('Btn') || key.includes('Title') || key.includes('Text')) {
+                        element.innerHTML = value;
+                    } else {
+                        element.textContent = value;
+                    }
+                }
+            }
+        }
+
+        // Back to Top功能
+        const backToTopBtn = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
+        
+        backToTopBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置默认语言
+            switchLanguage('fr');
+            
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    if (this.getAttribute('href') !== '#') {
+                        e.preventDefault();
+                        
+                        const targetId = this.getAttribute('href');
+                        const targetElement = document.querySelector(targetId);
+                        
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 80,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
