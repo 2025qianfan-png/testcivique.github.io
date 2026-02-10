@@ -725,12 +725,13 @@ FR : La tradition ne peut jamais justifier une atteinte aux droits individuels e
 中：错误。\n\
 传统不能成为侵犯个人权利和良心自由的理由。"
 },
+
 {
   id: "si0054",
-  type: "carte resident",
+   type: "carte resident",
   category: "Mises en situation",
-  difficulté: "moyen",
-  typeQuestion: "examen original", // 有红色o标志
+    difficulté: "moyen",
+    typeQuestion: "examen original",
   question: "Monsieur Y porte une croix visible en se rendant à la mairie pour effectuer une démarche. Que dit le principe de neutralité ?",
   options: [
     "C’est autorisé",
@@ -738,25 +739,11 @@ FR : La tradition ne peut jamais justifier une atteinte aux droits individuels e
     "Autorisé seulement si l’usager est d’accord",
     "Autorisé selon la religion de l’agent"
   ],
-  answer: 1,
-  explanation:
-"❌ A. C’est autorisé – Faux.\n\
-FR : Même une croyance personnelle ne permet pas de porter des symboles religieux visibles pendant le service public.\n\
-中：错误。\n\
-即使是个人信仰，也不允许在公共服务工作期间佩戴明显的宗教标志。\n\n\
-✅ B. Ce n’est pas autorisé – Correct !\n\
-FR : Le principe de neutralité dans les services publics impose que les agents publics ne portent pas de signes religieux visibles pendant l’exercice de leurs fonctions. Cela garantit que tous les usagers sont traités de manière égale, indépendamment de leur religion. Porter une croix visible en mairie viole ce principe.\n\
-中：正确。\n\
-公共服务中的中立原则要求公职人员在履行职务期间不得佩戴明显的宗教标志。这一原则确保所有使用公共服务的人都受到平等对待，不受宗教信仰影响。在市政厅佩戴可见的十字架违反了该原则。\n\n\
-❌ C. Autorisé seulement si l’usager est d’accord – Faux.\n\
-FR : La neutralité s’applique indépendamment de l’accord de l’usager. La religion de l’agent ne peut pas influencer le service public.\n\
-中：错误。\n\
-中立原则不取决于使用者是否同意，公职人员的宗教信仰不能影响公共服务。\n\n\
-❌ D. Autorisé selon la religion de l’agent – Faux.\n\
-FR : La neutralité est obligatoire pour tous les agents publics, quelle que soit leur religion.\n\
-中：错误。\n\
-中立原则对所有公职人员一视同仁，不因宗教不同而有所区别。"
-},
+  answer: 0,
+  explanation: "✅ A. C’est autorisé - Correct ! Le principe de neutralité concerne principalement les agents publics dans l’exercice de leurs fonctions. Un usager (citoyen) peut porter des signes religieux dans un service public, tant que cela ne trouble pas l’ordre public. Monsieur Y peut donc porter une croix visible en se rendant à la mairie.\n中：正确。法国的中立原则主要适用于公共服务人员（agent public），要求其在工作中保持宗教中立。普通市民（usager）在公共服务场所佩戴宗教标志是允许的，只要不影响公共秩序。因此，Y先生前往市政厅办理事务时佩戴十字架是允许的。\n\n❌ B. Ce n’est pas autorisé - Faux. Le principe de neutralité ne s’applique pas aux usagers. Interdire à un citoyen de porter un signe religieux constituerait une atteinte excessive à la liberté de conscience.\n中：错误。中立原则并不适用于普通市民，禁止市民佩戴宗教标志会过度限制其思想和宗教自由。\n\n❌ C. Autorisé seulement si l’usager est d’accord - Faux. Le principe de neutralité ne dépend pas de l’accord d’un autre usager. La question porte sur le droit individuel du citoyen.\n中：错误。中立原则与其他人是否同意无关，关注的是市民个人的权利。\n\n❌ D. Autorisé selon la religion de l’agent - Faux. La neutralité ne dépend pas de la religion de l’agent. Au contraire, l’agent public doit rester neutre quelles que soient ses convictions. De plus, la situation concerne un usager, non un agent.\n中：错误。中立原则不是根据工作人员的宗教信仰来判断的，而且本题讨论的是市民而非公共服务人员。"
+}
+
+,
 
   {
     id: "in0063", // 延续多年卡编号

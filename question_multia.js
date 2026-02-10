@@ -1217,22 +1217,23 @@ FR : Faux Les bâtiments scolaires ne sont pas obligatoirement des lieux officie
     answer: 1,
     explanation: "❌ A. Oui - Faux. Brûler publiquement le drapeau français constitue une atteinte aux symboles de la République et est interdit par la loi.\n中：错误。公开焚烧法国国旗属于对共和国象征的侮辱，法律禁止这种行为。\n\n✅ B. Non - Correct ! La loi française protège les symboles nationaux, dont le drapeau, et interdit de les dégrader ou de les brûler publiquement.\n中：正确。法国法律保护国家象征，包括国旗，禁止公开破坏或焚烧国旗。\n\n❌ C. Oui, seulement dans certaines régions - Faux. L'interdiction est valable sur tout le territoire français, sans exception régionale.\n中：错误。禁止行为在全法国范围内适用，没有地区例外。\n\n❌ D. Oui, si on est citoyen - Faux. Être citoyen français ne donne pas le droit de brûler le drapeau.\n中：错误。成为法国公民也不能公开焚烧国旗。"
   },
-  {
-    id: "si0008",
-    type: "carte multi",
-    category: "Mises en situation",
-    difficulté: "simple",
-    typeQuestion: "question simulée", // 无o标志
-    question: "Madame X et Madame Y sont des étrangères résidant en France. Elles souhaitent créer une association d'aide aux étrangers.",
-    options: [
-      "Elles peuvent la créer, mais doivent la déclarer à la préfecture",
-      "Elles ne peuvent pas créer d'association parce qu'elles ne sont pas de nationalité française.",
-      "Elles peuvent créer une association, mais seulement après avoir adhéré à une autre association.",
-      "Elles peuvent créer librement une association, sans condition de nationalité particulière."
-    ],
-    answer: 0,
-    explanation: "✅ A. Elles peuvent la créer, mais doivent la déclarer à la préfecture - Correct ! En France, toute personne, française ou étrangère résidant légalement, peut créer une association. Selon la loi de 1901, la plupart des associations doivent être déclarées à la préfecture pour obtenir la personnalité juridique et la capacité de recevoir des subventions ou de gérer un compte bancaire.\n中：正确。在法国，任何合法居留的人员，无论国籍，都可以创建协会。根据1901年的法律，大多数协会需向省政府（préfecture）登记，以获得法人资格，并能够接受补助或开设银行账户。\n\n❌ B. Elles ne peuvent pas créer d'association parce qu'elles ne sont pas de nationalité française - Faux. La nationalité française n'est pas un prérequis pour créer une association.\n中：错误。创建协会不要求拥有法国国籍。\n\n❌ C. Elles peuvent créer une association, mais seulement après avoir adhéré à une autre association - Faux. Il n'y a aucune obligation de rejoindre une autre association avant d'en créer une.\n中：错误。创建协会前不需要加入其他协会。\n\n❌ D. Elles peuvent créer librement une association, sans condition de nationalité particulière - Faux. Bien que la nationalité ne soit pas une condition, la création doit être déclarée à la préfecture pour être légalement reconnue. La formulation \"librement, sans condition\" ignore cette obligation légale.\n中：错误。虽然国籍不是限制条件，但协会要获得法律承认，必须向省政府登记。\"自由创建，无条件\"这一说法忽略了这一法律要求。"
-  },
+{
+  id: "si0008",
+  type: "carte multi",
+  category: "Mises en situation",
+  difficulté: "simple",
+  typeQuestion: "question simulée", // 无o标志
+  question: "Madame X et Madame Y sont des étrangères résidant en France. Elles souhaitent créer une association d'aide aux étrangers.",
+  options: [
+    "Elles peuvent la créer, mais doivent la déclarer à la préfecture",
+    "Elles ne peuvent pas créer d'association parce qu'elles ne sont pas de nationalité française.",
+    "Elles peuvent créer une association, mais seulement après avoir adhéré à une autre association.",
+    "Elles peuvent créer librement une association sans aucune formalité administrative."
+  ],
+  answer: 0,
+  explanation: "✅ A. Elles peuvent la créer, mais doivent la déclarer à la préfecture - Correct ! En France, toute personne, française ou étrangère résidant légalement, peut créer une association. Selon la loi de 1901, la plupart des associations doivent être déclarées à la préfecture pour obtenir la personnalité juridique et la capacité de recevoir des subventions ou de gérer un compte bancaire.\n中：正确。在法国，任何合法居留的人员，无论国籍，都可以创建协会。根据1901年的法律，大多数协会需向省政府（préfecture）登记，以获得法人资格，并能够接受补助或开设银行账户。\n\n❌ B. Elles ne peuvent pas créer d'association parce qu'elles ne sont pas de nationalité française - Faux. La nationalité française n'est pas un prérequis pour créer une association.\n中：错误。创建协会不要求拥有法国国籍。\n\n❌ C. Elles peuvent créer une association, mais seulement après avoir adhéré à une autre association - Faux. Il n'y a aucune obligation de rejoindre une autre association avant d'en créer une.\n中：错误。创建协会前不需要加入其他协会。\n\n❌ D. Elles peuvent créer librement une association sans aucune formalité administrative - Faux. Même si la nationalité n'est pas une condition, la création d'une association reconnue juridiquement nécessite une déclaration à la préfecture.\n中：错误。虽然国籍不是条件，但要使协会具有法律效力，仍需向省政府申报。"
+}
+,
   {
     id: "si0009",
     type: "carte multi",
@@ -17712,14 +17713,14 @@ FR : Faux Les bâtiments scolaires ne sont pas obligatoirement des lieux officie
     typeQuestion: "examen original", // 有"5o"
     question: "Quand faut-il déclarer son enfant au service d'état civil de la mairie ?",
     options: [
-      "Dans les 3 jours",
+      "Dans les 5 jours",
       "Dans le mois",
       "À la fin de l'année",
       "À l'école maternelle"
     ],
     answer: 0,
-    explanation: `✅ A. Dans les 3 jours - Correct ! La loi impose de déclarer la naissance dans les 3 jours suivant l'accouchement.
-    中：正确！法律规定孩子出生后3天内必须在市政府申报。
+    explanation: `✅ A. Dans les 5 jours - Correct ! La loi impose de déclarer la naissance dans les 5 jours suivant l'accouchement.
+    中：正确！法律规定孩子出生后5天内必须在市政府申报。
     
     ❌ B. Dans le mois - Faux. Ce délai est trop long et non conforme à la loi.
     中：错误。一个月已超过法定期限。
