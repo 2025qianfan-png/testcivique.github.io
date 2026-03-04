@@ -7,8 +7,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-   <!-- 添加到现有代码中 -->
-<!-- PWA Manifest -->
+   <!-- PWA Manifest -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#004080">
 
@@ -473,6 +472,15 @@
 
         .btn-success:hover {
             background-color: #229954;
+        }
+
+        /* 新增真题训练卡片橙色风格 */
+        .btn-orange {
+            background-color: var(--orange);
+            color: var(--white);
+        }
+        .btn-orange:hover {
+            background-color: #e67e22;
         }
 
         /* 主题卡片网格 */
@@ -1299,7 +1307,7 @@
         <div class="container">
             <div class="section-title">
                 <h2 id="testsTitle">Choisissez votre test</h2>
-                <p id="testsSubtitle">Deux options adaptées à vos besoins : test gratuit d'évaluation ou test complet pour nos étudiants</p>
+                <p id="testsSubtitle">Trois options adaptées à vos besoins : test gratuit, entraînement aux annales ou test complet pour nos étudiants</p>
             </div>
             
             <div class="cards-container">
@@ -1333,6 +1341,35 @@
                     </div>
                 </div>
                 
+                <!-- NEW: Annales / 真题训练卡片 -->
+                <div class="test-card">
+                    <div class="card-header" style="background-color: var(--orange);">
+                        <h3 id="annalesTestTitle">Entraînement aux annales</h3>
+                        <div class="card-price" id="annalesTestPrice">ACCÈS LIMITÉ</div>
+                        <p id="annalesTestDesc">Sujets des années précédentes</p>
+                    </div>
+                    <div class="card-body">
+                        <ul class="features-list">
+                            <li><i class="fas fa-check"></i> <span id="annalesFeature1">20 questions d'annales officielles</span></li>
+                            <li><i class="fas fa-check"></i> <span id="annalesFeature2">Correction immédiate</span></li>
+                            <li><i class="fas fa-check"></i> <span id="annalesFeature3">Explications détaillées</span></li>
+                            <li><i class="fas fa-check"></i> <span id="annalesFeature4">Statistiques de réussite</span></li>
+                            <li><i class="fas fa-check"></i> <span id="annalesFeature5">Renouvelé mensuellement</span></li>
+                        </ul>
+                        
+                        <div class="password-info">
+                            <p id="passwordInfoAnnales">
+                                <i class="fas fa-key"></i> <strong>Accès protégé :</strong> 
+                                Mot de passe disponible après inscription (contactez-nous)
+                            </p>
+                        </div>
+                        
+                        <a href="test-annales.html" class="btn btn-orange" id="annalesTestBtn">
+                            <i class="fas fa-history"></i> Accéder aux annales
+                        </a>
+                    </div>
+                </div>
+                
                 <!-- Student Test Card -->
                 <div class="test-card">
                     <div class="card-header" style="background-color: var(--green);">
@@ -1345,7 +1382,7 @@
                             <li><i class="fas fa-check"></i> <span id="feature6">40 questions conformes</span></li>
                             <li><i class="fas fa-check"></i> <span id="feature7">Durée : 45 minutes</span></li>
                             <li><i class="fas fa-check"></i> <span id="feature8">Simulation réelle</span></li>
-                            <li><i class="fas fa-check"></i> <span id="feature9">Résultats par email</span></li>
+                            <li><i class="fas fa-check"></i> <span id="feature9">2000 questions d’examen + entraînement</span></li>
                             <li><i class="fas fa-check"></i> <span id="feature10">Accès à la plateforme</span></li>
                         </ul>
                         
@@ -1831,7 +1868,7 @@
                 
                 // Test Cards
                 testsTitle: "Choisissez votre test",
-                testsSubtitle: "Deux options adaptées à vos besoins : test gratuit d'évaluation ou test complet pour nos étudiants",
+                testsSubtitle: "Trois options adaptées à vos besoins : test gratuit, entraînement aux annales ou test complet pour nos étudiants",
                 
                 freeTestTitle: "Test Gratuit",
                 freeTestPrice: "GRATUIT",
@@ -1844,13 +1881,25 @@
                 passwordInfoFree: '<i class="fas fa-key"></i> <strong>Accès protégé :</strong> Pour obtenir le mot de passe, contactez-nous à <a href="mailto:2025qianfan@gmail.com">2025qianfan@gmail.com</a>',
                 freeTestBtn: '<i class="fas fa-play-circle"></i> Commencer le test gratuit',
                 
+                // Annales / 真题训练
+                annalesTestTitle: "Entraînement aux annales",
+                annalesTestPrice: "ACCÈS LIMITÉ",
+                annalesTestDesc: "Questions issues des annales officielles",
+                annalesFeature1: "20 questions d'annales officielles",
+                annalesFeature2: "Durée : 30 minutes",
+                annalesFeature3: "Correction détaillée",
+                annalesFeature4: "Statistiques de réussite",
+                annalesFeature5: "Renouvelé mensuellement",
+                passwordInfoAnnales: '<i class="fas fa-key"></i> <strong>Accès protégé :</strong> Mot de passe disponible après inscription (contactez-nous)',
+                annalesTestBtn: '<i class="fas fa-history"></i> Accéder aux annales',
+                
                 studentTestTitle: "Test Étudiant",
                 studentTestPrice: "ACCÈS LIMITÉ",
                 studentTestDesc: "Pour nos étudiants inscrits",
                 feature6: "40 questions conformes",
                 feature7: "Durée : 45 minutes",
                 feature8: "Simulation réelle",
-                feature9: "Résultats par email",
+                feature9: "2000 questions originales + questions types examen",
                 feature10: "Accès à la plateforme",
                 passwordInfoStudent: '<i class="fas fa-lock"></i> <strong>Accès réservé :</strong> Mot de passe fourni après inscription aux cours de l\'association',
                 studentTestBtn: '<i class="fas fa-lock"></i> Accéder au test étudiant',
@@ -1945,7 +1994,7 @@
                 
                 // Test Cards
                 testsTitle: "选择您的测试",
-                testsSubtitle: "两种选项满足您的需求：免费评估测试或为我们的学员提供的完整测试",
+                testsSubtitle: "三种选项满足您的需求：免费测试、真题训练或为学员提供的完整测试",
                 
                 freeTestTitle: "免费测试",
                 freeTestPrice: "免费",
@@ -1958,13 +2007,25 @@
                 passwordInfoFree: '<i class="fas fa-key"></i> <strong>受保护访问：</strong> 要获取密码，请通过邮件联系我们 <a href="mailto:2025qianfan@gmail.com">2025qianfan@gmail.com</a>',
                 freeTestBtn: '<i class="fas fa-play-circle"></i> 开始免费测试',
                 
+                // Annales / 真题训练
+                annalesTestTitle: "真题训练",
+                annalesTestPrice: "限时访问",
+                annalesTestDesc: "学员反馈真题模拟",
+                annalesFeature1: "20道官方真题",
+                annalesFeature2: "即时批改",
+                annalesFeature3: "详细解析",
+                annalesFeature4: "通过率统计",
+                annalesFeature5: "每月更新",
+                passwordInfoAnnales: '<i class="fas fa-key"></i> <strong>受保护访问：</strong> 报名后获取密码（联系我们）',
+                annalesTestBtn: '<i class="fas fa-history"></i> 进入真题训练',
+                
                 studentTestTitle: "学员测试",
                 studentTestPrice: "限时访问",
                 studentTestDesc: "供我们已注册学员使用",
                 feature6: "40道符合标准的题目",
                 feature7: "时长：45分钟",
                 feature8: "真实模拟",
-                feature9: "邮件发送结果",
+                feature9: "2000道原题加模拟试题",
                 feature10: "访问学习平台",
                 passwordInfoStudent: '<i class="fas fa-lock"></i> <strong>受限访问：</strong> 报名参加协会课程后提供密码',
                 studentTestBtn: '<i class="fas fa-lock"></i> 进入学员测试',
