@@ -1,7 +1,7 @@
-const CACHE_NAME = 'civique-exam-v1.1';
+const CACHE_NAME = 'civique-exam-v1.2';
 const urlsToCache = [
   '/',
-  '/index.html',
+ '/index.html?v=1.2',
   '/manifest.json',
   // 添加您的其他页面和资源
 ];
@@ -111,4 +111,5 @@ self.addEventListener('notificationclick', event => {
   event.waitUntil(
     clients.openWindow('/')
   );
+
 });
