@@ -1,4 +1,4 @@
-const CACHE_NAME = 'civique-exam-v1.0';
+const CACHE_NAME = 'civique-exam-v1.1';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -111,4 +111,5 @@ self.addEventListener('notificationclick', event => {
   event.waitUntil(
     clients.openWindow('/')
   );
+
 });
