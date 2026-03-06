@@ -172,31 +172,6 @@ h1, h2, h3, h4 {
 }
 
 /* Login Modal */
-.login-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.85);
-  z-index: 3000;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.login-content {
-  background-color: var(--white);
-  padding: 30px;
-  border-radius: var(--border-radius);
-  max-width: 500px;
-  width: 100%;
-  margin: 40px auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: modalFade 0.4s ease-out;
-}
 
 .login-content h2 {
   font-size: 1.8rem;
@@ -2308,9 +2283,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             console.log("学生信息:", studentInfo);
             
-            // 隐藏登录模态框
-            const loginModal = document.getElementById('loginModal');
-            if (loginModal) loginModal.style.display = 'none';
+     
             
             // 直接显示培训信息窗口
             showTrainingInfo();
@@ -2327,8 +2300,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 daysLeft: -1
             };
             
-            const loginModal = document.getElementById('loginModal');
-            if (loginModal) loginModal.style.display = 'none';
+      
             
             showTrainingInfo();
         }
@@ -2343,8 +2315,7 @@ document.addEventListener('DOMContentLoaded', function() {
             daysLeft: -1
         };
         
-        const loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.style.display = 'none';
+ 
         
         showTrainingInfo();
     }
