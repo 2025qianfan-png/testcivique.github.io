@@ -2005,44 +2005,7 @@
 </div>
 
 <!-- Login Modal -->
-<div id="loginModal" class="login-overlay">
-  <div class="login-content">
-    <h2>Accès Test Étudiant</h2>
-    <p>Veuillez entrer vos informations d'étudiant</p>
-    
-    <form id="loginForm" class="login-form">
-      <div class="form-group">
-        <label for="studentName">Nom de l'étudiant *</label>
-        <input type="text" id="studentName" placeholder="Votre nom complet" required>
-      </div>
-      
-      <div class="form-group">
-        <label for="studentPassword">Mot de passe *</label>
-        <input type="password" id="studentPassword" placeholder="Mot de passe fourni" required>
-        <div class="form-error" id="loginError">Nom ou mot de passe incorrect</div>
-      </div>
-      
-      <div style="background-color: rgba(243,156,18,0.1); border-left: 4px solid var(--orange); padding: 12px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 0.9rem;">
-        <p><i class="fas fa-info-circle"></i> Tous les tests : 40 questions - 45 minutes</p>
-        <p><i class="fas fa-check-circle"></i> Seuil de réussite : 32/40 (80%)</p>
-      </div>
-    </form>
-    
-    <div class="loading-spinner" id="loginSpinner" style="display: none;">
-      <div class="spinner"></div>
-      <p>Connexion en cours...</p>
-    </div>
-    
-    <div class="login-btns" id="loginButtons">
-      <button class="btn btn-primary btn-modal" id="loginButton">
-        <i class="fas fa-sign-in-alt"></i> Se connecter
-      </button>
-   <button class="btn btn-modal" onclick="window.location.href='index.html';">
-    <i class="fas fa-home"></i> Accueil
-  </button>
-    </div>
-  </div>
-</div>
+
 
 <!-- Test Selection Modal -->
 <div id="selectionModal" class="selection-overlay">
@@ -2178,9 +2141,9 @@
     </div>
     
     <div class="selection-footer">
-      <button class="btn btn-modal" onclick="goBackToLogin()">
-        <i class="fas fa-sign-out-alt"></i> Déconnexion
-      </button>
+         <button class="btn btn-primary" onclick="goBackToHome()">
+    <i class="fas fa-home"></i> Retour à l'accueil / 返回主页
+  </button>
     </div>
   </div>
 </div>
@@ -2196,7 +2159,7 @@
       </button>
      <!-- 在results-content中找到这个按钮，确保是这样的： -->
 
-      <button class="btn btn-primary" onclick="goBackToHome()">
+      <button class="btn btn-primary" onclick="goBackToSelection()">
         <i class="fas fa-home"></i> Accueil
       </button>
     </div>
@@ -2293,7 +2256,7 @@
 <button class="btn" onclick="restartTest()">
     <i class="fas fa-redo"></i> Nouveau test / 新测试
 </button>
-        <button class="btn btn-primary" onclick="goBackToHome()">
+        <button class="btn btn-primary" onclick="goBackToSelection()">
           <i class="fas fa-home"></i> Accueil
         </button>
       </div>
@@ -2434,6 +2397,7 @@ const testTypes = {
 // ==================== 全局变量 ====================
 let selectedTestType = null;
 let studentInfo = { name: "", testDate: "", testType: "", type: "", daysLeft: 0 };
+
 let selectedQuestions = [];
 let currentQuestionIndex = 0;
 let userAnswers = [];
@@ -4051,6 +4015,10 @@ async function recordMistakesToDatabase() {
 
 // ==================== 其他功能 ====================
 // ==================== 返回主页（从错题集或结果页面） ====================
+
+
+
+
 function goBackToHome() {
     showConfirm(
         "Retour à l'accueil / 返回主页", 
@@ -4074,13 +4042,18 @@ function goBackToHome() {
             document.querySelector('.test-footer').style.display = 'none';
             
             // 显示选择模态框（主页）
-            showSelectionScreen();
+             window.location.href = 'index.html';
         }
     );
 }
 
 // ==================== 返回选择界面（从错题集） ====================
 function goBackToSelection() {
+  showConfirm(
+        "Retour à l'écran de sélection / 返回选择界面", 
+        "Êtes-vous sûr de vouloir retourner à l'écran de sélection ? / 您确定要返回选择界面吗？", 
+        'warning',
+        () => {
     // 停止计时器（如果有）
     if (timerInterval) {
         clearInterval(timerInterval);
@@ -4099,6 +4072,8 @@ function goBackToSelection() {
     
     // 显示选择界面
     showSelectionScreen();
+      }
+    );
 }
 
 // ==================== 显示选择界面 ====================
@@ -4255,9 +4230,9 @@ function loadSelectionScreen() {
         </div>
         
         <div class="selection-footer">
-            <button class="btn btn-modal" onclick="goBackToLogin()">
-                <i class="fas fa-sign-out-alt"></i> Déconnexion
-            </button>
+             <button class="btn btn-primary" onclick="goBackToHome()">
+    <i class="fas fa-home"></i> Retour à l'accueil / 返回主页
+  </button>
         </div>
     `;
     
@@ -4667,23 +4642,77 @@ function initializeTest() {
     document.getElementById('resultsContainer').style.display = 'none';
 }
 // ==================== 页面加载完成 ====================
+// ==================== 页面加载完成 ====================
 document.addEventListener('DOMContentLoaded', function() {
     console.log("页面加载完成");
     console.log("Supabase功能检查:", window.supabaseAuth ? "可用" : "不可用");
-    if (window.supabaseAuth) {
-        console.log("可用方法:", Object.keys(window.supabaseAuth));
-    }
     
-    // 绑定登录按钮事件
-    document.getElementById('loginButton').addEventListener('click', validateLogin);
+    // 从URL获取参数
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const type = urlParams.get('type');
     
-    // 在登录页面按Enter键提交
-    document.getElementById('studentPassword').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            validateLogin();
+    console.log("URL参数:", { token, type });
+    
+    if (token) {
+        try {
+            // 尝试新方式解码（支持中文）
+            let userData;
+            try {
+                const utf8String = atob(token);
+                const jsonString = decodeURIComponent(utf8String);
+                userData = JSON.parse(jsonString);
+                console.log("使用新方式解析token成功:", userData);
+            } catch (e) {
+                // 如果新方式失败，尝试旧方式（兼容性）
+                console.log("新方式解析失败，尝试旧方式:", e);
+                userData = JSON.parse(atob(token));
+                console.log("使用旧方式解析token成功:", userData);
+            }
+            
+            // 按照您原来的格式填充 studentInfo
+            studentInfo.name = userData.name || userData.userId || "Étudiant";
+            studentInfo.type = type || userData.type || "t";
+            
+            // 读取剩余天数
+            if (userData.daysLeft !== undefined) {
+                studentInfo.daysLeft = userData.daysLeft;
+            } else if (userData.expiry) {
+                const now = Date.now();
+                const diffTime = userData.expiry - now;
+                studentInfo.daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            } else {
+                studentInfo.daysLeft = -1;
+            }
+            
+            studentInfo.testDate = "";
+            studentInfo.testType = "";
+            
+            console.log("学生信息:", studentInfo);
+            
+            // 隐藏登录模态框（如果存在）
+            const loginModal = document.getElementById('loginModal');
+            if (loginModal) loginModal.style.display = 'none';
+            
+            // 显示选择界面
+            document.getElementById('selectionModal').style.display = 'flex';
+            
+            // 更新卡片权限
+            updateTestCardPermissions();
+            
+            // 显示天数信息
+            showDaysLeftInfo();
+            
+        } catch (e) {
+            console.error("Token解析失败:", e);
+            alert("登录信息错误，请重新登录");
+            window.location.href = 'index.html';
         }
-    });
+    } else {
+        // 如果没有token，返回主页
+        alert("请先登录");
+        window.location.href = 'index.html';
+    }
     
     // 检查题库是否加载
     setTimeout(() => {

@@ -855,34 +855,6 @@
         </div>
     </nav>
 
-    <!-- 登录部分 - 改为test-rapide样式 -->
-    <section class="login-section" id="loginSection">
-        <div class="login-card">
-            <div class="login-icon">
-                <i class="fas fa-graduation-cap"></i>
-            </div>
-            <h2>Accès aux astuces</h2>
-            <p>Veuillez entrer vos identifiants pour accéder aux astuces d'examen</p>
-            
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="username"><i class="fas fa-user"></i> Nom d'utilisateur</label>
-                    <input type="text" id="username" placeholder="Entrez votre nom d'utilisateur" required>
-                    <div class="error-message" id="usernameError"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password"><i class="fas fa-lock"></i> Mot de passe</label>
-                    <input type="password" id="password" placeholder="Entrez votre mot de passe" required>
-                    <div class="error-message" id="passwordError"></div>
-                </div>
-                
-                <button type="submit" class="login-btn">
-                    <i class="fas fa-sign-in-alt"></i> Se connecter
-                </button>
-            </form>
-        </div>
-    </section>
 
     <!-- Main Content - 以下所有内容保持原样 -->
     <main class="main-content" id="mainContent">
@@ -1956,41 +1928,45 @@
         const mindmapImage2 = document.getElementById('mindmapImage2');
         const mindmapContainer2 = document.getElementById('mindmapContainer2');
         // 页面加载时 - 保持不变
-        window.addEventListener('load', function() {
-            // 确保登录部分可见
-            loginSection.style.display = 'flex';
-            mainContent.style.display = 'none';
-            
-            // 初始化语言
-            updateLanguage('fr');
-                        // 添加回车键登录支持
-            document.getElementById('password').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    validateLogin();
-                }
-            });
-            // 初始化思维导图光标
-            if (mindmapContainer1) mindmapContainer1.style.cursor = 'grab';
-            if (mindmapContainer2) mindmapContainer2.style.cursor = 'grab';
-            
-            // 为关键词块添加悬停效果
-            document.querySelectorAll('.keyword-block').forEach(item => {
-                item.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-3px)';
-                    this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
-                    this.style.transition = 'all 0.3s';
-                });
-                
-                item.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = 'none';
-                });
-            });
-        });
+  // 页面加载时
 
-        // 登录功能 - 简单版本
-                // 登录功能 - 使用Supabase验证
+window.addEventListener('load', function() {
+    console.log("历史页面加载完成");
+    
+    // 检查Supabase是否已加载
+    if (typeof window.supabaseAuth === 'undefined') {
+        console.warn("Supabase配置未加载，检查 supabase-config.js 文件");
+    }
+    
+    // 直接显示主内容，不需要登录
+    const loginSection = document.getElementById('loginSection');
+    const mainContent = document.getElementById('mainContent');
+    
+    if (loginSection) loginSection.style.display = 'none';
+    if (mainContent) mainContent.style.display = 'block';
+    
+    // 初始化语言
+    updateLanguage('fr');
+    
+    // 初始化思维导图光标
+    if (mindmapContainer1) mindmapContainer1.style.cursor = 'grab';
+    if (mindmapContainer2) mindmapContainer2.style.cursor = 'grab';
+    if (mindmapContainer3) mindmapContainer3.style.cursor = 'grab';
+    
+    // 为关键词块添加悬停效果
+    document.querySelectorAll('.keyword-block').forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px)';
+            this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+            this.style.transition = 'all 0.3s';
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+});
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
             validateLogin();

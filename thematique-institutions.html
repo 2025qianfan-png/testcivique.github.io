@@ -836,7 +836,7 @@
                     </div>
                     <h3 id="testTitle">Test rapide</h3>
                     <p id="testDescription">Testez vos connaissances sur le système institutionnel avec ce quiz de 20 questions. Obtenez des corrections instantanées et découvrez vos points forts et faibles.</p>
-                    <a href="test-rapide-institutions.html" class="btn btn-purple" id="testBtn">
+                    <a href="test-rapide-institutions.html?token=xxx" class="btn btn-purple" id="testBtn">
                         <i class="fas fa-play-circle"></i> Commencer le test
                     </a>
                 </div>
@@ -1095,29 +1095,40 @@
         });
 
         // 初始化页面
-        document.addEventListener('DOMContentLoaded', function() {
-            // 设置默认语言
-            switchLanguage('fr');
-            
-            // 平滑滚动
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    if (this.getAttribute('href') !== '#') {
-                        e.preventDefault();
-                        
-                        const targetId = this.getAttribute('href');
-                        const targetElement = document.querySelector(targetId);
-                        
-                        if (targetElement) {
-                            window.scrollTo({
-                                top: targetElement.offsetTop - 80,
-                                behavior: 'smooth'
-                            });
-                        }
-                    }
-                });
-            });
+// 初始化页面
+document.addEventListener('DOMContentLoaded', function() {
+    // 设置默认语言
+    switchLanguage('fr');
+    
+    // 从URL获取token
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    
+    // 如果有token，添加到测试链接中
+    if (token) {
+        const testBtn = document.getElementById('testBtn');
+        testBtn.href = `test-rapide-histoire.html?token=${token}`;
+    }
+    
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            if (this.getAttribute('href') !== '#') {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            }
         });
+    });
+});
     </script>
 </body>
 </html>

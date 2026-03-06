@@ -1201,45 +1201,7 @@ h1, h2, h3, h4 {
   </div>
 </div>
 
-<!-- Login Modal -->
-<div id="loginModal" class="login-overlay">
-  <div class="login-content">
-    <h2>Accès Test Organisation Politique Française et Européenne</h2>
-    <p>Veuillez entrer vos informations d'étudiant</p>
-    
-    <form id="loginForm" class="login-form">
-      <div class="form-group">
-        <label for="studentName">Nom de l'étudiant *</label>
-        <input type="text" id="studentName" placeholder="Votre nom complet" required>
-      </div>
-      
-      <div class="form-group">
-        <label for="studentPassword">Mot de passe *</label>
-        <input type="password" id="studentPassword" placeholder="Mot de passe fourni" required>
-        <div class="form-error" id="loginError">Nom ou mot de passe incorrect</div>
-      </div>
-      
-      <div style="background-color: rgba(243,156,18,0.1); border-left: 4px solid var(--orange); padding: 12px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 0.9rem;">
-        <p><i class="fas fa-info-circle"></i> Test spécialisé : 20 questions - Pas de limite de temps</p>
-        <p><i class="fas fa-check-circle"></i> Thèmes : République française et Institutions européennes</p>
-      </div>
-    </form>
-    
-    <div class="loading-spinner" id="loginSpinner" style="display: none;">
-      <div class="spinner"></div>
-      <p>Connexion en cours...</p>
-    </div>
-    
-    <div class="login-btns" id="loginButtons">
-      <button class="btn btn-primary btn-modal" onclick="validateLogin()">
-        <i class="fas fa-sign-in-alt"></i> Se connecter
-      </button>
-      <button class="btn btn-modal" onclick="goBackToHome()">
-        <i class="fas fa-home"></i> Accueil
-      </button>
-    </div>
-  </div>
-</div>
+
 
 <!-- 找到这个部分 -->
 <div id="trainingInfoModal" class="training-info-modal">
@@ -1614,84 +1576,7 @@ function closeTrainingInfo() {
     startTest();
 }
 
-// ==================== 登录验证 ====================
-function validateLogin() {
-    console.log("登录按钮被点击");
-    
-    const name = document.getElementById('studentName').value.trim();
-    const password = document.getElementById('studentPassword').value.trim();
-    const loginError = document.getElementById('loginError');
-    const loadingSpinner = document.getElementById('loginSpinner');
-    const loginButtons = document.getElementById('loginButtons');
-    
-    if (!name || !password) {
-        showAlert("Champs requis", "Veuillez remplir tous les champs.", 'warning');
-        return;
-    }
-    
-    // 显示加载状态
-    loginError.style.display = 'none';
-    loginButtons.style.display = 'none';
-    loadingSpinner.style.display = 'block';
-    
-    console.log("尝试Supabase登录:", name);
-    
-    // 使用Supabase验证（和之前测试系统一样）
-    window.supabaseAuth.validateStudent(name, password)
-        .then(student => {
-            if (student) {
-                console.log("登录成功:", student);
-                
-                // 检查访问权限
-                const accessCheck = window.supabaseAuth.checkAccess(student);
-                
-                if (!accessCheck.valid) {
-                    showAlert("Accès expiré", 
-                        accessCheck.message || "Votre période d'accès a expiré.", 
-                        'error');
-                    resetLoginForm();
-                    return;
-                }
-                
-                // 存储学生信息
-                studentInfo = {
-                    name: student.name,
-                    testDate: new Date().toLocaleString('fr-FR'),
-                    type: student.type || "t",
-                    daysLeft: accessCheck.daysLeft
-                };
-                
-                console.log("学生信息保存:", studentInfo);
-                
-                // 登录成功，隐藏登录窗口
-                document.getElementById('loginModal').style.display = 'none';
-                
-                // 显示培训信息窗口
-                showTrainingInfo();
-                
-            } else {
-                console.log("登录失败: 用户名或密码错误");
-                showAlert("Échec de connexion", "Nom d'étudiant ou mot de passe incorrect.", 'error');
-                resetLoginForm();
-            }
-        })
-        .catch(error => {
-            console.error("登录错误:", error);
-            showAlert("Erreur de connexion", "Une erreur est survenue. Veuillez réessayer.", 'error');
-            resetLoginForm();
-        });
-}
 
-// 重置登录表单
-function resetLoginForm() {
-    const loginSpinner = document.getElementById('loginSpinner');
-    const loginButtons = document.getElementById('loginButtons');
-    
-    loginSpinner.style.display = 'none';
-    loginButtons.style.display = 'flex';
-}
-
-// ==================== 开始测试 ====================
 function startTest() {
     // 显示加载动画
     document.getElementById('trainingInfoModal').style.display = 'none';
@@ -2378,13 +2263,85 @@ function initializeTest() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("页面加载完成");
     
-    // 在登录页面按Enter键提交
-    document.getElementById('studentPassword').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            validateLogin();
+    // 从URL获取参数
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const type = urlParams.get('type');
+    
+    console.log("URL参数:", { token, type });
+    
+    if (token) {
+        try {
+            // 解析token
+            let userData;
+            try {
+                const utf8String = atob(token);
+                const jsonString = decodeURIComponent(utf8String);
+                userData = JSON.parse(jsonString);
+                console.log("使用新方式解析token成功:", userData);
+            } catch (e) {
+                userData = JSON.parse(atob(token));
+                console.log("使用旧方式解析token成功:", userData);
+            }
+            
+            // 填充学生信息
+            studentInfo = {
+                name: userData.name || userData.userId || "Étudiant",
+                testDate: new Date().toLocaleString('fr-FR'),
+                type: type || userData.type || "t",
+                daysLeft: userData.daysLeft || -1
+            };
+            
+            console.log("学生信息:", studentInfo);
+            
+            // 隐藏登录模态框
+            const loginModal = document.getElementById('loginModal');
+            if (loginModal) loginModal.style.display = 'none';
+            
+            // 直接显示培训信息窗口
+            showTrainingInfo();
+            
+        } catch (e) {
+            console.error("Token解析失败:", e);
+            showAlert("Erreur de connexion", "Impossible de charger les informations. Utilisation du mode visiteur.", 'warning');
+            
+            // 使用默认访客信息
+            studentInfo = {
+                name: "Visiteur",
+                testDate: new Date().toLocaleString('fr-FR'),
+                type: "t",
+                daysLeft: -1
+            };
+            
+            const loginModal = document.getElementById('loginModal');
+            if (loginModal) loginModal.style.display = 'none';
+            
+            showTrainingInfo();
         }
-    });
+    } else {
+        // 如果没有token，使用默认访客信息
+        console.log("没有token，使用访客模式");
+        
+        studentInfo = {
+            name: "Visiteur",
+            testDate: new Date().toLocaleString('fr-FR'),
+            type: "t",
+            daysLeft: -1
+        };
+        
+        const loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.style.display = 'none';
+        
+        showTrainingInfo();
+    }
+    
+    // 保留回车键监听（但登录框已隐藏，可以删除）
+    // document.getElementById('studentPassword').addEventListener('keypress', function(e) {
+    //     if (e.key === 'Enter') {
+    //         e.preventDefault();
+    //         validateLogin();
+    //     }
+    // });
 });
 </script>
 </body>

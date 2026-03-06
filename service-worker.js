@@ -1,8 +1,10 @@
-const CACHE_NAME = 'civique-exam-v1.2';
+const CACHE_NAME = 'civique-exam-v1.1';
 const urlsToCache = [
   '/',
- '/index.html?v=1.2',
+ '/index.html?v=1.1',
+ '/admin.html?v=1.1',
   '/manifest.json',
+  '/test-gratuit.html?v=1.0',
   // 添加您的其他页面和资源
 ];
 

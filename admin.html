@@ -563,7 +563,7 @@
     .users-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 1000px;
+        min-width: 1200px; /* 从1000px增加到1200px以适应新增的密码列 */
     }
 
     .users-table th {
@@ -615,6 +615,40 @@
 
     .role-admin { background-color: rgba(231, 76, 60, 0.1); color: var(--red); }
     .role-user { background-color: rgba(52, 152, 219, 0.1); color: #3498db; }
+
+    /* 密码列样式 */
+    .password-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .password-text {
+        font-family: monospace;
+        background: #f0f0f0;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
+
+    .copy-password-btn {
+        background: none;
+        border: none;
+        color: var(--primary-blue);
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: var(--transition);
+    }
+
+    .copy-password-btn:hover {
+        background-color: rgba(0, 64, 128, 0.1);
+        transform: scale(1.1);
+    }
+
+    .copy-password-btn i {
+        font-size: 1rem;
+    }
 
     .action-buttons {
         display: flex;
@@ -1235,6 +1269,7 @@
                                 <th>Rôle</th>
                                 <th>Date de création</th>
                                 <th>Date d'expiration</th>
+                                <th>Mot de passe</th>  <!-- 新增密码列 -->
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -1520,7 +1555,7 @@
         // ==============================
         function checkAdminSession() {
             try {
-                const savedAdmin = localStorage.getItem('adminUser');
+                const savedAdmin = sessionStorage.getItem('adminUser');
                 if (savedAdmin) {
                     const admin = JSON.parse(savedAdmin);
                     if (admin && admin.name && admin.role === 'admin') {
@@ -1528,11 +1563,11 @@
                         showAdminContent();
                         loadUsers();
                     } else {
-                        localStorage.removeItem('adminUser');
+                        sessionStorage.removeItem('adminUser');
                     }
                 }
             } catch (e) {
-                localStorage.removeItem('adminUser');
+                sessionStorage.removeItem('adminUser');
                 console.error('会话检查错误:', e);
             }
         }
@@ -1587,7 +1622,7 @@
                 };
                 
                 // 保存到本地存储
-                localStorage.setItem('adminUser', JSON.stringify(currentAdmin));
+                sessionStorage.setItem('adminUser', JSON.stringify(currentAdmin));
                 
                 // 显示管理界面
                 showAdminContent();
@@ -1660,7 +1695,7 @@
             if (filteredUsers.length === 0) {
                 usersTableBody.innerHTML = `
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 40px;">
+                        <td colspan="8" style="text-align: center; padding: 40px;">  <!-- 从7改为8 -->
                             <i class="fas fa-users" style="font-size: 3rem; color: #ddd; margin-bottom: 15px;"></i>
                             <p style="color: var(--medium-gray);">Aucun utilisateur trouvé</p>
                         </td>
@@ -1734,6 +1769,18 @@
                     <td>${createdAt}</td>
                     <td class="${timerClass}">${timerInfo}</td>
                     <td>
+                        <div style="display: flex; align-items: center;">
+                            <span style="font-family: monospace; background: #f0f0f0; padding: 4px 8px; border-radius: 4px; font-size: 0.9rem;">
+                                ${user.password || '—'}
+                            </span>
+                            ${user.password ? `
+                            <button class="copy-password-btn" data-password="${user.password}" style="margin-left: 8px; background: none; border: none; color: var(--primary-blue); cursor: pointer;" title="Copier le mot de passe">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                    <td>
                         <div class="action-buttons">
                             <button class="action-btn edit-btn" data-id="${user.id}">
                                 <i class="fas fa-edit"></i> Modifier
@@ -1763,6 +1810,21 @@
                         showDeleteConfirmation(userId);
                     });
                 }
+            });
+            
+            // 添加密码复制功能
+            document.querySelectorAll('.copy-password-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const password = this.dataset.password;
+                    if (!password) return;
+                    
+                    navigator.clipboard.writeText(password).then(() => {
+                        showToast('Mot de passe copié!', 'success');
+                    }).catch(() => {
+                        showToast('Erreur lors de la copie', 'error');
+                    });
+                });
             });
         }
 
@@ -2100,7 +2162,7 @@
         // 登出功能
         // ==============================
         function handleLogout() {
-            localStorage.removeItem('adminUser');
+            sessionStorage.removeItem('adminUser');
             currentAdmin = null;
             allUsers = [];
             filteredUsers = [];

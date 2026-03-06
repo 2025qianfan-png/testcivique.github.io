@@ -17,7 +17,7 @@
     // 禁止常见快捷键
     document.addEventListener('keydown', function (e) {
         // Ctrl + C / Ctrl + U / Ctrl + S
-        if (e.ctrlKey && ['c', 'u', 's', 'x', 'v', 'a'].includes(e.key.toLowerCase())) {
+        if (e.ctrlKey && ['c', 'u', 's', 'x', 'a'].includes(e.key.toLowerCase())) {
             e.preventDefault();
         }
 
@@ -1032,6 +1032,209 @@ h1, h2, h3, h4 {
     font-size: 16px !important;
   }
 }
+/* Custom Modal Styles */
+.custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 4000;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.custom-modal-content {
+  background-color: var(--white);
+  padding: 30px;
+  border-radius: var(--border-radius);
+  max-width: 450px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalFade 0.3s ease-out;
+  position: relative;
+  border-top: 5px solid var(--primary-blue);
+}
+
+.custom-modal-icon {
+  font-size: 3.5rem;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.custom-modal-icon.warning i {
+  color: var(--orange);
+}
+
+.custom-modal-icon.question i {
+  color: var(--primary-blue);
+}
+
+.custom-modal-icon.info i {
+  color: #3498db;
+}
+
+.custom-modal-icon.success i {
+  color: var(--green);
+}
+
+.custom-modal-icon.error i {
+  color: var(--red);
+}
+
+.custom-modal-title {
+  font-size: 1.6rem;
+  color: var(--primary-blue);
+  text-align: center;
+  margin-bottom: 15px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+}
+
+.custom-modal-message {
+  font-size: 1.1rem;
+  color: var(--dark-gray);
+  text-align: center;
+  margin-bottom: 25px;
+  line-height: 1.6;
+  padding: 0 10px;
+}
+
+.custom-modal-message.small {
+  font-size: 0.95rem;
+  color: var(--medium-gray);
+}
+
+.custom-modal-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.custom-modal-btn {
+  padding: 12px 30px;
+  min-width: 120px;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.custom-modal-btn-primary {
+  background-color: var(--primary-blue);
+  color: var(--white);
+}
+
+.custom-modal-btn-primary:hover {
+  background-color: var(--primary-light-blue);
+  transform: translateY(-2px);
+}
+
+.custom-modal-btn-secondary {
+  background-color: var(--light-gray);
+  color: var(--dark-gray);
+}
+
+.custom-modal-btn-secondary:hover {
+  background-color: #e0e0e0;
+  transform: translateY(-2px);
+}
+
+.custom-modal-btn-danger {
+  background-color: var(--red);
+  color: var(--white);
+}
+
+.custom-modal-btn-danger:hover {
+  background-color: #c0392b;
+  transform: translateY(-2px);
+}
+
+.custom-modal-btn-success {
+  background-color: var(--green);
+  color: var(--white);
+}
+
+.custom-modal-btn-success:hover {
+  background-color: #229954;
+  transform: translateY(-2px);
+}
+
+/* 输入框模态框 */
+.custom-modal-input {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin: 15px 0;
+  transition: var(--transition);
+}
+
+.custom-modal-input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1);
+}
+
+/* 进度条模态框 */
+.custom-modal-progress {
+  margin: 20px 0;
+}
+
+.progress-text {
+  font-size: 0.9rem;
+  color: var(--medium-gray);
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.progress-bar-custom {
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-fill-custom {
+  height: 100%;
+  background-color: var(--primary-blue);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+/* 在 .custom-modal-content 中添加或修改 */
+.custom-modal-content {
+  background-color: var(--white);
+  padding: 30px;
+  border-radius: var(--border-radius);
+  max-width: 450px;
+  width: 90%; /* 改为百分比 */
+  max-height: 80vh; /* 限制最大高度 */
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalFade 0.3s ease-out;
+  position: relative;
+  border-top: 5px solid var(--primary-blue);
+}
+
+/* 让消息区域可以滚动 */
+.custom-modal-message {
+  font-size: 1rem;
+  color: var(--dark-gray);
+  margin-bottom: 25px;
+  line-height: 1.5;
+  overflow-y: auto;
+  flex: 1;
+}
 </style>
 </head>
 <body>
@@ -1040,8 +1243,8 @@ h1, h2, h3, h4 {
 <div id="disclaimerModal" class="disclaimer-overlay">
   <div class="disclaimer-content">
     <div class="disclaimer-header">
-      <h2>Examen blanc pour Examen civique</h2>
-      <p class="disclaimer-subtitle">多年卡公民考试模拟测试</p>
+      <h2>Test de positionnement pour la formation à l’examen civique </h2>
+      <p class="disclaimer-subtitle">公民考试培训入学水平测试</p>
     </div>
     
     <div class="disclaimer-body">
@@ -1181,7 +1384,20 @@ h1, h2, h3, h4 {
     </button>
   </div>
 </div>
-
+<!-- Custom Modal Container -->
+<div id="customModal" class="custom-modal-overlay">
+  <div class="custom-modal-content">
+    <div class="custom-modal-icon" id="customModalIcon">
+      <i class="fas fa-info-circle"></i>
+    </div>
+    <h3 class="custom-modal-title" id="customModalTitle">Titre</h3>
+    <div class="custom-modal-message" id="customModalMessage">Message</div>
+    <div id="customModalExtra" style="display: none;"></div>
+    <div class="custom-modal-buttons" id="customModalButtons">
+      <!-- Buttons will be inserted here -->
+    </div>
+  </div>
+</div>
 <!-- Test Header -->
 <header class="test-header" style="display: none;">
   <div class="container">
@@ -1314,206 +1530,583 @@ let studentInfo = {
 };
 
 // Questions avec réponses et explications
-const questions = [
+const questions_naturalisation  = [
   {
-    question: "De quelle année date la Constitution française ?",
-    options: ["1798", "1958", "1962", "1944"],
-    answer: 1,
-    explanation: "La Constitution actuelle de la France date de 1958 et fonde la Ve République."
-  },
-  {
-    question: "Quelles sont les couleurs du drapeau français ?",
-    options: ["rouge, blanc et bleu", "rouge, vert et bleu", "blanc, noir et rouge", "rouge, blanc et vert"],
-    answer: 0,
-    explanation: "Le drapeau français est composé de trois couleurs : bleu, blanc et rouge."
-  },
-  {
-    question: "Qu'est-ce que la laïcité ?",
-    options: [
-      "une religion officielle de la France",
-      "la séparation de l’État et des religions",
-      "une fête nationale française",
-      "une loi sur la langue française"
-    ],
-    answer: 1,
-    explanation: "La laïcité garantit la séparation de l’État et des religions ainsi que la liberté de conscience."
-  },
-  {
-    question: "En France, avoir plusieurs femmes est :",
-    options: ["obligatoire", "autorisé", "interdit", "normal"],
-    answer: 2,
-    explanation: "La polygamie est interdite par la loi en France."
-  },
-  {
-    question: "Madame X et Monsieur Y font le même travail dans une entreprise. En France, leur salaire est :",
-    options: [
-      "le même",
-      "différent parce qu’ils n’ont pas le même âge",
-      "différent parce qu’ils n’ont pas le même sexe",
-      "différent sans raison"
-    ],
-    answer: 0,
-    explanation: "En France, l’égalité salariale entre les femmes et les hommes est un principe légal."
-  },
-  {
-    question: "Le Parlement est composé :",
-    options: [
-      "de députés et de sénateurs",
-      "de juges et de policiers",
-      "de professeurs et d’élèves",
-      "du président et du Premier ministre"
-    ],
-    answer: 0,
-    explanation: "Le Parlement français est composé de l’Assemblée nationale (députés) et du Sénat (sénateurs)."
-  },
-  {
-    question: "Un ministre ne respecte pas la loi. En France :",
-    options: [
-      "il ne reçoit pas de punition",
-      "il reçoit une punition seulement dans certains cas",
-      "il peut décider de ne pas recevoir de punition",
-      "il reçoit la même punition que les citoyens"
-    ],
-    answer: 3,
-    explanation: "En France, tous les citoyens sont égaux devant la loi, y compris les ministres."
-  },
-  {
-    question: "Quel traité a permis la création officielle de l’Union européenne ?",
-    options: [
-      "le traité de Rome",
-      "le traité de Maastricht",
-      "le traité de Lisbonne",
-      "le traité de Paris"
-    ],
-    answer: 1,
-    explanation: "Le traité de Maastricht (1992) a officiellement créé l’Union européenne."
-  },
-  {
-    question: "De quelle année date la Déclaration des droits de l’homme et du citoyen ?",
-    options: ["1789", "1905", "1944", "1952"],
-    answer: 0,
-    explanation: "La Déclaration des droits de l’homme et du citoyen date de 1789, pendant la Révolution française."
-  },
-  {
-    question: "Que doit faire une personne en cas d’accident ?",
-    options: [
-      "partir sans aider",
-      "demander de l’aide à des amis",
-      "prendre une photo et poster sur les réseaux sociaux",
-      "appeler les secours (le 15, le 17 ou le 18)"
-    ],
-    answer: 3,
-    explanation: "En cas d’accident, il faut appeler les secours : 15 (SAMU), 17 (police) ou 18 (pompiers)."
-  },
-  {
-    question: "Une femme peut avorter :",
-    options: [
-      "seulement si elle est mariée",
-      "quand elle veut, sans limite",
-      "seulement si elle a un enfant",
-      "légalement en France jusqu’à 14 semaines de grossesse"
-    ],
-    answer: 3,
-    explanation: "En France, l’IVG est autorisée jusqu’à 14 semaines de grossesse."
-  },
-  {
-    question: "Madame X a insulté Madame Y. Que peut faire Madame Y ?",
-    options: [
-      "Porter plainte auprès de la police.",
-      "Demander à son mari d’intervenir.",
-      "Insulter Madame X en retour.",
-      "Demander à son père d’intervenir."
-    ],
-    answer: 0,
-    explanation: "En cas d’insulte, une personne peut porter plainte auprès de la police."
-  },
-  {
-    question: "Jeter des déchets dans la rue :",
-    options: [
-      "est interdit",
-      "est permis dans le parc",
-      "est permis quand il n’y a personne",
-      "est permis à certaines heures"
-    ],
-    answer: 0,
-    explanation: "Jeter des déchets dans la rue est interdit et puni par la loi."
-  },
-  {
-    question: "Madame X refuse de payer sa facture d’impôts. En France :",
-    options: [
-      "c’est illégal et elle peut être punie",
-      "c’est possible si son père est d’accord",
-      "c’est possible si son mari est d’accord",
-      "c’est possible si son entreprise est d’accord"
-    ],
-    answer: 0,
-    explanation: "Le paiement des impôts est obligatoire en France. Refuser de payer est illégal."
-  },
-  {
-    question: "Le 11 novembre est un jour férié. À quoi correspond cette date ?",
-    options: [
-      "le jour de Noël",
-      "l’anniversaire de la Révolution française",
-      "la fête des mères",
-      "la fin de la Première Guerre mondiale"
-    ],
-    answer: 3,
-    explanation: "Le 11 novembre commémore l’armistice de 1918, marquant la fin de la Première Guerre mondiale."
-  },
-  {
-    question: "Quelle île française se trouve dans l'océan Indien ?",
-    options: ["Guadeloupe", "La Corse", "La Réunion", "Guyane"],
-    answer: 2,
-    explanation: "La Réunion est une île française située dans l’océan Indien."
-  },
-  {
-    question: "Qui était Molière ?",
-    options: [
-      "un écrivain et dramaturge français",
-      "un peintre",
-      "un écrivain",
-      "un scientifique"
-    ],
-    answer: 0,
-    explanation: "Molière était un célèbre écrivain et dramaturge français du XVIIe siècle."
-  },
-  {
-    question: "Qu’est-ce que le Louvre ?",
-    options: [
-      "un musée à Paris",
-      "un château où vit le président",
-      "un stade de football",
-      "une grande école"
-    ],
-    answer: 0,
-    explanation: "Le Louvre est un grand musée situé à Paris."
-  },
-  {
-    question: "Ne pas envoyer un enfant de 8 ans à l’école en France :",
-    options: [
-      "est possible si l’enfant ne veut pas y aller",
-      "est possible si les parents peuvent l’enseigner à la maison",
-      "est interdit",
-      "est possible si l’enfant ne parle pas français"
-    ],
-    answer: 2,
-    explanation: "L’instruction est obligatoire en France pour les enfants de 3 à 16 ans."
-  },
-  {
-    question: "En France, pour le travail, quelle phrase est correcte ?",
-    options: [
-      "On peut travailler sans dire à l’administration",
-      "Tout salarié doit être déclaré par son employeur",
-      "On peut travailler sans contrat si on est adulte",
-      "Les heures supplémentaires ne doivent jamais être déclarées"
-    ],
-    answer: 1,
-    explanation: "Tout salarié doit être déclaré légalement par son employeur."
-  }
+  question: "Quel jour célèbre-t-on officiellement la laïcité en France ?",
+  options: ["Le 14 juillet", "Le 9 décembre", "Le 1er mai", "Le 11 novembre"],
+  answer: 1,
+  explanation: "Le 9 décembre correspond à l'anniversaire de la loi de 1905 qui établit la séparation de l'État et des Églises en France."
+},
+{
+  question: "Que porte Marianne sur la tête ?",
+  options: ["Une couronne", "Un bonnet phrygien", "Un casque", "Un chapeau"],
+  answer: 1,
+  explanation: "Marianne, symbole de la République française, porte un bonnet phrygien qui représente la liberté depuis la Révolution française."
+},
+{
+  question: "Quel terme désigne précisément la haine ou les préjugés contre les Juifs ?",
+  options: ["Islamophobie", "Antisémitisme", "Racisme", "Xénophobie"],
+  answer: 1,
+  explanation: "L'antisémitisme désigne spécifiquement les préjugés, la haine ou la discrimination envers les personnes juives."
+},
+{
+  question: "Une personne déclare ne croire en aucun dieu. On peut dire :",
+  options: ["Elle est croyante", "Elle est athée", "Elle est agnostique", "Elle est polythéiste"],
+  answer: 1,
+  explanation: "Une personne athée affirme qu'elle ne croit en aucun dieu ou divinité."
+},
+{
+  question: "Monsieur X se rend à la mairie pour faire sa demande de permis de conduire. L'agent lui demande d'enlever son couvre-chef à caractère religieux pour vérifier son identité, mais il refuse au nom de sa foi.",
+  options: [
+    "Non, car la religion ne peut pas modifier l'ordre du service public.",
+    "Oui, c'est sa liberté.",
+    "Non, car il faut obéir totalement à l'agent, sinon son permis sera annulé.",
+    "Oui, si un autre agent est d'accord."
+  ],
+  answer: 0,
+  explanation: "Dans les services publics, certaines règles doivent être respectées pour des raisons administratives et de sécurité, notamment la vérification de l'identité."
+},
+{
+  question: "L'inscription sur les listes électorales est :",
+  options: ["Automatique pour tous", "Facultative", "Payante", "Obligatoire pour pouvoir voter"],
+  answer: 3,
+  explanation: "Pour voter en France, il faut être inscrit sur les listes électorales. Cette inscription est donc nécessaire pour exercer son droit de vote."
+},
+{
+  question: "Quelle est l'une des voies possibles pour modifier la Constitution ?",
+  options: [
+    "Décision du Président seul",
+    "Vote des maires",
+    "Référendum ou vote du Parlement réuni en Congrès",
+    "Décision du Conseil constitutionnel"
+  ],
+  answer: 2,
+  explanation: "La Constitution française peut être modifiée soit par référendum, soit par un vote du Parlement réuni en Congrès à Versailles."
+},
+{
+  question: "Quelle condition est obligatoire pour se présenter à l'élection présidentielle ?",
+  options: [
+    "Avoir été ministre",
+    "Avoir plus de 40 ans",
+    "Être marié",
+    "Obtenir 500 parrainages d’élus"
+  ],
+  answer: 3,
+  explanation: "Pour être candidat à l'élection présidentielle en France, il faut obtenir le soutien d'au moins 500 élus."
+},
+{
+  question: "Quand est célébrée la journée de l'Europe ?",
+  options: ["1er mai", "8 mai", "9 mai", "14 juillet"],
+  answer: 2,
+  explanation: "La journée de l'Europe est célébrée le 9 mai, en souvenir de la déclaration Schuman de 1950 qui a lancé la construction européenne."
+},
+{
+  question: "À quoi sert le droit de grève ?",
+  options: [
+    "À obtenir des privilèges fiscaux",
+    "À manifester son mécontentement au travail",
+    "À voter aux élections",
+    "À créer des partis politiques"
+  ],
+  answer: 1,
+  explanation: "Le droit de grève permet aux travailleurs d'arrêter le travail pour défendre leurs droits ou protester contre certaines conditions de travail."
+},
+{
+  question: "Que signifie être citoyen d'un État ?",
+  options: [
+    "Avoir une maison dans le pays",
+    "Bénéficier de droits et remplir des devoirs",
+    "Être membre d’un parti politique",
+    "Avoir un emploi dans le secteur public"
+  ],
+  answer: 1,
+  explanation: "Être citoyen signifie avoir des droits (comme voter) mais aussi des devoirs (respecter les lois, payer des impôts, etc.)."
+},
+{
+  question: "Suite à une interpellation par la police, il est possible de :",
+  options: [
+    "Être informé de ses droits et garder le silence",
+    "Être détenu sans explication pendant un mois",
+    "Être jugé sans avocat",
+    "Subir des violences sans recours"
+  ],
+  answer: 0,
+  explanation: "Lors d'une garde à vue, une personne doit être informée de ses droits, notamment celui de garder le silence et de consulter un avocat."
+},
+{
+  question: "Que doit faire un citoyen s'il est appelé à être juré dans un procès d'assises ?",
+  options: [
+    "Se présenter et participer au procès",
+    "Refuser si on n’aime pas la justice",
+    "Simplement envoyer un formulaire",
+    "Payer une taxe"
+  ],
+  answer: 0,
+  explanation: "Être juré d'assises est un devoir citoyen. La personne tirée au sort doit se présenter pour participer au procès."
+},
+{
+  question: "Une personne est privée de ses droits civils et politiques pendant 5 ans suite à une condamnation. Parmi ces propositions laquelle est correcte ? Pendant 5 ans,...",
+  options: [
+    "Elle peut voter",
+    "Elle peut se présenter aux élections",
+    "Elle ne peut ni voter ni être élue",
+    "Elle est exemptée de toutes obligations légales"
+  ],
+  answer: 2,
+  explanation: "La privation des droits civiques signifie qu'une personne ne peut pas voter ni se présenter à une élection pendant la durée fixée."
+},
+{
+  question: "Qui a été président de la Ve République ?",
+  options: [
+    "Louis-Napoléon Bonaparte",
+    "Albert Lebrun",
+    "Jacques Chirac",
+    "Raymond Poincaré"
+  ],
+  answer: 2,
+  explanation: "Jacques Chirac a été président de la République française de 1995 à 2007 sous la Ve République."
+},
+{
+  question: "En quelle année Napoléon Ier est-il devenu empereur ?",
+  options: ["1789", "1799", "1804", "1815"],
+  answer: 2,
+  explanation: "Napoléon Bonaparte est devenu empereur des Français en 1804 après s'être fait couronner à Notre-Dame de Paris."
+},
+{
+  question: "Dans quelle ville les rois de France étaient-ils couronnés ?",
+  options: ["Paris", "Lyon", "Reims", "Bordeaux"],
+  answer: 2,
+  explanation: "Les rois de France étaient traditionnellement sacrés dans la cathédrale de Reims."
+},
+{
+  question: "Qui a peint \"La liberté guidant le peuple\" ?",
+  options: [
+    "Eugène Delacroix",
+    "Claude Monet",
+    "Jacques-Louis David",
+    "Gustave Courbet"
+  ],
+  answer: 0,
+  explanation: "Le tableau \"La Liberté guidant le peuple\" a été peint par Eugène Delacroix en 1830."
+},
+{
+  question: "La contraception :",
+  options: [
+    "Est accessible aux mineures sans autorisation parentale et gratuitement",
+    "Nécessite l'accord des deux parents pour une mineure",
+    "Est interdite en France",
+    "N'est remboursée que pour les majeures"
+  ],
+  answer: 0,
+  explanation: "En France, les mineures peuvent accéder à la contraception gratuitement et sans autorisation parentale dans certains centres de santé."
+},
+{
+  question: "L'instruction des enfants est obligatoire de :",
+  options: ["3 à 16 ans", "6 à 14 ans", "2 à 18 ans", "4 à 12 ans"],
+  answer: 0,
+  explanation: "Depuis 2019, l'instruction est obligatoire en France pour les enfants de 3 à 16 ans."
+}
 ];
+const questions_resident = [{
+  question: "La Constitution française établit « Liberté, Égalité, Fraternité » comme devise de la France. En quelle année la Constitution a-t-elle été adoptée ?",
+  options: ["1798", "1958", "1962", "1944"],
+  answer: 1,
+  explanation: "La Constitution actuelle de la France a été adoptée en 1958 et marque le début de la Ve République."
+},
+{
+  question: "Qu'est-ce que la laïcité?",
+  options: [
+    "garantit la liberté de conscience pour tous",
+    "Interdit toute forme de prosélytisme dans tous les lieux.",
+    "Signifie uniquement que l’État ne finance aucune religion.",
+    "Garantit la liberté de religion à tous, mais ne reconnaît pas le droit de ne pas croire."
+  ],
+  answer: 0,
+  explanation: "La laïcité garantit la liberté de conscience : chacun est libre de croire, de ne pas croire ou de changer de religion."
+},
+{
+  question: "Madame X et Monsieur Y occupent des postes similaires dans la même entreprise. Laquelle des situations suivantes n’est pas conforme au principe d’égalité ?",
+  options: [
+    "Monsieur Y perçoit un salaire plus élevé que Madame X en raison d’une expérience professionnelle plus importante.",
+    "Bien que Madame X soit en situation de handicap, elle bénéficie des mêmes conditions de travail et de traitement que Monsieur Y.",
+    "Le congé maternité de Madame X est plus long que le congé de Monsieur Y.",
+    "Le salaire de Madame X est réduit en raison de ses opinions politiques différentes de celles de son employeur"
+  ],
+  answer: 3,
+  explanation: "En France, discriminer un salarié pour ses opinions politiques est interdit par la loi."
+},
+{
+  question: "Monsieur Y se rend à la préfecture pour effectuer une démarche concernant son permis de conduire. Il souhaite être reçu par un agent qui partage la religion bouddhiste afin d’échanger avec lui. Laquelle des propositions suivantes est correcte ?",
+  options: [
+    "Il a le droit de choisir, car il est possible de discuter librement de sa religion dans un service public.",
+    "Il n’a pas le droit de choisir, car la religion ne peut pas être prise en compte dans un service public.",
+    "Seuls les agents peuvent le choisir, car eux seuls ont le droit d’exprimer et de discuter de leur religion.",
+    "Les agents ne peuvent pas le choisir, car ils n’ont pas le droit de discuter de religion dans l’exercice de leurs fonctions."
+  ],
+  answer: 1,
+  explanation: "Dans les services publics, les agents doivent être neutres et la religion ne peut pas être un critère pour choisir un agent."
+},
+{
+  question: "En France, la répudiation est :",
+  options: [
+    "Autorisée dès lors qu’il existe un motif valable.",
+    "Autorisée uniquement pour certains groupes religieux.",
+    "Totalement interdite par la loi.",
+    "Autorisée sous certaines conditions."
+  ],
+  answer: 2,
+  explanation: "La répudiation, c’est-à-dire le fait pour un époux de divorcer unilatéralement sans procédure judiciaire, n’est pas reconnue par le droit français."
+},
+{
+  question: "Qu’est-ce que État de droit ?",
+  options: [
+    "Le droit est supérieur aux pouvoirs et aux autorités politiques",
+    "Les droits du gouvernement sont protégés en priorité.",
+    "Seuls les citoyens bénéficient de droits garantis par la loi.",
+    "La loi peut être contournée par le pouvoir politique en cas de nécessité."
+  ],
+  answer: 0,
+  explanation: "Dans un État de droit, toutes les autorités publiques doivent respecter la loi et les règles juridiques."
+},
+{
+  question: "Qu’est-ce que l’Hôtel de Matignon ?",
+  options: [
+    "La résidence du chef du gouvernement.",
+    "La résidence des sénateurs.",
+    "La résidence des députés.",
+    "La résidence d’un ministre important."
+  ],
+  answer: 0,
+  explanation: "L’Hôtel de Matignon est la résidence officielle et le lieu de travail du Premier ministre français."
+},
+{
+  question: "Quel traité a permis la création officielle de l’Union européenne ?",
+  options: [
+    "Le traité de Rome",
+    "Le traité de Maastricht",
+    "Le traité de Lisbonne",
+    "Le traité de Paris"
+  ],
+  answer: 1,
+  explanation: "Le traité de Maastricht signé en 1992 a officiellement créé l’Union européenne."
+},
+{
+  question: "Madame X souhaite interrompre sa grossesse. Elle est majeure.",
+  options: [
+    "Elle doit obtenir le consentement de son mari .",
+    "Elle doit obtenir le consentement de son père.",
+    "Elle peut décider elle-même.",
+    "Elle doit obtenir le consentement de son médecin traitant."
+  ],
+  answer: 2,
+  explanation: "En France, une femme majeure peut décider seule d’interrompre sa grossesse dans le cadre légal de l’IVG."
+},
+{
+  question: "Que doit faire une personne en cas d’accident ?",
+  options: [
+    "Apporter assistance et appeler les secours.",
+    "Demander de l’aide à des amis.",
+    "Partir immédiatement sans intervenir.",
+    "Sortir son téléphone pour prendre des photos comme preuve."
+  ],
+  answer: 0,
+  explanation: "La loi impose de porter assistance à une personne en danger et d’appeler les secours."
+},
+{
+  question: "Concernant les droits individuels, quelle proposition est correcte ?",
+  options: [
+    "La loi ne protège que les droits des citoyens .",
+    "Les sont protégés par la loi mais peuvent comporter certaines limites.",
+    "Les droits individuels ne peuvent jamais être limité par le gouvernement.",
+    "Les droits individuels sont illimités et peuvent être exercés librement."
+  ],
+  answer: 1,
+  explanation: "Les droits individuels sont protégés par la loi mais peuvent être limités pour protéger l’ordre public ou les droits des autres."
+},
+{
+  question: "Madame X a insulté Madame Y. Que peut faire Madame Y ?",
+  options: [
+    "Porter plainte auprès de la police.",
+    "Demander à son mari d’intervenir.",
+    "Insulter Madame X en retour.",
+    "Demander à son père d’intervenir."
+  ],
+  answer: 0,
+  explanation: "En cas d’insulte, la victime peut porter plainte auprès de la police."
+},
+{
+  question: "Jeter un mégot par terre est :",
+  options: [
+    "Une infraction passible d’amende.",
+    "Autorisé dans les lieux publics.",
+    "Sans conséquence légale.",
+    "Autorisé dans certains cas dans les parcs."
+  ],
+  answer: 0,
+  explanation: "Jeter un mégot dans la rue est interdit et peut entraîner une amende."
+},
+{
+  question: "En France, payer des impôts est :",
+  options: [
+    "Une obligation pour toutes les personnes résidant en France.",
+    "Une obligation uniquement pour les personnes de nationalité française.",
+    "Non obligatoire pour les personnes sans titre de séjour légal.",
+    "Une obligation pour toutes les personnes qui perçoivent des revenus imposables en France."
+  ],
+  answer: 3,
+  explanation: "Toute personne ayant des revenus imposables en France doit payer des impôts selon la loi."
+},
+{
+  question: "Depuis quand les Français élisent-ils le président de la République au suffrage?",
+  options: ["1981", "1798", "1962", "1944"],
+  answer: 2,
+  explanation: "Depuis la réforme constitutionnelle de 1962, le président de la République est élu au suffrage universel direct."
+},
+{
+  question: "Où a eu lieu le débarquement en 1944",
+  options: ["À Paris", "À Lille", "À Dunkerque", "À Normandie"],
+  answer: 3,
+  explanation: "Le débarquement du 6 juin 1944 a eu lieu en Normandie pendant la Seconde Guerre mondiale."
+},
+{
+  question: "Quelle île française se trouve dans l'océan Indien ?",
+  options: ["Guadeloupe", "La Corse", "La Réunion", "Guyane"],
+  answer: 2,
+  explanation: "La Réunion est une île française située dans l’océan Indien."
+},
+{
+  question: "Qui était Marguerite Yourcenar ?",
+  options: [
+    "Une écrivaine française, première femme élue à l’Académie française.",
+    "Une chanteuse célèbre en France.",
+    "Une scientifique française spécialisée en biologie.",
+    "Une peintre française du XXe siècle."
+  ],
+  answer: 0,
+  explanation: "Marguerite Yourcenar est une grande écrivaine française et la première femme élue à l’Académie française en 1980."
+},
+{
+  question: "En France, concernant les consultations médicales, laquelle des affirmations suivantes est correcte ?",
+  options: [
+    "Consulter son médecin traitant ne nécessite pas d’ordonnance.",
+    "On peut obtenir n’importe quel médicament directement en pharmacie sans prescription",
+    "Les consultations chez un spécialiste ne nécessitent jamais de rendez-vous",
+    "Il est obligatoire de passer par l’hôpital pour toute consultation médicale."
+  ],
+  answer: 0,
+  explanation: "On peut consulter son médecin traitant directement sans ordonnance préalable."
+},
+{
+  question: "En France, concernant le travail, laquelle des affirmations suivantes est correcte ?",
+  options: [
+    "Travailler sans déclaration à l’administration est légal.",
+    "Tout salarié doit être déclaré par son employeur auprès de l’administration.",
+    "On peut travailler sans contrat si l’on est majeur.",
+    "Les heures supplémentaires ne doivent jamais être déclarées."
+  ],
+  answer: 1,
+  explanation: "En France, tout salarié doit être déclaré par son employeur afin de respecter le droit du travail."
+}];
+const questions_multi = [{
+  question: "De quelle année date la Constitution française ?",
+  options: ["1798", "1958", "1962", "1944"],
+  answer: 1,
+  explanation: "La Constitution actuelle de la France date de 1958 et fonde la Ve République."
+},
+{
+  question: "Quelles sont les couleurs du drapeau français?",
+  options: ["rouge, blanc et bleu", "rouge, vert et bleu", "blanc, noir et rouge", "rouge, blanc et vert"],
+  answer: 0,
+  explanation: "Le drapeau français est composé de trois couleurs : bleu, blanc et rouge."
+},
+{
+  question: "Qu'est-ce que la laïcité?",
+  options: [
+    "une religion officielle de la France",
+    "la séparation de l’État et des religions",
+    "une fête nationale française",
+    "une loi sur la langue française"
+  ],
+  answer: 1,
+  explanation: "La laïcité garantit la séparation de l'État et des religions ainsi que la liberté de conscience."
+},
+{
+  question: "En France, avoir plusieurs femmes est :",
+  options: ["obligatoire", "autorisé", "interdit", "normal"],
+  answer: 2,
+  explanation: "La polygamie est interdite par la loi en France."
+},
+{
+  question: "Madame X et Monsieur Y font le même travail dans une entreprise. En France, leur salaire est :",
+  options: [
+    "le même",
+    "différent parce qu’ils n’ont pas le même âge",
+    "différent parce qu’ils n’ont pas le même sexe",
+    "différent sans raison"
+  ],
+  answer: 0,
+  explanation: "En France, l’égalité salariale entre les femmes et les hommes est un principe inscrit dans la loi."
+},
+{
+  question: "Le Parlement est composé :",
+  options: [
+    "de députés et de sénateurs",
+    "de juges et de policiers",
+    "de professeurs et d’élèves",
+    "du président et du Premier ministre"
+  ],
+  answer: 0,
+  explanation: "Le Parlement français est composé de l’Assemblée nationale et du Sénat."
+},
+{
+  question: "Un ministre ne respecte pas la loi. En France :",
+  options: [
+    "il ne reçoit pas de punition",
+    "il reçoit une punition seulement dans certains cas",
+    "il peut décider de ne pas recevoir de punition",
+    "il reçoit la même punition que les citoyens"
+  ],
+  answer: 3,
+  explanation: "En France, tous les citoyens sont égaux devant la loi, y compris les ministres."
+},
+{
+  question: "Quel traité a permis la création officielle de l’Union européenne ?",
+  options: [
+    "le traité de Rome",
+    "le traité de Maastricht",
+    "le traité de Lisbonne",
+    "le traité de Paris"
+  ],
+  answer: 1,
+  explanation: "Le traité de Maastricht signé en 1992 a créé officiellement l’Union européenne."
+},
+{
+  question: "De quelle année date la Déclaration des droits de l’homme et du citoyen ?",
+  options: ["1789", "1905", "1944", "1952"],
+  answer: 0,
+  explanation: "La Déclaration des droits de l’homme et du citoyen a été adoptée en 1789 pendant la Révolution française."
+},
+{
+  question: "Que doit faire une personne en cas d’accident ?",
+  options: [
+    "partir sans aider",
+    "Demander de l’aide à des amis.",
+    "prendre une photo et poster sur les réseaux sociaux",
+    "appeler les secours (le 15, le 17 ou le 18)"
+  ],
+  answer: 3,
+  explanation: "En cas d’accident, il faut appeler les secours : 15 (SAMU), 17 (police) ou 18 (pompiers)."
+},
+{
+  question: "Une femme peut avorter :",
+  options: [
+    "seulement si elle est mariée",
+    "quand elle veut, sans limite",
+    "seulement si elle a un enfant",
+    "légalement en France jusqu’à 14 semaines de grossesse"
+  ],
+  answer: 3,
+  explanation: "En France, l’interruption volontaire de grossesse (IVG) est autorisée jusqu’à 14 semaines de grossesse."
+},
+{
+  question: "Madame X a insulté Madame Y. Que peut faire Madame Y ?",
+  options: [
+    "Porter plainte auprès de la police.",
+    "Demander à son mari d’intervenir.",
+    "Insulter Madame X en retour.",
+    "Demander à son père d’intervenir."
+  ],
+  answer: 0,
+  explanation: "En cas d’insulte, la victime peut porter plainte auprès de la police."
+},
+{
+  question: "Jeter des déchets dans la rue :",
+  options: [
+    "est interdit",
+    "est permis dans le parc",
+    "est permis quand il n’y a personne",
+    "est permis à certaines heures"
+  ],
+  answer: 0,
+  explanation: "Jeter des déchets dans la rue est interdit et peut être sanctionné par une amende."
+},
+{
+  question: "Madame X refuse de payer sa facture d’impôts. En France :",
+  options: [
+    "c’est illégal et elle peut être punie",
+    "c’est possible si son père est d’accord",
+    "c’est possible si son mari est d’accord",
+    "c’est possible si son entreprise est d’accord"
+  ],
+  answer: 0,
+  explanation: "Le paiement des impôts est obligatoire en France. Ne pas les payer est illégal."
+},
+{
+  question: "Le 11 novembre est un jour férié. À quoi correspond cette date ?",
+  options: [
+    "le jour de Noël",
+    "l’anniversaire de la Révolution française",
+    "la fête des mères",
+    "la fin de la Première Guerre mondiale"
+  ],
+  answer: 3,
+  explanation: "Le 11 novembre commémore l’armistice de 1918 qui marque la fin de la Première Guerre mondiale."
+},
+{
+  question: "Quelle île française se trouve dans l'océan Indien ?",
+  options: ["Guadeloupe", "La Corse", "La Réunion", "Guyane"],
+  answer: 2,
+  explanation: "La Réunion est une île française située dans l’océan Indien."
+},
+{
+  question: "Qui était Molière ?",
+  options: [
+    "un écrivain et dramaturge français",
+    "un un peintre",
+    "un écrivain",
+    "un scientifique"
+  ],
+  answer: 0,
+  explanation: "Molière est un célèbre dramaturge et écrivain français du XVIIe siècle."
+},
+{
+  question: "Qu’est-ce que le Louvre ?",
+  options: [
+    "un musée à Paris",
+    "un château où vit le président",
+    "un stade de football",
+    "une grande école"
+  ],
+  answer: 0,
+  explanation: "Le Louvre est l’un des plus grands musées du monde, situé à Paris."
+},
+{
+  question: "Ne pas envoyer un enfant de 8 ans à l’école en France :",
+  options: [
+    "est possible si l’enfant ne veut pas y aller",
+    "est possible si les parents peuvent l’enseigner à la maison",
+    "est interdit",
+    "est possible si l’enfant ne parle pas français"
+  ],
+  answer: 2,
+  explanation: "L’instruction est obligatoire en France pour les enfants de 3 à 16 ans."
+},
+{
+  question: "En France, pour le travail, quelle phrase est correcte ?",
+  options: [
+    "On peut travailler sans dire à l’administration",
+    "Tout salarié doit être déclaré par son employeur",
+    "On peut travailler sans contrat si on est adulte",
+    "Les heures supplémentaires ne doivent jamais être déclarées"
+  ],
+  answer: 1,
+  explanation: "En France, tout salarié doit être déclaré légalement par son employeur."
+}];
 
+
+let questions = [];
 let currentQuestionIndex = 0;
-let userAnswers = new Array(questions.length).fill(null);
+let userAnswers = []; // 暂时不初始化，等选完题库后再初始化
 
 // Variables du timer
 let totalTime = 20 * 60; // 20 minutes en secondes
@@ -1558,7 +2151,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
 function acceptDisclaimer() {
   if (!document.getElementById('agreeCheckbox').checked) {
-    alert("Veuillez cocher la case pour accepter les conditions.");
+    customAlert("Veuillez cocher la case pour accepter les conditions.", "Attention");
     return;
   }
   
@@ -1576,11 +2169,13 @@ function acceptDisclaimer() {
 }
 
 function rejectDisclaimer() {
-  if (confirm("Êtes-vous sûr de vouloir quitter? Vous ne pourrez pas passer le test sans accepter les conditions.")) {
-    window.location.href = "index.html";
-  }
+  customConfirm("Êtes-vous sûr de vouloir quitter? Vous ne pourrez pas passer le test sans accepter les conditions.")
+    .then(result => {
+      if (result) {
+        window.location.href = "index.html";
+      }
+    });
 }
-
 function goBackToDisclaimer() {
   document.getElementById('nameModal').style.display = 'none';
   document.getElementById('disclaimerModal').style.display = 'flex';
@@ -1604,7 +2199,7 @@ function saveStudentInfo() {
   
   // Validation
   if (!firstName || !lastName || !email) {
-    alert("Veuillez remplir tous les champs obligatoires.");
+    customAlert("Veuillez remplir tous les champs obligatoires.", "Erreur");
     return;
   }
   
@@ -1638,17 +2233,47 @@ function isValidEmail(email) {
 }
 
 // Fonctions principales
+// 找到这个函数，完全替换为下面的代码
 function validatePassword() {
   const password = document.getElementById('passwordInput').value;
   const errorElement = document.getElementById('passwordError');
   
-  if (password === 'pretest2026') {
+  // 根据密码选择题库
+  let selectedQuestions = null;
+  let testType = "";
+  
+  if (password === 'pretestmulti') {
+    selectedQuestions = questions_multi;  // 使用第一个题库
+    testType = "Carte de séjour pluriannuelle";
+  } else if (password === 'pretest10') {
+    selectedQuestions = questions_resident;  // 使用第二个题库
+    testType = "Carte de résident";
+  } else if (password === 'pretestnatur') {
+    selectedQuestions = questions_naturalisation;  // 使用第三个题库
+    testType = "Naturalisation";
+  }
+  
+  if (selectedQuestions) {
+    // 设置全局题库
+    questions = selectedQuestions;
+    userAnswers = new Array(questions.length).fill(null);
+    
+    // 关闭密码模态框
     document.getElementById('passwordModal').style.display = 'none';
     document.getElementById('testContainer').classList.add('show');
     
-    // Afficher l'en-tête et le pied de page
+    // 显示页眉和页脚
     document.querySelector('.test-header').style.display = 'block';
     document.querySelector('.test-footer').style.display = 'block';
+    
+    // 修改标题显示考试类型
+    document.querySelector('.test-header h1').textContent = `Test Civique - ${testType}`;
+    
+    // 修改描述文字
+    const headerParagraph = document.querySelector('.test-header p');
+    if (headerParagraph) {
+      headerParagraph.textContent = `Examen blanc pour ${testType} | 16 bonnes réponses pour réussir`;
+    }
     
     // 滚动到顶部
     setTimeout(() => {
@@ -1657,19 +2282,22 @@ function validatePassword() {
     
     initializeTest();
   } else {
+    // 密码错误
     errorElement.style.display = 'block';
     document.getElementById('passwordInput').value = '';
     document.getElementById('passwordInput').focus();
   }
 }
 
+// 找到这个函数，修改为：
 function initializeTest() {
   document.getElementById('totalQuestions').textContent = questions.length;
+  // 修改提交按钮文字，显示题目数量
+  document.getElementById('submitBtn').textContent = `Soumettre le test (${questions.length} questions)`;
   showQuestion(currentQuestionIndex);
   updateQuestionCounter();
   startTimer();
 }
-
 function showQuestion(index) {
   const question = questions[index];
   
@@ -1788,11 +2416,10 @@ function timeUp() {
   clearInterval(timerInterval);
   isTimerRunning = false;
   
-  // Afficher un message que le temps est écoulé
-  alert("Le temps est écoulé! Votre test sera soumis automatiquement.");
-  
-  // Soumettre automatiquement le test
-  submitTestAuto();
+  customAlert("Le temps est écoulé! Votre test sera soumis automatiquement.", "Temps écoulé")
+    .then(() => {
+      submitTestAuto();
+    });
 }
 
 function submitTestAuto() {
@@ -1820,17 +2447,21 @@ function submitTest() {
   });
   
   if (unanswered > 0) {
-    if (!confirm(`${unanswered} question(s) non répondues. Soumettre quand même?`)) {
-      if (isTimerRunning) {
-        startTimer(); // Redémarrer le timer si l'utilisateur annule
-      }
-      return;
-    }
+    customConfirm(`${unanswered} question(s) non répondues. Soumettre quand même?`, "Questions non répondus")
+      .then(result => {
+        if (result) {
+          calculateScore();
+          displayResults(false);
+        } else {
+          if (isTimerRunning) {
+            startTimer();
+          }
+        }
+      });
+  } else {
+    calculateScore();
+    displayResults(false);
   }
-  
-  // Afficher les résultats
-  calculateScore();
-  displayResults(false);
 }
 
 function calculateScore() {
@@ -1967,18 +2598,39 @@ function prepareEmailData() {
   const fullName = `${studentInfo.firstName} ${studentInfo.lastName}`;
   const recommendation = getCourseRecommendation(currentScore);
   
-  // Construire le corps de l'email
+  // 获取当前考试类型
+  let testType = "";
+  if (questions === questions_multi) {
+    testType = "Carte de séjour pluriannuelle (多年卡)";
+  } else if (questions === questions_resident) {
+    testType = "Carte de résident (十年卡)";
+  } else if (questions === questions_naturalisation) {
+    testType = "Naturalisation (入籍)";
+  } else {
+    testType = "Test civique général (通用测试)";
+  }
+  
+  // 构建邮件正文
   let emailBody = `RÉSULTATS DU TEST CIVIQUE - ${fullName}\n`;
-  emailBody += `Date du test: ${studentInfo.testDate}\n\n`;
+  emailBody += `====================================\n\n`;
+  emailBody += `Date du test: ${studentInfo.testDate}\n`;
+  emailBody += `Type de test: ${testType}\n\n`;
+  
   emailBody += `INFORMATIONS DU CANDIDAT:\n`;
+  emailBody += `------------------------\n`;
   emailBody += `Nom: ${fullName}\n`;
   emailBody += `Email: ${studentInfo.email}\n\n`;
+  
   emailBody += `RÉSULTATS:\n`;
+  emailBody += `----------\n`;
   emailBody += `Score: ${currentScore}/${questions.length} (${Math.round(currentPercentage)}%)\n`;
   emailBody += `Évaluation: ${currentScoreText}\n\n`;
+  
   emailBody += `RECOMMANDATION DE COURS:\n`;
+  emailBody += `------------------------\n`;
   emailBody += `${recommendation.recommendation}\n`;
   emailBody += `${recommendation.details}\n\n`;
+  
   emailBody += `DÉTAIL DES RÉPONSES:\n`;
   emailBody += `====================\n\n`;
   
@@ -2003,12 +2655,13 @@ function prepareEmailData() {
   emailBody += `Email de l'association: 2025qianfan@gmail.com\n`;
   
   return {
-    to_email: "2025qianfan@gmail.com", // Email fixe pour l'association
-    cc_email: studentInfo.email, // Copie à l'étudiant
-    subject: `Résultats Test Civique - ${fullName}`,
+    to_email: "2025qianfan@gmail.com",
+    cc_email: studentInfo.email,
+    subject: `Résultats Test Civique - ${fullName} (${testType})`,
     student_name: fullName,
     student_email: studentInfo.email,
     test_date: studentInfo.testDate,
+    test_type: testType,
     score: `${currentScore}/${questions.length}`,
     percentage: `${Math.round(currentPercentage)}%`,
     recommendation: recommendation.recommendation,
@@ -2016,7 +2669,6 @@ function prepareEmailData() {
     body: emailBody
   };
 }
-
 function sendEmailWithEmailJS(emailData) {
   console.log("开始发送EmailJS邮件...");
   
@@ -2029,30 +2681,34 @@ function sendEmailWithEmailJS(emailData) {
   console.log("- Template ID:", templateID);
   console.log("- Public Key: D2jk67ERbrJZSUyvC");
   
+  // 显示发送状态
+  showEmailStatus("sending");
+  
   // 构建模板参数 - 与您的模板变量完全匹配
   const templateParams = {
-    // 必需字段（根据EmailJS要求）
+    // 必需字段
     from_name: "Association Mille Voiles",
     reply_to: studentInfo.email,
     
-    // 模板变量（必须与模板中的 {{variable}} 完全一致）
-    student_name: emailData.student_name || `${studentInfo.firstName} ${studentInfo.lastName}`,
-    student_email: emailData.student_email || studentInfo.email,
-    test_date: emailData.test_date || studentInfo.testDate,
-    score: emailData.score || `${currentScore}/${questions.length}`,
-    percentage: emailData.percentage || `${Math.round(currentPercentage)}%`,
-    recommendation: emailData.recommendation || getCourseRecommendation(currentScore).recommendation,
-    details: emailData.details || getCourseRecommendation(currentScore).details,
+    // 模板变量
+    student_name: emailData.student_name,
+    student_email: emailData.student_email,
+    test_date: emailData.test_date,
+    test_type: emailData.test_type,
+    score: emailData.score,
+    percentage: emailData.percentage,
+    recommendation: emailData.recommendation,
+    details: emailData.details,
     
     // 邮件基本信息
-    to_email: emailData.to_email || "2025qianfan@gmail.com",
-    subject: emailData.subject || `Résultats Test Civique - ${studentInfo.firstName} ${studentInfo.lastName}`
+    to_email: emailData.to_email,
+    subject: emailData.subject
   };
   
   console.log("发送参数检查:", templateParams);
   
   // 验证所有必需的模板变量都有值
-  const requiredVars = ['student_name', 'student_email', 'test_date', 'score', 'percentage', 'recommendation', 'details'];
+  const requiredVars = ['student_name', 'student_email', 'test_date', 'test_type', 'score', 'percentage', 'recommendation', 'details'];
   const missingVars = requiredVars.filter(varName => !templateParams[varName]);
   
   if (missingVars.length > 0) {
@@ -2122,11 +2778,15 @@ function sendEmailWithEmailJS(emailData) {
       showEmailStatus("error", `${errorMsg}${errorDetails ? `: ${errorDetails}` : ''}`);
       
       // 提供备选方案
-      setTimeout(function() {
-        if (confirm(`邮件发送失败 (${errorMsg})。\n\n是否使用备选方法发送邮件？`)) {
-          sendEmailFallback(emailData);
-        }
-      }, 1500);
+ // 在 catch 块中替换
+setTimeout(function() {
+  customConfirm(`邮件发送失败 (${errorMsg})。\n\n是否使用备选方法发送邮件？`, "Erreur d'envoi")
+    .then(result => {
+      if (result) {
+        sendEmailFallback(emailData);
+      }
+    });
+}, 1500);
     });
 }
 function sendEmailFallback(emailData) {
@@ -2244,47 +2904,62 @@ function closeStatusModal() {
 }
 
 function restartTest() {
-  if (confirm("Voulez-vous vraiment recommencer le test? Vos réponses actuelles seront perdues.")) {
-    currentQuestionIndex = 0;
-    userAnswers = new Array(questions.length).fill(null);
-    
-    // Réinitialiser le timer
-    timeLeft = totalTime;
-    if (timerInterval) {
-      clearInterval(timerInterval);
-    }
-    isTimerRunning = false;
-    
-    // Réinitialiser l'affichage du timer
-    document.getElementById('timerDisplay').textContent = "20:00";
-    document.getElementById('timerDisplay').style.color = "";
-    document.getElementById('timerDisplay').style.animation = "";
-    document.getElementById('timerProgress').style.width = "100%";
-    document.getElementById('timerProgress').style.backgroundColor = "var(--primary-blue)";
-    document.getElementById('timerWarning').style.display = 'none';
-    document.getElementById('timerCritical').style.display = 'none';
-    
-    document.getElementById('resultsContainer').classList.remove('show');
-    document.getElementById('testContainer').style.display = 'block';
-    document.getElementById('testContainer').classList.add('show');
-    
-    // 滚动到顶部
-    setTimeout(() => {
-      window.scrollTo(0, 0);
-    }, 100);
-    
-    initializeTest();
-  }
+  customConfirm("Voulez-vous vraiment recommencer le test? Vos réponses actuelles seront perdues.", "Recommencer")
+    .then(result => {
+      if (result) {
+        currentQuestionIndex = 0;
+        userAnswers = new Array(questions.length).fill(null);
+        
+        // Réinitialiser le timer
+        timeLeft = totalTime;
+        if (timerInterval) {
+          clearInterval(timerInterval);
+        }
+        isTimerRunning = false;
+        
+        // Réinitialiser l'affichage du timer
+        document.getElementById('timerDisplay').textContent = "20:00";
+        document.getElementById('timerDisplay').style.color = "";
+        document.getElementById('timerDisplay').style.animation = "";
+        document.getElementById('timerProgress').style.width = "100%";
+        document.getElementById('timerProgress').style.backgroundColor = "var(--primary-blue)";
+        document.getElementById('timerWarning').style.display = 'none';
+        document.getElementById('timerCritical').style.display = 'none';
+        
+        document.getElementById('resultsContainer').classList.remove('show');
+        document.getElementById('testContainer').style.display = 'block';
+        document.getElementById('testContainer').classList.add('show');
+        
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+        }, 100);
+        
+        initializeTest();
+      }
+    });
 }
-
 function goBackToHome() {
   window.location.href = "index.html";
 }
 
 function showInstructions() {
-  alert("Instructions du test:\n\n1. Vous avez 20 minutes pour répondre à 20 questions.\n2. Le timer en haut de la page indique le temps restant.\n3. Vous recevrez des avertissements à 5 minutes et 1 minute de la fin.\n4. Si le temps expire, votre test sera soumis automatiquement.\n5. Vous pouvez naviguer entre les questions avec les boutons 'Question précédente' et 'Question suivante'.\n6. Cliquez sur 'Soumettre le test' quand vous avez terminé.\n7. Seuil de réussite : 16 réponses correctes sur 20.\n8. Vos résultats seront automatiquement envoyés à 2025qianfan@gmail.com.\n\nBonne chance!");
+  showCustomModal({
+    icon: 'info',
+    title: 'Instructions du test',
+    message: `
+      <div style="text-align: left; max-height: 60vh; overflow-y: auto; padding-right: 10px;">
+        <p style="margin: 8px 0;"><strong>⏱️ Temps :</strong> 20 minutes</p>
+        <p style="margin: 8px 0;"><strong>📝 Questions :</strong> 20 questions</p>
+        <p style="margin: 8px 0;"><strong>✅ Réussite :</strong> 16 bonnes réponses</p>
+        <p style="margin: 8px 0;"><strong>⚠️ Alertes :</strong> à 5min et 1min</p>
+        <p style="margin: 8px 0;"><strong>🔄 Navigation :</strong> Précédente / Suivante</p>
+        <p style="margin: 8px 0;"><strong>📧 Résultats :</strong> Envoyés à 2025qianfan@gmail.com</p>
+        <p style="margin: 15px 0 5px 0; text-align: center; font-weight: bold; color: #004080;">Bonne chance !</p>
+      </div>
+    `,
+    buttons: [{ text: 'Compris', class: 'custom-modal-btn-primary', value: true }]
+  });
 }
-
 // Permettre l'appui sur Entrée dans le champ de mot de passe
 document.getElementById('passwordInput').addEventListener('keypress', function(e) {
   if (e.key === 'Enter') {
@@ -2304,6 +2979,160 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+// 自定义弹窗函数
+function showCustomModal(options) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('customModal');
+    const icon = document.getElementById('customModalIcon');
+    const title = document.getElementById('customModalTitle');
+    const message = document.getElementById('customModalMessage');
+    const extra = document.getElementById('customModalExtra');
+    const buttonsContainer = document.getElementById('customModalButtons');
+    
+    // 设置图标
+    icon.className = 'custom-modal-icon';
+    let iconHtml = '';
+    switch(options.icon) {
+      case 'warning':
+        iconHtml = '<i class="fas fa-exclamation-triangle"></i>';
+        icon.classList.add('warning');
+        break;
+      case 'question':
+        iconHtml = '<i class="fas fa-question-circle"></i>';
+        icon.classList.add('question');
+        break;
+      case 'success':
+        iconHtml = '<i class="fas fa-check-circle"></i>';
+        icon.classList.add('success');
+        break;
+      case 'error':
+        iconHtml = '<i class="fas fa-times-circle"></i>';
+        icon.classList.add('error');
+        break;
+      case 'info':
+      default:
+        iconHtml = '<i class="fas fa-info-circle"></i>';
+        icon.classList.add('info');
+        break;
+    }
+    icon.innerHTML = iconHtml;
+    
+    // 设置标题和消息
+    title.textContent = options.title || '';
+    message.innerHTML = options.message || '';  // 使用 innerHTML 而不是 textContent
+    
+    // 清空按钮容器
+    buttonsContainer.innerHTML = '';
+    
+    // 创建按钮
+    if (options.buttons && options.buttons.length > 0) {
+      options.buttons.forEach(btn => {
+        const button = document.createElement('button');
+        button.className = `custom-modal-btn ${btn.class || 'custom-modal-btn-primary'}`;
+        button.textContent = btn.text;
+        button.onclick = () => {
+          modal.style.display = 'none';
+          if (btn.value !== undefined) {
+            resolve(btn.value);
+          } else {
+            resolve(true);
+          }
+        };
+        buttonsContainer.appendChild(button);
+      });
+    } else {
+      // 默认确定按钮
+      const button = document.createElement('button');
+      button.className = 'custom-modal-btn custom-modal-btn-primary';
+      button.textContent = 'OK';
+      button.onclick = () => {
+        modal.style.display = 'none';
+        resolve(true);
+      };
+      buttonsContainer.appendChild(button);
+    }
+    
+    // 显示模态框
+    modal.style.display = 'flex';
+  });
+}
+
+// 替换 alert
+function customAlert(message, title = "Information") {
+  return showCustomModal({
+    icon: 'info',
+    title: title,
+    message: message,
+    buttons: [{ text: 'OK', class: 'custom-modal-btn-primary', value: true }]
+  });
+}
+
+// 替换 confirm
+function customConfirm(message, title = "Confirmation") {
+  return showCustomModal({
+    icon: 'question',
+    title: title,
+    message: message,
+    buttons: [
+      { text: 'Non', class: 'custom-modal-btn-secondary', value: false },
+      { text: 'Oui', class: 'custom-modal-btn-primary', value: true }
+    ]
+  });
+}
+
+// 替换带输入的 confirm
+function customPrompt(message, defaultValue = "", title = "Saisie") {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('customModal');
+    const icon = document.getElementById('customModalIcon');
+    const titleEl = document.getElementById('customModalTitle');
+    const messageEl = document.getElementById('customModalMessage');
+    const extra = document.getElementById('customModalExtra');
+    const buttonsContainer = document.getElementById('customModalButtons');
+    
+    // 设置图标
+    icon.className = 'custom-modal-icon info';
+    icon.innerHTML = '<i class="fas fa-pencil-alt"></i>';
+    
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    
+    // 添加输入框
+    extra.style.display = 'block';
+    extra.innerHTML = `
+      <input type="text" id="customPromptInput" class="custom-modal-input" value="${defaultValue}" placeholder="Votre réponse...">
+    `;
+    
+    buttonsContainer.innerHTML = '';
+    
+    // 取消按钮
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'custom-modal-btn custom-modal-btn-secondary';
+    cancelBtn.textContent = 'Annuler';
+    cancelBtn.onclick = () => {
+      modal.style.display = 'none';
+      extra.style.display = 'none';
+      resolve(null);
+    };
+    
+    // 确认按钮
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'custom-modal-btn custom-modal-btn-primary';
+    confirmBtn.textContent = 'Confirmer';
+    confirmBtn.onclick = () => {
+      const inputValue = document.getElementById('customPromptInput').value;
+      modal.style.display = 'none';
+      extra.style.display = 'none';
+      resolve(inputValue);
+    };
+    
+    buttonsContainer.appendChild(cancelBtn);
+    buttonsContainer.appendChild(confirmBtn);
+    
+    modal.style.display = 'flex';
+    setTimeout(() => document.getElementById('customPromptInput').focus(), 100);
+  });
+}
 </script>
 
 </body>
