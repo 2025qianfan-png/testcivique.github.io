@@ -1,7 +1,7 @@
-const CACHE_NAME = 'civique-exam-v1.2';
+const CACHE_NAME = 'civique-exam-v1.3';
 const urlsToCache = [
   '/',
- '/index.html?v=1.1',
+ '/index.html?v=1.3',
  '/admin.html?v=1.1',
   '/manifest.json',
   '/test-gratuit.html?v=1.0',
@@ -116,5 +116,6 @@ self.addEventListener('notificationclick', event => {
 
 
 });
+
 
 
