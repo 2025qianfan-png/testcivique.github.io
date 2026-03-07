@@ -1413,7 +1413,7 @@ document.addEventListener('keydown', function (e) {
         e.preventDefault();
     }
 });
-
+let selectedTestType = 'droits_obligations'; 
 
 // ==================== 主题分布配置 ====================
 // 模块三：基本权利和居住义务
@@ -2139,11 +2139,69 @@ function submitTest() {
     proceedWithSubmission();
 }
 
-function proceedWithSubmission() {
-    calculateScore();
-    displayResults();
+// 在文件末尾添加错题记录函数
+async function recordMistakesToDatabase() {
+    console.log('开始记录错题到数据库...');
+    
+    try {
+        if (!window.supabaseAuth || !window.supabaseAuth.recordMistake) {
+            console.warn('Supabase错题记录功能不可用');
+            return;
+        }
+        
+        // 确保 studentInfo 有 name
+        if (!studentInfo.name || studentInfo.name === "Visiteur") {
+            console.warn('学生姓名未知，无法记录错题');
+            return;
+        }
+        
+        let recordedCount = 0;
+        
+        for (let i = 0; i < selectedQuestions.length; i++) {
+            if (userAnswers[i] !== selectedQuestions[i].answer) {
+                try {
+                    const userAnswer = userAnswers[i] !== null ? userAnswers[i] : -1;
+                    
+                    const questionToSave = { ...selectedQuestions[i] };
+                    // 确保有 difficulty 属性
+                    if (!questionToSave.difficulty && questionToSave['difficulté']) {
+                        questionToSave.difficulty = questionToSave['difficulté'];
+                    }
+
+                    const result = await window.supabaseAuth.recordMistake(
+                        studentInfo,
+                        questionToSave,
+                        userAnswer,
+                        'droits_obligations'  // 测试类型标识
+                    );
+                    if (result) {
+                        recordedCount++;
+                    }
+                } catch (err) {
+                    console.error(`记录错题 ${i + 1} 失败:`, err);
+                }
+            }
+        }
+        
+        console.log(`错题记录完成: ${recordedCount} 题`);
+        
+    } catch (error) {
+        console.error('记录错题过程失败:', error);
+    }
 }
 
+// 修改 proceedWithSubmission 函数
+function proceedWithSubmission() {
+    calculateScore();
+    
+    // 记录错题
+    recordMistakesToDatabase().then(() => {
+        displayResults();
+    }).catch(error => {
+        console.error("记录错题失败:", error);
+        displayResults();
+    });
+}
 function calculateScore() {
     let correct = 0;
     
