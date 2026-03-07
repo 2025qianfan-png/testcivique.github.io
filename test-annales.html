@@ -11,7 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-/* Variables et reset */
+/* 原有样式保持不变，与您提供的代码一致 */
 :root {
   --primary-blue: #004080;
   --primary-light-blue: #0066cc;
@@ -353,6 +353,40 @@ h1, h2, h3, h4 {
 .access-days-info i {
   color: var(--orange);
   margin-right: 8px;
+}
+
+/* 用户类型指示器 */
+.user-type-indicator {
+  background-color: var(--primary-blue);
+  color: white;
+  padding: 12px 20px;
+  border-radius: var(--border-radius);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  box-shadow: var(--shadow);
+}
+
+.user-type-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.user-type-badge i {
+  font-size: 1.2rem;
+  color: var(--primary-yellow);
+}
+
+.user-type-name {
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.9rem;
 }
 
 /* Test Container */
@@ -1088,9 +1122,6 @@ h1, h2, h3, h4 {
   </div>
 </div>
 
-<!-- Login Modal -->
-
-
 <!-- Training Info Modal -->
 <div id="trainingInfoModal" class="training-info-modal">
   <div class="training-info-content">
@@ -1154,6 +1185,17 @@ h1, h2, h3, h4 {
 <!-- Test Container -->
 <main class="container">
   <div id="testContainer" class="test-container">
+    <!-- 用户类型指示器 -->
+    <div class="user-type-indicator" id="userTypeIndicator">
+      <div class="user-type-badge">
+        <i class="fas fa-user-graduate"></i>
+        <span id="userTypeText">Type d'utilisateur</span>
+      </div>
+      <div class="user-type-name" id="userTypeName">
+        Chargement...
+      </div>
+    </div>
+    
     <!-- Question Counter -->
     <div class="question-counter">
       <div class="counter-info">
@@ -1277,6 +1319,34 @@ let currentScoreText = "";
 
 let allQuestions = [];
 
+// 用户类型对应的显示文本
+const userTypeDisplay = {
+    'm': {
+        fr: 'Titre de Séjour 2-4 Ans',
+        zh: '2-4年居留许可',
+        icon: 'fa-passport',
+        color: '#3498db'
+    },
+    'n': {
+        fr: 'Nationalité Française',
+        zh: '法国国籍',
+        icon: 'fa-flag',
+        color: '#2ecc71'
+    },
+    'r': {
+        fr: 'Carte de Résident 10 Ans',
+        zh: '10年长期居留卡',
+        icon: 'fa-id-card-alt',
+        color: '#9b59b6'
+    },
+    't': {
+        fr: 'Tous les tests (accès complet)',
+        zh: '所有测试（完全访问）',
+        icon: 'fa-graduation-cap',
+        color: '#f1c40f'
+    }
+};
+
 // ==================== 自定义提示窗口 ====================
 function showAlert(title, message, type = 'info') {
     const alertModal = document.getElementById('alertModal');
@@ -1302,68 +1372,120 @@ function closeTrainingInfo() {
     startTest();
 }
 
-// ==================== 登录验证 ====================
-function validateLogin() {
-    const name = document.getElementById('studentName').value.trim();
-    const password = document.getElementById('studentPassword').value.trim();
-    const loginError = document.getElementById('loginError');
-    const loadingSpinner = document.getElementById('loginSpinner');
-    const loginButtons = document.getElementById('loginButtons');
+// ==================== 从URL获取参数 ====================
+function getUrlParameter(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
+
+// 解析token
+function parseToken(token) {
+    try {
+        const decoded = atob(token);
+        return JSON.parse(decoded);
+    } catch (e) {
+        console.error("Token解析失败:", e);
+        return null;
+    }
+}
+
+// ==================== 更新用户类型显示 ====================
+// ==================== 更新用户类型显示 ====================
+function updateUserTypeDisplay() {
+    const userTypeText = document.getElementById('userTypeText');
+    const userTypeName = document.getElementById('userTypeName');
+    const userTypeIndicator = document.getElementById('userTypeIndicator');
     
-    if (!name || !password) {
-        showAlert("Champs requis", "Veuillez remplir tous les champs.", 'warning');
-        return;
+    console.log("更新显示，用户类型:", studentInfo.type);
+    
+    // 根据用户类型设置显示内容
+    let displayFr = '';
+    let displayZh = '';
+    let icon = '';
+    let color = '';
+    
+    switch(studentInfo.type) {
+        case 'm':
+            displayFr = 'Titre de Séjour 2-4 Ans';
+            displayZh = '2-4年居留许可';
+            icon = 'fa-passport';
+            color = '#3498db';
+            break;
+        case 'n':
+            displayFr = 'Nationalité Française';
+            displayZh = '法国国籍';
+            icon = 'fa-flag';
+            color = '#2ecc71';
+            break;
+        case 'r':
+            displayFr = 'Carte de Résident 10 Ans';
+            displayZh = '10年长期居留卡';
+            icon = 'fa-id-card-alt';
+            color = '#9b59b6';
+            break;
+        case 't':
+            displayFr = 'Accès complet';
+            displayZh = '完全访问';
+            icon = 'fa-graduation-cap';
+            color = '#f1c40f';
+            break;
+        default:
+            displayFr = 'Visiteur';
+            displayZh = '访客模式';
+            icon = 'fa-user';
+            color = 'var(--primary-blue)';
     }
     
-    loginError.style.display = 'none';
-    loginButtons.style.display = 'none';
-    loadingSpinner.style.display = 'block';
-    
-    window.supabaseAuth.validateStudent(name, password)
-        .then(student => {
-            if (student) {
-                const accessCheck = window.supabaseAuth.checkAccess(student);
-                if (!accessCheck.valid) {
-                    showAlert("Accès expiré", accessCheck.message || "Votre période d'accès a expiré.", 'error');
-                    resetLoginForm();
-                    return;
-                }
-                studentInfo = {
-                    name: student.name,
-                    testDate: new Date().toLocaleString('fr-FR'),
-                    type: student.type || "t",
-                    daysLeft: accessCheck.daysLeft
-                };
-                document.getElementById('loginModal').style.display = 'none';
-                showTrainingInfo();
-            } else {
-                showAlert("Échec de connexion", "Nom d'étudiant ou mot de passe incorrect.", 'error');
-                resetLoginForm();
-            }
-        })
-        .catch(error => {
-            console.error("登录错误:", error);
-            showAlert("Erreur de connexion", "Une erreur est survenue. Veuillez réessayer.", 'error');
-            resetLoginForm();
-        });
+    // 更新显示
+    userTypeText.innerHTML = `<i class="fas ${icon}"></i> ${studentInfo.name} - ${displayFr}`;
+    userTypeName.textContent = displayZh;
+    userTypeIndicator.style.backgroundColor = color;
 }
-
-function resetLoginForm() {
-    document.getElementById('loginSpinner').style.display = 'none';
-    document.getElementById('loginButtons').style.display = 'flex';
-}
-
+// ==================== 培训信息窗口 ====================
 // ==================== 培训信息窗口 ====================
 function showTrainingInfo() {
     const trainingTypeInfo = document.getElementById('trainingTypeInfo');
     const accessDaysInfo = document.getElementById('accessDaysInfo');
     
+    // 用户类型显示
+    let userTypeText = '';
+    let userTypeChinese = '';
+    let userTypeIcon = '';
+    
+    console.log("显示培训信息，用户类型:", studentInfo.type);
+    
+    switch(studentInfo.type) {
+        case 'm':
+            userTypeText = 'Titre de Séjour 2-4 Ans';
+            userTypeChinese = '2-4年居留许可申请者';
+            userTypeIcon = 'fa-passport';
+            break;
+        case 'n':
+            userTypeText = 'Nationalité Française';
+            userTypeChinese = '法国入籍申请者';
+            userTypeIcon = 'fa-flag';
+            break;
+        case 'r':
+            userTypeText = 'Carte de Résident 10 Ans';
+            userTypeChinese = '10年长期居留卡申请者';
+            userTypeIcon = 'fa-id-card-alt';
+            break;
+        case 't':
+            userTypeText = 'Tous les tests (accès complet)';
+            userTypeChinese = '所有测试（完全访问）';
+            userTypeIcon = 'fa-graduation-cap';
+            break;
+        default:
+            userTypeText = 'Visiteur';
+            userTypeChinese = '访客模式';
+            userTypeIcon = 'fa-user';
+    }
+    
     let trainingHTML = `
         <h3><i class="fas fa-history"></i> Entraînement aux Annales Officielles</h3>
-        <p><strong>Public visé :</strong> Tous les demandeurs (accès complet)</p>
-        <p><strong>Target audience :</strong> All applicants (full access)</p>
-        <div class="chinese"><strong>适用对象：</strong> 所有申请者（完全访问权限）</div>
-        <p><strong>Note :</strong> Ces questions sont des extraits d'examens originaux (typeQuestion: "examen original").</p>
+        <p><strong><i class="fas fa-user"></i> Utilisateur :</strong> ${studentInfo.name}</p>
+        <p><strong><i class="${userTypeIcon}"></i> Type de test :</strong> ${userTypeText}</p>
+        <p><strong><i class="fas fa-language"></i> 测试类型：</strong> ${userTypeChinese}</p>
         <div style="margin-top:15px; padding:12px; background:rgba(0,64,128,0.08); border-radius:6px;">
             <p><strong><i class="fas fa-question-circle"></i> Test spécialisé :</strong></p>
             <p>• 20 questions issues des annales - Pas de limite de temps</p>
@@ -1387,7 +1509,6 @@ function showTrainingInfo() {
     
     document.getElementById('trainingInfoModal').style.display = 'flex';
 }
-
 // ==================== 开始测试 ====================
 function startTest() {
     document.getElementById('trainingInfoModal').style.display = 'none';
@@ -1395,10 +1516,22 @@ function startTest() {
     
     setTimeout(() => {
         try {
-            // 合并题库（与原来相同）
-            allQuestions = [...question_multi];
-            if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
-                allQuestions = allQuestions.concat(question_resident);
+            console.log("开始测试，用户类型:", studentInfo.type);
+            
+            // 根据学生类型选择题库
+            if (studentInfo.type === 'm') {
+                // 四年居留：只用 question_multia
+                allQuestions = [...question_multi];
+                console.log("四年居留题库：使用 question_multia，总数:", allQuestions.length);
+            } else {
+                // 十年居留和入籍：用 question_multia + question_resident
+                allQuestions = [...question_multi];
+                if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+                    allQuestions = allQuestions.concat(question_resident);
+                    console.log("十年居留/入籍题库：使用 question_multia + question_resident，总数:", allQuestions.length);
+                } else {
+                    console.log("十年居留/入籍题库：仅使用 question_multia，总数:", allQuestions.length);
+                }
             }
             
             // 筛选 typeQuestion === "examen original"
@@ -1408,7 +1541,7 @@ function startTest() {
                 throw new Error("Aucune question de type 'examen original' trouvée.");
             }
             
-            // 随机选择20题（如果不足20则全部使用，但一般应有足够题目）
+            // 随机选择20题
             selectedQuestions = shuffleArray(originalQuestions).slice(0, 20);
             
             closeAlert();
@@ -1422,6 +1555,9 @@ function startTest() {
             document.getElementById('testTypeInfo').textContent = "Annales officielles";
             document.getElementById('footerTestInfo').textContent = "Annales officielles - 20 questions";
             
+            // 更新用户类型显示
+            updateUserTypeDisplay();
+            
             initializeTest();
         } catch (error) {
             console.error("初始化测试失败:", error);
@@ -1429,7 +1565,6 @@ function startTest() {
         }
     }, 1500);
 }
-
 // Fisher-Yates 洗牌
 function shuffleArray(array) {
     const newArray = [...array];
@@ -1613,9 +1748,68 @@ function submitTest() {
     proceedWithSubmission();
 }
 
+// 在文件末尾添加错题记录函数
+async function recordMistakesToDatabase() {
+    console.log('开始记录错题到数据库...');
+    
+    try {
+        if (!window.supabaseAuth || !window.supabaseAuth.recordMistake) {
+            console.warn('Supabase错题记录功能不可用');
+            return;
+        }
+        
+        // 确保 studentInfo 有 name
+        if (!studentInfo.name || studentInfo.name === "Visiteur") {
+            console.warn('学生姓名未知，无法记录错题');
+            return;
+        }
+        
+        let recordedCount = 0;
+        
+        for (let i = 0; i < selectedQuestions.length; i++) {
+            if (userAnswers[i] !== selectedQuestions[i].answer) {
+                try {
+                    const userAnswer = userAnswers[i] !== null ? userAnswers[i] : -1;
+                    
+                    const questionToSave = { ...selectedQuestions[i] };
+                    // 确保有 difficulty 属性
+                    if (!questionToSave.difficulty && questionToSave['difficulté']) {
+                        questionToSave.difficulty = questionToSave['difficulté'];
+                    }
+
+                    const result = await window.supabaseAuth.recordMistake(
+                        studentInfo,
+                        questionToSave,
+                        userAnswer,
+                        'droits_obligations'  // 测试类型标识
+                    );
+                    if (result) {
+                        recordedCount++;
+                    }
+                } catch (err) {
+                    console.error(`记录错题 ${i + 1} 失败:`, err);
+                }
+            }
+        }
+        
+        console.log(`错题记录完成: ${recordedCount} 题`);
+        
+    } catch (error) {
+        console.error('记录错题过程失败:', error);
+    }
+}
+
+// 修改 proceedWithSubmission 函数
 function proceedWithSubmission() {
     calculateScore();
-    displayResults();
+    
+    // 记录错题
+    recordMistakesToDatabase().then(() => {
+        displayResults();
+    }).catch(error => {
+        console.error("记录错题失败:", error);
+        displayResults();
+    });
 }
 
 function calculateScore() {
@@ -1731,7 +1925,16 @@ function proceedWithRestart() {
     document.getElementById('questionReview').classList.remove('active');
     document.getElementById('testContainer').style.display = 'block';
     
-    // 重新随机选题
+    // 重新根据学生类型筛选题目
+    if (studentInfo.type === 'm') {
+        allQuestions = [...question_multi];
+    } else {
+        allQuestions = [...question_multi];
+        if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+            allQuestions = allQuestions.concat(question_resident);
+        }
+    }
+    
     const originalQuestions = allQuestions.filter(q => q.typeQuestion === "examen original");
     selectedQuestions = shuffleArray(originalQuestions).slice(0, 20);
     userAnswers = new Array(selectedQuestions.length).fill(null);
@@ -1767,19 +1970,82 @@ function goBackToHome() {
     }, 100);
 }
 
+// ==================== 页面加载完成 ====================
+// ==================== 页面加载完成 ====================
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Page annales chargée");
     
-    // 设置默认访客信息
-    studentInfo = {
-        name: "Visiteur",
-        testDate: new Date().toLocaleString('fr-FR'),
-        type: "t",
-        daysLeft: -1
-    };
+    // 从URL获取参数
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
     
-    // 直接显示培训信息窗口
-    showTrainingInfo();
+    console.log("URL参数:", { token });
+    
+    if (token) {
+        try {
+            // 解析token
+            let userData;
+            try {
+                const utf8String = atob(token);
+                const jsonString = decodeURIComponent(utf8String);
+                userData = JSON.parse(jsonString);
+                console.log("使用新方式解析token成功:", userData);
+            } catch (e) {
+                userData = JSON.parse(atob(token));
+                console.log("使用旧方式解析token成功:", userData);
+            }
+            
+            // 确保 userData 存在且有数据
+            if (userData) {
+                // 获取用户类型，默认为 't'
+                let userType = userData.type || 't';
+                
+                console.log("从token解析出的用户类型:", userType);
+                
+                // 填充学生信息
+                studentInfo = {
+                    name: userData.name || userData.userId || "Étudiant",
+                    testDate: new Date().toLocaleString('fr-FR'),
+                    type: userType,
+                    daysLeft: userData.daysLeft || -1
+                };
+                
+                console.log("学生信息:", studentInfo);
+                console.log("用户类型:", studentInfo.type);
+                
+                // 直接显示培训信息窗口
+                showTrainingInfo();
+            } else {
+                throw new Error("无法解析用户数据");
+            }
+            
+        } catch (e) {
+            console.error("Token解析失败:", e);
+            showAlert("Erreur de connexion", "Impossible de charger les informations. Utilisation du mode visiteur.", 'warning');
+            
+            // 使用默认访客信息
+            studentInfo = {
+                name: "Admin",
+                testDate: new Date().toLocaleString('fr-FR'),
+                type: "t",
+                daysLeft: -1
+            };
+            
+            showTrainingInfo();
+        }
+    } else {
+        // 如果没有token，使用默认访客信息
+        console.log("没有token，使用访客模式");
+        
+        studentInfo = {
+            name: "Visiteur",
+            testDate: new Date().toLocaleString('fr-FR'),
+            type: "t",
+            daysLeft: -1
+        };
+        
+        showTrainingInfo();
+    }
 });
 </script>
 </body>

@@ -1787,33 +1787,34 @@
                 </div>
                 
                 <!-- NEW: Annales / 真题训练卡片 -->
-                <div class="test-card">
-                    <div class="card-header" style="background-color: var(--orange);">
-                        <h3 id="annalesTestTitle">Test officiel</h3>
-                        <div class="card-price" id="annalesTestPrice">ACCÈS LIMITÉ</div>
-                        <p id="annalesTestDesc">Sujets d'examen réels</p>
-                    </div>
-                    <div class="card-body">
-                        <ul class="features-list">
-                            <li><i class="fas fa-check"></i> <span id="annalesFeature1">20 questions officielles</span></li>
-                            <li><i class="fas fa-check"></i> <span id="annalesFeature2">Correction immédiate</span></li>
-                            <li><i class="fas fa-check"></i> <span id="annalesFeature3">Explications détaillées</span></li>
-                            <li><i class="fas fa-check"></i> <span id="annalesFeature4">Statistiques de réussite</span></li>
-                            <li><i class="fas fa-check"></i> <span id="annalesFeature5">Renouvelé mensuellement</span></li>
-                        </ul>
-                        
-                        <div class="password-info">
-                            <p id="passwordInfoAnnales">
-                                <i class="fas fa-key"></i> <strong>Accès protégé :</strong> 
-                                Mot de passe disponible après inscription (contactez-nous)
-                            </p>
-                        </div>
-                        
-                        <a href="#" class="btn btn-orange protected-link" id="annalesTestBtn" data-page="test-officiel" data-href="test-annales.html" data-needs-auth="true" data-needs-userinfo="false">
-                             <i class="fas fa-play-circle"></i> Commencer le test 
-                        </a>
-                    </div>
-                </div>
+             <!-- NEW: Annales / 真题训练卡片 -->
+<div class="test-card">
+    <div class="card-header" style="background-color: var(--orange);">
+        <h3 id="annalesTestTitle">Test officiel</h3>
+        <div class="card-price" id="annalesTestPrice">ACCÈS LIMITÉ</div>
+        <p id="annalesTestDesc">Sujets d'examen réels</p>
+    </div>
+    <div class="card-body">
+        <ul class="features-list">
+            <li><i class="fas fa-check"></i> <span id="annalesFeature1">20 questions officielles</span></li>
+            <li><i class="fas fa-check"></i> <span id="annalesFeature2">Correction immédiate</span></li>
+            <li><i class="fas fa-check"></i> <span id="annalesFeature3">Explications détaillées</span></li>
+            <li><i class="fas fa-check"></i> <span id="annalesFeature4">Statistiques de réussite</span></li>
+            <li><i class="fas fa-check"></i> <span id="annalesFeature5">Renouvelé mensuellement</span></li>
+        </ul>
+        
+        <div class="password-info">
+            <p id="passwordInfoAnnales">
+                <i class="fas fa-key"></i> <strong>Accès protégé :</strong> 
+                Mot de passe disponible après inscription (contactez-nous)
+            </p>
+        </div>
+        
+        <a href="#" class="btn btn-orange protected-link" id="annalesTestBtn" data-page="test-officiel" data-href="test-annales.html" data-needs-auth="true" data-needs-userinfo="true">
+             <i class="fas fa-play-circle"></i> Commencer le test 
+        </a>
+    </div>
+</div>
                 
                 <!-- Student Test Card -->
                 <div class="test-card">
@@ -3128,32 +3129,34 @@ function initAuthUI() {
             });
         }
 
-        function enableProtectedLinks(user) {
-            document.querySelectorAll('.protected-link').forEach(link => {
-                link.classList.remove('disabled');
-                const page = link.dataset.page;
-                const href = link.dataset.href;
-                const needsUserInfo = link.dataset.needsUserinfo === 'true';
-                
-                // 移除旧的事件监听器（通过替换克隆来避免重复）
-                const newLink = link.cloneNode(true);
-                link.parentNode.replaceChild(newLink, link);
-                
-                newLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    
-                    // 检查是否需要用户信息
-                    if (needsUserInfo) {
-                        const token = generatePageToken(page, user);
-                        window.location.href = href + '?token=' + token + '&type=' + user.type;
-                    } else {
-                        // test officiel 直接进入，不传用户信息
-                        window.location.href = href;
-                    }
-                });
-            });
-        }
-
+  function enableProtectedLinks(user) {
+    document.querySelectorAll('.protected-link').forEach(link => {
+        link.classList.remove('disabled');
+        const page = link.dataset.page;
+        const href = link.dataset.href;
+        const needsUserInfo = link.dataset.needsUserinfo === 'true'; // 关键：读取 data-needs-userinfo 属性
+        
+        // 移除旧的事件监听器
+        const newLink = link.cloneNode(true);
+        link.parentNode.replaceChild(newLink, link);
+        
+        newLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // 检查是否需要用户信息
+            if (needsUserInfo) {
+                // 需要用户信息：生成 token 并传递
+                const token = generatePageToken(page, user);
+                window.location.href = href + '?token=' + token + '&type=' + user.type;
+                console.log("传递token和用户类型:", user.type);
+            } else {
+                // 不需要用户信息：直接进入
+                window.location.href = href;
+                console.log("直接进入，不传递用户信息");
+            }
+        });
+    });
+}
         // ==================== 模态框 ====================
         function openLoginModal() {
             document.getElementById('loginModal').classList.add('show');
