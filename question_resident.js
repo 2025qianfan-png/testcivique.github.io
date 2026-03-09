@@ -324,7 +324,7 @@ const question_resident = [
   },
     // === Mises en situation 情景模块（十年卡）===
   {
-    id: "si0035",
+    id: "si0169",
     type: "carte resident",
     category: "Mises en situation",
     difficulté: "moyen",
@@ -340,7 +340,7 @@ const question_resident = [
     explanation: "❌ A. Madame X peut la refuser directement à cause de son handicap - Faux. Refuser un candidat à cause de son handicap est une discrimination interdite par la loi.\n中：错误。因为残疾而直接拒绝求职者属于违法歧视。\n\n✅ B. Madame X doit lui faire passer l'entretien comme pour un candidat valide - Correct ! Tous les candidats doivent être traités de manière égale.\n中：正确！所有候选人都应被平等对待，包括面试机会。\n\n❌ C. Madame X doit l'embaucher immédiatement - Faux. L'employeur n'est pas obligé d'embaucher, mais doit évaluer les compétences.\n中：错误。雇主没有义务立刻录用，但必须公平评估能力。\n\n❌ D. Madame Y ne devrait pas venir passer l'entretien - Faux. Toute personne a le droit de postuler à un emploi.\n中：错误。任何人都有应聘工作的权利。"
   },
   {
-    id: "si0036",
+    id: "si0170",
     type: "carte resident",
     category: "Mises en situation",
     difficulté: "moyen",
@@ -356,7 +356,7 @@ const question_resident = [
     explanation: "❌ A. Il peut en parler seulement avec sa famille, pas sur Internet - Faux. La liberté d'expression ne se limite pas à la famille.\n中：错误。言论自由不限于家庭内部。\n\n❌ B. Il doit uniquement say du bien du gouvernement - Faux. La liberté d'expression permet de critiquer le gouvernement.\n中：错误。言论自由允许批评政府。\n\n✅ C. Il peut exprimer son opinion tant qu'il respecte la loi - Correct ! La liberté d'expression s'exerce dans le respect des lois et des autres.\n中：正确。言论自由是在遵守法律和尊重他人的前提下表达观点。\n\n❌ D. Il n'a pas le droit de parler de politique - Faux. Les citoyens peuvent discuter de politique librement dans le cadre légal.\n中：错误。公民可以在法律允许范围内自由讨论政治。"
   },
   {
-    id: "si0037",
+    id: "si0171",
     type: "carte resident",
     category: "Mises en situation",
     difficulté: "moyen",
@@ -372,7 +372,7 @@ const question_resident = [
     explanation: "✅ A. C'est interdit - Correct ! La polygamie est strictement interdite en France pour tous, quelle que soit la religion ou la culture. Le mariage doit être monogame.\n中：正确。法国严格禁止一夫多妻制，不论宗教或文化背景如何，婚姻必须是一夫一妻制。\n\n❌ B. C'est possible - Faux. La loi française ne permet pas d'avoir plusieurs épouses simultanément.\n中：错误。法国法律不允许同时有多个妻子。\n\n❌ C. C'est autorisé pour certaines religions - Faux. Aucune religion ne peut légalement autoriser la polygamie en France ; la loi prime toujours sur la religion.\n中：错误。在法国，没有宗教可以合法允许一夫多妻制；法律高于宗教。\n\n❌ D. C'est décidé par le ministre - Faux. Le mariage polygame n'est pas une question de décision administrative, c'est interdit par la loi.\n中：错误。一夫多妻制不是行政决定问题，而是法律禁止的行为。"
   },
   {
-    id: "si0038",
+    id: "si0172",
     type: "carte resident",
     category: "Mises en situation",
     difficulté: "moyen",
@@ -388,7 +388,7 @@ const question_resident = [
     explanation: "❌ A. Légale - Faux. La répudiation unilatérale (mettre fin au mariage sans procédure judiciaire) est interdite en France. Le divorce doit suivre une procédure légale.\n中：错误。在法国，单方面驱逐妻子（无司法程序解除婚姻）是非法的。离婚必须经过法律程序。\n\n✅ B. Interdite - Correct ! On ne peut pas répudier sa femme comme dans certaines traditions anciennes. La loi protège le mariage et les droits de chacun.\n中：正确。在法国，不能像某些古老传统那样随意休妻。法律保护婚姻及每个人的权利。\n\n❌ C. Autorisée seulement pour certaines religions - Faux. La loi française interdit la répudiation quelle que soit la religion.\n中：错误。无论宗教信仰如何，法国法律都禁止驱逐妻子。\n\n❌ D. Facultative - Faux. La répudiation n'est pas une option légale ; seule la procédure de divorce encadrée par la loi est possible.\n中：错误。驱逐妻子不是合法选择，只有通过法律程序的离婚才被允许。"
   },
   {
-    id: "si0039",
+    id: "si0173",
     type: "carte resident",
     category: "Mises en situation",
     difficulté: "moyen",
@@ -404,7 +404,7 @@ const question_resident = [
     explanation: "✅ A. Demander un document administratif - Correct ! Les usagers des services publics, comme dans une mairie, peuvent effectuer des démarches administratives : demander une carte d'identité, un passeport, un acte de naissance, ou tout autre document officiel. Cela relève de leurs droits civiques et de l'accès aux services publics.\n中：正确。公共服务的使用者（如市政厅）可以办理行政事务：申请身份证、护照、出生证明或其他官方文件。这属于公民权利和公共服务的基本保障。\n\n❌ B. Organiser un événement religieux - Faux. Une mairie est un service public laïc ; elle ne peut pas organiser ou promouvoir un événement religieux.\n中：错误。市政厅是世俗公共机构，不能组织或推广宗教活动。\n\n❌ C. Imposer sa religion - Faux. Selon le principe de laïcité, personne ne peut imposer sa religion dans un service public.\n中：错误。根据世俗原则，任何人都不能在公共服务机构中强制推广自己的宗教信仰。\n\n❌ D. Modifier la loi - Faux. Les citoyens ne peuvent pas modifier la loi directement dans une mairie ; cela relève du pouvoir législatif.\n中：错误。公民不能直接在市政厅修改法律，这是立法机关的职权范围。"
   },
   {
-    id: "si0040",
+    id: "si0174",
     type: "carte resident",
     category: "Mises en situation",
     difficulté: "difficile",
@@ -421,7 +421,7 @@ const question_resident = [
   },
 
   {
-    id: "si0041",
+    id: "si0175",
     type: "carte resident",
     category: "Mises en situation",
     difficulté: "difficile",
@@ -437,7 +437,7 @@ const question_resident = [
     explanation: "❌ A. Il a le droit de choisir, car il est possible de discuter librement de sa religion dans un service public - Faux. Dans un service public, la religion des agents ne doit pas influencer le service rendu aux usagers ; choisir un agent en fonction de sa religion serait contraire au principe de neutralité.\n中：错误。在公共服务中，公职人员的宗教信仰不得影响服务；根据宗教选择工作人员违反中立原则。\n\n✅ B. Il n'a pas le droit de choisir, car la religion ne peut pas être prise en compte dans un service public - Correct ! Le principe de neutralité impose que les usagers soient traités de manière égale, indépendamment de leur religion ou de celle de l'agent.\n中：正确。中立原则要求服务对象不受自己或工作人员宗教信仰的影响，每个人都应平等对待。\n\n❌ C. Seuls les agents peuvent le choisir, car eux seuls ont le droit d'exprimer et de discuter de leur religion - Faux. Les agents ne peuvent pas utiliser leur religion pour influencer les choix des usagers.\n中：错误。公职人员不得利用宗教信仰影响服务对象的选择。\n\n❌ D. Les agents ne peuvent pas le choisir, car ils n'ont pas le droit de discuter de religion dans l'exercice de leurs fonctions - Faux. Les agents peuvent avoir des croyances personnelles, mais le principe de neutralité impose qu'ils ne les affichent pas et ne les utilisent pas dans le cadre du service public.\n中：错误。公职人员可以有个人信仰，但中立原则要求他们在工作中不展示或利用宗教信仰。"
   },
   {
-    id: "si0042",
+    id: "si0176",
     type: "carte resident",
     category: "Mises en situation",
     difficulté: "difficile",
@@ -453,7 +453,7 @@ const question_resident = [
     explanation: "❌ A. C'est autorisé - Faux. La liberté de réunion ne peut jamais justifier une activité terroriste.\n中：错误。集会自由不能成为恐怖主义活动的正当理由。\n\n✅ B. C'est interdit - Correct ! Toute activité terroriste est strictement interdite par la loi, quelle que soit la justification invoquée.\n中：正确。任何恐怖主义活动都被法律严格禁止，不论以何种理由进行。\n\n❌ C. C'est toléré si personne n'est blessé - Faux. Une activité terroriste est interdite même en l'absence de victimes.\n中：错误。即使没有人员受伤，恐怖主义活动仍然是非法的。\n\n❌ D. C'est seulement interdit si l'État l'interdit formellement - Faux. La loi interdit le terrorisme de manière générale, sans nécessité d'une interdiction spécifique de l'État.\n中：错误。恐怖主义行为本身即被法律禁止，不需要国家另行特别禁止。"
   },
   {
-    id: "si0043",
+    id: "si0177",
     type: "carte resident",
     category: "Mises en situation",
     difficulté: "difficile",
@@ -469,7 +469,7 @@ const question_resident = [
     explanation: "❌ A. Elle peut organiser librement son événement religieux dans la mairie - Faux. La mairie est un lieu de service public soumis au principe de neutralité.\n中：错误。市政厅属于公共服务场所，必须遵守中立原则。\n\n✅ B. Elle ne peut pas organiser d'événement religieux dans la mairie - Correct ! Les événements religieux ne peuvent pas être organisés dans un lieu de service public.\n中：正确。宗教活动不得在公共服务场所组织举行。\n\n❌ C. Elle peut organiser l'événement uniquement si la mairie appartient à sa religion - Faux. Une mairie n'appartient à aucune religion.\n中：错误。市政厅不属于任何宗教。\n\n❌ D. Elle peut organiser l'événement seulement si elle paie un droit spécial - Faux. Le paiement d'un droit ne permet pas de déroger au principe de neutralité.\n中：错误。缴纳费用不能使公共服务场所偏离中立原则。"
   },
   {
-    id: "si0044",
+    id: "si0178",
     type: "carte resident",
     category: "Mises en situation",
     difficulté: "moyen",
@@ -485,7 +485,7 @@ const question_resident = [
     explanation: "❌ A. Elle peut le faire librement pendant les cours - Faux. Dans un établissement public, les enseignants doivent respecter la neutralité et ne peuvent pas promouvoir une religion.\n中：错误。在公立学校，教师必须保持中立，不能在课堂上宣传宗教。\n\n✅ B. Elle ne peut pas promouvoir sa religion auprès des élèves - Correct ! La neutralité du service public interdit toute promotion religieuse par un enseignant dans un établissement public.\n中：正确。公共服务中立原则禁止教师在公立学校宣传宗教。\n\n❌ C. Elle peut le faire seulement avec l'autorisation des parents - Faux. Même avec l'autorisation des parents, un enseignant ne peut pas promouvoir sa religion dans un établissement public.\n中：错误。即使得到家长同意，教师在公立学校仍不能宣传宗教。\n\n❌ D. Elle peut le faire mais uniquement en dehors de l'établissement - Faux. Même en dehors de l'établissement, un enseignant ne doit pas utiliser sa position professionnelle pour promouvoir une religion auprès des élèves.\n中：错误。教师不能利用其职业身份向学生宣传宗教，即使在校外也不允许。"
   },
   {
-    id: "si0045",
+    id: "si0179",
     type: "carte resident",
     category: "Mises en situation",
     difficulté: "moyen",
@@ -501,7 +501,7 @@ const question_resident = [
     explanation: "✅ A. Oui, librement - Correct ! Hors des heures de cours, un élève peut pratiquer sa religion dans le respect des règles de l'établissement.\n中：正确。在课外时间，学生可以自由进行宗教活动，但需遵守学校规定。\n\n❌ B. Non - Faux. La pratique religieuse en dehors des cours est autorisée.\n中：错误。课外时间的宗教活动是允许的。\n\n❌ C. Seulement si les enseignants le permettent - Faux. Les enseignants ne peuvent pas interdire la pratique religieuse en dehors des cours, sauf si cela viole les règles de l'établissement.\n中：错误。教师不能单方面禁止课外宗教活动，除非违反学校规则。\n\n❌ D. Seulement les jours fériés - Faux. La pratique religieuse n'est pas limitée aux seuls jours fériés.\n中：错误。宗教活动不只限于节假日。"
   },
   {
-    id: "si0046",
+    id: "si0180",
     type: "carte resident",
     category: "Mises en situation",
     difficulté: "moyen",
@@ -517,7 +517,7 @@ const question_resident = [
     explanation: "❌ A. Illégalement - Faux. La critique politique est autorisée dans le cadre de la liberté d'expression.\n中：错误。在报纸上批评政治决定属于言论自由范围，不是违法。\n\n✅ B. Dans le cadre de la liberté d'expression - Correct ! La liberté d'expression permet de critiquer les décisions politiques.\n中：正确。言论自由允许对政治决定进行批评。\n\n❌ C. Contre la Constitution - Faux. La Constitution protège la liberté d'expression.\n中：错误。宪法保障言论自由，因此不违反宪法。\n\n❌ D. Contre la démocratie - Faux. La critique politique fait partie du débat démocratique.\n中：错误。政治批评属于民主讨论的一部分，不反对民主。"
   },
   {
-    id: "si0047",
+    id: "si0181",
     type: "carte resident",
     category: "Mises en situation",
     difficulté: "moyen",
@@ -534,7 +534,7 @@ const question_resident = [
   },
   
  {
-  id: "si0048",
+  id: "si0182",
   type: "carte resident",
   category: "Mises en situation",
   difficulté: "simple",
@@ -566,7 +566,7 @@ FR : L’accord des parents n’est pas requis pour créer une association.\n\
 成立协会不需要家长同意。"
 },
 {
-  id: "si0049",
+  id: "si0183",
   type: "carte resident",
   category: "Mises en situation",
   difficulté: "moyen",
@@ -598,7 +598,7 @@ FR : La raison de l’interdiction n’est pas liée à l’héritage, mais au r
 禁止休妻的原因不是继承问题，而是为了保护夫妻平等与个人权利。"
 },
 {
-  id: "si0050",
+  id: "si0184",
   type: "carte resident",
   category: "Mises en situation",
   difficulté: "moyen",
@@ -630,7 +630,7 @@ FR : L’interdiction s’applique sur tout le territoire français, sans except
 该禁令适用于整个法国，没有任何地区例外。"
 },
 {
-  id: "si0051",
+  id: "si0185",
   type: "carte resident",
   category: "Mises en situation",
   difficulté: "simple",
@@ -662,7 +662,7 @@ FR : La loi sur l’égalité salariale s’applique à tous les secteurs profes
 平等薪酬的法律适用于所有行业，没有行业例外。"
 },
 {
-  id: "si0052",
+  id: "si0186",
   type: "carte resident",
   category: "Mises en situation",
   difficulté: "moyen",
@@ -694,7 +694,7 @@ FR : La loi protège les femmes enceintes contre toute discrimination profession
 法律明确保护孕妇不受职业歧视，怀孕不能作为拒绝录用的理由。"
 },
 {
-  id: "si0053",
+  id: "si0187",
   type: "carte resident",
   category: "Mises en situation",
   difficulté: "moyen",
@@ -727,7 +727,7 @@ FR : La tradition ne peut jamais justifier une atteinte aux droits individuels e
 },
 
 {
-  id: "si0054",
+  id: "si0188",
    type: "carte resident",
   category: "Mises en situation",
     difficulté: "moyen",

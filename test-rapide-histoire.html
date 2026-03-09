@@ -1393,12 +1393,14 @@ h1, h2, h3, h4 {
   </div>
 </footer>
 
-<script src="compte.js"></script>
+
 <script src="question_multia.js"></script>
 <script src="question_resident.js"></script>
+<script src="question_nat.js"></script>
 
 <script>
 // ==================== 全局配置 ====================
+let selectedTestType = 'culture_module'
 // 禁止右键
 document.addEventListener('contextmenu', function (e) {
     e.preventDefault();
@@ -1480,7 +1482,6 @@ function closeAlert() {
 }
 
 // ==================== 培训信息窗口 ====================
-// ==================== 培训信息窗口 ====================
 function showTrainingInfo() {
     const trainingTypeInfo = document.getElementById('trainingTypeInfo');
     const accessDaysInfo = document.getElementById('accessDaysInfo');
@@ -1488,6 +1489,7 @@ function showTrainingInfo() {
     // 根据学生类型显示不同的培训信息
     let trainingHTML = '';
     let difficultyNote = '';
+    let bankInfo = ''; // 新增：题库信息
     
     switch(studentInfo.type) {
         case 'm': // 四年居留
@@ -1498,6 +1500,10 @@ function showTrainingInfo() {
                 <div class="chinese">
                     <strong>适用对象：</strong> 2-4年居留许可申请者
                 </div>
+            `;
+            bankInfo = `
+                <p><strong><i class="fas fa-database"></i> Base de questions :</strong> multi année</p>
+                <p><strong>题库来源：</strong> 多年期居留题库</p>
             `;
             difficultyNote = '<p><strong>Note :</strong> Questions sur les connaissances de base de l\'histoire, géographie et culture française.</p>';
             break;
@@ -1511,6 +1517,10 @@ function showTrainingInfo() {
                     <strong>适用对象：</strong> 法国入籍申请者
                 </div>
             `;
+            bankInfo = `
+                <p><strong><i class="fas fa-database"></i> Base de questions :</strong> Nationalité</p>
+                <p><strong>题库来源：</strong> 入籍题库</p>
+            `;
             difficultyNote = '<p><strong>Note :</strong> Questions approfondies sur l\'histoire, la géographie et le patrimoine culturel français.</p>';
             break;
             
@@ -1522,6 +1532,10 @@ function showTrainingInfo() {
                 <div class="chinese">
                     <strong>适用对象：</strong> 10年居留卡申请者
                 </div>
+            `;
+            bankInfo = `
+                <p><strong><i class="fas fa-database"></i> Base de questions :</strong>Résident</p>
+                <p><strong>题库来源：</strong> 10年居留卡题库</p>
             `;
             difficultyNote = '<p><strong>Note :</strong> Questions sur la compréhension de l\'histoire et de la culture française.</p>';
             break;
@@ -1535,10 +1549,16 @@ function showTrainingInfo() {
                     <strong>适用对象：</strong> 所有申请者（完全访问权限）
                 </div>
             `;
+            bankInfo = `
+                <p><strong><i class="fas fa-database"></i> Base de questions :</strong> Toutes les bases </p>
+                <p><strong>题库来源：</strong> 所有题库</p>
+            `;
             difficultyNote = '<p><strong>Note :</strong> Vous avez accès à toutes les questions sur l\'histoire, la géographie et la culture française.</p>';
             break;
     }
     
+    // 将题库信息添加到显示内容中
+    trainingHTML += bankInfo;
     trainingHTML += difficultyNote;
     
     // 添加测试具体信息
@@ -1586,6 +1606,7 @@ function showTrainingInfo() {
     // 显示培训信息窗口
     document.getElementById('trainingInfoModal').style.display = 'flex';
 }
+
 function closeTrainingInfo() {
     document.getElementById('trainingInfoModal').style.display = 'none';
     startTest();
@@ -1607,13 +1628,37 @@ function startTest() {
                 // 四年居留：只用 question_multia
                 allQuestions = [...question_multi];
                 console.log("四年居留题库：使用 question_multia，总数:", allQuestions.length);
-            } else {
-                // 十年居留和入籍：用 question_multia + question_resident
+            } else if (studentInfo.type === 'r') {
+                // 十年居留：使用 question_multia + question_resident
+                allQuestions = [...question_multi];
+                if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+                    allQuestions = allQuestions.concat(question_resident);
+                    console.log("十年居留题库：使用 question_multia + question_resident，总数:", allQuestions.length);
+                } else {
+                    console.warn("question_resident.js 未找到，仅使用 question_multia");
+                }
+            } else if (studentInfo.type === 'n') {
+                // 法国入籍：使用 question_multia + question_resident + question_nat
                 allQuestions = [...question_multi];
                 if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
                     allQuestions = allQuestions.concat(question_resident);
                 }
-                console.log("十年居留/入籍题库：使用 question_multia + question_resident，总数:", allQuestions.length);
+                if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
+                    allQuestions = allQuestions.concat(question_nat);
+                    console.log("法国入籍题库：使用 question_multia + question_resident + question_nat，总数:", allQuestions.length);
+                } else {
+                    console.warn("question_nat.js 未找到，仅使用 question_multia + question_resident");
+                }
+            } else {
+                // 完全访问：使用所有题库
+                allQuestions = [...question_multi];
+                if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+                    allQuestions = allQuestions.concat(question_resident);
+                }
+                if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
+                    allQuestions = allQuestions.concat(question_nat);
+                }
+                console.log("完全访问题库：使用所有题库，总数:", allQuestions.length);
             }
             
             if (allQuestions.length === 0) {
@@ -1628,12 +1673,13 @@ function startTest() {
             document.getElementById('testContainer').classList.add('show');
             document.querySelector('.test-footer').style.display = 'block';
             
-              document.getElementById('testTitle').textContent = "Histoire et Culture";
-    document.getElementById('testSubtitle').textContent = "Histoire, géographie et patrimoine français";
-    document.getElementById('testTypeInfo').textContent = "Test Histoire et Culture";
-    document.getElementById('footerTestInfo').textContent = 
-        "Histoire, géographie et culture française - 20 questions";
-                        initializeTest();
+            document.getElementById('testTitle').textContent = "Histoire et Culture";
+            document.getElementById('testSubtitle').textContent = "Histoire, géographie et patrimoine français";
+            document.getElementById('testTypeInfo').textContent = "Test Histoire et Culture";
+            document.getElementById('footerTestInfo').textContent = 
+                "Histoire, géographie et culture française - 20 questions";
+            
+            initializeTest();
             
         } catch (error) {
             console.error("初始化测试失败:", error);
@@ -1641,7 +1687,6 @@ function startTest() {
         }
     }, 1500);
 }
-
 // ==================== 根据主题分布选择题目 ====================
 function selectQuestionsByTheme() {
     console.log("开始按主题分布选择题目...");
@@ -2236,6 +2281,40 @@ function restartTest() {
 }
 
 function proceedWithRestart() {
+    // 重新根据学生类型加载题库
+    if (studentInfo.type === 'm') {
+        // 四年居留：只用 question_multia
+        allQuestions = [...question_multi];
+        console.log("重新加载四年居留题库：", allQuestions.length);
+    } else if (studentInfo.type === 'r') {
+        // 十年居留：使用 question_multia + question_resident
+        allQuestions = [...question_multi];
+        if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+            allQuestions = allQuestions.concat(question_resident);
+            console.log("重新加载十年居留题库：", allQuestions.length);
+        }
+    } else if (studentInfo.type === 'n') {
+        // 法国入籍：使用 question_multia + question_resident + question_nat
+        allQuestions = [...question_multi];
+        if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+            allQuestions = allQuestions.concat(question_resident);
+        }
+        if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
+            allQuestions = allQuestions.concat(question_nat);
+            console.log("重新加载法国入籍题库：", allQuestions.length);
+        }
+    } else {
+        // 完全访问：使用所有题库
+        allQuestions = [...question_multi];
+        if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+            allQuestions = allQuestions.concat(question_resident);
+        }
+        if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
+            allQuestions = allQuestions.concat(question_nat);
+        }
+        console.log("重新加载完全访问题库：", allQuestions.length);
+    }
+    
     // 完全重新初始化
     currentQuestionIndex = 0;
     answeredQuestions.clear();
@@ -2256,7 +2335,6 @@ function proceedWithRestart() {
     
     window.scrollTo(0, 0);
 }
-
 function showInstructions() {
     showAlert("Instructions du test",
         "TEST DES VALEURS RÉPUBLICAINES ET LAÏCITÉ\n\n" +

@@ -3,8 +3,10 @@
 <head>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
+  <!-- 题库文件 (假设存在) -->
   <script src="question_multia.js"></script>
   <script src="question_resident.js"></script>
+  <script src="question_nat.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=0.8">
   <title>Test Étudiant Civique - Association Mille Voiles</title>
@@ -3440,7 +3442,8 @@ function startTestIfAllowed(type) {
     // 立即开始测试，不显示加载状态
     startTest(type);
 }
-// ==================== 开始测试 ====================
+
+
 // ==================== 开始测试 ====================
 function startTest(type) {
     selectedTestType = type;
@@ -3463,21 +3466,48 @@ function startTest(type) {
             // 1. 更新学生信息
             studentInfo.testType = selectedTestType;
             
-            // 2. 检查题库
+            // 2. 检查题库是否已加载
             if (typeof question_multi === 'undefined' || question_multi.length === 0) {
                 throw new Error("题库 'question_multia.js' 未正确加载或为空");
             }
             
-            // 3. 加载题库
-            if (testTypes[selectedTestType].source === "both") {
-                allQuestions = [...question_multi];
+            // 3. 根据测试类型加载题库
+            allQuestions = [...question_multi]; // 先加载基础题库
+            
+            if (selectedTestType === 'multi_year') {
+                // 四年居留：只用 question_multi
+                console.log("四年居留题库：使用 question_multi，总数:", allQuestions.length);
+            }
+            else if (selectedTestType === 'ten_year') {
+                // 十年居留：使用 question_multi + question_resident
                 if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
                     allQuestions = allQuestions.concat(question_resident);
-                    console.log("使用两个题库，总数:", allQuestions.length);
+                    console.log("十年居留题库：使用 question_multi + question_resident，总数:", allQuestions.length);
+                } else {
+                    console.warn("question_resident.js 未找到，仅使用 question_multi");
                 }
-            } else {
-                allQuestions = [...question_multi];
-                console.log("使用question_multi题库，总数:", allQuestions.length);
+            }
+            else if (selectedTestType === 'nationality') {
+                // 法国入籍：使用 question_multi + question_resident + question_nat
+                if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+                    allQuestions = allQuestions.concat(question_resident);
+                }
+                if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
+                    allQuestions = allQuestions.concat(question_nat);
+                    console.log("法国入籍题库：使用 question_multi + question_resident + question_nat，总数:", allQuestions.length);
+                } else {
+                    console.warn("question_nat.js 未找到，仅使用 question_multi + question_resident");
+                }
+            }
+            else {
+                // 完全访问：使用所有三个题库
+                if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+                    allQuestions = allQuestions.concat(question_resident);
+                }
+                if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
+                    allQuestions = allQuestions.concat(question_nat);
+                }
+                console.log("完全访问题库：使用所有题库，总数:", allQuestions.length);
             }
             
             if (allQuestions.length === 0) {
@@ -4384,20 +4414,42 @@ function reloadQuestionBank() {
     // 根据测试类型重新加载题库
     if (testTypes[selectedTestType].source === "both") {
         allQuestions = [...question_multi];
-        if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
-            allQuestions = allQuestions.concat(question_resident);
-            console.log("加载两个题库，总数:", allQuestions.length);
-        } else {
-            console.log("仅加载question_multi题库，总数:", allQuestions.length);
+        
+        // 十年居留：加 resident
+        if (selectedTestType === 'ten_year') {
+            if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+                allQuestions = allQuestions.concat(question_resident);
+                console.log("重新加载十年居留题库：总数:", allQuestions.length);
+            }
+        }
+        // 法国入籍：加 resident + nat
+        else if (selectedTestType === 'nationality') {
+            if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+                allQuestions = allQuestions.concat(question_resident);
+            }
+            if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
+                allQuestions = allQuestions.concat(question_nat);
+                console.log("重新加载法国入籍题库：总数:", allQuestions.length);
+            }
+        }
+        // 完全访问：加所有
+        else {
+            if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+                allQuestions = allQuestions.concat(question_resident);
+            }
+            if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
+                allQuestions = allQuestions.concat(question_nat);
+            }
+            console.log("重新加载完全访问题库：总数:", allQuestions.length);
         }
     } else {
+        // 四年居留：只用 multi
         allQuestions = [...question_multi];
-        console.log("加载question_multi题库，总数:", allQuestions.length);
+        console.log("重新加载四年居留题库：总数:", allQuestions.length);
     }
     
     return allQuestions.length > 0;
 }
-
 // ==================== 重新选择题目 ====================
 function reselectQuestions() {
     console.log("重新选择题目...");

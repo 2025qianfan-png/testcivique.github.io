@@ -2459,32 +2459,22 @@ FR : Faux Les bâtiments scolaires ne sont pas obligatoirement des lieux officie
 ❌ D. Élire - Faux. Le gouvernement n'élit pas les représentants.
 中：错误。政府不选举代表。`
   },
-  {
-    id: "in0032",
-    type: "carte multi",
-    category: "Institutions",
-    difficulté: "simple",
-    typeQuestion: "question simulée",
-    question: "Nombre de régions en France ?",
-    options: [
-      "12",
-      "13", 
-      "15",
-      "18"
-    ],
-    answer: 1,
-    explanation: `❌ A. 12 - Faux. Ce n'est pas le bon chiffre.
-中：错误。不是正确数字。
-
-❌ B. 13 - Faux. La France métropolitaine compte 13 régions.
-中：正确。法国本土共有13个大区。
-
-❌ C. 15 - Faux. Ce n'est pas le bon chiffre.
-中：错误。不是正确数字。
-
-✅ D. 18 - Correct. 18 inclut les régions d’outre-mer.
-中：正确。18包括海外大区。`
-  },
+ {
+  id: "in0032",
+  type: "carte multi",
+  category: "Institutions",
+  difficulté: "simple",
+  typeQuestion: "question simulée",
+ question: "Nombre de régions en France ?",
+  options: [
+    "12",
+    "13",
+    "15",
+    "18"
+  ],
+  "answer": 3,
+  "explanation": "❌ A. 12\nFR : Faux. La France ne compte pas 12 régions.\n中：错误。法国不是12个大区。\n\n❌ B. 13\nFR : Faux. 13 correspond aux régions de la France métropolitaine uniquement, mais la France compte également les régions d’outre-mer.\n中：错误。13指的是法国本土大区，但法国还包括海外大区。\n\n❌ C. 15\nFR : Faux. Ce nombre ne correspond pas à l’organisation administrative actuelle.\n中：错误。这个数字不符合当前法国的行政区划。\n\n✅ D. 18\nFR : Correct. La France compte 18 régions au total : 13 en métropole et 5 en outre-mer.\n中：正确。法国总共有18个大区：13个本土大区和5个海外大区。"
+},
   {
     id: "in0033",
     type: "carte multi",
@@ -3399,32 +3389,22 @@ FR : Faux Les bâtiments scolaires ne sont pas obligatoirement des lieux officie
 ❌ D. 14 juillet - Faux. Le 14 juillet est la fête nationale française.
 中：错误。7月14日是法国国庆日。`
   },
-  {
-    id: "ue0006",
-    type: "carte multi",
-    category: "UnionEuropéenne",
-    difficulté: "simple",
-    typeQuestion: "examen original",
-    question: "Depuis quand l'euro est monnaie unique ?",
-    options: [
-      "1999",
-      "2000",
-      "2002",
-      "2005"
-    ],
-    answer: 0, // A
-    explanation: `✅ A. 1999 - Correct ! L'euro est monnaie unique depuis 1999, même si les billets et pièces sont entrés en circulation en 2002.
-中：正确。欧元自1999年成为统一货币，2002年开始流通。
-
-❌ B. 2000 - Faux. 2000 n'est pas une date clé pour l'euro.
-中：错误。2000年不是欧元关键年份。
-
-❌ C. 2002 - Faux. 2002 marque l'entrée en circulation des billets et pièces, pas la création de la monnaie unique.
-中：错误。2002年是欧元流通年，但不是统一货币开始年份。
-
-❌ D. 2005 - Faux. 2005 est trop tard.
-中：错误。2005年不是欧元开始年份。`
-  },
+{
+id: "ue0006",
+type: "carte multi",
+ category: "UnionEuropéenne",
+  difficulté: "simple",
+  typeQuestion: "examen original",
+ question: "Depuis quand l'euro est monnaie unique ?",
+  options: [
+    "1999",
+    "2000",
+    "2002",
+    "2005"
+  ],
+  "answer": 2,
+  "explanation": "❌ A. 1999\nFR : Faux. En 1999, l’euro était uniquement utilisé pour les transactions électroniques et bancaires, pas en billets et pièces.\n中：错误。1999年欧元只用于电子和银行交易，还没有纸币和硬币流通。\n\n❌ B. 2000\nFR : Faux. L’euro n’a pas été introduit en espèces cette année-là.\n中：错误。2000年欧元还未作为现金使用。\n\n✅ C. 2002\nFR : Correct. L’euro est devenu monnaie unique physique avec l’introduction des billets et pièces en janvier 2002.\n中：正确。欧元自2002年1月开始以纸币和硬币形式成为统一货币。\n\n❌ D. 2005\nFR : Faux. Cette date ne correspond à aucun événement lié à l’introduction de l’euro.\n中：错误。2005年与欧元的引入无关。"
+},
   {
     id: "ue0007",
     type: "carte multi",
@@ -10931,6 +10911,607 @@ FR : Faux Les bâtiments scolaires ne sont pas obligatoirement des lieux officie
     explanation: "❌ A. Légal - Faux. Sans consentement clair, c'est une violence sexuelle possible.\n中：错误。没有明确同意可能构成性暴力。\n\n✅ B. Une violence sexuelle possible - Correct ! Une personne inconsciente ou fortement alcoolisée ne peut pas consentir.\n中：正确。醉酒无法同意，可能构成性侵。\n\n❌ C. Un consentement implicite - Faux. L'alcool empêche le consentement.\n中：错误。不能视为默认同意。\n\n❌ D. Une obligation - Faux. Ce n'est pas une obligation.\n中：错误。不是义务。"
   },
 
+{
+id: "si0119",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "simple",
+typeQuestion: "examen original",
+question: "Un couple veut marier sa fille de 13 ans avec son consentement. Que dit la loi française ?",
+options: [
+"C’est possible, car elle est d’accord",
+"Ce n’est pas possible, car elle est mineure",
+"C’est possible avec accord spécial du maire",
+"Elle peut se marier si ses parents signent"
+],
+answer: 1,
+explanation: `❌ A. C’est possible, car elle est d’accord
+FR : Faux. Le mariage d’un mineur est interdit en France, même avec son consentement.
+中：错误。即使孩子同意，未成年人结婚在法国是非法的。
+
+✅ B. Ce n’est pas possible, car elle est mineure
+FR : Correct. L’âge légal pour se marier en France est 18 ans.
+中：正确。法国法定结婚年龄为18岁。
+
+❌ C. C’est possible avec accord spécial du maire
+FR : Faux. Le maire ne peut pas autoriser un mariage de mineur sans respecter la loi.
+中：错误。市长不能违反法律批准未成年人结婚。
+
+❌ D. Elle peut se marier si ses parents signent
+FR : Faux. Le mariage des mineurs est interdit même avec le consentement parental.
+中：错误。即使父母同意，未成年人结婚仍然违法。`
+},
+{
+id: "si0120",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "moyen",
+typeQuestion: "examen original",
+question: "Dans quel cas un journaliste peut-il être puni pour un reportage ?",
+options: [
+"Décrire une enquête d’entreprise",
+"Dire qu’un voisin ne paie pas ses impôts sans preuve",
+"Se moquer du président",
+"Faire des commentaires politiques en général"
+],
+answer: 1,
+explanation: `❌ A. Décrire une enquête d’entreprise
+FR : Faux. Les enquêtes journalistiques objectives sont légales.
+中：错误。客观报道企业调查是合法的。
+
+✅ B. Dire qu’un voisin ne paie pas ses impôts sans preuve
+FR : Correct. Publier des accusations non fondées constitue une diffamation et peut entraîner des sanctions.
+中：正确。无证据指控邻居逃税属于诽谤，可依法处罚。
+
+❌ C. Se moquer du président
+FR : Faux. La satire politique est protégée par la liberté d’expression en France.
+中：错误。讽刺总统属于受保护的政治言论。
+
+❌ D. Faire des commentaires politiques en général
+FR : Faux. Les opinions politiques exprimées légalement ne sont pas punissables.
+中：错误。合法表达政治观点不受处罚。`
+},
+{
+id: "si0121",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "moyen",
+typeQuestion: "examen original",
+question: "Une personne filme quelqu’un et publie la vidéo sur Internet.",
+options: [
+"Ce n’est pas permis sans le consentement de la personne filmée",
+"Il faut l’accord de la police",
+"Il ne peut filmer que des célébrités",
+"Il peut le faire si c’est pour un usage privé"
+],
+answer: 0,
+explanation: `✅ A. Ce n’est pas permis sans le consentement de la personne filmée
+FR : Correct. Publier l’image de quelqu’un sans autorisation viole le droit à l’image.
+中：正确。未经他人同意拍摄并发布视频侵犯肖像权。
+
+❌ B. Il faut l’accord de la police
+FR : Faux. La police ne délivre pas d’autorisation pour publier une vidéo privée.
+中：错误。警方不需要批准私人视频发布。
+
+❌ C. Il ne peut filmer que des célébrités
+FR : Faux. Même les célébrités ont des droits à l’image.
+中：错误。名人也享有肖像权。
+
+❌ D. Il peut le faire si c’est pour un usage privé
+FR : Faux. Même pour un usage privé sur Internet, la publication publique est interdite sans consentement.
+中：错误。即便是私人使用，上传到网络公开传播也需征得同意。`
+},
+{
+id: "si0122",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "moyen",
+typeQuestion: "examen original",
+question: "Une personne se rend à une administration et on lui demande d’enlever son couvre-chef religieux pour vérification d’identité, elle refuse.",
+options: [
+"Ce n’est pas permis de changer la procédure publique à cause de la religion",
+"C’est possible, c’est sa liberté de croyance",
+"Il doit enlever son couvre-chef en toutes circonstances",
+"Il peut refuser et annuler le service"
+],
+answer: 0,
+explanation: `✅ A. Ce n’est pas permis de changer la procédure publique à cause de la religion
+FR : Correct. La procédure administrative doit rester neutre, mais la liberté religieuse de l’usager est protégée.
+中：正确。行政程序不能因宗教改变，但服务对象的宗教自由受到保护。
+
+❌ B. C’est possible, c’est sa liberté de croyance
+FR : Faux. La liberté religieuse ne permet pas de modifier la procédure administrative unilatéralement.
+中：错误。宗教自由不允许单方面改变行政程序。
+
+❌ C. Il doit enlever son couvre-chef en toutes circonstances
+FR : Faux. La neutralité s’applique surtout aux agents, pas aux usagers.
+中：错误。中立原则主要约束工作人员，而非服务对象。
+
+❌ D. Il peut refuser et annuler le service
+FR : Faux. Refuser le service pour cause religieuse est illégal.
+中：错误。因宗教原因拒绝服务是违法的。`
+},
+{
+id: "si0123",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "moyen",
+typeQuestion: "examen original",
+question: "Une personne porte une croix visible lors d’une démarche administrative.",
+options: [
+"Le personnel peut lui demander de l’enlever",
+"La police doit intervenir",
+"Comme usager, il peut ne pas l’enlever, c’est sa liberté",
+"Il peut le porter seulement avec accord d’un responsable religieux"
+],
+answer: 2,
+explanation: `❌ A. Le personnel peut lui demander de l’enlever
+FR : Faux. La neutralité s’applique surtout aux agents, pas aux usagers.
+中：错误。中立原则约束工作人员，不约束服务对象。
+
+❌ B. La police doit intervenir
+FR : Faux. Il n’y a pas d’intervention nécessaire pour un usager portant un signe religieux.
+中：错误。佩戴宗教标志的服务对象不需要警方介入。
+
+✅ C. Comme usager, il peut ne pas l’enlever, c’est sa liberté
+FR : Correct. Les usagers peuvent porter des signes religieux lors des démarches administratives.
+中：正确。服务对象可以佩戴宗教标志，这是个人自由。
+
+❌ D. Il peut le porter seulement avec accord d’un responsable religieux
+FR : Faux. Aucun accord n’est nécessaire pour les usagers.
+中：错误。服务对象不需要宗教负责人批准。`
+},
+
+{
+id: "si0124",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "simple",
+typeQuestion: "examen original",
+question: "Un restaurant affiche « Interdit de porter des signes religieux ».",
+options: [
+"Le patron peut l’exiger",
+"Le patron ne peut pas le faire, c’est une discrimination",
+"Le patron ne peut pas l’exiger mais peut refuser le service",
+"Le patron peut le faire s’il ferme le restaurant"
+],
+answer: 1,
+explanation: `❌ A. Le patron peut l’exiger
+FR : Faux. Refuser un client pour motif religieux est illégal.
+中：错误。基于宗教理由拒绝顾客违法。
+
+✅ B. Le patron ne peut pas le faire, c’est une discrimination
+FR : Correct. La loi interdit la discrimination envers les clients.
+中：正确。法律禁止对顾客的宗教歧视。
+
+❌ C. Le patron ne peut pas l’exiger mais peut refuser le service
+FR : Faux. Refuser un service pour ce motif est également interdit.
+中：错误。基于宗教标志拒绝服务也是违法的。
+
+❌ D. Le patron peut le faire s’il ferme le restaurant
+FR : Faux. La fermeture ne légalise pas la discrimination.
+中：错误。关店也不能使歧视合法。`
+},
+{
+id: "si0125",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "moyen",
+typeQuestion: "examen original",
+question: "Vous avez rendez-vous avec un agent immobilier pour visiter un logement. Après avoir soumis votre dossier, l’agent refuse votre candidature. Quel motif est légal ?",
+options: [
+"Votre couleur de peau ou nationalité",
+"Votre capacité financière ou solvabilité",
+"Votre orientation sexuelle",
+"Votre religion"
+],
+answer: 1,
+explanation: `❌ A. Votre couleur de peau ou nationalité
+FR : Faux. La discrimination raciale est interdite par la loi française.
+中：错误。基于种族或国籍拒绝是违法的。
+
+✅ B. Votre capacité financière ou solvabilité
+FR : Correct. L’agent peut refuser un dossier pour motif financier (loyer non assuré, garanties insuffisantes).
+中：正确。中介可以因经济能力或担保不足拒绝租赁申请，这是合法理由。
+
+❌ C. Votre orientation sexuelle
+FR : Faux. La discrimination fondée sur l’orientation sexuelle est interdite.
+中：错误。基于性取向拒绝是违法的。
+
+❌ D. Votre religion
+FR : Faux. La religion ne peut pas être un motif de refus légal.
+中：错误。宗教信仰不能作为拒绝的合法理由。`
+},
+{
+id: "si0126",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "simple",
+typeQuestion: "examen original",
+question: "Monsieur X remplace la batterie de sa voiture. Où doit-il jeter l’ancienne batterie ?",
+options: [
+"Dans la poubelle normale",
+"Chez un commerçant ou centre de recyclage spécialisé",
+"Sur la voie publique",
+"Dans le jardin"
+],
+answer: 1,
+explanation: `❌ A. Dans la poubelle normale
+FR : Faux. Les batteries contiennent des substances toxiques et ne peuvent pas être jetées dans les ordures ménagères.
+中：错误。电瓶含有有毒物质，不能丢进普通垃圾桶。
+
+✅ B. Chez un commerçant ou centre de recyclage spécialisé
+FR : Correct. Les batteries doivent être rapportées à un point de collecte ou centre de recyclage.
+中：正确。电瓶必须送到回收点或专门回收中心处理。
+
+❌ C. Sur la voie publique
+FR : Faux. Déposer une batterie sur la voie publique est interdit et dangereux.
+中：错误。将电瓶丢在公共道路上是违法且危险的。
+
+❌ D. Dans le jardin
+FR : Faux. Enterrer une batterie pollue l’environnement et est interdit.
+中：错误。埋入土壤会污染环境，是违法的。`
+},
+{
+id: "si0127",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "difficile",
+typeQuestion: "examen original",
+question: "Madame X demande à Madame Y de se prostituer. Madame Y a-t-elle le droit de refuser ? Pourquoi ?",
+options: [
+"Non, elle doit accepter",
+"Oui, elle a le droit de refuser",
+"Elle doit accepter si elle reçoit de l’argent",
+"Elle peut accepter seulement si elle signe un contrat"
+],
+answer: 1,
+explanation: `❌ A. Non, elle doit accepter
+FR : Faux. La prostitution forcée est illégale et constitue une atteinte à la liberté individuelle.
+中：错误。强迫卖淫是违法的，侵犯个人自由。
+
+✅ B. Oui, elle a le droit de refuser
+FR : Correct. La loi protège la liberté et l’intégrité corporelle de chacun.
+中：正确。法律保护每个人的自由和身体完整权，拒绝是合法的。
+
+❌ C. Elle doit accepter si elle reçoit de l’argent
+FR : Faux. L’argent ne justifie pas la contrainte ou l’atteinte à la liberté.
+中：错误。有报酬也不能强迫卖淫。
+
+❌ D. Elle peut accepter seulement si elle signe un contrat
+FR : Faux. La prostitution forcée reste interdite, contrat ou non.
+中：错误。强迫卖淫始终违法，签合同也不能合法化。`
+},
+{
+id: "si0128",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "moyen",
+typeQuestion: "examen original",
+question: "Le frère de Madame Y exige qu’elle participe à un événement familial religieux. Peut-elle refuser ? Pourquoi ?",
+options: [
+"Non, elle doit suivre la famille",
+"Oui, elle peut refuser",
+"Elle doit demander l’autorisation du gouvernement",
+"Elle peut être punie par la famille"
+],
+answer: 1,
+explanation: `❌ A. Non, elle doit suivre la famille
+FR : Faux. La liberté de religion et de conscience interdit toute obligation.
+中：错误。宗教自由和良心自由禁止强制参加宗教活动。
+
+✅ B. Oui, elle peut refuser
+FR : Correct. Chaque personne a la liberté de croire ou de ne pas croire, et de ne pas participer à des rites religieux.
+中：正确。每个人有信仰自由，可以拒绝参加宗教活动。
+
+❌ C. Elle doit demander l’autorisation du gouvernement
+FR : Faux. Le gouvernement n’a pas compétence sur la participation à des événements familiaux.
+中：错误。政府无权干涉家庭宗教活动的参与。
+
+❌ D. Elle peut être punie par la famille
+FR : Faux. La loi protège sa liberté, aucune sanction familiale n’a de valeur légale.
+中：错误。法律保护其自由，家庭处罚不具法律效力。`
+},
+{
+id: "si0129",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "moyen",
+typeQuestion: "examen original",
+question: "Concernant les démarches médicales en France, laquelle est correcte ?",
+options: [
+"On peut consulter un cardiologue sans passer par son médecin traitant",
+"Il faut une ordonnance pour faire une radiologie",
+"On peut se rendre au labo sans ordonnance pour faire une prise de sang",
+"On peut choisir librement tous les examens sans ordonnance"
+],
+answer: 0,
+explanation: `✅ A. On peut consulter un cardiologue sans passer par son médecin traitant
+FR : Correct. Certains spécialistes peuvent être consultés directement selon le parcours de soins.
+中：正确。根据医疗程序，某些专科医生可以直接就诊，无需家庭医生转诊。
+
+❌ B. Il faut une ordonnance pour faire une radiologie
+FR : Correct. Une radiologie nécessite toujours une prescription médicale.
+中：正确。拍X光或放射检查必须有医生处方。
+
+❌ C. On peut se rendre au labo sans ordonnance pour faire une prise de sang
+FR : Faux. Certaines prises de sang nécessitent une ordonnance selon le test demandé.
+中：错误。部分血液检查需要医生处方。
+
+❌ D. On peut choisir librement tous les examens sans ordonnance
+FR : Faux. La loi encadre la réalisation des examens médicaux pour protéger la santé et éviter les abus.
+中：错误。法律规定部分检查必须有处方，以保护健康和防止滥用。`
+},
+{
+id: "si0130",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "moyen",
+typeQuestion: "examen original",
+question: "Un employé veut participer à une activité religieuse pendant les heures de travail. Que doit-il faire et que peut décider l’entreprise ?",
+options: [
+"Il peut partir sans prévenir",
+"Il doit demander un congé ou une autorisation spéciale",
+"Il doit prier discrètement à son poste",
+"Il n’a pas le droit de participer à une activité religieuse"
+],
+answer: 1,
+explanation: `❌ A. Il peut partir sans prévenir
+FR : Faux. L’employé doit suivre les règles internes de l’entreprise et le droit du travail.
+中：错误。员工不能擅自离岗，需要遵守公司规定和劳动法。
+
+✅ B. Il doit demander un congé ou une autorisation spéciale
+FR : Correct. L’employé doit demander un congé ou une autorisation et l’employeur peut l’accepter ou non selon les règles de l’entreprise.
+中：正确。员工需请假或申请授权，公司可根据内部规定批准。
+
+❌ C. Il doit prier discrètement à son poste
+FR : Faux. Les activités religieuses sur le lieu de travail doivent respecter la neutralité et le règlement intérieur.
+中：错误。工作场所的宗教活动必须遵守中立原则和公司规定。
+
+❌ D. Il n’a pas le droit de participer à une activité religieuse
+FR : Faux. Le droit au repos ou congé pour raison religieuse est protégé dans certaines limites.
+中：错误。在一定范围内，员工有休假或请假参加宗教活动的权利。`
+},
+{
+id: "si0131",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "moyen",
+typeQuestion: "examen original",
+question: "Une presse écrit un article critiquant la politique du gouvernement. Est-ce légal ?",
+options: [
+"Non, la critique politique est interdite",
+"Oui, mais la publication est interdite",
+"Oui, c’est légal et le journal peut être vendu",
+"Non, sauf si l’autorité gouvernementale l’approuve"
+],
+answer: 2,
+explanation: `❌ A. Non, la critique politique est interdite
+FR : Faux. La liberté de la presse protège la critique politique, tant qu’elle n’est pas diffamatoire.
+中：错误。只要不构成诽谤，政治批评受新闻自由保护。
+
+❌ B. Oui, mais la publication est interdite
+FR : Faux. Les journaux peuvent publier des articles critiques légalement.
+中：错误。报纸可以合法地发表批评文章。
+
+✅ C. Oui, c’est légal et le journal peut être vendu
+FR : Correct. La liberté de presse permet de publier et vendre ces articles.
+中：正确。新闻自由允许出版并售卖批评性文章。
+
+❌ D. Non, sauf si l’autorité gouvernementale l’approuve
+FR : Faux. Le gouvernement ne peut pas censurer la presse de manière préventive.
+中：错误。政府不能事先审查报纸内容。`
+},
+{
+id: "si0132",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "moyen",
+typeQuestion: "examen original",
+question: "Vous découvrez que votre voisin frappe son enfant. Que devez-vous faire ?",
+options: [
+"Ignorer la situation",
+"Intervenir physiquement pour punir le voisin",
+"Signaler la situation aux services compétents (police ou protection de l’enfance)",
+"Critiquer le voisin devant ses enfants"
+],
+answer: 2,
+explanation: `❌ A. Ignorer la situation
+FR : Faux. L’enfant est en danger, il faut agir.
+中：错误。孩子处于危险中，不能忽视。
+
+❌ B. Intervenir physiquement pour punir le voisin
+FR : Faux. Cela est dangereux et illégal.
+中：错误。直接动手干预是危险且违法的。
+
+✅ C. Signaler la situation aux services compétents (police ou protection de l’enfance)
+FR : Correct. La loi protège les enfants et oblige à signaler les mauvais traitements.
+中：正确。法律要求报告虐待儿童行为以保护儿童。
+
+❌ D. Critiquer le voisin devant les enfants
+FR : Faux. Cela ne protège pas l’enfant et peut aggraver la situation.
+中：错误。公开指责邻居不会保护孩子，可能加剧问题。`
+},
+{
+id: "si0133",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "moyen",
+typeQuestion: "examen original",
+question: "Deux collégiens discutent de religion dans leur cours. Est-ce permis ?",
+options: [
+"Non, toute discussion religieuse est interdite à l’école",
+"Oui, tant que c’est dans le cadre pédagogique",
+"Non, sauf avec autorisation parentale",
+"Oui, mais uniquement en dehors de l’école"
+],
+answer: 1,
+explanation: `❌ A. Non, toute discussion religieuse est interdite à l’école
+FR : Faux. L’école doit respecter la liberté d’expression encadrée et la laïcité.
+中：错误。学校必须尊重受控的言论自由和世俗原则。
+
+✅ B. Oui, tant que c’est dans le cadre pédagogique
+FR : Correct. Les discussions religieuses sont autorisées dans le cadre éducatif et respectueux.
+中：正确。在教育课堂上、遵守规则的宗教讨论是允许的。
+
+❌ C. Non, sauf avec autorisation parentale
+FR : Faux. Les discussions encadrées ne nécessitent pas toujours l’autorisation des parents.
+中：错误。课堂讨论在受控范围内通常不需要家长同意。
+
+❌ D. Oui, mais uniquement en dehors de l’école
+FR : Faux. L’école peut organiser des discussions pédagogiques sur la religion.
+中：错误。学校可以在课程中安排宗教教育讨论。`
+},
+{
+id: "si0134",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "simple",
+typeQuestion: "examen original",
+question: "Lors d’une démarche administrative, quelle langue devez-vous utiliser à la mairie en France ?",
+options: [
+"N’importe quelle langue est acceptable",
+"Français",
+"Anglais",
+"La langue de votre choix si l’employé est bilingue"
+],
+answer: 1,
+explanation: `❌ A. N’importe quelle langue est acceptable
+FR : Faux. Les documents officiels et échanges se font en français.
+中：错误。官方文件和交流必须使用法语。
+
+✅ B. Français
+FR : Correct. Le français est la langue officielle pour les démarches administratives.
+中：正确。法语是办理行政事务的官方语言。
+
+❌ C. Anglais
+FR : Faux. L’anglais n’est pas reconnu pour les démarches officielles.
+中：错误。英语不被官方认可用于行政事务。
+
+❌ D. La langue de votre choix si l’employé est bilingue
+FR : Faux. Même si le personnel comprend, les échanges officiels doivent rester en français.
+中：错误。即使工作人员能听懂，也必须使用法语。`
+},
+{
+id: "si0135",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "moyen",
+typeQuestion: "examen original",
+question: "Si un employé est victime de discrimination ou de harcèlement au travail, où peut-il se tourner pour obtenir de l’aide ?",
+options: [
+"Il ne peut rien faire",
+"Seul devant le juge",
+"Inspection du travail, Défenseur des droits, syndicats",
+"Seulement auprès de ses collègues"
+],
+answer: 2,
+explanation: `❌ A. Il ne peut rien faire
+FR : Faux. La loi protège les employés contre la discrimination et le harcèlement.
+中：错误。法律保护员工不受歧视和骚扰。
+
+❌ B. Seul devant le juge
+FR : Faux. Il existe des organismes spécialisés pour l’accompagner.
+中：错误。可以求助专门机构，而非单独上法庭。
+
+✅ C. Inspection du travail, Défenseur des droits, syndicats
+FR : Correct. Ces institutions peuvent recevoir les plaintes et offrir un accompagnement légal.
+中：正确。劳动监察、权利保护机构和工会可受理投诉并提供法律支持。
+
+❌ D. Seulement auprès de ses collègues
+FR : Faux. Les collègues ne sont pas compétents légalement.
+中：错误。同事无法提供法律帮助。`
+},
+{
+id: "si0136",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "simple",
+typeQuestion: "examen original",
+question: "À quoi sert le médecin traitant (médecin généraliste) en France ?",
+options: [
+"À diagnostiquer, soigner, orienter vers des spécialistes si nécessaire",
+"Seulement à prescrire des médicaments",
+"À représenter l’employé devant l’administration",
+"À s’occuper uniquement des enfants"
+],
+answer: 0,
+explanation: `✅ A. À diagnostiquer, soigner, orienter vers des spécialistes si nécessaire
+FR : Correct. Le médecin traitant coordonne le parcours de soins et assure le suivi médical.
+中：正确。家庭医生负责诊断、治疗并根据需要转诊，同时管理医疗跟进。
+
+❌ B. Seulement à prescrire des médicaments
+FR : Faux. Son rôle dépasse la simple prescription.
+中：错误。家庭医生的职责不只是开药。
+
+❌ C. À représenter l’employé devant l’administration
+FR : Faux. Ce n’est pas sa fonction.
+中：错误。家庭医生不代表员工处理行政事务。
+
+❌ D. À s’occuper uniquement des enfants
+FR : Faux. Il prend en charge tous les patients.
+中：错误。家庭医生服务对象不限于儿童。`
+},
+{
+id: "si0137",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "moyen",
+typeQuestion: "examen original",
+question: "Vous trouvez que la jupe de votre collègue est trop courte. Que pouvez-vous faire ?",
+options: [
+"L’insulter ou la critiquer devant les autres",
+"Lui faire des remarques respectueuses en privé si c’est lié à la sécurité ou règlement interne",
+"Partager son image sur les réseaux sociaux",
+"Informer le patron pour qu’il lui inflige une amende ou une sanction financière"
+],
+answer: 1,
+explanation: `❌ A. L’insulter ou la critiquer devant les autres
+FR : Faux. Cela constitue du harcèlement ou une atteinte à la dignité.
+中：错误。公开辱骂或批评属于骚扰或侵犯尊严。
+
+✅ B. Lui faire des remarques respectueuses en privé si c’est lié à la sécurité ou règlement interne
+FR : Correct. Les observations doivent être faites avec respect et justification objective (ex : sécurité ou règlement).
+中：正确。仅在尊重的情况下、出于安全或公司规定目的，可私下提醒。
+
+❌ C. Partager son image sur les réseaux sociaux
+FR : Faux. Cela constitue une atteinte à la vie privée.
+中：错误。在社交媒体分享属于侵犯隐私。
+
+❌ D. Informer le patron pour qu’il lui inflige une amende ou une sanction financière
+FR : Faux. Le règlement interne ne prévoit pas de sanction financière pour la tenue vestimentaire d’un collègue et cela constituerait une atteinte à sa dignité.
+中：错误。公司规定不允许因穿着对同事罚款，这属于侵犯尊严。`
+},
+{
+id: "si0138",
+type: "carte multi",
+category: "Mises en situation",
+difficulté: "simple",
+typeQuestion: "examen original",
+question: "Un professeur souhaite prier avant de commencer son cours. Est-ce possible ?",
+options: [
+"Oui, à condition que ce soit privé et ne perturbe pas les élèves",
+"Non, l’école doit rester laïque",
+"Oui, devant tous les élèves",
+"Oui, mais seulement après avoir demandé l’autorisation à chaque élève"
+],
+answer: 1,
+explanation: `❌ A. Oui, à condition que ce soit privé et ne perturbe pas les élèves
+FR : Faux. Dans l’école publique, toute pratique religieuse doit rester strictement séparée de l’enseignement.
+中：错误。在公立学校中，任何宗教活动都必须严格与教学分离。
+
+✅ B. Non, l’école doit rester laïque
+FR : Correct. La loi impose la neutralité religieuse dans les établissements scolaires publics.
+中：正确。法律要求公立学校保持宗教中立，禁止在课堂上进行祈祷等宗教活动。
+
+❌ C. Oui, devant tous les élèves
+FR : Faux. La laïcité interdit d’imposer une pratique religieuse aux élèves.
+中：错误。世俗原则禁止强迫学生参与宗教活动。
+
+❌ D. Oui, mais seulement après avoir demandé l’autorisation à chaque élève
+FR : Faux. Même avec autorisation, l’école publique doit rester laïque.
+中：错误。即使征求学生同意，公立学校也必须保持世俗中立。`
+},
   {
     id: "pf0001",
     type: "carte multi",
@@ -14015,17 +14596,22 @@ FR : Faux Les bâtiments scolaires ne sont pas obligatoirement des lieux officie
     answer: 2,
     explanation: `❌ A. La monarchie constitutionnelle - Faux. La monarchie constitutionnelle est abolie en 1792.\n中：错误。1792年废除君主立宪制。\n\n❌ B. Le Consulat - Faux. Le Consulat est instauré en 1799.\n中：错误。执政府成立于1799年。\n\n✅ C. La Première République - Correct ! En septembre 1792, la Première République est proclamée.\n中：正确！1792年9月宣布第一共和国成立。\n\n❌ D. Le Premier Empire - Faux. Le Premier Empire commence en 1804 avec Napoléon.\n中：错误。第一帝国从1804年开始。`
   },
-  {
-    id: "gh0042",
-    type: "carte multi",
-    category: "Grandes périodes et personnages historiques",
-    difficulté: "moyen",
-    typeQuestion: "examen original",
-    question: "Quel régime suit directement la Première République ?",
-    options: ["Le Premier Empire", "La Restauration", "Le Consulat", "La Monarchie de Juillet"],
-    answer: 0,
-    explanation: `✅ A. Le Premier Empire - Correct ! La Première République est suivie par le Premier Empire en 1804.\n中：正确！第一共和国之后直接进入第一帝国（1804年）。\n\n❌ B. La Restauration - Faux. La Restauration arrive après la chute de Napoléon en 1814.\n中：错误。复辟在拿破仑失败后（1814年）才开始。\n\n❌ C. Le Consulat - Faux. Le Consulat précède le Premier Empire (1799-1804).\n中：错误。执政府在第一帝国之前。\n\n❌ D. La Monarchie de Juillet - Faux. Elle commence en 1830, bien plus tard.\n中：错误。七月王朝始于1830年。`
-  },
+ {
+  id: "gh0042",
+  type: "carte multi",
+  category: "Grandes périodes et personnages historiques",
+  difficulté: "moyen",
+  typeQuestion: "examen original",
+  question: "Quel régime suit directement la Première République ?",
+  options: [
+    "Le Premier Empire",
+    "La Restauration",
+    "La Monarchie de Juillet",
+    "Une autre République"
+  ],
+  "answer": 0,
+  "explanation": "✅ A. Le Premier Empire\nFR : Correct ! La Première République est suivie par le Premier Empire en 1804.\n中：正确！第一共和国之后直接进入第一帝国（1804年）。\n\n❌ B. La Restauration\nFR : Faux. La Restauration arrive après la chute de Napoléon en 1814.\n中：错误。复辟在拿破仑失败后（1814年）才开始。\n\n❌ C. La Monarchie de Juillet\nFR : Faux. Elle commence en 1830, bien plus tard.\n中：错误。七月王朝始于1830年。\n\n❌ D. Une autre République\nFR : Faux. La Première République est suivie directement par l’Empire, pas par une autre République.\n中：错误。第一共和国之后直接进入帝国，而不是另一共和国。"
+},
   {
     id: "gh0043",
     type: "carte multi",
@@ -15997,8 +16583,8 @@ FR : Faux Les bâtiments scolaires ne sont pas obligatoirement des lieux officie
     "18 ans",
     "12 ans"
   ],
-  answer: 1,
-  explanation: "❌ A. 14 ans - Faux. 14 ans est possible seulement pour des travaux légers pendant les vacances scolaires, avec autorisation.\n中：错误。14岁只允许在假期进行轻工作并需授权。\n\n✅ B. 16 ans - Correct ! L’âge minimum pour travailler en France est généralement 16 ans (travail normal, sous conditions).\n中：正确！法国常规工作最低年龄通常为16岁（在符合条件的情况下）。\n\n❌ C. 18 ans - Faux, parce que 18 ans est l’âge adulte, pas l’âge minimum pour travailler.\n中：错误，因为不是最低年龄。\n\n❌ D. 12 ans - Faux, parce que 12 ans est trop jeune et interdit pour travailler.\n中：错误，因为12 岁不允许工作。"
+  "answer": 1,
+  "explanation": "❌ A. 14 ans\nFR : Faux. 14 ans est possible seulement pour des travaux légers pendant les vacances scolaires, avec autorisation.\n中：错误。14岁只允许在假期进行轻工作并需授权。\n\n✅ B. 16 ans\nFR : Correct ! L’âge minimum pour travailler en France est généralement 16 ans (travail normal, sous conditions).\n中：正确！法国常规工作最低年龄通常为16岁（在符合条件的情况下）。\n\n❌ C. 18 ans\nFR : Faux, parce que 18 ans est l’âge adulte, pas l’âge minimum pour travailler.\n中：错误，因为不是最低年龄。\n\n❌ D. 12 ans\nFR : Faux, parce que 12 ans est trop jeune et interdit pour travailler.\n中：错误，因为12 岁不允许工作。"
 }
 ,
   {
@@ -17836,20 +18422,20 @@ FR : Faux Les bâtiments scolaires ne sont pas obligatoirement des lieux officie
     中：错误。医院只出具医学证明，法律登记必须在市政府完成。`
   },
 {
-  id: "ir0010",
-  type: "carte multi",
-  category: "S'installer et résider en France",
+id: "ir0010",
+type: "carte multi",
+ category: "S'installer et résider en France",
   difficulté: "simple",
   typeQuestion: "examen original",
-  question: "À quel âge peut-on conduire seul après avoir obtenu le permis B ?",
+ question: "À quel âge peut-on conduire seul après avoir obtenu le permis B ?",
   options: [
-    "Avoir 16 ans",
-    "Avoir suivi la formation obligatoire et réussir l’examen",
-    "Payer une amende",
-    "Avoir un véhicule ancien"
+    "16 ans",
+    "17 ans",
+    "18 ans",
+    "21 ans"
   ],
-  answer: 1,
-  explanation: "✅ B. Avoir suivi la formation obligatoire et réussir l’examen - Correct ! Pour conduire seul en France, il faut avoir suivi toute la formation obligatoire et avoir réussi l'examen du permis B.\n中：正确！在法国，要独自驾驶，必须完成规定培训并通过驾照考试。\n\n❌ A. Avoir 16 ans - Faux. À 17 ans, on peut commencer certaines formations et passer l’examen classique du permis B.\n中：错误。16岁还不能独自驾驶，17岁可以开始学习并参加普通驾照考试。\n\n❌ C. Payer une amende - Faux. Payer une amende n’a aucun rapport avec l’âge légal pour conduire.\n中：错误。支付罚款与法定驾驶年龄无关。\n\n❌ D. Avoir un véhicule ancien - Faux. Le type de véhicule ne change pas l’âge légal.\n中：错误。车辆类型不影响法定驾驶年龄。"
+  "answer": 1,
+  "explanation": "❌ A. 16 ans\nFR : Faux. À 17 ans, on peut commencer certaines formations et passer l’examen classique du permis B.\n中：错误。16岁还不能独立驾驶，17岁才能开始培训并参加驾照考试。\n\n✅ B. 17 ans\nFR : Correct ! C’est l’âge légal pour conduire seul après avoir obtenu le permis B et réussi la formation obligatoire.\n中：正确！完成培训并通过考试后，17岁可以独立驾驶。\n\n❌ C. 18 ans\nFR : Faux. Bien que 18 ans soit l’âge légal pour la majorité, on peut conduire seul dès 17 ans avec le permis B.\n中：错误。虽然18岁是成年年龄，但17岁即可独立驾驶。\n\n❌ D. 21 ans\nFR : Faux. L’âge de 21 ans n’est pas requis pour obtenir le permis B.\n中：错误。驾驶B类驾照不需要等到21岁。"
 }
 ,
   {
@@ -18804,8 +19390,460 @@ FR : Faux Les bâtiments scolaires ne sont pas obligatoirement des lieux officie
     
     ❌ D. Déclarer ses revenus - Faux, parce que la déclaration de revenus est une démarche différente.
     中：错误，因为报税不是结婚的目的。`
-  }
-];
+  },
+{
+    id: "in0065",
+    type: "naturalisation",
+    category: "Institutions",
+    difficulté: "moyen",
+    typeQuestion: "examen original",
+    question: "Qui peut se présenter aux élections présidentielles ?",
+    options: [
+      "Tout citoyen français majeur",
+      "Tout citoyen français majeur ayant 500 parrainages d'élus",
+      "Tout citoyen européen résidant en France",
+      "Tout membre du gouvernement"
+    ],
+    answer: 1,
+    explanation: `❌ A) Tout citoyen français majeur
+FR : Faux. La nationalité française et la majorité sont nécessaires mais pas suffisantes. La Constitution exige également de recueillir 500 parrainages d'élus (maires, députés, sénateurs, etc.) provenant d'au moins 30 départements ou collectivités d'outre-mer différents, sans qu'aucun parrainage ne dépasse 10% du total. Cette règle vise à garantir un soutien minimum et à éviter les candidatures fantaisistes.
+中：错误。法国国籍和成年是必要条件但不充分。宪法还要求获得500名民选官员（市长、议员、参议员等）的推荐，这些推荐必须来自至少30个不同的省份或海外领地，且单个省份的推荐不得超过总数的10%。这一规定旨在确保候选人获得最低限度的支持，并防止轻率的候选资格。
+
+✅ B) Tout citoyen français majeur ayant 500 parrainages d'élus
+FR : Correct ! Pour être candidat à l'élection présidentielle française, il faut : être de nationalité française, être âgé d'au moins 18 ans, être inscrit sur les listes électorales, et surtout recueillir 500 signatures (parrainages) d'élus. Ces parrainages sont rendus publics par le Conseil constitutionnel, garantissant ainsi la transparence du processus. Depuis 2016, les parrainages sont publiés intégralement sur le site du Conseil constitutionnel.
+中：正确。要成为法国总统候选人，必须满足：具有法国国籍、年满18周岁、在选民名单上登记，最重要的是获得500名民选官员的联名支持。这些推荐由宪法委员会公开，确保过程的透明度。自2016年起，所有推荐都完整公布在宪法委员会网站上。
+
+❌ C) Tout citoyen européen résidant en France
+FR : Faux. Les citoyens européens peuvent voter aux élections municipales et européennes en France, et même se présenter aux élections municipales, mais ne peuvent pas se présenter à l'élection présidentielle, qui est réservée aux citoyens français. La présidence de la République incarne la souveraineté nationale française, qui ne peut être exercée que par un citoyen français.
+中：错误。欧盟公民可以在法国参加市镇选举和欧洲选举投票，甚至可以参加市镇选举竞选，但不能参加总统选举，这是保留给法国公民的。共和国总统职位体现法国国家主权，只能由法国公民行使。
+
+❌ D) Tout membre du gouvernement
+FR : Faux. Être membre du gouvernement ne donne aucun droit automatique à se présenter. Les ministres doivent démissionner du gouvernement s'ils souhaitent être candidats, et doivent remplir toutes les conditions légales comme tout autre citoyen (parrainages, nationalité, etc.). Aucune dispense n'est accordée aux membres du gouvernement.
+中：错误。政府成员身份并不自动赋予参选资格。部长如果希望参选必须辞去政府职务，并且必须像其他公民一样满足所有法律条件（推荐、国籍等）。政府成员没有任何豁免特权。`
+  },
+  {
+    id: "in0066",
+    type: "naturalisation",
+    category: "Institutions",
+    difficulté: "simple",
+    typeQuestion: "examen original",
+    question: "Qui est élu lors des élections municipales ?",
+    options: [
+      "Le préfet",
+      "Les conseillers municipaux",
+      "Les députés",
+      "Le président du conseil départemental"
+    ],
+    answer: 1,
+    explanation: `❌ A) Le préfet
+FR : Faux. Le préfet est un haut fonctionnaire nommé par décret du Président de la République en Conseil des ministres. Il représente l'État dans le département et n'est pas élu par les citoyens. Il assure le contrôle de légalité des actes des collectivités territoriales et est responsable de l'ordre public.
+中：错误。省长是由总统在部长会议上通过法令任命的高级公务员。他在省内代表国家，不由公民选举产生。他负责监督地方行政单位行为的合法性，并负责公共秩序。
+
+✅ B) Les conseillers municipaux
+FR : Correct ! Lors des élections municipales, les citoyens élisent les conseillers municipaux pour un mandat de 6 ans. Ces conseillers formeront ensuite le conseil municipal, qui élira le maire parmi ses membres. Le nombre de conseillers varie selon la taille de la commune : de 7 pour les plus petites communes à 69 pour Paris, Lyon et Marseille.
+中：正确。在市镇选举中，公民选举市议会议员，任期6年。这些议员组成市议会，然后由市议会从成员中选举产生市长。议员人数根据市镇规模而定：最小市镇7人，巴黎、里昂、马赛等大城市69人。
+
+❌ C) Les députés
+FR : Faux. Les députés sont élus lors des élections législatives, qui ont lieu généralement après l'élection présidentielle. Ils siègent à l'Assemblée nationale et votent les lois. Les élections législatives se déroulent dans 577 circonscriptions, chaque circonscription élisant un député.
+中：错误。议员是在立法选举中产生的，通常在大选之后举行。他们在国民议会任职并投票通过法律。立法选举在577个选区进行，每个选区选举一名议员。
+
+❌ D) Le président du conseil départemental
+FR : Faux. Le président du conseil départemental est élu par les conseillers départementaux, après les élections départementales. Il n'est pas élu directement par les citoyens lors des élections municipales. Les élections départementales (anciennement cantonales) élisent les conseillers départementaux pour 6 ans.
+中：错误。省议会主席是在省选举之后由省议员选举产生的，不是由公民在市镇选举中直接选举。省选举（原称县选举）选举省议员，任期6年。`
+  },
+  {
+    id: "in0067",
+    type: "naturalisation",
+    category: "Institutions",
+    difficulté: "simple",
+    typeQuestion: "examen original",
+    question: "Quelles sont les fonctions du maire ?",
+    options: [
+      "Il dirige les services de l'État dans un département",
+      "Il dirige les services de proximité de la commune et exerce des fonctions d'état civil",
+      "Il vote les lois au Parlement",
+      "Il contrôle l'action du gouvernement"
+    ],
+    answer: 1,
+    explanation: `❌ A) Il dirige les services de l'État dans un département
+FR : Faux. C'est le préfet qui dirige les services de l'État dans le département. Le préfet est le représentant direct de l'État et garantit l'ordre public et l'application des lois au niveau départemental. Il est nommé par décret du Président de la République.
+中：错误。领导省级国家服务机构的是省长。省长是国家的直接代表，在省级层面保障公共秩序和法律执行。他由总统法令任命。
+
+✅ B) Il dirige les services de proximité de la commune et exerce des fonctions d'état civil
+FR : Correct ! Le maire a une double casquette : il est à la fois exécutif de la commune (gestion des services municipaux, urbanisme, écoles municipales) et agent de l'État (tenue des registres d'état civil, organisation des élections, police municipale, publication des lois et règlements). Il est élu par le conseil municipal pour 6 ans.
+中：正确。市长具有双重身份：既是市镇的执行官（管理市政服务、城市规划、市镇学校），也是国家公务员（负责民事登记、组织选举、市镇警察、公布法律法规）。他由市议会选举产生，任期6年。
+
+❌ C) Il vote les lois au Parlement
+FR : Faux. Ce sont les parlementaires (députés et sénateurs) qui votent les lois. Le maire, même s'il est une personnalité politique locale importante, n'a pas de pouvoir législatif national. Les lois sont votées par l'Assemblée nationale et le Sénat après navette parlementaire.
+中：错误。法律由议员（国民议会议员和参议员）投票通过。市长虽然是重要的地方政治人物，但没有国家立法权。法律由国民议会和参议院在两院穿梭审议后投票通过。
+
+❌ D) Il contrôle l'action du gouvernement
+FR : Faux. Le contrôle du gouvernement est exercé par le Parlement (questions au gouvernement, motions de censure, commissions d'enquête). Le maire n'a pas ce pouvoir de contrôle au niveau national. Les citoyens peuvent voter aux élections nationales pour influencer la composition du gouvernement.
+中：错误。监督政府是议会的职能（向政府提问、不信任动议、调查委员会）。市长没有国家层面的监督权。公民通过国家选举投票来影响政府的组成。`
+  },
+  {
+    id: "in0068",
+    type: "naturalisation",
+    category: "Institutions",
+    difficulté: "simple",
+    typeQuestion: "examen original",
+    question: "Comment sont désignés les députés ?",
+    options: [
+      "Par scrutin proportionnel intégral national",
+      "Par scrutin majoritaire à deux tours",
+      "Par tirage au sort",
+      "Par les sénateurs"
+    ],
+    answer: 1,
+    explanation: `❌ A) Par scrutin proportionnel intégral national
+FR : Faux. La France n'utilise pas le scrutin proportionnel pour les élections législatives. Ce système est utilisé pour les élections européennes. Le scrutin proportionnel pourrait donner une représentation plus fidèle des petits partis mais fragiliserait la majorité gouvernementale et la stabilité politique. Certains pays européens l'utilisent, mais pas la France pour les législatives.
+中：错误。法国立法选举不使用比例代表制。这个制度用于欧洲选举。比例代表制可能使小党派获得更准确的代表性，但会削弱政府多数派和政治稳定性。一些欧洲国家使用该制度，但法国立法选举不使用。
+
+✅ B) Par scrutin majoritaire à deux tours
+FR : Correct ! Les députés sont élus au scrutin uninominal majoritaire à deux tours dans 577 circonscriptions législatives. Pour être élu au premier tour, un candidat doit obtenir la majorité absolue des suffrages exprimés (plus de 50%) et un nombre de voix au moins égal à 25% des électeurs inscrits. Au second tour, la majorité relative suffit. Ce système favorise la stabilité gouvernementale.
+中：正确。议员通过两轮单记名多数制在577个立法选区中选举产生。要在第一轮当选，候选人必须获得绝对多数票（超过50%）且得票数至少达到登记选民数的25%。第二轮相对多数即可当选。这个制度有利于政府稳定。
+
+❌ C) Par tirage au sort
+FR : Faux. Le tirage au sort n'est pas utilisé en France pour désigner les représentants politiques. Il est parfois utilisé pour les jurys d'assises ou certaines consultations citoyennes locales (conventions citoyennes), mais jamais pour les élections nationales. La démocratie représentative française est fondée sur l'élection.
+中：错误。抽签在法国不用于产生政治代表。有时用于重罪法庭陪审团或某些地方公民咨询（公民大会），但从不用于国家选举。法国的代议制民主基于选举。
+
+❌ D) Par les sénateurs
+FR : Faux. Les députés sont élus directement par le peuple, pas par les sénateurs. Les sénateurs sont d'ailleurs élus au suffrage universel indirect par un collège électoral qui comprend notamment les députés, les conseillers régionaux, départementaux et les délégués des conseils municipaux. C'est l'inverse du système proposé.
+中：错误。议员由人民直接选举产生，不是由参议员选举。参议员本身是由包括议员、大区议员、省议员和市议会代表在内的选举团通过间接普选产生的。这与提议的制度正好相反。`
+  },
+  {
+    id: "in0069",
+    type: "naturalisation",
+    category: "Institutions",
+    difficulté: "simple",
+    typeQuestion: "examen original",
+    question: "Qui vote les lois ?",
+    options: [
+      "Le Président de la République",
+      "Le Gouvernement",
+      "Le Parlement",
+      "Le Conseil constitutionnel"
+    ],
+    answer: 2,
+    explanation: `❌ A) Le Président de la République
+FR : Faux. Le Président promulgue les lois (les rend officielles) mais ne les vote pas. Il peut demander une nouvelle délibération ou saisir le Conseil constitutionnel avant promulgation, mais le pouvoir législatif appartient exclusivement au Parlement. Le Président peut aussi soumettre certains projets de loi au référendum (article 11).
+中：错误。总统颁布法律（使其正式生效）但不投票表决。他可以在颁布前要求重新审议或提交宪法委员会审查，但立法权专属议会。总统也可以将某些法案提交全民公投（宪法第11条）。
+
+❌ B) Le Gouvernement
+FR : Faux. Le Gouvernement propose des projets de loi et peut participer aux débats parlementaires, mais il ne vote pas les lois. Les ministres ne sont pas membres du Parlement (sauf exception du cas particulier du Premier ministre qui peut être invité). Le Gouvernement peut opposer la question de confiance pour faire adopter un texte sans vote (49.3), mais c'est une procédure exceptionnelle.
+中：错误。政府提出法案并可以参加议会辩论，但不投票表决。部长不是议会议员（特殊情况除外，如总理可能被邀请）。政府可以动用质询信任程序不经投票通过文本（49.3条），但这是例外程序。
+
+✅ C) Le Parlement
+FR : Correct ! Le Parlement, composé de l'Assemblée nationale (577 députés élus au suffrage direct) et du Sénat (348 sénateurs élus au suffrage indirect), vote les lois. Une loi doit être adoptée dans les mêmes termes par les deux chambres pour être promulguée. En cas de désaccord, une commission mixte paritaire peut être réunie, et l'Assemblée nationale a le dernier mot.
+中：正确。议会由国民议会（577名直选议员）和参议院（348名间接选举参议员）组成，负责投票表决法律。一项法律必须由两院以相同文本通过才能颁布。如有分歧，可召集混合委员会，国民议会有最终决定权。
+
+❌ D) Le Conseil constitutionnel
+FR : Faux. Le Conseil constitutionnel contrôle la conformité des lois à la Constitution avant leur promulgation. Il peut être saisi par le Président, le Premier ministre, les présidents des assemblées ou 60 députés/sénateurs. Il ne vote pas les lois. Composé de 9 membres nommés pour 9 ans, il est le gardien de la Constitution.
+中：错误。宪法委员会在法律颁布前审查其是否符合宪法。它可由总统、总理、议长或60名议员提请审查。它不投票表决法律。由9名任期9年的成员组成，是宪法的守护者。`
+  },
+  {
+    id: "in0070",
+    type: "naturalisation",
+    category: "Institutions",
+    difficulté: "simple",
+    typeQuestion: "examen original",
+    question: "Quelles sont les durées du mandat du conseil municipal et du maire ?",
+    options: [
+      "4 ans",
+      "5 ans",
+      "6 ans",
+      "7 ans"
+    ],
+    answer: 2,
+    explanation: `❌ A) 4 ans
+FR : Faux. Le mandat de 4 ans n'existe pas pour les élus municipaux en France. Cette durée existe pour certains mandats dans d'autres pays (États-Unis pour le président) ou pour d'autres institutions (les membres du CESE sont nommés pour 4 ans).
+中：错误。法国市镇议员没有4年任期。这个任期存在于其他国家（美国总统）或其他机构（经济社会环境委员会成员任期4年）。
+
+❌ B) 5 ans
+FR : Faux. Le mandat de 5 ans (quinquennat) est celui du Président de la République et des députés, pas des élus municipaux. Cette durée a été choisie pour aligner les élections présidentielles et législatives et éviter la cohabitation.
+中：错误。5年任期是总统和议员的任期，不是市镇议员。这个时长是为了使总统和立法选举同步，避免共治。
+
+✅ C) 6 ans
+FR : Correct ! Le mandat du conseil municipal et du maire est de 6 ans. Les élections municipales ont lieu tous les 6 ans pour renouveler l'ensemble des conseils municipaux de France (environ 35 000 communes). La durée du mandat est fixée par le code électoral. Les dernières élections ont eu lieu en 2020, les prochaines en 2026.
+中：正确。市议会和市长的任期为6年。市镇选举每6年举行一次，更新法国所有市议会（约35,000个市镇）。任期由选举法规定。上次选举在2020年，下次在2026年。
+
+❌ D) 7 ans
+FR : Faux. Le mandat de 7 ans (septennat) était celui du Président de la République avant le référendum de 2000 qui a instauré le quinquennat. Cette durée n'a jamais été appliquée aux élus municipaux. Le septennat a été créé en 1873 sous la IIIe République.
+中：错误。7年任期是2000年公投改为5年任期前总统的任期。这个任期从未适用于市镇议员。七年制始于1873年第三共和国。`
+  },
+  {
+    id: "in0071",
+    type: "naturalisation",
+    category: "Institutions",
+    difficulté: "simple",
+    typeQuestion: "examen original",
+    question: "Quelle est la durée du mandat du Président de la République française ?",
+    options: [
+      "5 ans",
+      "6 ans",
+      "7 ans",
+      "4 ans"
+    ],
+    answer: 0,
+    explanation: `✅ A) 5 ans
+FR : Correct ! Le mandat présidentiel est de 5 ans (quinquennat) depuis le référendum du 24 septembre 2000. Cette réforme visait à aligner la durée du mandat présidentiel sur celui des députés pour éviter la cohabitation (situations où le Président et le Premier ministre sont de camps politiques opposés). Le quinquennat a été appliqué pour la première fois à l'élection de 2002, réélisant Jacques Chirac.
+中：正确。自2000年9月24日公投后，法国总统任期为5年（五年任期制）。这项改革旨在使总统任期与议员任期一致，以避免共治（总统和总理来自不同政治阵营的情况）。五年制首次应用于2002年选举，雅克·希拉克连任。
+
+❌ B) 6 ans
+FR : Faux. Le mandat de 6 ans n'a jamais été appliqué en France pour la présidence. C'est la durée du mandat des sénateurs (depuis 2004) et des conseillers municipaux. Les sénateurs sont renouvelés par moitié tous les 3 ans.
+中：错误。法国总统从未有过6年任期。这是参议员（自2004年起）和市议员的任期。参议员每3年改选一半。
+
+❌ C) 7 ans
+FR : Faux. Le septennat (7 ans) était en vigueur de 1873 à 2002 (sauf interruption). Instauré sous la IIIe République, il a été maintenu sous la IVe et la Ve République jusqu'à la réforme de 2000. Il a été critiqué pour sa longueur et le risque de cohabitation. Depuis 2002, le mandat est de 5 ans.
+中：错误。七年制从1873年到2002年实行（除中断外）。始于第三共和国，在第四和第五共和国保持到2000年改革。因其时长和共治风险而受到批评。自2002年起任期为5年。
+
+❌ D) 4 ans
+FR : Faux. Le mandat de 4 ans n'existe pas en France pour les élections nationales. C'est la durée du mandat des membres du Conseil économique, social et environnemental (CESE), une assemblée consultative. Aux États-Unis, le président est élu pour 4 ans.
+中：错误。法国国家选举没有4年任期。这是经济社会环境委员会成员的任期，这是一个咨询性机构。在美国，总统任期4年。`
+  },
+  {
+    id: "in0072",
+    type: "naturalisation",
+    category: "Institutions",
+    difficulté: "simple",
+    typeQuestion: "examen original",
+    question: "Quelle est la durée du mandat des députés ?",
+    options: [
+      "4 ans",
+      "5 ans",
+      "6 ans",
+      "7 ans"
+    ],
+    answer: 1,
+    explanation: `❌ A) 4 ans
+FR : Faux. Les députés français ne sont pas élus pour 4 ans. Cette durée existe pour les représentants au Parlement européen, qui sont élus pour 5 ans également (et non 4). Dans certains pays comme les États-Unis, les représentants sont élus pour 2 ans seulement.
+中：错误。法国议员不是4年任期。欧洲议会议员也是5年任期（不是4年）。在美国等国家，众议员任期仅为2年。
+
+✅ B) 5 ans
+FR : Correct ! Les députés sont élus pour 5 ans lors des élections législatives. Toutefois, l'Assemblée nationale peut être dissoute par le Président de la République (article 12 de la Constitution), ce qui provoque des élections anticipées et écourte le mandat. Cette dissolution est un pouvoir propre du Président, sans contreseing du Premier ministre.
+中：正确。议员在立法选举中当选，任期5年。但国民议会可被总统解散（宪法第12条），导致提前选举，缩短任期。解散是总统的特有权力，无需总理副署。
+
+❌ C) 6 ans
+FR : Faux. Le mandat de 6 ans est celui des sénateurs (renouvelés par moitié tous les 3 ans) et des conseillers municipaux. Les sénateurs représentent les collectivités territoriales et sont élus au suffrage indirect.
+中：错误。6年任期是参议员（每3年改选一半）和市议员的任期。参议员代表地方行政单位，通过间接选举产生。
+
+❌ D) 7 ans
+FR : Faux. Le mandat de 7 ans était celui du Président de la République avant 2002, jamais celui des députés. Sous la IIIe République, les députés étaient élus pour 4 ans. Sous la IVe République, pour 5 ans également. La Ve République a maintenu le quinquennat pour les députés.
+中：错误。7年任期是2002年前总统的任期，从未是议员任期。在第三共和国，议员任期4年。在第四共和国，也是5年。第五共和国保持了议员5年任期。`
+  },
+  {
+    id: "in0073",
+    type: "naturalisation",
+    category: "Institutions",
+    difficulté: "simple",
+    typeQuestion: "examen original",
+    question: "Quelle est la durée du mandat des sénateurs ?",
+    options: [
+      "4 ans",
+      "5 ans",
+      "6 ans",
+      "9 ans"
+    ],
+    answer: 2,
+    explanation: `❌ A) 4 ans
+FR : Faux. Les sénateurs n'ont jamais été élus pour 4 ans en France. Cette durée n'a jamais été appliquée au Sénat, qui a toujours eu un mandat plus long que celui des députés pour assurer la stabilité et la continuité des institutions.
+中：错误。法国参议员从未有过4年任期。这个时长从未应用于参议院，参议院的任期一直比众议院长，以确保机构的稳定性和连续性。
+
+❌ B) 5 ans
+FR : Faux. Le mandat de 5 ans est celui des députés et du Président, pas des sénateurs. La différence de durée entre les deux chambres (Assemblée nationale et Sénat) est voulue pour assurer une certaine stabilité et éviter que les deux assemblées soient renouvelées en même temps.
+中：错误。5年任期是议员和总统的，不是参议员。两院（国民议会和参议院）任期差异是有意设计的，以确保一定的稳定性，避免两院同时更新。
+
+✅ C) 6 ans
+FR : Correct ! Les sénateurs sont élus pour 6 ans depuis la réforme de 2004 (loi constitutionnelle du 30 juillet 2004). Avant cette réforme, leur mandat était de 9 ans. Le Sénat est renouvelé par moitié tous les 3 ans (série 1 et série 2). Cette réforme visait à moderniser le Sénat tout en préservant son rôle de représentation des collectivités territoriales.
+中：正确。自2004年改革（2004年7月30日宪法性法律）以来，参议员任期为6年。改革前为9年。参议院每3年改选一半（第一系列和第二系列）。这项改革旨在实现参议院现代化，同时保持其代表地方行政单位的角色。
+
+❌ D) 9 ans
+FR : Faux. Cette durée existait avant la réforme de 2004. Le mandat de 9 ans était critiqué car il rendait le Sénat trop éloigné de l'évolution politique et peu représentatif des changements sociétaux. Depuis 2004, le mandat est de 6 ans, avec un renouvellement par moitié tous les 3 ans.
+中：错误。9年任期是2004年改革之前。9年任期曾被批评使参议院脱离政治发展，不能很好代表社会变化。自2004年起任期为6年，每3年改选一半。`
+  },
+  {
+    id: "in0074",
+    type: "naturalisation",
+    category: "Institutions",
+    difficulté: "simple",
+    typeQuestion: "examen original",
+    question: "Qui dirige l'action du gouvernement ?",
+    options: [
+      "Le Président de la République",
+      "Le Premier ministre",
+      "Le ministre de l'Intérieur",
+      "Le Parlement"
+    ],
+    answer: 1,
+    explanation: `❌ A) Le Président de la République
+FR : Faux. Le Président nomme le Premier ministre et préside le Conseil des ministres, mais il ne dirige pas l'action quotidienne du gouvernement. En période de cohabitation, cette distinction est encore plus nette : le Président voit son rôle réduit aux domaines régaliens (défense, diplomatie) tandis que le Premier ministre gouverne. L'article 20 de la Constitution confie la direction du gouvernement au Premier ministre.
+中：错误。总统任命总理并主持部长会议，但不负责政府日常工作的领导。在共治时期，这种区别更为明显：总统的角色限于主权领域（国防、外交），而总理治理国家。宪法第20条将政府领导权交给总理。
+
+✅ B) Le Premier ministre
+FR : Correct ! Selon l'article 21 de la Constitution, le Premier ministre dirige l'action du gouvernement. Il est responsable de la défense nationale, assure l'exécution des lois, et peut déléguer certains pouvoirs aux ministres. Il coordonne l'action des ministres, arbitre les conflits entre eux, et engage la responsabilité du gouvernement devant l'Assemblée nationale.
+中：正确。根据宪法第21条，总理领导政府工作。他负责国防，确保法律执行，并可向部长委派某些权力。他协调部长们的工作，仲裁部长间的冲突，并对国民议会承担政府责任。
+
+❌ C) Le ministre de l'Intérieur
+FR : Faux. Le ministre de l'Intérieur dirige son ministère (sécurité intérieure, collectivités territoriales, cultes, organisation des élections) mais n'a pas autorité sur l'ensemble du gouvernement. Il est l'un des ministres les plus importants, mais il n'a pas de pouvoir hiérarchique sur ses collègues.
+中：错误。内政部长只负责其部门（国内安全、地方行政、宗教事务、组织选举），不对整个政府有领导权。他是最重要的部长之一，但对其他部长没有等级权力。
+
+❌ D) Le Parlement
+FR : Faux. Le Parlement vote les lois et contrôle l'action du gouvernement (questions au gouvernement, commissions d'enquête, motions de censure), mais il ne le dirige pas. La séparation des pouvoirs interdit au législatif de diriger l'exécutif. Le gouvernement est responsable devant le Parlement, mais c'est le Premier ministre qui le dirige.
+中：错误。议会负责立法和监督政府（向政府提问、调查委员会、不信任动议），但不领导政府。三权分立禁止立法权领导行政权。政府对议会负责，但领导政府的是总理。`
+  },
+  {
+    id: "in0075",
+    type: "naturalisation",
+    category: "Institutions",
+    difficulté: "moyen",
+    typeQuestion: "examen original",
+    question: "Qui sanctionne l'auteur d'un vol ?",
+    options: [
+      "La justice civile",
+      "La justice pénale",
+      "La justice administrative",
+      "La justice constitutionnelle"
+    ],
+    answer: 1,
+    explanation: `❌ A) La justice civile
+FR : Faux. La justice civile règle les conflits entre personnes privées (divorce, héritage, contrat, voisinage, consommation). Elle ne sanctionne pas les infractions pénales comme le vol, mais peut traiter des demandes de dommages-intérêts après que la faute a été établie par la justice pénale. Les tribunaux civils sont les tribunaux judiciaires, les conseils de prud'hommes, les tribunaux de commerce.
+中：错误。民事司法处理私人之间的纠纷（离婚、继承、合同、邻里关系、消费）。它不制裁盗窃等刑事犯罪，但可以在刑事司法确认过错后处理损害赔偿请求。民事法院包括司法法院、劳资调解委员会、商事法院。
+
+✅ B) La justice pénale
+FR : Correct. Le vol est une infraction pénale, définie et punie par le Code pénal (article 311-1 et suivants). Il est jugé par la justice pénale selon sa gravité : tribunal de police pour les contraventions, tribunal correctionnel pour les délits (vol simple), cour d'assises pour les crimes (vol avec violence ayant entraîné la mort). Les peines peuvent être l'amende, l'emprisonnement, ou des travaux d'intérêt général.
+中：正确。盗窃是刑事犯罪，由刑法典（第311-1条及后续）定义和惩处。根据严重程度由刑事司法审理：违警罪法庭审理违警罪，轻罪法庭审理轻罪（普通盗窃），重罪法庭审理重罪（导致死亡的暴力盗窃）。刑罚可以是罚款、监禁或社区服务。
+
+❌ C) La justice administrative
+FR : Faux. La justice administrative traite les conflits entre les citoyens et l'administration (annulation d'un arrêté préfectoral, litige fiscal, responsabilité d'un service public, urbanisme). Elle est rendue par les tribunaux administratifs, les cours administratives d'appel et le Conseil d'État. Elle ne juge pas les auteurs de vols, sauf si le voleur est un agent public dans l'exercice de ses fonctions (détournement de fonds publics).
+中：错误。行政司法处理公民与行政机关之间的纠纷（撤销省政令、税务纠纷、公共服务责任、城市规划）。由行政法庭、行政上诉法院和国家行政法院审理。它不审判盗窃犯，除非盗窃者是执行公务的公务员（挪用公款）。
+
+❌ D) La justice constitutionnelle
+FR : Faux. La justice constitutionnelle contrôle la conformité des lois à la Constitution. Elle est exercée par le Conseil constitutionnel, composé de 9 membres nommés pour 9 ans et des anciens présidents de la République. Elle ne juge pas les individus, mais la conformité des normes juridiques. Elle peut être saisie avant la promulgation d'une loi ou par voie de question prioritaire de constitutionnalité (QPC).
+中：错误。宪法司法负责审查法律是否符合宪法。由宪法委员会行使，由9名任期9年的成员和共和国前总统组成。它不审判个人，而是审查法律规范的合宪性。可以在法律颁布前或通过优先合宪性问题程序提请审查。`
+  },
+  {
+    id: "in0076",
+    type: "naturalisation",
+    category: "Institutions",
+    difficulté: "simple",
+    typeQuestion: "examen original",
+    question: "Qui gère les collèges publics ?",
+    options: [
+      "La commune",
+      "Le département",
+      "La région",
+      "L'État"
+    ],
+    answer: 1,
+    explanation: `❌ A) La commune
+FR : Faux. La commune gère les écoles primaires et maternelles (maternelle et élémentaire). Elle est responsable des bâtiments scolaires, de la restauration scolaire, du matériel pédagogique de base, et du personnel communal (ATSEM, agents d'entretien). Les communes peuvent aussi gérer des écoles de musique ou des crèches.
+中：错误。市镇负责小学和幼儿园。它负责校舍、学校餐饮、基本教学设备和市镇工作人员（幼儿教育助理、维护人员）。市镇也可以管理音乐学校或托儿所。
+
+✅ B) Le département
+FR : Correct ! Depuis les lois de décentralisation de 1982-1983 (lois Defferre), le département est responsable de la gestion des collèges publics : construction, reconstruction, extension, grosses réparations, équipement, fonctionnement, restauration, et personnel technicien et d'entretien (TOS - techniciens et ouvriers de service, transférés de l'État aux départements). Le président du conseil départemental est l'ordonnateur des dépenses du collège.
+中：正确。自1982-1983年权力下放法（德费尔法）以来，省负责公立初中的管理：建设、重建、扩建、大修、设备、运行、餐饮以及技术人员和维护人员（TOS，从国家转移到省）。省议会主席是初中开支的审批者。
+
+❌ C) La région
+FR : Faux. La région gère les lycées publics, les établissements d'éducation spéciale et la formation professionnelle. Cette compétence lui a été transférée par les lois de décentralisation. La région est également responsable des transports régionaux (TER) et du développement économique.
+中：错误。大区负责公立高中、特殊教育机构和职业培训。这项权限通过权力下放法转移给大区。大区还负责区域交通（TER）和经济发展。
+
+❌ D) L'État
+FR : Faux. L'État fixe les programmes scolaires (ministère de l'Éducation nationale), recrute et paie les enseignants (professeurs certifiés, agrégés), et délivre les diplômes nationaux (brevet, baccalauréat). La gestion matérielle des collèges a été transférée aux départements. L'État garde un rôle de contrôle pédagogique et d'inspection.
+中：错误。国家制定教学大纲（国民教育部）、招聘和支付教师工资（持有证书或教师资格的教师）、颁发国家文凭（初中毕业证书、高中毕业会考）。初中的物质管理已转移给省。国家保留教学控制和督导的角色。`
+  },
+  {
+    id: "in0077",
+    type: "naturalisation",
+    category: "Institutions",
+    difficulté: "simple",
+    typeQuestion: "examen original",
+    question: "Qui gère les écoles primaires et maternelles publiques ?",
+    options: [
+      "La région",
+      "Le département",
+      "L'État",
+      "La commune"
+    ],
+    answer: 3,
+    explanation: `❌ A) La région
+FR : Faux. La région s'occupe des lycées, de la formation professionnelle, des transports régionaux (TER) et du développement économique. Elle n'a pas compétence sur les écoles primaires. Les régions ont été créées en tant que collectivités territoriales en 1982 et leurs compétences ont été renforcées par les lois NOTRe de 2015.
+中：错误。大区负责高中、职业培训、区域交通（TER）和经济发展。它不负责小学。大区作为地方行政单位成立于1982年，2015年NOTRe法案加强了其权限。
+
+❌ B) Le département
+FR : Faux. Le département gère les collèges, les routes départementales, l'action sociale (RSA, aide sociale à l'enfance, personnes âgées) et les services de PMI (protection maternelle et infantile). Les écoles primaires relèvent des communes. Les départements ont été créés en 1789 et sont les collectivités historiques.
+中：错误。省负责初中、省级道路、社会事务（RSA、儿童社会救助、老年人）和母婴保护服务。小学属于市镇管辖。省成立于1789年，是历史悠久的行政单位。
+
+❌ C) L'État
+FR : Faux. L'État fixe les programmes nationaux, recrute et paie les enseignants (fonctionnaires d'État), et délivre les diplômes. Mais la gestion matérielle des écoles (bâtiments, cantine, matériel, personnel communal) revient à la commune. Cette répartition date des lois de décentralisation de Jules Ferry (XIXe siècle) pour les écoles.
+中：错误。国家负责国家课程、招聘和支付教师工资（国家公务员）、颁发文凭。但学校的物质管理（校舍、食堂、设备、市镇工作人员）属于市镇。这种分工可追溯到朱尔·费里的权力下放法（19世纪）。
+
+✅ D) La commune
+FR : Correct ! La commune est responsable des écoles primaires et maternelles publiques depuis les lois de décentralisation du XIXe siècle et confirmé par les lois de 1982-1983. Elle gère les bâtiments, le matériel, la cantine, les activités périscolaires, et le personnel communal (ATSEM, agents d'entretien, personnel de cantine). C'est la collectivité de proximité par excellence, la plus proche des administrés.
+中：正确。自19世纪权力下放法以来，市镇负责公立小学和幼儿园，并在1982-1983年的法律中得到确认。它管理校舍、设备、食堂、课外活动和市镇工作人员（幼儿教育助理、维护人员、食堂工作人员）。市镇是最贴近民众的地方行政单位。`
+  },
+  {
+    id: "in0078",
+    type: "naturalisation",
+    category: "Institutions",
+    difficulté: "moyen",
+    typeQuestion: "examen original",
+    question: "Comment sont désignés les maires ?",
+    options: [
+      "Élus directement par les citoyens",
+      "Nommés par le préfet",
+      "Élus par le conseil municipal",
+      "Désignés par le Président"
+    ],
+    answer: 2,
+    explanation: `❌ A) Élus directement par les citoyens
+FR : Faux. Les citoyens élisent les conseillers municipaux lors des élections municipales au suffrage universel direct. Ce sont ensuite ces conseillers qui élisent le maire parmi eux. Le maire n'est donc pas élu au suffrage universel direct, contrairement au Président ou aux députés. C'est un scrutin indirect à deux degrés.
+中：错误。公民在市镇选举中通过直接普选选举市议会议员。然后由这些议员从他们中选举产生市长。因此市长不像总统或议员那样由直接普选产生。这是两级间接选举。
+
+❌ B) Nommés par le préfet
+FR : Faux. Le préfet est un représentant de l'État, il n'a pas le pouvoir de nommer les maires, qui sont des élus locaux. Le préfet peut seulement suspendre un maire en cas de manquement grave pour une durée maximale d'un mois (article L2122-16 du CGCT). Il peut aussi déférer ses actes au tribunal administratif s'ils sont illégaux.
+中：错误。省长是国家代表，无权任命作为地方民选官员的市长。省长只能在市长严重失职时暂停其职务，最长一个月（地方行政法典L2122-16条）。如果市长行为违法，省长可以将其提交行政法庭。
+
+✅ C) Élus par le conseil municipal
+FR : Correct ! Après l'élection du conseil municipal (au complet), le conseil se réunit dans les 8 jours suivant la proclamation des résultats pour élire le maire et ses adjoints. Le maire est élu à bulletins secrets, à la majorité absolue des conseillers aux deux premiers tours, ou à la majorité relative au troisième tour. En cas d'égalité, le plus âgé l'emporte.
+中：正确。市议会（全体）选举后，议会在结果公布后8天内开会选举市长和副市长。市长以无记名投票方式选举产生，前两轮需获得绝对多数，第三轮相对多数即可当选。票数相等时，年长者当选。
+
+❌ D) Désignés par le Président
+FR : Faux. Le Président de la République n'intervient pas dans la désignation des maires, qui relève de la démocratie locale. Le Président peut seulement décorer certains maires (Légion d'honneur, Ordre national du Mérite) pour leurs services à la collectivité. La désignation des maires est strictement encadrée par le code électoral et le code général des collectivités territoriales.
+中：错误。共和国总统不参与市长任命，这属于地方民主事务。总统只能表彰某些市长（荣誉军团勋章、国家功绩勋章）对社区的贡献。市长的产生严格受选举法和地方行政总法典约束。`
+  },
+  {
+    id: "in0079",
+    type: "naturalisation",
+    category: "Institutions",
+    difficulté: "simple",
+    typeQuestion: "examen original",
+    question: "Quelle collectivité territoriale est responsable des transports régionaux ?",
+    options: [
+      "La commune",
+      "Le département",
+      "La région",
+      "L'État"
+    ],
+    answer: 2,
+    explanation: `❌ A) La commune
+FR : Faux. La commune gère les transports urbains locaux (bus municipaux, tramway, métro) en collaboration avec les intercommunalités (métropoles, communautés d'agglomération, communautés de communes). Elle n'a pas compétence sur les transports régionaux comme les TER (Trains Express Régionaux) qui traversent plusieurs communes et départements.
+中：错误。市镇与市镇联合体（大都会、城市圈共同体、市镇共同体）合作管理城市内部交通（市镇公交、有轨电车、地铁）。它不负责跨越多个市镇和省份的区域交通，如TER。
+
+❌ B) Le département
+FR : Faux. Le département s'occupe surtout des routes départementales, du transport scolaire (c'est l'autorité organisatrice de la mobilité pour les transports scolaires) et des collèges. Mais depuis les lois NOTRe de 2015, les transports régionaux (TER, cars interurbains) ont été transférés aux régions.
+中：错误。省主要负责省级道路、校车运输（是校车运输的组织机构）和初中。但自2015年NOTRe法案以来，区域交通（TER、城际大巴）已转移给大区。
+
+✅ C) La région
+FR : Correct ! Depuis les lois de décentralisation et notamment la loi NOTRe de 2015, la région est devenue l'autorité organisatrice unique des transports régionaux : TER (Trains Express Régionaux), cars interurbains, et transport scolaire (en lien avec les départements pour l'organisation). Elle est également responsable des ports fluviaux et aéroports régionaux.
+中：正确。自权力下放法以来，特别是2015年NOTRe法案，大区成为区域交通的唯一组织机构：TER、城际大巴和校车运输（与省合作组织）。大区还负责内河港口和区域机场。
+
+❌ D) L'État
+FR : Faux. L'État définit la politique nationale des transports, fixe les normes de sécurité, et gère les grands réseaux nationaux (autoroutes concédées, SNCF Réseau pour les infrastructures ferroviaires nationales, aéroports internationaux). Mais la gestion des transports régionaux a été décentralisée aux régions depuis 1982, avec un renforcement en 2015.
+中：错误。国家制定国家交通政策，制定安全标准，管理国家主要网络（特许高速公路、国家铁路基础设施网络SNCF Réseau、国际机场）。但自1982年以来，区域交通管理已下放给大区，并在2015年得到加强。`
+  },
+  
+]
+
 
 
 

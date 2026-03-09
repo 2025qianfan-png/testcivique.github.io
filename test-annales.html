@@ -1292,9 +1292,11 @@ h1, h2, h3, h4 {
   </div>
 </footer>
 
-<!-- 题库文件 (假设存在) -->
+
+<!-- 题库文件 -->
 <script src="question_multia.js"></script>
 <script src="question_resident.js"></script>
+<script src="question_nat.js"></script>
 
 <script>
 // ==================== 全局配置 ====================
@@ -1510,6 +1512,7 @@ function showTrainingInfo() {
     document.getElementById('trainingInfoModal').style.display = 'flex';
 }
 // ==================== 开始测试 ====================
+// ==================== 开始测试 ====================
 function startTest() {
     document.getElementById('trainingInfoModal').style.display = 'none';
     showAlert("Préparation du test", "Chargement des questions en cours...", 'info');
@@ -1520,18 +1523,40 @@ function startTest() {
             
             // 根据学生类型选择题库
             if (studentInfo.type === 'm') {
-                // 四年居留：只用 question_multia
+                // 四年居留：只用 question_multi
                 allQuestions = [...question_multi];
-                console.log("四年居留题库：使用 question_multia，总数:", allQuestions.length);
-            } else {
-                // 十年居留和入籍：用 question_multia + question_resident
+                console.log("四年居留题库：使用 question_multi，总数:", allQuestions.length);
+            } else if (studentInfo.type === 'r') {
+                // 十年居留：使用 question_multi + question_resident
                 allQuestions = [...question_multi];
                 if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
                     allQuestions = allQuestions.concat(question_resident);
-                    console.log("十年居留/入籍题库：使用 question_multia + question_resident，总数:", allQuestions.length);
+                    console.log("十年居留题库：使用 question_multi + question_resident，总数:", allQuestions.length);
                 } else {
-                    console.log("十年居留/入籍题库：仅使用 question_multia，总数:", allQuestions.length);
+                    console.log("十年居留题库：仅使用 question_multi，总数:", allQuestions.length);
                 }
+            } else if (studentInfo.type === 'n') {
+                // 法国入籍：使用 question_multi + question_resident + question_nat
+                allQuestions = [...question_multi];
+                if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+                    allQuestions = allQuestions.concat(question_resident);
+                }
+                if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
+                    allQuestions = allQuestions.concat(question_nat);
+                    console.log("法国入籍题库：使用 question_multi + question_resident + question_nat，总数:", allQuestions.length);
+                } else {
+                    console.log("法国入籍题库：question_nat 未找到，总数:", allQuestions.length);
+                }
+            } else {
+                // 完全访问 (type='t' 或其他)：使用所有题库
+                allQuestions = [...question_multi];
+                if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+                    allQuestions = allQuestions.concat(question_resident);
+                }
+                if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
+                    allQuestions = allQuestions.concat(question_nat);
+                }
+                console.log("完全访问题库：使用所有题库，总数:", allQuestions.length);
             }
             
             // 筛选 typeQuestion === "examen original"
@@ -1565,6 +1590,8 @@ function startTest() {
         }
     }, 1500);
 }
+
+
 // Fisher-Yates 洗牌
 function shuffleArray(array) {
     const newArray = [...array];
@@ -1928,10 +1955,26 @@ function proceedWithRestart() {
     // 重新根据学生类型筛选题目
     if (studentInfo.type === 'm') {
         allQuestions = [...question_multi];
+    } else if (studentInfo.type === 'r') {
+        allQuestions = [...question_multi];
+        if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+            allQuestions = allQuestions.concat(question_resident);
+        }
+    } else if (studentInfo.type === 'n') {
+        allQuestions = [...question_multi];
+        if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+            allQuestions = allQuestions.concat(question_resident);
+        }
+        if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
+            allQuestions = allQuestions.concat(question_nat);
+        }
     } else {
         allQuestions = [...question_multi];
         if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
             allQuestions = allQuestions.concat(question_resident);
+        }
+        if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
+            allQuestions = allQuestions.concat(question_nat);
         }
     }
     
@@ -1947,7 +1990,6 @@ function proceedWithRestart() {
     updateQuestionCounter();
     window.scrollTo(0, 0);
 }
-
 function showInstructions() {
     showAlert("Instructions", 
         "ENTRAÎNEMENT AUX ANNALES\n\n" +
