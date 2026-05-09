@@ -118,6 +118,7 @@
         }
         .btn-refresh { background: var(--primary-blue); color: white; }
         .btn-add { background: var(--green); color: white; }
+        .btn-delete-admin { background: var(--red); color: white; }
         
         .calendar-container {
             background: white;
@@ -133,7 +134,8 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -287,6 +289,51 @@
         .btn-confirm-cancel { padding: 10px 24px; background: var(--light-gray); border: none; border-radius: 30px; cursor: pointer; }
         .btn-confirm-ok { padding: 10px 24px; background: var(--green); color: white; border: none; border-radius: 30px; cursor: pointer; }
         .warning-text { color: var(--red); font-size: 0.85rem; margin-top: 10px; text-align: center; }
+        
+        /* 删除确认对话框 */
+        .delete-confirm-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .delete-confirm-overlay.active { opacity: 1; visibility: visible; }
+        .delete-confirm-card {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .delete-confirm-overlay.active .delete-confirm-card { transform: scale(1); }
+        .delete-confirm-header {
+            background: linear-gradient(135deg, var(--red), #c0392b);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .delete-confirm-header i { font-size: 2.5rem; margin-bottom: 10px; }
+        .delete-confirm-header h3 { color: white; margin: 0; }
+        .delete-confirm-body { padding: 25px; text-align: center; }
+        .delete-confirm-body p { color: #666; margin-bottom: 5px; }
+        .delete-confirm-footer {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            border-top: 1px solid #eee;
+        }
     </style>
 </head>
 <body>
@@ -393,6 +440,30 @@
         </div>
     </div>
 
+    <!-- 删除确认对话框 -->
+    <div id="deleteConfirmOverlay" class="delete-confirm-overlay">
+        <div class="delete-confirm-card">
+            <div class="delete-confirm-header">
+                <i class="fas fa-trash-alt"></i>
+                <h3>Confirmer la suppression</h3>
+            </div>
+            <div class="delete-confirm-body">
+                <p>Êtes-vous sûr de vouloir supprimer ce cours ?</p>
+                <p style="margin-top: 10px; font-size: 0.85rem; color: var(--red);">Cette action est irréversible.</p>
+                <div id="deleteCourseInfo" style="margin-top: 15px; padding: 10px; background: #f5f5f5; border-radius: 8px;">
+                    <p><strong>📚 Cours:</strong> <span id="deleteCourseType">-</span></p>
+                    <p><strong>📅 Date:</strong> <span id="deleteCourseDate">-</span></p>
+                    <p><strong>👨‍🏫 Intervenant:</strong> <span id="deleteCourseTeacher">-</span></p>
+                    <p><strong>👨‍🎓 Élève:</strong> <span id="deleteCourseStudent">-</span></p>
+                </div>
+            </div>
+            <div class="delete-confirm-footer">
+                <button class="btn-confirm-cancel" id="cancelDeleteCourseBtn">Annuler</button>
+                <button class="btn-confirm-ok" id="confirmDeleteCourseBtn" style="background: var(--red);">Supprimer</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ========== 全局变量 ==========
         let allCourses = [];
@@ -400,6 +471,8 @@
         let allTeachers = [];
         let calendar = null;
         let pendingDragInfo = null;
+        let pendingDeleteCourseId = null;
+        let currentUserRole = null;
 
         // ========== DOM 元素 ==========
         const totalCoursesEl = document.getElementById('totalCourses');
@@ -415,6 +488,20 @@
         const evaluationModal = document.getElementById('evaluationModal');
         const conflictWarning = document.getElementById('conflictWarning');
         const dragConfirmDialog = document.getElementById('dragConfirmDialog');
+        const deleteConfirmOverlay = document.getElementById('deleteConfirmOverlay');
+
+        // ========== 获取当前用户角色 ==========
+        function getCurrentUserRole() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            if (token) {
+                try {
+                    const data = JSON.parse(decodeURIComponent(atob(token)));
+                    return data.role;
+                } catch(e) {}
+            }
+            return null;
+        }
 
         // ========== 辅助函数 ==========
         function showToast(msg, type) {
@@ -434,8 +521,10 @@
 
         function formatDateTime(date) {
             if (!date) return '-';
-            return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' +
-                   date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            return new Date(date).toLocaleString('fr-FR', { 
+                day: '2-digit', month: '2-digit', year: 'numeric', 
+                hour: '2-digit', minute: '2-digit' 
+            });
         }
 
         // 检查冲突
@@ -559,7 +648,7 @@
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
                 slotMinTime: '08:00:00',
-                slotMaxTime: '20:00:00',
+                slotMaxTime: '21:00:00',
                 allDaySlot: false,
                 height: 'auto',
                 editable: true,
@@ -612,10 +701,15 @@
                 
                 eventDidMount: (info) => {
                     const el = info.el;
-                    el.addEventListener('contextmenu', (e) => {
-                        e.preventDefault();
-                        if (confirm('Supprimer ce cours ?')) deleteCourse(info.event.id);
-                    });
+                    // 管理员可以右键删除
+                    if (currentUserRole === 'admin') {
+                        el.style.cursor = 'pointer';
+                        el.addEventListener('contextmenu', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            showDeleteConfirm(info.event.id);
+                        });
+                    }
                     const typeText = info.event.extendedProps.typeText;
                     if (typeText && el) {
                         const badge = document.createElement('div');
@@ -699,7 +793,6 @@
             document.getElementById('courseId').value = '';
             document.getElementById('modalTitle').innerText = 'Ajouter un cours';
             
-            // 处理时间显示
             if (startTime) {
                 const date = new Date(startTime);
                 const year = date.getFullYear();
@@ -742,7 +835,7 @@
             document.getElementById('teacherId').value = course.teacher_id;
             document.getElementById('courseType').value = course.course_type || 'training';
             
-            // 修复：将 UTC 时间转换为本地时间显示
+            // 使用本地时间格式显示
             const startDate = new Date(course.start_time);
             const year = startDate.getFullYear();
             const month = String(startDate.getMonth() + 1).padStart(2, '0');
@@ -766,9 +859,8 @@
             const duration = parseFloat(document.getElementById('duration').value) || 2;
             const courseId = document.getElementById('courseId').value;
             if (teacherId && startTime) {
-                // 将本地时间转换为 UTC 检查冲突
-                const startUTC = new Date(startTime).toISOString();
-                const hasConflict = checkConflict(teacherId, startUTC, courseId || null, duration);
+                const startTimeStr = startTime.replace('T', ' ') + ':00';
+                const hasConflict = checkConflict(teacherId, startTimeStr, courseId || null, duration);
                 conflictWarning.style.display = hasConflict ? 'flex' : 'none';
                 return !hasConflict;
             }
@@ -789,11 +881,10 @@
                 return;
             }
             
-            // 将本地时间转换为 UTC 存储
-            const startDate = new Date(startTimeLocal);
-            const startTimeUTC = startDate.toISOString();
+            // 转换为 "YYYY-MM-DD HH:MM:00" 格式，不做时区转换
+            const startTimeStr = startTimeLocal.replace('T', ' ') + ':00';
             
-            if (checkConflict(teacherId, startTimeUTC, id || null, duration)) {
+            if (checkConflict(teacherId, startTimeStr, id || null, duration)) {
                 showToast('Conflit horaire avec un autre cours !', 'error');
                 return;
             }
@@ -802,7 +893,7 @@
                 student_id: document.getElementById('studentId').value,
                 teacher_id: teacherId,
                 course_type: document.getElementById('courseType').value,
-                start_time: startTimeUTC,
+                start_time: startTimeStr,
                 duration: duration,
                 location: document.getElementById('location').value || null,
                 material_link: document.getElementById('materialLink').value || null,
@@ -825,11 +916,61 @@
                 if (result.error) throw result.error;
                 closeModal(courseModal);
                 await loadData();
-                showToast(id ? 'Cours modifié avec succès' : 'Cours créé avec succès', 'success');
+                showToast(id ? 'Cours modifié' : 'Cours créé', 'success');
             } catch (err) {
                 console.error(err);
                 showToast('Erreur: ' + (err.message || 'Vérifiez la console'), 'error');
             }
+        }
+
+        // ========== 管理员删除功能 ==========
+        function showDeleteConfirm(courseId) {
+            const course = allCourses.find(c => c.id === courseId);
+            if (!course) return;
+            
+            const student = allStudents.find(s => s.id === course.student_id);
+            const teacher = allTeachers.find(t => t.id === course.teacher_id);
+            
+            pendingDeleteCourseId = courseId;
+            document.getElementById('deleteCourseType').textContent = getTypeText(course.course_type);
+            document.getElementById('deleteCourseDate').textContent = formatDateTime(course.start_time);
+            document.getElementById('deleteCourseTeacher').textContent = teacher?.name || 'N/A';
+            document.getElementById('deleteCourseStudent').textContent = student?.name || 'N/A';
+            
+            deleteConfirmOverlay.classList.add('active');
+        }
+
+        async function confirmDeleteCourse() {
+            if (!pendingDeleteCourseId) return;
+            
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            try {
+                const { error } = await supabase.from('courses').delete().eq('id', pendingDeleteCourseId);
+                if (error) throw error;
+                
+                deleteConfirmOverlay.classList.remove('active');
+                pendingDeleteCourseId = null;
+                await loadData();
+                showToast('Cours supprimé avec succès', 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Erreur lors de la suppression', 'error');
+            }
+        }
+
+        function cancelDeleteCourse() {
+            deleteConfirmOverlay.classList.remove('active');
+            pendingDeleteCourseId = null;
+        }
+
+        function getTypeText(t) { 
+            const types = {
+                'training': '📚 培训内容',
+                '4year': '🎫 四年卡',
+                '10year': '🎟️ 十年卡',
+                'naturalization': '🛂 入籍'
+            };
+            return types[t] || t;
         }
 
         // ========== 评价功能 ==========
@@ -873,18 +1014,6 @@
             }
         }
 
-        async function deleteCourse(courseId) {
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            try {
-                const { error } = await supabase.from('courses').delete().eq('id', courseId);
-                if (error) throw error;
-                await loadData();
-                showToast('Cours supprimé', 'success');
-            } catch (err) {
-                showToast('Erreur suppression', 'error');
-            }
-        }
-
         // ========== 事件绑定 ==========
         document.getElementById('courseForm').addEventListener('submit', saveCourse);
         document.getElementById('evaluationForm').addEventListener('submit', saveEvaluation);
@@ -896,6 +1025,8 @@
         document.getElementById('refreshCalendarBtn').addEventListener('click', () => refreshCalendar());
         document.getElementById('confirmDragBtn').addEventListener('click', executeDrag);
         document.getElementById('cancelDragBtn').addEventListener('click', cancelDrag);
+        document.getElementById('cancelDeleteCourseBtn').addEventListener('click', cancelDeleteCourse);
+        document.getElementById('confirmDeleteCourseBtn').addEventListener('click', confirmDeleteCourse);
         
         filterType.addEventListener('change', () => refreshCalendar());
         filterTeacher.addEventListener('change', () => refreshCalendar());
@@ -913,8 +1044,10 @@
         document.getElementById('duration')?.addEventListener('change', checkConflictRealtime);
         
         dragConfirmDialog.addEventListener('click', (e) => { if (e.target === dragConfirmDialog) cancelDrag(); });
+        deleteConfirmOverlay.addEventListener('click', (e) => { if (e.target === deleteConfirmOverlay) cancelDeleteCourse(); });
 
-        // 启动
+        // ========== 启动 ==========
+        currentUserRole = getCurrentUserRole();
         loadData();
     </script>
 </body>
