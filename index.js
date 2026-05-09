@@ -989,50 +989,49 @@ function initHamburger() {
     const navLinks = document.getElementById('navLinks');
     
     if (hamburgerBtn && navLinks) {
-        // 汉堡菜单点击事件
         hamburgerBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             this.classList.toggle('active');
             navLinks.classList.toggle('active');
             
-            // 当菜单打开时，禁止body滚动
             if (navLinks.classList.contains('active')) {
                 document.body.style.overflow = 'hidden';
+                document.body.classList.add('menu-open');
             } else {
                 document.body.style.overflow = '';
+                document.body.classList.remove('menu-open');
             }
         });
         
-        // 点击导航链接后关闭菜单
         navLinks.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', function() {
                 if (window.innerWidth <= 1024) {
                     hamburgerBtn.classList.remove('active');
                     navLinks.classList.remove('active');
                     document.body.style.overflow = '';
+                    document.body.classList.remove('menu-open');
                 }
             });
         });
         
-        // 点击菜单外部关闭菜单
         document.addEventListener('click', function(e) {
             if (window.innerWidth <= 1024 && 
                 navLinks.classList.contains('active') && 
                 !navLinks.contains(e.target) && 
                 !hamburgerBtn.contains(e.target)) {
-                
                 hamburgerBtn.classList.remove('active');
                 navLinks.classList.remove('active');
                 document.body.style.overflow = '';
+                document.body.classList.remove('menu-open');
             }
         });
         
-        // 窗口大小改变时，如果大于1024px，强制关闭菜单
         window.addEventListener('resize', function() {
             if (window.innerWidth > 1024) {
                 hamburgerBtn.classList.remove('active');
                 navLinks.classList.remove('active');
                 document.body.style.overflow = '';
+                document.body.classList.remove('menu-open');
             }
         });
     }
