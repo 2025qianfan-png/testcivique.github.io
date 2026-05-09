@@ -118,7 +118,6 @@
         }
         .btn-refresh { background: var(--primary-blue); color: white; }
         .btn-add { background: var(--green); color: white; }
-        .btn-delete-admin { background: var(--red); color: white; }
         
         .calendar-container {
             background: white;
@@ -128,6 +127,51 @@
             margin-bottom: 30px;
         }
         #calendar { max-width: 100%; }
+        
+        /* 课程事件样式 - 删除按钮 */
+        .fc-event {
+            position: relative;
+            overflow: visible !important;
+            cursor: pointer;
+        }
+        .fc-event-delete {
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            width: 22px;
+            height: 22px;
+            background: var(--red);
+            color: white;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 20px;
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0.9;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .fc-event-delete:hover {
+            opacity: 1;
+            transform: scale(1.1);
+            background: #c0392b;
+        }
+        /* 移动端删除按钮更大 */
+        @media (max-width: 768px) {
+            .fc-event-delete {
+                width: 28px;
+                height: 28px;
+                font-size: 16px;
+                line-height: 26px;
+                top: 1px;
+                right: 2px;
+            }
+        }
+        .fc-event-type { font-size: 0.7rem; opacity: 0.9; margin-top: 2px; }
+        .material-link-cal { font-size: 0.65rem; margin-top: 2px; }
+        .material-link-cal a { color: rgba(255,255,255,0.8); text-decoration: none; }
         
         .modal {
             display: none;
@@ -217,9 +261,6 @@
             padding: 20px;
             margin-top: 40px;
         }
-        
-        .fc-event { cursor: pointer; }
-        .fc-event-type { font-size: 0.7rem; opacity: 0.9; margin-top: 2px; }
         
         .confirm-dialog-overlay {
             position: fixed;
@@ -334,6 +375,8 @@
             gap: 15px;
             border-top: 1px solid #eee;
         }
+        .btn-confirm-cancel { padding: 10px 24px; background: var(--light-gray); border: none; border-radius: 30px; cursor: pointer; }
+        .btn-confirm-delete { padding: 10px 24px; background: var(--red); color: white; border: none; border-radius: 30px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -459,7 +502,7 @@
             </div>
             <div class="delete-confirm-footer">
                 <button class="btn-confirm-cancel" id="cancelDeleteCourseBtn">Annuler</button>
-                <button class="btn-confirm-ok" id="confirmDeleteCourseBtn" style="background: var(--red);">Supprimer</button>
+                <button class="btn-confirm-delete" id="confirmDeleteCourseBtn">Supprimer</button>
             </div>
         </div>
     </div>
@@ -472,7 +515,6 @@
         let calendar = null;
         let pendingDragInfo = null;
         let pendingDeleteCourseId = null;
-        let currentUserRole = null;
 
         // ========== DOM 元素 ==========
         const totalCoursesEl = document.getElementById('totalCourses');
@@ -489,19 +531,6 @@
         const conflictWarning = document.getElementById('conflictWarning');
         const dragConfirmDialog = document.getElementById('dragConfirmDialog');
         const deleteConfirmOverlay = document.getElementById('deleteConfirmOverlay');
-
-        // ========== 获取当前用户角色 ==========
-        function getCurrentUserRole() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('token');
-            if (token) {
-                try {
-                    const data = JSON.parse(decodeURIComponent(atob(token)));
-                    return data.role;
-                } catch(e) {}
-            }
-            return null;
-        }
 
         // ========== 辅助函数 ==========
         function showToast(msg, type) {
@@ -701,15 +730,9 @@
                 
                 eventDidMount: (info) => {
                     const el = info.el;
-                    // 管理员可以右键删除
-                    if (currentUserRole === 'admin') {
-                        el.style.cursor = 'pointer';
-                        el.addEventListener('contextmenu', (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            showDeleteConfirm(info.event.id);
-                        });
-                    }
+                    const course = info.event.extendedProps.course;
+                    
+                    // 添加类型标签
                     const typeText = info.event.extendedProps.typeText;
                     if (typeText && el) {
                         const badge = document.createElement('div');
@@ -717,6 +740,8 @@
                         badge.innerText = typeText;
                         el.querySelector('.fc-event-title')?.after(badge);
                     }
+                    
+                    // 添加课件链接
                     const materialLink = info.event.extendedProps.course?.material_link;
                     if (materialLink && el) {
                         const linkDiv = document.createElement('div');
@@ -724,6 +749,19 @@
                         linkDiv.innerHTML = `<a href="${materialLink}" target="_blank" style="color:rgba(255,255,255,0.8);"><i class="fas fa-link"></i> support</a>`;
                         el.appendChild(linkDiv);
                     }
+                    
+                    // ========== 添加删除按钮（小红✕）==========
+                    const deleteBtn = document.createElement('div');
+                    deleteBtn.className = 'fc-event-delete';
+                    deleteBtn.innerHTML = '✕';
+                    deleteBtn.title = 'Supprimer ce cours';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        showDeleteConfirm(info.event.id);
+                    };
+                    
+                    el.style.position = 'relative';
+                    el.appendChild(deleteBtn);
                 }
             });
             calendar.render();
@@ -923,7 +961,7 @@
             }
         }
 
-        // ========== 管理员删除功能 ==========
+        // ========== 删除功能 ==========
         function showDeleteConfirm(courseId) {
             const course = allCourses.find(c => c.id === courseId);
             if (!course) return;
@@ -1047,7 +1085,6 @@
         deleteConfirmOverlay.addEventListener('click', (e) => { if (e.target === deleteConfirmOverlay) cancelDeleteCourse(); });
 
         // ========== 启动 ==========
-        currentUserRole = getCurrentUserRole();
         loadData();
     </script>
 </body>
