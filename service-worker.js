@@ -1,10 +1,8 @@
-const CACHE_NAME = 'civique-exam-v1.4';
+const CACHE_NAME = 'civique-exam-v1.5';
 const urlsToCache = [
   '/',
   '/index.html',
   '/admin.html',
-  '/admin.css',
-  '/admin.js',
   '/student.html',
   '/teacher.html',
   '/cours.html',
@@ -66,23 +64,30 @@ self.addEventListener('fetch', event => {
     return;
   }
   
+  // 跳过后台管理相关请求（保持实时性）
+  if (event.request.url.includes('/admin.html') || 
+      event.request.url.includes('/student.html') || 
+      event.request.url.includes('/teacher.html') ||
+      event.request.url.includes('/cours.html')) {
+    // 对于这些页面，优先网络，失败时使用缓存
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+  
   event.respondWith(
     caches.match(event.request)
       .then(response => {
         if (response) {
-          // 返回缓存
           return response;
         }
-        
-        // 从网络获取
         return fetch(event.request)
           .then(response => {
-            // 检查是否有效
             if (!response || response.status !== 200) {
               return response;
             }
-            
-            // 只缓存同源请求
             if (event.request.url.startsWith(self.location.origin)) {
               const responseToCache = response.clone();
               caches.open(CACHE_NAME)
@@ -91,10 +96,6 @@ self.addEventListener('fetch', event => {
                 });
             }
             return response;
-          })
-          .catch(() => {
-            // 离线时返回缓存的首页
-            return caches.match('/index.html');
           });
       })
   );
@@ -110,19 +111,7 @@ self.addEventListener('push', event => {
     data: {
       dateOfArrival: Date.now(),
       primaryKey: 1
-    },
-    actions: [
-      {
-        action: 'explore',
-        title: 'Voir',
-        icon: '/icons/icon-72x72.png'
-      },
-      {
-        action: 'close',
-        title: 'Fermer',
-        icon: '/icons/icon-72x72.png'
-      }
-    ]
+    }
   };
   
   event.waitUntil(
@@ -134,14 +123,7 @@ self.addEventListener('push', event => {
 self.addEventListener('notificationclick', event => {
   console.log('Notification click reçu');
   event.notification.close();
-  
-  if (event.action === 'explore') {
-    event.waitUntil(
-      clients.openWindow('/')
-    );
-  } else {
-    event.waitUntil(
-      clients.openWindow('/')
-    );
-  }
+  event.waitUntil(
+    clients.openWindow('/')
+  );
 });
