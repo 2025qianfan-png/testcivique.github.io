@@ -721,37 +721,45 @@
             courseModal.style.display = 'flex';
         }
 
-        async function openEditModal(courseId) {
-            const course = allCourses.find(c => c.id === courseId);
-            if (!course) return;
-            
-            // 重置表单
-            document.getElementById('courseForm').reset();
-            document.getElementById('courseId').value = course.id;
-            document.getElementById('modalTitle').innerText = 'Modifier le cours';
-            conflictWarning.style.display = 'none';
-            
-            // 填充下拉框
-            const studentSelect = document.getElementById('studentId');
-            const teacherSelect = document.getElementById('teacherId');
-            studentSelect.innerHTML = '<option value="">Sélectionner...</option>' + allStudents.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
-            teacherSelect.innerHTML = '<option value="">Sélectionner...</option>' + allTeachers.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
-            
-            // 填充数据
-            document.getElementById('studentId').value = course.student_id;
-            document.getElementById('teacherId').value = course.teacher_id;
-            document.getElementById('courseType').value = course.course_type || 'training';
-            const startDate = new Date(course.start_time);
-            document.getElementById('startTime').value = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-            document.getElementById('duration').value = course.duration || 2;
-            document.getElementById('location').value = course.location || '';
-            document.getElementById('materialLink').value = course.material_link || '';
-            document.getElementById('notes').value = course.notes || '';
-            document.getElementById('status').value = course.status || 'scheduled';
-            
-            courseModal.style.display = 'flex';
-        }
-
+      async function openEditModal(courseId) {
+    const course = allCourses.find(c => c.id === courseId);
+    if (!course) return;
+    
+    // 重置表单
+    document.getElementById('courseForm').reset();
+    document.getElementById('courseId').value = course.id;
+    document.getElementById('modalTitle').innerText = 'Modifier le cours';
+    conflictWarning.style.display = 'none';
+    
+    // 填充下拉框
+    const studentSelect = document.getElementById('studentId');
+    const teacherSelect = document.getElementById('teacherId');
+    studentSelect.innerHTML = '<option value="">Sélectionner...</option>' + allStudents.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+    teacherSelect.innerHTML = '<option value="">Sélectionner...</option>' + allTeachers.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+    
+    // 填充数据
+    document.getElementById('studentId').value = course.student_id;
+    document.getElementById('teacherId').value = course.teacher_id;
+    document.getElementById('courseType').value = course.course_type || 'training';
+    
+    // 修复时间：将 UTC 时间转换为本地时间用于显示
+    const startDate = new Date(course.start_time);
+    const year = startDate.getFullYear();
+    const month = String(startDate.getMonth() + 1).padStart(2, '0');
+    const day = String(startDate.getDate()).padStart(2, '0');
+    const hours = String(startDate.getHours()).padStart(2, '0');
+    const minutes = String(startDate.getMinutes()).padStart(2, '0');
+    const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+    document.getElementById('startTime').value = localDateTime;
+    
+    document.getElementById('duration').value = course.duration || 2;
+    document.getElementById('location').value = course.location || '';
+    document.getElementById('materialLink').value = course.material_link || '';
+    document.getElementById('notes').value = course.notes || '';
+    document.getElementById('status').value = course.status || 'scheduled';
+    
+    courseModal.style.display = 'flex';
+}
         function checkConflictRealtime() {
             const teacherId = document.getElementById('teacherId').value;
             const startTime = document.getElementById('startTime').value;
@@ -766,53 +774,37 @@
             return true;
         }
 
-        async function saveCourse(e) {
-            e.preventDefault();
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            const id = document.getElementById('courseId').value;
-            const teacherId = document.getElementById('teacherId').value;
-            const startTime = document.getElementById('startTime').value;
-            const duration = parseFloat(document.getElementById('duration').value) || 2;
-            
-            if (checkConflict(teacherId, startTime, id || null, duration)) {
-                showToast('Conflit horaire !', 'error');
-                return;
-            }
-            
-            const data = {
-                student_id: document.getElementById('studentId').value,
-                teacher_id: teacherId,
-                course_type: document.getElementById('courseType').value,
-                start_time: new Date(startTime).toISOString(),
-                duration: duration,
-                location: document.getElementById('location').value || null,
-                material_link: document.getElementById('materialLink').value || null,
-                notes: document.getElementById('notes').value || null,
-                status: document.getElementById('status').value
-            };
-            
-            if (!data.student_id || !data.teacher_id || !data.start_time) {
-                showToast('Veuillez remplir tous les champs obligatoires', 'error');
-                return;
-            }
-            
-            try {
-                let result;
-                if (id) {
-                    result = await supabase.from('courses').update(data).eq('id', id);
-                } else {
-                    result = await supabase.from('courses').insert([data]);
-                }
-                if (result.error) throw result.error;
-                closeModal(courseModal);
-                await loadData();
-                showToast(id ? 'Cours modifié' : 'Cours créé', 'success');
-            } catch (err) {
-                console.error(err);
-                showToast('Erreur: ' + (err.message || 'Vérifiez la console'), 'error');
-            }
-        }
-
+       async function saveCourse(e) {
+    e.preventDefault();
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const id = document.getElementById('courseId').value;
+    const teacherId = document.getElementById('teacherId').value;
+    const startTimeLocal = document.getElementById('startTime').value;
+    const duration = parseFloat(document.getElementById('duration').value) || 2;
+    
+    // 将本地时间转换为 UTC 存储
+    const startDate = new Date(startTimeLocal);
+    const startTimeUTC = startDate.toISOString();
+    
+    if (checkConflict(teacherId, startTimeUTC, id || null, duration)) {
+        showToast('Conflit horaire !', 'error');
+        return;
+    }
+    
+    const data = {
+        student_id: document.getElementById('studentId').value,
+        teacher_id: teacherId,
+        course_type: document.getElementById('courseType').value,
+        start_time: startTimeUTC,
+        duration: duration,
+        location: document.getElementById('location').value || null,
+        material_link: document.getElementById('materialLink').value || null,
+        notes: document.getElementById('notes').value || null,
+        status: document.getElementById('status').value
+    };
+    
+    // ... 其余代码不变
+}
         // ========== 评价功能 ==========
         async function openEvaluationModal(courseId) {
             const course = allCourses.find(c => c.id === courseId);
