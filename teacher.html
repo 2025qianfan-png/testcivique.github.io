@@ -198,7 +198,6 @@
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(0,64,128,0.1);
         }
-        .form-group small { display: block; color: #666; font-size: 0.75rem; margin-top: 5px; }
         
         .form-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px; }
         .cancel-btn { padding: 10px 20px; background: #eee; border: none; border-radius: 30px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
@@ -364,7 +363,7 @@
     
     <footer class="footer"><div class="container"><p>&copy; 2025 Association Mille Voiles</p></div></footer>
     
-    <!-- Modal ajout disponibilité (simplifié) -->
+    <!-- Modal ajout disponibilité -->
     <div class="modal" id="addDispoModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -556,7 +555,6 @@
         function refreshCalendar() {
             if (!calendar) return;
             const events = [];
-            // 可用时间 - 蓝色
             availabilities.forEach(a => {
                 events.push({ 
                     id: a.id, 
@@ -568,11 +566,10 @@
                     extendedProps: { type: 'availability' } 
                 });
             });
-            // 课程 - 根据状态配色
             allCourses.forEach(c => {
-                let color = '#2ecc71';     // 绿色 - 已预约
-                if (c.status === 'completed') color = '#95a5a6';  // 灰色 - 完成
-                else if (c.status === 'in_progress') color = '#f39c12';  // 橙色 - 进行中
+                let color = '#2ecc71';
+                if (c.status === 'completed') color = '#95a5a6';
+                else if (c.status === 'in_progress') color = '#f39c12';
                 else if (c.teacher_started && !c.student_confirmed) color = '#f39c12';
                 events.push({ 
                     id: c.id, 
@@ -629,6 +626,13 @@
         let selectedDate = null;
         let selectedSlots = [];
         
+        // 将本地时间转换为UTC存储（解决时区偏移）
+        function localToUTC(year, month, day, hour, minute) {
+            // month 从0开始，需要转换
+            const localDate = new Date(year, month, day, hour, minute);
+            return localDate.toISOString();
+        }
+        
         function openAddDispoModal(date) {
             selectedDate = date;
             selectedSlots = [];
@@ -646,7 +650,7 @@
                     const start = el.dataset.start;
                     if (el.classList.contains('selected')) {
                         icon.className = 'fas fa-check-square';
-                        if (!selectedSlots.find(s => s.start === start)) selectedSlots.push({ start: start, end: el.dataset.end });
+                        if (!selectedSlots.find(s => s.start === start)) selectedSlots.push({ start: start, end: el.dataset.end, label: el.querySelector('.slot-time').innerText });
                     } else {
                         icon.className = 'far fa-square';
                         selectedSlots = selectedSlots.filter(s => s.start !== start);
@@ -656,63 +660,70 @@
             document.getElementById('addDispoModal').style.display = 'flex';
         }
         
-       async function addSelectedSlots() {
+
+        async function addSelectedSlots() {
     if (selectedSlots.length === 0) { 
         showToast('Sélectionnez au moins un créneau', 'error'); 
         return; 
     }
     const supabase = window.supabaseAuth.getSupabaseClient();
     
-    // 获取年月日（本地时间）
+    // 获取日期
     const year = selectedDate.getFullYear();
     const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
     const day = String(selectedDate.getDate()).padStart(2, '0');
     const dateStr = `${year}-${month}-${day}`;
     
     // 获取当天已有的可用时间
-    const startOfDay = `${dateStr} 00:00:00`;
-    const endOfDay = `${dateStr} 23:59:59`;
-    const { data: existing } = await supabase
+    const { data: existingAvail } = await supabase
         .from('availabilities')
         .select('start_time')
         .eq('teacher_id', currentTeacher.userId)
-        .gte('start_time', startOfDay)
-        .lte('start_time', endOfDay);
+        .gte('start_time', `${dateStr} 00:00:00`)
+        .lte('start_time', `${dateStr} 23:59:59`);
     
-    // 提取已存在的时间段
-    const existingHours = existing?.map(e => {
-        const t = new Date(e.start_time);
-        return t.getHours();
-    }) || [];
+    // 获取当天已有的课程（已预约的时间）
+    const { data: existingCourses } = await supabase
+        .from('courses')
+        .select('start_time')
+        .eq('teacher_id', currentTeacher.userId)
+        .gte('start_time', `${dateStr} 00:00:00`)
+        .lte('start_time', `${dateStr} 23:59:59`);
+    
+    // 收集所有已被占用的时间段（小时）
+    const occupiedHours = [
+        ...(existingAvail?.map(e => new Date(e.start_time).getHours()) || []),
+        ...(existingCourses?.map(e => new Date(e.start_time).getHours()) || [])
+    ];
     
     let added = 0;
     for (const slot of selectedSlots) {
         const startHour = parseInt(slot.start.split(':')[0]);
         
-        // 检查冲突
-        if (existingHours.includes(startHour)) {
-            showToast(`Créneau ${slot.label} existe déjà`, 'warning');
+        // 检查是否已被占用（无论是可用时间还是已预约课程）
+        if (occupiedHours.includes(startHour)) {
+            showToast(`⚠️ ${slot.label} existe déjà ou est déjà réservé`, 'warning');
             continue;
         }
         
-        // 构造正确的本地时间字符串
-        const startDateTime = `${dateStr} ${slot.start}:00`;
-        const endDateTime = `${dateStr} ${slot.end}:00`;
+        const startTimeStr = `${dateStr} ${slot.start}:00`;
+        const endTimeStr = `${dateStr} ${slot.end}:00`;
         
         const { error } = await supabase
             .from('availabilities')
             .insert([{
                 teacher_id: currentTeacher.userId,
-                start_time: startDateTime,
-                end_time: endDateTime,
+                start_time: startTimeStr,
+                end_time: endTimeStr,
                 status: 'available'
             }]);
         
         if (error) {
             console.error('插入错误:', error);
-            showToast('Erreur lors de l\'ajout', 'error');
+            showToast('Erreur', 'error');
         } else {
             added++;
+            occupiedHours.push(startHour);
         }
     }
     
@@ -723,7 +734,9 @@
         selectedSlots = [];
     }
 }
-        // ========== 删除可用时间 ==========
+// ========== 删除可用时间 ==========
+        
+        
         async function confirmDelete() {
             if (!pendingDeleteId) return;
             const supabase = window.supabaseAuth.getSupabaseClient();

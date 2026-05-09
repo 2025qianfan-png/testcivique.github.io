@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <title>Gestion des cours - Association Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --primary-blue: #004080;
+            --primary-light-blue: #0066cc;
+            --primary-yellow: #ffd633;
+            --dark-gray: #333;
+            --medium-gray: #666;
+            --light-gray: #f5f7fa;
+            --white: #fff;
+            --green: #27ae60;
+            --red: #e74c3c;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --border-radius: 12px;
+        }
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            min-height: 100vh;
+        }
+        @media (max-width: 768px) {
+            body { transform: scale(0.8); transform-origin: top center; width: 125%; min-height: 125vh; left: -12.5%; position: relative; }
+            html { overflow-x: hidden; }
+        }
+        h1, h2, h3 { font-family: 'Montserrat', sans-serif; color: var(--primary-blue); }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+        
+        .main-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-light-blue));
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+        .main-header h1 { color: white; font-size: 1.8rem; }
+        .main-header p { font-size: 0.9rem; opacity: 0.9; }
+        
+        .main-nav {
+            background: white;
+            padding: 12px 0;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active { background: var(--primary-blue); color: white; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        @media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .stat-card .stat-icon { font-size: 2rem; color: var(--primary-blue); margin-bottom: 10px; }
+        .stat-card .stat-number { font-size: 2rem; font-weight: 700; color: var(--primary-blue); }
+        .stat-card .stat-label { font-size: 0.8rem; color: var(--medium-gray); }
+        
+        .filters-bar {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            flex: 1;
+            min-width: 150px;
+        }
+        .btn-refresh, .btn-add {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-refresh { background: var(--primary-blue); color: white; }
+        .btn-add { background: var(--green); color: white; }
+        
+        .calendar-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        #calendar { max-width: 100%; }
+        
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-title { font-size: 1.5rem; color: var(--primary-blue); }
+        .close-btn { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--medium-gray); }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--primary-blue); }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+        .form-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px; }
+        .cancel-btn { padding: 10px 20px; background: var(--light-gray); border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .save-btn { padding: 10px 20px; background: var(--green); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .conflict-warning {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--red);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+            font-size: 0.85rem;
+        }
+        
+        .rating-stars { display: flex; gap: 8px; margin-top: 8px; }
+        .star { font-size: 1.8rem; cursor: pointer; color: #ddd; }
+        .star.active { color: #f1c40f; }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1100;
+            animation: fadeInUp 0.3s;
+        }
+        .toast-success { background: var(--green); }
+        .toast-error { background: var(--red); }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .footer {
+            background: var(--primary-blue);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+        
+        .fc-event { cursor: pointer; }
+        .fc-event-type { font-size: 0.7rem; opacity: 0.9; margin-top: 2px; }
+        
+        /* 确认对话框 */
+        .confirm-dialog-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .confirm-dialog-overlay.active { opacity: 1; visibility: visible; }
+        .confirm-dialog-card {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 480px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .confirm-dialog-overlay.active .confirm-dialog-card { transform: scale(1); }
+        .confirm-dialog-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-light-blue));
+            color: white;
+            padding: 20px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .confirm-dialog-header h3 { color: white; margin: 0; }
+        .confirm-dialog-body { padding: 25px; }
+        .time-change-info {
+            background: var(--light-gray);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .time-change-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .time-change-row:last-child { border-bottom: none; }
+        .time-value.old { color: var(--red); text-decoration: line-through; }
+        .time-value.new { color: var(--green); }
+        .course-details {
+            background: #f0f7ff;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .course-details p { margin: 8px 0; font-size: 0.9rem; }
+        .confirm-dialog-footer {
+            padding: 20px 25px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid #eee;
+        }
+        .btn-confirm-cancel { padding: 10px 24px; background: var(--light-gray); border: none; border-radius: 30px; cursor: pointer; }
+        .btn-confirm-ok { padding: 10px 24px; background: var(--green); color: white; border: none; border-radius: 30px; cursor: pointer; }
+        .warning-text { color: var(--red); font-size: 0.85rem; margin-top: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <h1><i class="fas fa-book-open"></i> Gestion des cours</h1>
+            <p>Association Mille Voiles - Planning et suivi des cours</p>
+        </div>
+    </header>
+    <nav class="main-nav">
+        <div class="container" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+            <a href="admin.html" class="nav-link"><i class="fas fa-users"></i> Utilisateurs</a>
+            <a href="cours.html" class="nav-link active"><i class="fas fa-book-open"></i> Cours</a>
+        </div>
+    </nav>
+    <main style="padding: 30px 0;">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-chalkboard"></i></div><div class="stat-number" id="totalCourses">0</div><div class="stat-label">Total cours</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-week"></i></div><div class="stat-number" id="monthCourses">0</div><div class="stat-label">Ce mois</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-number" id="completedRate">0%</div><div class="stat-label">Taux complétion</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-star"></i></div><div class="stat-number" id="avgRating">0</div><div class="stat-label">Note moyenne</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-number" id="activeStudents">0</div><div class="stat-label">Élèves actifs</div></div>
+            </div>
+            <div class="filters-bar">
+                <select id="filterType" class="filter-select">
+                    <option value="">Tous les types</option>
+                    <option value="training">📚 培训内容</option>
+                    <option value="4year">🎫 四年卡</option>
+                    <option value="10year">🎟️ 十年卡</option>
+                    <option value="naturalization">🛂 入籍</option>
+                </select>
+                <select id="filterTeacher" class="filter-select"><option value="">Tous les intervenants</option></select>
+                <button id="refreshCalendarBtn" class="btn-refresh"><i class="fas fa-sync-alt"></i> Rafraîchir</button>
+                <button id="addCourseBtn" class="btn-add"><i class="fas fa-plus"></i> Ajouter un cours</button>
+            </div>
+            <div class="calendar-container"><div id="calendar"></div></div>
+        </div>
+    </main>
+    <footer class="footer"><div class="container"><p>&copy; 2025 Association Mille Voiles</p></div></footer>
+
+    <!-- 课程模态框 -->
+    <div class="modal" id="courseModal">
+        <div class="modal-content">
+            <div class="modal-header"><h2 class="modal-title" id="modalTitle">Ajouter un cours</h2><button class="close-btn" id="closeModalBtn">&times;</button></div>
+            <form id="courseForm">
+                <input type="hidden" id="courseId">
+                <div class="form-row">
+                    <div class="form-group"><label>Élève (学员) *</label><select id="studentId" required><option value="">Sélectionner...</option></select></div>
+                    <div class="form-group"><label>Intervenant *</label><select id="teacherId" required><option value="">Sélectionner...</option></select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Type de cours *</label><select id="courseType" required><option value="training">📚 培训内容</option><option value="4year">🎫 四年卡</option><option value="10year">🎟️ 十年卡</option><option value="naturalization">🛂 入籍</option></select></div>
+                    <div class="form-group"><label>Date et heure *</label><input type="datetime-local" id="startTime" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Durée (heures)</label><input type="number" id="duration" value="2" step="0.5" min="0.5"></div>
+                    <div class="form-group"><label>Lieu</label><input type="text" id="location" placeholder="Salle, adresse..."></div>
+                </div>
+                <div class="form-group"><label>Lien du cours / support</label><input type="url" id="materialLink" placeholder="https://..."></div>
+                <div class="form-group"><label>Notes / Contenu</label><textarea id="notes" rows="2" placeholder="Objectifs, programme..."></textarea></div>
+                <div class="form-group"><label>Statut</label><select id="status"><option value="scheduled">📅 计划</option><option value="completed">✅ 完成</option><option value="cancelled">❌ 取消</option></select></div>
+                <div id="conflictWarning" class="conflict-warning"><i class="fas fa-exclamation-triangle"></i> Conflit horaire !</div>
+                <div class="form-actions"><button type="button" class="cancel-btn" id="cancelModalBtn">Annuler</button><button type="submit" class="save-btn">Enregistrer</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 评价模态框 -->
+    <div class="modal" id="evaluationModal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Évaluation du cours</h2><button class="close-btn" id="closeEvalBtn">&times;</button></div>
+            <form id="evaluationForm">
+                <input type="hidden" id="evalCourseId">
+                <div class="form-group"><label>Commentaire intervenant</label><textarea id="teacherComment" rows="3"></textarea></div>
+                <div class="form-group"><label>Note élève (1-5)</label><div class="rating-stars" id="ratingStars"><span class="star" data-value="1">★</span><span class="star" data-value="2">★</span><span class="star" data-value="3">★</span><span class="star" data-value="4">★</span><span class="star" data-value="5">★</span></div><input type="hidden" id="studentRating"></div>
+                <div class="form-group"><label>Commentaire élève</label><textarea id="studentComment" rows="3"></textarea></div>
+                <div class="form-actions"><button type="button" class="cancel-btn" id="cancelEvalBtn">Annuler</button><button type="submit" class="save-btn">Enregistrer</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 拖拽确认对话框 -->
+    <div id="dragConfirmDialog" class="confirm-dialog-overlay">
+        <div class="confirm-dialog-card">
+            <div class="confirm-dialog-header"><i class="fas fa-calendar-alt"></i><h3>Confirmer le déplacement</h3></div>
+            <div class="confirm-dialog-body">
+                <div class="time-change-info">
+                    <div class="time-change-row"><span>Ancien horaire :</span><span class="time-value old" id="oldTimeValue">-</span></div>
+                    <div class="time-change-row"><span>Nouvel horaire :</span><span class="time-value new" id="newTimeValue">-</span></div>
+                </div>
+                <div class="course-details">
+                    <p><strong>Élève :</strong> <span id="detailStudent">-</span></p>
+                    <p><strong>Intervenant :</strong> <span id="detailTeacher">-</span></p>
+                    <p><strong>Type :</strong> <span id="detailType">-</span></p>
+                    <p><strong>Durée :</strong> <span id="detailDuration">-</span> heures</p>
+                </div>
+                <div id="confirmConflictWarning" class="warning-text" style="display:none;"><i class="fas fa-exclamation-triangle"></i> Conflit détecté !</div>
+            </div>
+            <div class="confirm-dialog-footer">
+                <button class="btn-confirm-cancel" id="cancelDragBtn">Annuler</button>
+                <button class="btn-confirm-ok" id="confirmDragBtn">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== 全局变量 ==========
+        let allCourses = [];
+        let allStudents = [];
+        let allTeachers = [];
+        let calendar = null;
+        let pendingDragInfo = null;
+
+        // ========== DOM 元素 ==========
+        const totalCoursesEl = document.getElementById('totalCourses');
+        const monthCoursesEl = document.getElementById('monthCourses');
+        const completedRateEl = document.getElementById('completedRate');
+        const avgRatingEl = document.getElementById('avgRating');
+        const activeStudentsEl = document.getElementById('activeStudents');
+        const filterType = document.getElementById('filterType');
+        const filterTeacher = document.getElementById('filterTeacher');
+        const refreshBtn = document.getElementById('refreshCalendarBtn');
+        const addCourseBtn = document.getElementById('addCourseBtn');
+        const courseModal = document.getElementById('courseModal');
+        const evaluationModal = document.getElementById('evaluationModal');
+        const conflictWarning = document.getElementById('conflictWarning');
+        const dragConfirmDialog = document.getElementById('dragConfirmDialog');
+
+        // ========== 辅助函数 ==========
+        function showToast(msg, type) {
+            let t = document.createElement('div');
+            t.className = `toast toast-${type || 'success'}`;
+            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function closeModal(modal) { modal.style.display = 'none'; }
+
+        function escapeHtml(s) {
+            if (!s) return '';
+            return s.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+        }
+
+        function formatDateTime(date) {
+            if (!date) return '-';
+            return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' +
+                   date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // 检查冲突
+        function checkConflict(teacherId, startTime, excludeId, duration = 2) {
+            if (!teacherId || !startTime) return false;
+            const s = new Date(startTime).getTime();
+            const e = s + duration * 3600000;
+            return allCourses.some(c => {
+                if (c.teacher_id !== teacherId) return false;
+                if (excludeId && c.id === excludeId) return false;
+                if (c.status === 'cancelled') return false;
+                const cs = new Date(c.start_time).getTime();
+                const ce = cs + (c.duration || 2) * 3600000;
+                return s < ce && e > cs;
+            });
+        }
+
+        // 对齐30分钟
+        function snapToGrid(date) {
+            const minutes = date.getMinutes();
+            const remainder = minutes % 30;
+            if (remainder !== 0) {
+                const newMinutes = remainder < 15 ? minutes - remainder : minutes + (30 - remainder);
+                date.setMinutes(newMinutes);
+                date.setSeconds(0);
+                date.setMilliseconds(0);
+            }
+            return date;
+        }
+
+        // ========== 数据加载 ==========
+        async function loadData() {
+            try {
+                const supabase = window.supabaseAuth.getSupabaseClient();
+                const [coursesRes, studentsRes, teachersRes] = await Promise.all([
+                    supabase.from('courses').select('*').order('start_time'),
+                    supabase.from('students').select('id, name').eq('role', 'stu'),
+                    supabase.from('students').select('id, name').eq('role', 'teacher')
+                ]);
+                if (coursesRes.error) throw coursesRes.error;
+                if (studentsRes.error) throw studentsRes.error;
+                if (teachersRes.error) throw teachersRes.error;
+
+                allCourses = coursesRes.data || [];
+                allStudents = studentsRes.data || [];
+                allTeachers = teachersRes.data || [];
+
+                // 更新老师筛选下拉框
+                filterTeacher.innerHTML = '<option value="">Tous les intervenants</option>' + 
+                    allTeachers.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+
+                updateStats();
+                initCalendar();
+            } catch (err) {
+                console.error(err);
+                showToast('Erreur chargement', 'error');
+            }
+        }
+
+        function updateStats() {
+            const total = allCourses.length;
+            const now = new Date();
+            const monthCourses = allCourses.filter(c => {
+                const d = new Date(c.start_time);
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+            }).length;
+            const completed = allCourses.filter(c => c.status === 'completed').length;
+            const rated = allCourses.filter(c => c.student_rating);
+            const avgRating = rated.length ? (rated.reduce((s, c) => s + c.student_rating, 0) / rated.length).toFixed(1) : 0;
+            const activeStudents = [...new Set(allCourses.filter(c => c.status === 'scheduled').map(c => c.student_id))].length;
+
+            totalCoursesEl.textContent = total;
+            monthCoursesEl.textContent = monthCourses;
+            completedRateEl.textContent = total ? Math.round(completed / total * 100) : 0;
+            avgRatingEl.textContent = avgRating;
+            activeStudentsEl.textContent = activeStudents;
+        }
+
+        function getEventSource() {
+            const filtered = allCourses.filter(c => 
+                (!filterType.value || c.course_type === filterType.value) &&
+                (!filterTeacher.value || c.teacher_id === filterTeacher.value)
+            );
+            const colors = { scheduled: '#3498db', completed: '#2ecc71', cancelled: '#e74c3c' };
+            const typeText = { training: '📚 培训', '4year': '🎫 四年', '10year': '🎟️ 十年', naturalization: '🛂 入籍' };
+            
+            return filtered.map(c => {
+                const s = allStudents.find(x => x.id === c.student_id);
+                const t = allTeachers.find(x => x.id === c.teacher_id);
+                const endTime = new Date(new Date(c.start_time).getTime() + (c.duration || 2) * 3600000);
+                return {
+                    id: c.id,
+                    title: `${s?.name || 'N/A'} - ${t?.name || 'N/A'}`,
+                    start: c.start_time,
+                    end: endTime.toISOString(),
+                    duration: c.duration || 2,
+                    backgroundColor: colors[c.status] || '#3498db',
+                    borderColor: colors[c.status] || '#3498db',
+                    extendedProps: { course: c, student: s, teacher: t, typeText: typeText[c.course_type] || '' }
+                };
+            });
+        }
+
+        function refreshCalendar() {
+            if (calendar) {
+                calendar.removeAllEvents();
+                calendar.addEventSource(getEventSource());
+            }
+        }
+
+        // ========== 日历初始化 ==========
+        function initCalendar() {
+            if (calendar) calendar.destroy();
+            const el = document.getElementById('calendar');
+            
+            calendar = new FullCalendar.Calendar(el, {
+                initialView: 'timeGridWeek',
+                locale: 'fr',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                slotMinTime: '08:00:00',
+                slotMaxTime: '20:00:00',
+                allDaySlot: false,
+                height: 'auto',
+                editable: true,
+                selectable: true,
+                snapDuration: '00:30:00',
+                slotDuration: '00:30:00',
+                slotLabelInterval: '01:00:00',
+                events: getEventSource(),
+                
+                eventDrop: async (info) => {
+                    let newStart = snapToGrid(info.event.start);
+                    let newEnd = snapToGrid(info.event.end);
+                    info.event.setStart(newStart);
+                    info.event.setEnd(newEnd);
+                    showConfirmDialog(info, newStart, newEnd);
+                },
+                
+                eventResize: async (info) => {
+                    let newEnd = snapToGrid(info.event.end);
+                    info.event.setEnd(newEnd);
+                    const newDuration = (newEnd - info.event.start) / 3600000;
+                    const teacherId = info.event.extendedProps.course.teacher_id;
+                    const courseId = info.event.id;
+                    const hasConflict = checkConflict(teacherId, info.event.start, courseId, newDuration);
+                    if (hasConflict) {
+                        showToast('Conflit horaire !', 'error');
+                        info.revert();
+                        return;
+                    }
+                    const supabase = window.supabaseAuth.getSupabaseClient();
+                    const { error } = await supabase.from('courses').update({ duration: newDuration }).eq('id', courseId);
+                    if (error) {
+                        showToast('Erreur', 'error');
+                        info.revert();
+                    } else {
+                        const idx = allCourses.findIndex(c => c.id === courseId);
+                        if (idx !== -1) allCourses[idx].duration = newDuration;
+                        updateStats();
+                        showToast('Durée modifiée', 'success');
+                    }
+                },
+                
+                select: (info) => {
+                    let start = snapToGrid(info.start);
+                    let startStr = start.toISOString().slice(0, 16);
+                    openCreateModal(startStr);
+                },
+                
+                eventClick: (info) => { openEditModal(info.event.id); },
+                
+                eventDidMount: (info) => {
+                    const el = info.el;
+                    el.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        if (confirm('Supprimer ce cours ?')) deleteCourse(info.event.id);
+                    });
+                    const typeText = info.event.extendedProps.typeText;
+                    if (typeText && el) {
+                        const badge = document.createElement('div');
+                        badge.className = 'fc-event-type';
+                        badge.innerText = typeText;
+                        el.querySelector('.fc-event-title')?.after(badge);
+                    }
+                    const materialLink = info.event.extendedProps.course?.material_link;
+                    if (materialLink && el) {
+                        const linkDiv = document.createElement('div');
+                        linkDiv.className = 'material-link-cal';
+                        linkDiv.innerHTML = `<a href="${materialLink}" target="_blank" style="color:rgba(255,255,255,0.8);"><i class="fas fa-link"></i> support</a>`;
+                        el.appendChild(linkDiv);
+                    }
+                }
+            });
+            calendar.render();
+        }
+
+        // 显示确认对话框
+        function showConfirmDialog(eventInfo, newStart, newEnd) {
+            const course = eventInfo.event.extendedProps.course;
+            const student = allStudents.find(s => s.id === course.student_id);
+            const teacher = allTeachers.find(t => t.id === course.teacher_id);
+            const oldStart = new Date(course.start_time);
+            const newDuration = (newEnd - newStart) / 3600000;
+            const hasConflict = checkConflict(course.teacher_id, newStart, course.id, newDuration);
+
+            document.getElementById('oldTimeValue').innerHTML = formatDateTime(oldStart) + ` (${course.duration || 2}h)`;
+            document.getElementById('newTimeValue').innerHTML = formatDateTime(newStart) + ` (${newDuration.toFixed(1)}h)`;
+            document.getElementById('detailStudent').textContent = student?.name || 'N/A';
+            document.getElementById('detailTeacher').textContent = teacher?.name || 'N/A';
+            document.getElementById('detailType').textContent = { training: '培训内容', '4year': '四年卡', '10year': '十年卡', naturalization: '入籍' }[course.course_type] || course.course_type;
+            document.getElementById('detailDuration').textContent = newDuration.toFixed(1);
+            document.getElementById('confirmConflictWarning').style.display = hasConflict ? 'block' : 'none';
+
+            pendingDragInfo = { eventInfo, newStart, newEnd, newDuration, hasConflict };
+            dragConfirmDialog.classList.add('active');
+        }
+
+        async function executeDrag() {
+            if (!pendingDragInfo) return;
+            const { eventInfo, newStart, newEnd, newDuration, hasConflict } = pendingDragInfo;
+            if (hasConflict) {
+                showToast('Conflit horaire !', 'error');
+                dragConfirmDialog.classList.remove('active');
+                pendingDragInfo = null;
+                eventInfo.revert();
+                return;
+            }
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const { error } = await supabase.from('courses').update({
+                start_time: newStart.toISOString(),
+                duration: newDuration
+            }).eq('id', eventInfo.event.id);
+            if (error) {
+                showToast('Erreur', 'error');
+                eventInfo.revert();
+            } else {
+                const idx = allCourses.findIndex(c => c.id === eventInfo.event.id);
+                if (idx !== -1) {
+                    allCourses[idx].start_time = newStart.toISOString();
+                    allCourses[idx].duration = newDuration;
+                }
+                updateStats();
+                refreshCalendar();
+                showToast('Cours déplacé', 'success');
+            }
+            dragConfirmDialog.classList.remove('active');
+            pendingDragInfo = null;
+        }
+
+        function cancelDrag() {
+            if (pendingDragInfo) pendingDragInfo.eventInfo.revert();
+            pendingDragInfo = null;
+            dragConfirmDialog.classList.remove('active');
+        }
+
+        // ========== 添加/编辑课程 ==========
+        function openCreateModal(startTime) {
+            // 重置表单
+            document.getElementById('courseForm').reset();
+            document.getElementById('courseId').value = '';
+            document.getElementById('modalTitle').innerText = 'Ajouter un cours';
+            document.getElementById('startTime').value = startTime || '';
+            document.getElementById('duration').value = 2;
+            document.getElementById('status').value = 'scheduled';
+            conflictWarning.style.display = 'none';
+            
+            // 填充下拉框
+            const studentSelect = document.getElementById('studentId');
+            const teacherSelect = document.getElementById('teacherId');
+            studentSelect.innerHTML = '<option value="">Sélectionner...</option>' + allStudents.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+            teacherSelect.innerHTML = '<option value="">Sélectionner...</option>' + allTeachers.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+            
+            courseModal.style.display = 'flex';
+        }
+
+        async function openEditModal(courseId) {
+            const course = allCourses.find(c => c.id === courseId);
+            if (!course) return;
+            
+            // 重置表单
+            document.getElementById('courseForm').reset();
+            document.getElementById('courseId').value = course.id;
+            document.getElementById('modalTitle').innerText = 'Modifier le cours';
+            conflictWarning.style.display = 'none';
+            
+            // 填充下拉框
+            const studentSelect = document.getElementById('studentId');
+            const teacherSelect = document.getElementById('teacherId');
+            studentSelect.innerHTML = '<option value="">Sélectionner...</option>' + allStudents.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+            teacherSelect.innerHTML = '<option value="">Sélectionner...</option>' + allTeachers.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+            
+            // 填充数据
+            document.getElementById('studentId').value = course.student_id;
+            document.getElementById('teacherId').value = course.teacher_id;
+            document.getElementById('courseType').value = course.course_type || 'training';
+            const startDate = new Date(course.start_time);
+            document.getElementById('startTime').value = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            document.getElementById('duration').value = course.duration || 2;
+            document.getElementById('location').value = course.location || '';
+            document.getElementById('materialLink').value = course.material_link || '';
+            document.getElementById('notes').value = course.notes || '';
+            document.getElementById('status').value = course.status || 'scheduled';
+            
+            courseModal.style.display = 'flex';
+        }
+
+        function checkConflictRealtime() {
+            const teacherId = document.getElementById('teacherId').value;
+            const startTime = document.getElementById('startTime').value;
+            const duration = parseFloat(document.getElementById('duration').value) || 2;
+            const courseId = document.getElementById('courseId').value;
+            if (teacherId && startTime) {
+                const hasConflict = checkConflict(teacherId, startTime, courseId || null, duration);
+                conflictWarning.style.display = hasConflict ? 'flex' : 'none';
+                return !hasConflict;
+            }
+            conflictWarning.style.display = 'none';
+            return true;
+        }
+
+        async function saveCourse(e) {
+            e.preventDefault();
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const id = document.getElementById('courseId').value;
+            const teacherId = document.getElementById('teacherId').value;
+            const startTime = document.getElementById('startTime').value;
+            const duration = parseFloat(document.getElementById('duration').value) || 2;
+            
+            if (checkConflict(teacherId, startTime, id || null, duration)) {
+                showToast('Conflit horaire !', 'error');
+                return;
+            }
+            
+            const data = {
+                student_id: document.getElementById('studentId').value,
+                teacher_id: teacherId,
+                course_type: document.getElementById('courseType').value,
+                start_time: new Date(startTime).toISOString(),
+                duration: duration,
+                location: document.getElementById('location').value || null,
+                material_link: document.getElementById('materialLink').value || null,
+                notes: document.getElementById('notes').value || null,
+                status: document.getElementById('status').value
+            };
+            
+            if (!data.student_id || !data.teacher_id || !data.start_time) {
+                showToast('Veuillez remplir tous les champs obligatoires', 'error');
+                return;
+            }
+            
+            try {
+                let result;
+                if (id) {
+                    result = await supabase.from('courses').update(data).eq('id', id);
+                } else {
+                    result = await supabase.from('courses').insert([data]);
+                }
+                if (result.error) throw result.error;
+                closeModal(courseModal);
+                await loadData();
+                showToast(id ? 'Cours modifié' : 'Cours créé', 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Erreur: ' + (err.message || 'Vérifiez la console'), 'error');
+            }
+        }
+
+        // ========== 评价功能 ==========
+        async function openEvaluationModal(courseId) {
+            const course = allCourses.find(c => c.id === courseId);
+            if (!course) return;
+            document.getElementById('evalCourseId').value = courseId;
+            document.getElementById('teacherComment').value = course.teacher_comment || '';
+            document.getElementById('studentComment').value = course.student_comment || '';
+            document.getElementById('studentRating').value = course.student_rating || '';
+            updateStarDisplay(course.student_rating || 0);
+            evaluationModal.style.display = 'flex';
+        }
+
+        function updateStarDisplay(rating) {
+            document.querySelectorAll('#ratingStars .star').forEach((star, i) => {
+                if (i < rating) star.classList.add('active');
+                else star.classList.remove('active');
+            });
+        }
+
+        async function saveEvaluation(e) {
+            e.preventDefault();
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const courseId = document.getElementById('evalCourseId').value;
+            const data = {
+                teacher_comment: document.getElementById('teacherComment').value || null,
+                student_comment: document.getElementById('studentComment').value || null,
+                student_rating: parseInt(document.getElementById('studentRating').value) || null,
+                evaluated_at: new Date().toISOString(),
+                status: 'completed'
+            };
+            try {
+                const { error } = await supabase.from('courses').update(data).eq('id', courseId);
+                if (error) throw error;
+                closeModal(evaluationModal);
+                await loadData();
+                showToast('Évaluation enregistrée', 'success');
+            } catch (err) {
+                showToast('Erreur', 'error');
+            }
+        }
+
+        async function deleteCourse(courseId) {
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            try {
+                const { error } = await supabase.from('courses').delete().eq('id', courseId);
+                if (error) throw error;
+                await loadData();
+                showToast('Cours supprimé', 'success');
+            } catch (err) {
+                showToast('Erreur suppression', 'error');
+            }
+        }
+
+        // ========== 事件绑定 ==========
+        document.getElementById('courseForm').addEventListener('submit', saveCourse);
+        document.getElementById('evaluationForm').addEventListener('submit', saveEvaluation);
+        document.getElementById('addCourseBtn').addEventListener('click', () => openCreateModal(''));
+        document.getElementById('closeModalBtn').addEventListener('click', () => closeModal(courseModal));
+        document.getElementById('closeEvalBtn').addEventListener('click', () => closeModal(evaluationModal));
+        document.getElementById('cancelModalBtn').addEventListener('click', () => closeModal(courseModal));
+        document.getElementById('cancelEvalBtn').addEventListener('click', () => closeModal(evaluationModal));
+        document.getElementById('refreshCalendarBtn').addEventListener('click', () => refreshCalendar());
+        document.getElementById('confirmDragBtn').addEventListener('click', executeDrag);
+        document.getElementById('cancelDragBtn').addEventListener('click', cancelDrag);
+        
+        filterType.addEventListener('change', () => refreshCalendar());
+        filterTeacher.addEventListener('change', () => refreshCalendar());
+        
+        document.querySelectorAll('#ratingStars .star').forEach(star => {
+            star.addEventListener('click', () => {
+                const val = parseInt(star.dataset.value);
+                document.getElementById('studentRating').value = val;
+                updateStarDisplay(val);
+            });
+        });
+        
+        document.getElementById('teacherId')?.addEventListener('change', checkConflictRealtime);
+        document.getElementById('startTime')?.addEventListener('change', checkConflictRealtime);
+        document.getElementById('duration')?.addEventListener('change', checkConflictRealtime);
+        
+        dragConfirmDialog.addEventListener('click', (e) => { if (e.target === dragConfirmDialog) cancelDrag(); });
+
+        // 启动
+        loadData();
+    </script>
+</body>
+</html>

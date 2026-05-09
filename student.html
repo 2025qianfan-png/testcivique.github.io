@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <title>Espace étudiant - Association Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary-blue: #004080;
+            --primary-light-blue: #0066cc;
+            --primary-yellow: #ffd633;
+            --green: #27ae60;
+            --red: #e74c3c;
+            --orange: #f39c12;
+            --gray: #95a5a6;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --border-radius: 12px;
+        }
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+        }
+        @media (max-width: 768px) {
+            body { transform: scale(0.8); transform-origin: top center; width: 125%; min-height: 125vh; left: -12.5%; position: relative; }
+            html { overflow-x: hidden; }
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-light-blue));
+            color: white;
+            padding: 15px 0;
+        }
+        .header .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .header h1 { color: white; font-size: 1.5rem; }
+        .lang-switch { display: flex; gap: 8px; }
+        .lang-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .lang-btn.active { background: var(--primary-yellow); color: var(--primary-blue); }
+        .user-info { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.2); padding: 8px 18px; border-radius: 30px; }
+        .logout-btn { background: var(--red); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        @media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .stat-card .stat-icon { font-size: 2rem; color: var(--primary-blue); margin-bottom: 10px; }
+        .stat-card .stat-number { font-size: 2rem; font-weight: 700; color: var(--primary-blue); }
+        .stat-label { font-size: 0.8rem; color: #666; }
+        
+        .calendar-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        #calendar { max-width: 100%; }
+        
+        .courses-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-top: 30px;
+        }
+        .section-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-yellow);
+        }
+        .section-header h3 { font-size: 1.2rem; }
+        
+        .course-card {
+            border: 1px solid #eee;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        .course-card:hover { box-shadow: var(--shadow); }
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .course-title { font-weight: 700; font-size: 1.1rem; color: var(--primary-blue); }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-scheduled { background: rgba(52,152,219,0.1); color: #3498db; }
+        .status-pending { background: rgba(243,156,18,0.1); color: var(--orange); }
+        .status-in-progress { background: rgba(46,204,113,0.1); color: #2ecc71; }
+        .status-completed { background: rgba(46,204,113,0.1); color: #2ecc71; }
+        
+        .course-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        .detail-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+        .detail-item i { width: 20px; color: var(--primary-blue); }
+        .detail-item a { color: var(--primary-blue); text-decoration: none; }
+        
+        .course-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .action-btn:hover { transform: translateY(-2px); }
+        .btn-confirm { background: var(--green); color: white; }
+        .btn-rate { background: #f39c12; color: white; }
+        .btn-cancel { background: var(--red); color: white; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { font-size: 1.4rem; color: var(--primary-blue); }
+        .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; }
+        .close-modal:hover { color: var(--red); }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--primary-blue); }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+        .form-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px; }
+        .cancel-btn { padding: 10px 20px; background: #eee; border: none; border-radius: 30px; cursor: pointer; font-weight: 600; }
+        .save-btn { padding: 10px 20px; background: var(--green); color: white; border: none; border-radius: 30px; cursor: pointer; font-weight: 600; }
+        .save-btn:hover { background: #219653; transform: translateY(-2px); }
+        
+        .rating-stars { display: flex; gap: 10px; margin: 15px 0; justify-content: center; }
+        .star { font-size: 2rem; cursor: pointer; color: #ddd; }
+        .star.active { color: #f1c40f; }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            color: white;
+            font-weight: 600;
+            z-index: 1100;
+            animation: slideInRight 0.3s ease;
+        }
+        .toast-success { background: var(--green); }
+        .toast-error { background: var(--red); }
+        .toast-warning { background: var(--orange); }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .booking-info {
+            background: #f0f7ff;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .booking-info p { margin: 8px 0; }
+        .auto-type-info {
+            background: #e8f5e9;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #2e7d32;
+        }
+        .warning-text {
+            color: var(--red);
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .confirm-dialog {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .confirm-dialog.active { opacity: 1; visibility: visible; }
+        .confirm-card {
+            background: white;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 450px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .confirm-dialog.active .confirm-card { transform: scale(1); }
+        .confirm-header {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .confirm-header i { font-size: 2.5rem; margin-bottom: 10px; }
+        .confirm-header h3 { color: white; margin: 0; }
+        .confirm-body { padding: 25px; text-align: center; }
+        .confirm-body p { color: #666; }
+        .confirm-footer {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            border-top: 1px solid #eee;
+        }
+        .confirm-cancel {
+            padding: 10px 24px;
+            background: #eee;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .confirm-delete {
+            padding: 10px 24px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .confirm-cancel:hover { background: #ddd; }
+        .confirm-delete:hover { background: #c0392b; transform: translateY(-2px); }
+        
+        .footer { background: var(--primary-blue); color: white; text-align: center; padding: 20px; margin-top: 40px; }
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+        .fc-event { cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1><i class="fas fa-user-graduate"></i> <span id="pageTitle">Espace étudiant</span></h1>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="lang-switch">
+                    <button class="lang-btn active" id="langFrBtn" data-lang="fr">FR</button>
+                    <button class="lang-btn" id="langZhBtn" data-lang="zh">中文</button>
+                </div>
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="studentName">Chargement...</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span id="logoutText">Déconnexion</span></button>
+            </div>
+        </div>
+    </header>
+    
+    <main class="container" style="padding: 30px 0;">
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-check"></i></div><div class="stat-number" id="bookedCount">0</div><div class="stat-label" id="statBookedLabel">Cours réservés</div></div>
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-number" id="availableCount">0</div><div class="stat-label" id="statAvailableLabel">Disponibilités</div></div>
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-star"></i></div><div class="stat-number" id="avgRating">0</div><div class="stat-label" id="statRatingLabel">Note moyenne</div></div>
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-chalkboard-user"></i></div><div class="stat-number" id="teacherCount">0</div><div class="stat-label" id="statTeacherLabel">Intervenants</div></div>
+        </div>
+        
+        <div class="calendar-container"><div id="calendar"></div></div>
+        
+        <div class="courses-section">
+            <div class="section-header"><h3 id="myCoursesTitle"><i class="fas fa-calendar-day"></i> Mes cours</h3></div>
+            <div id="coursesList"><div class="empty-state" id="emptyCoursesMsg">Chargement...</div></div>
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Association Mille Voiles</p>
+        </div>
+    </footer>
+    
+    <!-- Modal réservation -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="bookingTitle"><i class="fas fa-calendar-plus"></i> Réserver un cours</h2>
+                <button class="close-modal" id="closeBookingModalBtn">&times;</button>
+            </div>
+            <div id="bookingInfo" class="booking-info"></div>
+            <div class="auto-type-info" id="autoTypeInfo">
+                <i class="fas fa-info-circle"></i> <span id="autoTypeText">Chargement...</span>
+            </div>
+            <div id="bookingWarning" class="warning-text"></div>
+            <div class="form-actions">
+                <button type="button" class="cancel-btn" id="cancelBookingBtn"><span id="cancelBtnText">Annuler</span></button>
+                <button type="button" class="save-btn" id="confirmBookingBtn"><span id="confirmBtnText">Confirmer</span></button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal évaluation -->
+    <div class="modal" id="ratingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="ratingTitle"><i class="fas fa-star"></i> Évaluer le cours</h2>
+                <button class="close-modal" id="closeRatingModalBtn">&times;</button>
+            </div>
+            <form id="ratingForm">
+                <input type="hidden" id="ratingCourseId">
+                <div class="form-group">
+                    <label id="ratingLabel">Note (1 à 5)</label>
+                    <div class="rating-stars" id="ratingStars">
+                        <span class="star" data-value="1">★</span>
+                        <span class="star" data-value="2">★</span>
+                        <span class="star" data-value="3">★</span>
+                        <span class="star" data-value="4">★</span>
+                        <span class="star" data-value="5">★</span>
+                    </div>
+                    <input type="hidden" id="studentRating">
+                </div>
+                <div class="form-group">
+                    <label id="commentLabel">Commentaire</label>
+                    <textarea id="studentComment" rows="3" placeholder="Votre retour sur le cours..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" id="cancelRatingBtn"><span id="cancelRatingText">Annuler</span></button>
+                    <button type="submit" class="save-btn"><span id="saveRatingText">Envoyer</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 确认取消对话框 -->
+    <div id="confirmCancelDialog" class="confirm-dialog">
+        <div class="confirm-card">
+            <div class="confirm-header">
+                <i class="fas fa-calendar-times"></i>
+                <h3 id="cancelDialogTitle">Annuler le cours</h3>
+            </div>
+            <div class="confirm-body">
+                <p id="cancelDialogMsg">Êtes-vous sûr de vouloir annuler ce cours ?</p>
+                <div style="margin-top: 15px; padding: 10px; background: #f5f5f5; border-radius: 8px;">
+                    <p><strong id="cancelCourseLabel">📚 Cours:</strong> <span id="cancelCourseType">-</span></p>
+                    <p><strong id="cancelDateLabel">📅 Date:</strong> <span id="cancelCourseDate">-</span></p>
+                    <p><strong id="cancelTeacherLabel">👨‍🏫 Intervenant:</strong> <span id="cancelCourseTeacher">-</span></p>
+                </div>
+                <p style="margin-top: 15px; color: var(--orange);" id="cancelInfoMsg">
+                    <i class="fas fa-info-circle"></i> Le créneau sera à nouveau disponible.
+                </p>
+            </div>
+            <div class="confirm-footer">
+                <button class="confirm-cancel" id="cancelConfirmNoBtn"><span id="noBtnText">Non, garder</span></button>
+                <button class="confirm-delete" id="cancelConfirmYesBtn"><span id="yesBtnText">Oui, annuler</span></button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ========== 翻译 ==========
+        const translations = {
+            fr: {
+                pageTitle: "Espace étudiant",
+                logoutText: "Déconnexion",
+                statBookedLabel: "Cours réservés",
+                statAvailableLabel: "Disponibilités",
+                statRatingLabel: "Note moyenne",
+                statTeacherLabel: "Intervenants",
+                myCoursesTitle: "Mes cours",
+                emptyCourses: "Aucun cours réservé",
+                bookingTitle: "Réserver un cours",
+                confirmBtnText: "Confirmer",
+                cancelBtnText: "Annuler",
+                ratingTitle: "Évaluer le cours",
+                ratingLabel: "Note (1 à 5)",
+                commentLabel: "Commentaire",
+                saveRatingText: "Envoyer",
+                cancelRatingText: "Annuler",
+                cancelDialogTitle: "Annuler le cours",
+                cancelDialogMsg: "Êtes-vous sûr de vouloir annuler ce cours ?",
+                cancelCourseLabel: "📚 Cours:",
+                cancelDateLabel: "📅 Date:",
+                cancelTeacherLabel: "👨‍🏫 Intervenant:",
+                cancelInfoMsg: "Le créneau sera à nouveau disponible pour d'autres étudiants.",
+                noBtnText: "Non, garder",
+                yesBtnText: "Oui, annuler",
+                bookingWarning: "⚠️ Les cours doivent être réservés au moins 24 heures à l'avance.",
+                autoTypePrefix: "📌 Type de cours: ",
+                autoTypeSuffix: "(selon votre profil)",
+                confirmPresence: "Confirmer",
+                evaluate: "Évaluer",
+                cancel: "Annuler",
+                toastBooked: "Cours réservé !",
+                toastConfirmed: "Présence confirmée",
+                toastCancelled: "Cours annulé, le créneau est à nouveau disponible",
+                toastError: "Erreur",
+                toastRating: "Merci !"
+            },
+            zh: {
+                pageTitle: "学生空间",
+                logoutText: "退出登录",
+                statBookedLabel: "已预约课程",
+                statAvailableLabel: "可预约时间",
+                statRatingLabel: "平均评分",
+                statTeacherLabel: "老师人数",
+                myCoursesTitle: "我的课程",
+                emptyCourses: "暂无预约课程",
+                bookingTitle: "预约课程",
+                confirmBtnText: "确认",
+                cancelBtnText: "取消",
+                ratingTitle: "评价课程",
+                ratingLabel: "评分 (1到5)",
+                commentLabel: "评论",
+                saveRatingText: "提交",
+                cancelRatingText: "取消",
+                cancelDialogTitle: "取消课程",
+                cancelDialogMsg: "确定要取消这个课程吗？",
+                cancelCourseLabel: "📚 课程:",
+                cancelDateLabel: "📅 日期:",
+                cancelTeacherLabel: "👨‍🏫 老师:",
+                cancelInfoMsg: "该时段将重新对其他学生开放。",
+                noBtnText: "不，保留",
+                yesBtnText: "是，取消",
+                bookingWarning: "⚠️ 课程必须提前至少24小时预约。",
+                autoTypePrefix: "📌 课程类型: ",
+                autoTypeSuffix: "(根据您的个人资料)",
+                confirmPresence: "确认出席",
+                evaluate: "评价",
+                cancel: "取消",
+                toastBooked: "课程预约成功！",
+                toastConfirmed: "出席已确认",
+                toastCancelled: "课程已取消，时段已重新开放",
+                toastError: "错误",
+                toastRating: "谢谢！"
+            }
+        };
+        
+        let currentLang = 'fr';
+        
+        // 更新界面文字
+        function updateUIText() {
+            const t = translations[currentLang];
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('logoutText').textContent = t.logoutText;
+            document.getElementById('statBookedLabel').textContent = t.statBookedLabel;
+            document.getElementById('statAvailableLabel').textContent = t.statAvailableLabel;
+            document.getElementById('statRatingLabel').textContent = t.statRatingLabel;
+            document.getElementById('statTeacherLabel').textContent = t.statTeacherLabel;
+            document.getElementById('myCoursesTitle').innerHTML = `<i class="fas fa-calendar-day"></i> ${t.myCoursesTitle}`;
+            document.getElementById('bookingTitle').innerHTML = `<i class="fas fa-calendar-plus"></i> ${t.bookingTitle}`;
+            document.getElementById('confirmBtnText').textContent = t.confirmBtnText;
+            document.getElementById('cancelBtnText').textContent = t.cancelBtnText;
+            document.getElementById('ratingTitle').innerHTML = `<i class="fas fa-star"></i> ${t.ratingTitle}`;
+            document.getElementById('ratingLabel').textContent = t.ratingLabel;
+            document.getElementById('commentLabel').textContent = t.commentLabel;
+            document.getElementById('saveRatingText').textContent = t.saveRatingText;
+            document.getElementById('cancelRatingText').textContent = t.cancelRatingText;
+            document.getElementById('cancelDialogTitle').textContent = t.cancelDialogTitle;
+            document.getElementById('cancelDialogMsg').textContent = t.cancelDialogMsg;
+            document.getElementById('cancelCourseLabel').innerHTML = t.cancelCourseLabel;
+            document.getElementById('cancelDateLabel').innerHTML = t.cancelDateLabel;
+            document.getElementById('cancelTeacherLabel').innerHTML = t.cancelTeacherLabel;
+            document.getElementById('cancelInfoMsg').innerHTML = `<i class="fas fa-info-circle"></i> ${t.cancelInfoMsg}`;
+            document.getElementById('noBtnText').textContent = t.noBtnText;
+            document.getElementById('yesBtnText').textContent = t.yesBtnText;
+        }
+        
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('langFrBtn').classList.toggle('active', lang === 'fr');
+            document.getElementById('langZhBtn').classList.toggle('active', lang === 'zh');
+            updateUIText();
+            renderCoursesList();
+        }
+        
+        // ========== 全局变量 ==========
+        let currentStudent = null;
+        let availabilities = [];
+        let myCourses = [];
+        let teachers = [];
+        let calendar = null;
+        let pendingBooking = null;
+        let pendingCancel = null;
+        
+        function getCourseTypeFromStudentType(studentType) {
+            const typeMap = {
+                'n': 'naturalization',
+                'r': '10year',
+                'm': '4year',
+                't': 'rien'
+            };
+            return typeMap[studentType] || 'training';
+        }
+        
+        function getTypeText(t) {
+            const types = {
+                'training': '📚 培训内容',
+                '4year': '🎫 四年卡',
+                '10year': '🎟️ 十年卡',
+                'naturalization': '🛂 入籍',
+                'rien': '📝 其他'
+            };
+            return types[t] || t;
+        }
+        
+        function formatDateTime(dateStr) {
+            return new Date(dateStr).toLocaleString('fr-FR', { 
+                day:'2-digit', month:'2-digit', year:'numeric', 
+                hour:'2-digit', minute:'2-digit' 
+            });
+        }
+        
+        function isMoreThan24HoursAhead(dateStr) {
+            const courseDate = new Date(dateStr);
+            const now = new Date();
+            const diffHours = (courseDate - now) / (1000 * 60 * 60);
+            return diffHours >= 24;
+        }
+        
+        async function getStudentFromToken() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            if (!token) { window.location.href = 'index.html'; return null; }
+            try {
+                const data = JSON.parse(decodeURIComponent(atob(token)));
+                if (data.role !== 'stu') { window.location.href = 'index.html'; return null; }
+                return data;
+            } catch(e) { window.location.href = 'index.html'; return null; }
+        }
+        
+        async function loadAvailabilities() {
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const { data } = await supabase
+                .from('availabilities')
+                .select('*, students!teacher_id(name)')
+                .eq('status', 'available')
+                .order('start_time', { ascending: true });
+            availabilities = data || [];
+            
+            const teacherIds = [...new Set(availabilities.map(a => a.teacher_id))];
+            if (teacherIds.length > 0) {
+                const { data: teacherData } = await supabase
+                    .from('students')
+                    .select('id, name')
+                    .in('id', teacherIds);
+                teachers = teacherData || [];
+            }
+            
+            document.getElementById('availableCount').textContent = availabilities.length;
+            const uniqueTeachers = new Set(availabilities.map(a => a.teacher_id)).size;
+            document.getElementById('teacherCount').textContent = uniqueTeachers;
+            refreshCalendar();
+        }
+        
+        async function loadMyCourses() {
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const { data } = await supabase
+                .from('courses')
+                .select('*, students!teacher_id(name)')
+                .eq('student_id', currentStudent.userId)
+                .order('start_time', { ascending: true });
+            myCourses = data || [];
+            
+            document.getElementById('bookedCount').textContent = myCourses.length;
+            const rated = myCourses.filter(c => c.student_rating);
+            const avg = rated.length ? (rated.reduce((s,c)=>s+c.student_rating,0)/rated.length).toFixed(1) : 0;
+            document.getElementById('avgRating').textContent = avg;
+            renderCoursesList();
+            refreshCalendar();
+        }
+        
+        function renderCoursesList() {
+            const container = document.getElementById('coursesList');
+            const t = translations[currentLang];
+            if (!container) return;
+            if (myCourses.length === 0) { container.innerHTML = `<div class="empty-state">${t.emptyCourses}</div>`; return; }
+            
+            container.innerHTML = myCourses.map(c => {
+                let statusText = '', statusClass = '';
+                if (c.status === 'completed') {
+                    statusText = currentLang === 'fr' ? 'Terminé' : '已完成';
+                    statusClass = 'status-completed';
+                } else if (c.teacher_started && !c.student_confirmed) {
+                    statusText = currentLang === 'fr' ? 'En attente de votre confirmation' : '等待您确认';
+                    statusClass = 'status-pending';
+                } else if (c.teacher_started && c.student_confirmed) {
+                    statusText = currentLang === 'fr' ? 'En cours' : '进行中';
+                    statusClass = 'status-in-progress';
+                } else {
+                    statusText = currentLang === 'fr' ? 'Planifié' : '已计划';
+                    statusClass = 'status-scheduled';
+                }
+                
+                const canCancel = isMoreThan24HoursAhead(c.start_time);
+                const endTime = new Date(new Date(c.start_time).getTime() + 2 * 60 * 60 * 1000);
+                const timeDisplay = `${formatDateTime(c.start_time)} - ${endTime.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}`;
+                
+                return `
+                    <div class="course-card">
+                        <div class="course-header">
+                            <span class="course-title">${getTypeText(c.course_type)} - ${timeDisplay}</span>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="course-details">
+                            <div class="detail-item"><i class="fas fa-chalkboard-user"></i> ${currentLang === 'fr' ? 'Intervenant:' : '老师:'} ${c.students?.name || 'N/A'}</div>
+                            <div class="detail-item"><i class="fas fa-map-marker-alt"></i> ${c.location || (currentLang === 'fr' ? 'À définir' : '待定')}</div>
+                            <div class="detail-item"><i class="fas fa-video"></i> ${c.meeting_link ? `<a href="${c.meeting_link}" target="_blank">${currentLang === 'fr' ? 'Lien Meet' : '会议链接'}</a>` : (currentLang === 'fr' ? 'Non défini' : '未设置')}</div>
+                            ${c.material_link ? `<div class="detail-item"><i class="fas fa-link"></i> <a href="${c.material_link}" target="_blank">${currentLang === 'fr' ? 'Support' : '课件'}</a></div>` : ''}
+                            ${c.teacher_comment ? `<div class="detail-item"><i class="fas fa-comment"></i> ${currentLang === 'fr' ? 'Avis:' : '评语:'} ${escapeHtml(c.teacher_comment)}</div>` : ''}
+                        </div>
+                        <div class="course-actions">
+                            ${c.teacher_started && !c.student_confirmed ? `<button class="action-btn btn-confirm" onclick="confirmCourse('${c.id}')"><i class="fas fa-check-circle"></i> ${t.confirmPresence}</button>` : ''}
+                            ${c.status === 'completed' && !c.student_rating ? `<button class="action-btn btn-rate" onclick="openRatingModal('${c.id}')"><i class="fas fa-star"></i> ${t.evaluate}</button>` : ''}
+                            ${c.status === 'scheduled' && canCancel ? `<button class="action-btn btn-cancel" onclick="prepareCancel('${c.id}','${c.start_time}','${c.teacher_id}','${c.course_type}','${escapeHtml(c.students?.name || '')}')"><i class="fas fa-trash"></i> ${t.cancel}</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function refreshCalendar() {
+            if (!calendar) return;
+            const events = [];
+            availabilities.forEach(a => {
+                const teacher = teachers.find(t => t.id === a.teacher_id);
+                const endTime = new Date(new Date(a.start_time).getTime() + 2 * 60 * 60 * 1000);
+                events.push({ 
+                    id: a.id, 
+                    title: `📅 ${teacher?.name || 'Intervenant'}`, 
+                    start: a.start_time, 
+                    end: endTime.toISOString(),
+                    backgroundColor: '#3498db', 
+                    borderColor: '#3498db', 
+                    extendedProps: { type: 'availability', data: a } 
+                });
+            });
+            myCourses.forEach(c => {
+                const endTime = new Date(new Date(c.start_time).getTime() + 2 * 60 * 60 * 1000);
+                events.push({ 
+                    id: c.id, 
+                    title: `📚 ${getTypeText(c.course_type)}`, 
+                    start: c.start_time, 
+                    end: endTime.toISOString(),
+                    backgroundColor: '#2ecc71', 
+                    borderColor: '#2ecc71', 
+                    extendedProps: { type: 'course' } 
+                });
+            });
+            calendar.removeAllEvents();
+            calendar.addEventSource(events);
+        }
+        
+        function initCalendar() {
+            const el = document.getElementById('calendar');
+            calendar = new FullCalendar.Calendar(el, {
+                initialView: 'timeGridWeek', locale: 'fr',
+                headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
+                slotMinTime: '08:00:00', slotMaxTime: '22:00:00', allDaySlot: false, height: 'auto',
+                eventClick: (info) => { if (info.event.extendedProps.type === 'availability') openBookingModal(info.event.extendedProps.data); }
+            });
+            calendar.render();
+        }
+        
+        function openBookingModal(availability) {
+            const teacherName = teachers.find(t => t.id === availability.teacher_id)?.name || 'Intervenant';
+            const courseType = getCourseTypeFromStudentType(currentStudent.type);
+            const courseTypeText = getTypeText(courseType);
+            const canBook = isMoreThan24HoursAhead(availability.start_time);
+            const endTime = new Date(new Date(availability.start_time).getTime() + 2 * 60 * 60 * 1000);
+            const timeDisplay = `${formatDateTime(availability.start_time)} - ${endTime.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}`;
+            const t = translations[currentLang];
+            
+            pendingBooking = { 
+                availabilityId: availability.id, 
+                teacherId: availability.teacher_id, 
+                startTime: availability.start_time, 
+                endTime: endTime.toISOString(),
+                courseType: courseType 
+            };
+            
+            document.getElementById('bookingInfo').innerHTML = `
+                <p><strong>${currentLang === 'fr' ? 'Intervenant:' : '老师:'}</strong> ${escapeHtml(teacherName)}</p>
+                <p><strong>${currentLang === 'fr' ? 'Horaire:' : '时间:'}</strong> ${timeDisplay}</p>
+                <p><strong>${currentLang === 'fr' ? 'Durée:' : '时长:'}</strong> 2 ${currentLang === 'fr' ? 'heures' : '小时'}</p>
+            `;
+            document.getElementById('autoTypeText').innerHTML = `${t.autoTypePrefix}${courseTypeText} ${t.autoTypeSuffix}`;
+            
+            if (!canBook) {
+                document.getElementById('bookingWarning').innerHTML = t.bookingWarning;
+                document.getElementById('confirmBookingBtn').disabled = true;
+                document.getElementById('confirmBookingBtn').style.opacity = '0.5';
+            } else {
+                document.getElementById('bookingWarning').innerHTML = '';
+                document.getElementById('confirmBookingBtn').disabled = false;
+                document.getElementById('confirmBookingBtn').style.opacity = '1';
+            }
+            
+            document.getElementById('bookingModal').style.display = 'flex';
+        }
+        
+        async function confirmBooking() {
+            if (!pendingBooking) return;
+            const t = translations[currentLang];
+            if (!isMoreThan24HoursAhead(pendingBooking.startTime)) {
+                showToast(t.bookingWarning, 'error');
+                return;
+            }
+            
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const { error: deleteError } = await supabase.from('availabilities').delete().eq('id', pendingBooking.availabilityId);
+            if (deleteError) { showToast(t.toastError, 'error'); return; }
+            
+            const courseData = {
+                student_id: currentStudent.userId,
+                teacher_id: pendingBooking.teacherId,
+                start_time: pendingBooking.startTime,
+                duration: 2,
+                course_type: pendingBooking.courseType,
+                status: 'scheduled'
+            };
+            const { error: insertError } = await supabase.from('courses').insert([courseData]);
+            if (insertError) { showToast(t.toastError, 'error'); return; }
+            
+            document.getElementById('bookingModal').style.display = 'none';
+            pendingBooking = null;
+            showToast(t.toastBooked, 'success');
+            await loadAvailabilities();
+            await loadMyCourses();
+        }
+        
+        async function confirmCourse(courseId) {
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const t = translations[currentLang];
+            const { error } = await supabase.from('courses').update({ student_confirmed: true, status: 'in_progress' }).eq('id', courseId);
+            if (error) { showToast(t.toastError, 'error'); return; }
+            showToast(t.toastConfirmed, 'success');
+            await loadMyCourses();
+        }
+        
+        function prepareCancel(courseId, startTime, teacherId, courseType, teacherName) {
+            const t = translations[currentLang];
+            if (!isMoreThan24HoursAhead(startTime)) {
+                showToast(t.bookingWarning, 'error');
+                return;
+            }
+            
+            pendingCancel = { courseId, startTime, teacherId, courseType, teacherName };
+            document.getElementById('cancelCourseType').textContent = getTypeText(courseType);
+            document.getElementById('cancelCourseDate').textContent = formatDateTime(startTime);
+            document.getElementById('cancelCourseTeacher').textContent = teacherName;
+            document.getElementById('confirmCancelDialog').classList.add('active');
+        }
+        
+        async function executeCancel() {
+            if (!pendingCancel) return;
+            const t = translations[currentLang];
+            const { courseId, startTime, teacherId } = pendingCancel;
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            
+            const { error: deleteError } = await supabase.from('courses').delete().eq('id', courseId);
+            if (deleteError) { showToast(t.toastError, 'error'); return; }
+            
+            const endTime = new Date(new Date(startTime).getTime() + 2 * 60 * 60 * 1000);
+            const { error: insertError } = await supabase.from('availabilities').insert([{
+                teacher_id: teacherId,
+                start_time: startTime,
+                end_time: endTime.toISOString(),
+                status: 'available'
+            }]);
+            if (insertError) { showToast(t.toastError, 'error'); return; }
+            
+            document.getElementById('confirmCancelDialog').classList.remove('active');
+            pendingCancel = null;
+            showToast(t.toastCancelled, 'success');
+            await loadAvailabilities();
+            await loadMyCourses();
+        }
+        
+        function closeCancelDialog() {
+            document.getElementById('confirmCancelDialog').classList.remove('active');
+            pendingCancel = null;
+        }
+        
+        function openRatingModal(courseId) {
+            document.getElementById('ratingCourseId').value = courseId;
+            document.getElementById('studentRating').value = '';
+            document.getElementById('studentComment').value = '';
+            updateStarDisplay(0);
+            document.getElementById('ratingModal').style.display = 'flex';
+        }
+        
+        function updateStarDisplay(rating) {
+            document.querySelectorAll('#ratingStars .star').forEach((star, i) => { 
+                if (i < rating) star.classList.add('active'); 
+                else star.classList.remove('active'); 
+            });
+        }
+        
+        async function saveRating(e) {
+            e.preventDefault();
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const t = translations[currentLang];
+            const courseId = document.getElementById('ratingCourseId').value;
+            const rating = parseInt(document.getElementById('studentRating').value);
+            const comment = document.getElementById('studentComment').value;
+            if (!rating || rating < 1 || rating > 5) { showToast('Note 1-5', 'error'); return; }
+            const { error } = await supabase.from('courses').update({ student_rating: rating, student_comment: comment || null }).eq('id', courseId);
+            if (error) { showToast(t.toastError, 'error'); return; }
+            document.getElementById('ratingModal').style.display = 'none';
+            showToast(t.toastRating, 'success');
+            await loadMyCourses();
+        }
+        
+        function escapeHtml(s) { return s ? s.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])) : ''; }
+        
+        function showToast(msg, type) { 
+            const t = document.createElement('div'); 
+            t.className = `toast toast-${type}`; 
+            t.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':'fa-exclamation-circle'}"></i> ${msg}`; 
+            document.body.appendChild(t); 
+            setTimeout(() => t.remove(), 3000); 
+        }
+        
+        function initModals() {
+            document.getElementById('closeBookingModalBtn').onclick = () => { document.getElementById('bookingModal').style.display = 'none'; pendingBooking = null; };
+            document.getElementById('cancelBookingBtn').onclick = () => { document.getElementById('bookingModal').style.display = 'none'; pendingBooking = null; };
+            document.getElementById('confirmBookingBtn').onclick = confirmBooking;
+            document.getElementById('closeRatingModalBtn').onclick = () => document.getElementById('ratingModal').style.display = 'none';
+            document.getElementById('cancelRatingBtn').onclick = () => document.getElementById('ratingModal').style.display = 'none';
+            document.getElementById('ratingForm').addEventListener('submit', saveRating);
+            document.getElementById('cancelConfirmYesBtn').onclick = executeCancel;
+            document.getElementById('cancelConfirmNoBtn').onclick = closeCancelDialog;
+            document.getElementById('confirmCancelDialog').onclick = (e) => {
+                if (e.target === document.getElementById('confirmCancelDialog')) closeCancelDialog();
+            };
+            document.querySelectorAll('#ratingStars .star').forEach(star => { 
+                star.addEventListener('click', () => { 
+                    const val = parseInt(star.dataset.value); 
+                    document.getElementById('studentRating').value = val; 
+                    updateStarDisplay(val); 
+                }); 
+            });
+            window.onclick = (e) => { 
+                if (e.target === document.getElementById('bookingModal')) document.getElementById('bookingModal').style.display = 'none'; 
+                if (e.target === document.getElementById('ratingModal')) document.getElementById('ratingModal').style.display = 'none'; 
+                if (e.target === document.getElementById('confirmCancelDialog')) closeCancelDialog();
+            };
+            
+            document.getElementById('langFrBtn').onclick = () => switchLanguage('fr');
+            document.getElementById('langZhBtn').onclick = () => switchLanguage('zh');
+        }
+        
+        async function init() {
+            currentStudent = await getStudentFromToken();
+            if (!currentStudent) return;
+            document.getElementById('studentName').textContent = currentStudent.name;
+            document.getElementById('logoutBtn').onclick = () => { sessionStorage.clear(); window.location.href = 'index.html'; };
+            updateUIText();
+            initCalendar();
+            initModals();
+            await loadAvailabilities();
+            await loadMyCourses();
+        }
+        
+        init();
+        
+        window.confirmCourse = confirmCourse;
+        window.prepareCancel = prepareCancel;
+        window.openRatingModal = openRatingModal;
+    </script>
+</body>
+</html>
