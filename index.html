@@ -271,6 +271,8 @@ h1, h2, h3, h4, h5 {
 }
 
 /* 汉堡菜单按钮 */
+
+/* 汉堡菜单按钮 - 默认隐藏，移动端显示 */
 .hamburger {
     display: none;
     flex-direction: column;
@@ -305,6 +307,64 @@ h1, h2, h3, h4, h5 {
 
 .hamburger.active span:nth-child(3) {
     transform: rotate(-45deg) translate(5px, 2px);
+}
+
+/* 移动端显示汉堡菜单 */
+@media (max-width: 1024px) {
+    .hamburger {
+        display: flex;
+    }
+    
+    /* 移动端Logo居中 */
+    .logo {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    /* 导航菜单 - 从右侧滑入 */
+    .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 80%;
+        max-width: 350px;
+        height: 100vh;
+        background-color: var(--white);
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding: 80px 25px 30px;
+        gap: 0;
+        transition: right 0.3s ease;
+        overflow-y: auto;
+        z-index: 101;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .nav-links.active {
+        right: 0;
+    }
+    
+    .nav-links a {
+        width: 100%;
+        padding: 15px 0;
+        border-bottom: 1px solid var(--light-gray);
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    
+    .user-info {
+        width: 100%;
+        margin-top: 20px;
+        justify-content: space-between;
+    }
+    
+    .user-dropdown {
+        position: static;
+        width: 100%;
+        margin-top: 10px;
+    }
 }
 
 /* 导航链接 - 桌面版 */
@@ -3437,8 +3497,11 @@ function initHamburger() {
     const navLinks = document.getElementById('navLinks');
     
     if (hamburgerBtn && navLinks) {
-        // 汉堡菜单点击事件
-        hamburgerBtn.addEventListener('click', function(e) {
+        // 移除原有的事件监听器（避免重复绑定）
+        const newBtn = hamburgerBtn.cloneNode(true);
+        hamburgerBtn.parentNode.replaceChild(newBtn, hamburgerBtn);
+        
+        newBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             this.classList.toggle('active');
             navLinks.classList.toggle('active');
@@ -3455,7 +3518,7 @@ function initHamburger() {
         navLinks.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', function() {
                 if (window.innerWidth <= 1024) {
-                    hamburgerBtn.classList.remove('active');
+                    newBtn.classList.remove('active');
                     navLinks.classList.remove('active');
                     document.body.style.overflow = '';
                 }
@@ -3467,9 +3530,9 @@ function initHamburger() {
             if (window.innerWidth <= 1024 && 
                 navLinks.classList.contains('active') && 
                 !navLinks.contains(e.target) && 
-                !hamburgerBtn.contains(e.target)) {
+                !newBtn.contains(e.target)) {
                 
-                hamburgerBtn.classList.remove('active');
+                newBtn.classList.remove('active');
                 navLinks.classList.remove('active');
                 document.body.style.overflow = '';
             }
@@ -3478,14 +3541,13 @@ function initHamburger() {
         // 窗口大小改变时，如果大于1024px，强制关闭菜单
         window.addEventListener('resize', function() {
             if (window.innerWidth > 1024) {
-                hamburgerBtn.classList.remove('active');
+                newBtn.classList.remove('active');
                 navLinks.classList.remove('active');
                 document.body.style.overflow = '';
             }
         });
     }
 }
-
         // ==================== FAQ ====================
         function initFAQ() {
             document.querySelectorAll('.faq-item').forEach(item => {
