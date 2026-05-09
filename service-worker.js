@@ -1,81 +1,106 @@
-const CACHE_NAME = 'civique-exam-v1.3';
+const CACHE_NAME = 'civique-exam-v1.4';
 const urlsToCache = [
   '/',
- '/index.html?v=1.3',
- '/admin.html?v=1.3',
+  '/index.html',
+  '/admin.html',
+  '/admin.css',
+  '/admin.js',
+  '/student.html',
+  '/teacher.html',
+  '/cours.html',
+  '/test-gratuit.html',
   '/manifest.json',
-  '/test-gratuit.html?v=1.0',
-  // 添加您的其他页面和资源
+  '/supabase-config.js',
+  '/icons/icon-72x72.png',
+  '/icons/icon-96x96.png',
+  '/icons/icon-128x128.png',
+  '/icons/icon-144x144.png',
+  '/icons/icon-152x152.png',
+  '/icons/icon-192x192.png',
+  '/icons/icon-384x384.png',
+  '/icons/icon-512x512.png'
 ];
 
-// 安装Service Worker
+// 安装 Service Worker
 self.addEventListener('install', event => {
+  console.log('Service Worker: 安装中...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Service Worker: 缓存文件');
         return cache.addAll(urlsToCache);
       })
+      .catch(err => {
+        console.error('缓存失败:', err);
+      })
       .then(() => self.skipWaiting())
   );
 });
 
-// 激活Service Worker
+// 激活 Service Worker
 self.addEventListener('activate', event => {
+  console.log('Service Worker: 激活中...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cache => {
           if (cache !== CACHE_NAME) {
-            console.log('Service Worker: 清除旧缓存');
+            console.log('Service Worker: 删除旧缓存', cache);
             return caches.delete(cache);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  return self.clients.claim();
 });
 
-// 拦截请求，使用缓存或网络
+// 拦截请求
 self.addEventListener('fetch', event => {
+  // 跳过非 GET 请求
+  if (event.request.method !== 'GET') {
+    return;
+  }
+  
+  // 跳过 Supabase API 请求
+  if (event.request.url.includes('supabase.co')) {
+    return;
+  }
+  
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // 如果在缓存中找到，返回缓存
         if (response) {
+          // 返回缓存
           return response;
         }
         
-        // 否则从网络获取
+        // 从网络获取
         return fetch(event.request)
           .then(response => {
-            // 检查是否收到有效响应
-            if (!response || response.status !== 200 || response.type !== 'basic') {
+            // 检查是否有效
+            if (!response || response.status !== 200) {
               return response;
             }
             
-            // 克隆响应
-            const responseToCache = response.clone();
-            
-            // 添加到缓存
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-            
+            // 只缓存同源请求
+            if (event.request.url.startsWith(self.location.origin)) {
+              const responseToCache = response.clone();
+              caches.open(CACHE_NAME)
+                .then(cache => {
+                  cache.put(event.request, responseToCache);
+                });
+            }
             return response;
           })
           .catch(() => {
-            // 如果网络请求失败，可以显示离线页面
-            // 这里返回缓存的首页
-            return caches.match('/');
+            // 离线时返回缓存的首页
+            return caches.match('/index.html');
           });
       })
   );
 });
 
-// 处理推送通知
+// 推送通知
 self.addEventListener('push', event => {
   const options = {
     body: event.data ? event.data.text() : 'Nouvelle notification',
@@ -89,7 +114,7 @@ self.addEventListener('push', event => {
     actions: [
       {
         action: 'explore',
-        title: 'Explorer',
+        title: 'Voir',
         icon: '/icons/icon-72x72.png'
       },
       {
@@ -101,22 +126,22 @@ self.addEventListener('push', event => {
   };
   
   event.waitUntil(
-    self.registration.showNotification('Examen Civique', options)
+    self.registration.showNotification('Mille Voiles', options)
   );
 });
 
-// 处理通知点击
+// 通知点击
 self.addEventListener('notificationclick', event => {
   console.log('Notification click reçu');
   event.notification.close();
   
-  event.waitUntil(
-    clients.openWindow('/')
-  );
-
-
+  if (event.action === 'explore') {
+    event.waitUntil(
+      clients.openWindow('/')
+    );
+  } else {
+    event.waitUntil(
+      clients.openWindow('/')
+    );
+  }
 });
-
-
-
-
