@@ -632,29 +632,52 @@
         }
 
         function getEventSource() {
-            const filtered = allCourses.filter(c => 
-                (!filterType.value || c.course_type === filterType.value) &&
-                (!filterTeacher.value || c.teacher_id === filterTeacher.value)
-            );
-            const colors = { scheduled: '#3498db', completed: '#2ecc71', cancelled: '#e74c3c' };
-            const typeText = { training: '📚 培训', '4year': '🎫 四年', '10year': '🎟️ 十年', naturalization: '🛂 入籍' };
-            
-            return filtered.map(c => {
-                const s = allStudents.find(x => x.id === c.student_id);
-                const t = allTeachers.find(x => x.id === c.teacher_id);
-                const endTime = new Date(new Date(c.start_time).getTime() + (c.duration || 2) * 3600000);
-                return {
-                    id: c.id,
-                    title: `${s?.name || 'N/A'} - ${t?.name || 'N/A'}`,
-                    start: c.start_time,
-                    end: endTime.toISOString(),
-                    duration: c.duration || 2,
-                    backgroundColor: colors[c.status] || '#3498db',
-                    borderColor: colors[c.status] || '#3498db',
-                    extendedProps: { course: c, student: s, teacher: t, typeText: typeText[c.course_type] || '' }
-                };
-            });
+    const filtered = allCourses.filter(c => 
+        (!filterType.value || c.course_type === filterType.value) &&
+        (!filterTeacher.value || c.teacher_id === filterTeacher.value)
+    );
+    const colors = { scheduled: '#3498db', completed: '#2ecc71', cancelled: '#e74c3c' };
+    const typeText = { training: '📚 培训', '4year': '🎫 四年', '10year': '🎟️ 十年', naturalization: '🛂 入籍' };
+    
+    return filtered.map(c => {
+        const s = allStudents.find(x => x.id === c.student_id);
+        const t = allTeachers.find(x => x.id === c.teacher_id);
+        
+        // 正确处理开始时间，避免时区问题
+        let startDateTime;
+        if (c.start_time && typeof c.start_time === 'string') {
+            // 如果数据库存储的是 "YYYY-MM-DD HH:MM:SS" 格式
+            if (c.start_time.includes(' ') && !c.start_time.includes('T')) {
+                startDateTime = new Date(c.start_time.replace(' ', 'T'));
+            } else {
+                startDateTime = new Date(c.start_time);
+            }
+        } else {
+            startDateTime = new Date(c.start_time);
         }
+        
+        // 检查日期是否有效
+        if (isNaN(startDateTime.getTime())) {
+            console.error('无效的日期:', c.start_time);
+            return null;
+        }
+        
+        // 计算结束时间：开始时间 + 时长（小时）
+        const durationMs = (c.duration || 2) * 3600000;
+        const endDateTime = new Date(startDateTime.getTime() + durationMs);
+        
+        return {
+            id: c.id,
+            title: `${s?.name || 'N/A'} - ${t?.name || 'N/A'}`,
+            start: startDateTime.toISOString(),
+            end: endDateTime.toISOString(),
+            duration: c.duration || 2,
+            backgroundColor: colors[c.status] || '#3498db',
+            borderColor: colors[c.status] || '#3498db',
+            extendedProps: { course: c, student: s, teacher: t, typeText: typeText[c.course_type] || '' }
+        };
+    }).filter(event => event !== null);
+}
 
         function refreshCalendar() {
             if (calendar) {
@@ -665,107 +688,108 @@
 
         // ========== 日历初始化 ==========
         function initCalendar() {
-            if (calendar) calendar.destroy();
-            const el = document.getElementById('calendar');
+    if (calendar) calendar.destroy();
+    const el = document.getElementById('calendar');
+    
+    calendar = new FullCalendar.Calendar(el, {
+        initialView: 'timeGridWeek',
+        locale: 'fr',
+        timeZone: 'local',  // 添加这一行 - 使用本地时区
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        slotMinTime: '08:00:00',
+        slotMaxTime: '21:00:00',
+        allDaySlot: false,
+        height: 'auto',
+        editable: true,
+        selectable: true,
+        snapDuration: '00:30:00',
+        slotDuration: '00:30:00',
+        slotLabelInterval: '01:00:00',
+        events: getEventSource(),
+        
+        eventDrop: async (info) => {
+            let newStart = snapToGrid(info.event.start);
+            let newEnd = snapToGrid(info.event.end);
+            info.event.setStart(newStart);
+            info.event.setEnd(newEnd);
+            showConfirmDialog(info, newStart, newEnd);
+        },
+        
+        eventResize: async (info) => {
+            let newEnd = snapToGrid(info.event.end);
+            info.event.setEnd(newEnd);
+            const newDuration = (newEnd - info.event.start) / 3600000;
+            const teacherId = info.event.extendedProps.course.teacher_id;
+            const courseId = info.event.id;
+            const hasConflict = checkConflict(teacherId, info.event.start, courseId, newDuration);
+            if (hasConflict) {
+                showToast('Conflit horaire !', 'error');
+                info.revert();
+                return;
+            }
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const { error } = await supabase.from('courses').update({ duration: newDuration }).eq('id', courseId);
+            if (error) {
+                showToast('Erreur', 'error');
+                info.revert();
+            } else {
+                const idx = allCourses.findIndex(c => c.id === courseId);
+                if (idx !== -1) allCourses[idx].duration = newDuration;
+                updateStats();
+                showToast('Durée modifiée', 'success');
+            }
+        },
+        
+        select: (info) => {
+            let start = snapToGrid(info.start);
+            let startStr = start.toISOString().slice(0, 16);
+            openCreateModal(startStr);
+        },
+        
+        eventClick: (info) => { openEditModal(info.event.id); },
+        
+        eventDidMount: (info) => {
+            const el = info.el;
+            const course = info.event.extendedProps.course;
             
-            calendar = new FullCalendar.Calendar(el, {
-                initialView: 'timeGridWeek',
-                locale: 'fr',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                },
-                slotMinTime: '08:00:00',
-                slotMaxTime: '21:00:00',
-                allDaySlot: false,
-                height: 'auto',
-                editable: true,
-                selectable: true,
-                snapDuration: '00:30:00',
-                slotDuration: '00:30:00',
-                slotLabelInterval: '01:00:00',
-                events: getEventSource(),
-                
-                eventDrop: async (info) => {
-                    let newStart = snapToGrid(info.event.start);
-                    let newEnd = snapToGrid(info.event.end);
-                    info.event.setStart(newStart);
-                    info.event.setEnd(newEnd);
-                    showConfirmDialog(info, newStart, newEnd);
-                },
-                
-                eventResize: async (info) => {
-                    let newEnd = snapToGrid(info.event.end);
-                    info.event.setEnd(newEnd);
-                    const newDuration = (newEnd - info.event.start) / 3600000;
-                    const teacherId = info.event.extendedProps.course.teacher_id;
-                    const courseId = info.event.id;
-                    const hasConflict = checkConflict(teacherId, info.event.start, courseId, newDuration);
-                    if (hasConflict) {
-                        showToast('Conflit horaire !', 'error');
-                        info.revert();
-                        return;
-                    }
-                    const supabase = window.supabaseAuth.getSupabaseClient();
-                    const { error } = await supabase.from('courses').update({ duration: newDuration }).eq('id', courseId);
-                    if (error) {
-                        showToast('Erreur', 'error');
-                        info.revert();
-                    } else {
-                        const idx = allCourses.findIndex(c => c.id === courseId);
-                        if (idx !== -1) allCourses[idx].duration = newDuration;
-                        updateStats();
-                        showToast('Durée modifiée', 'success');
-                    }
-                },
-                
-                select: (info) => {
-                    let start = snapToGrid(info.start);
-                    let startStr = start.toISOString().slice(0, 16);
-                    openCreateModal(startStr);
-                },
-                
-                eventClick: (info) => { openEditModal(info.event.id); },
-                
-                eventDidMount: (info) => {
-                    const el = info.el;
-                    const course = info.event.extendedProps.course;
-                    
-                    // 添加类型标签
-                    const typeText = info.event.extendedProps.typeText;
-                    if (typeText && el) {
-                        const badge = document.createElement('div');
-                        badge.className = 'fc-event-type';
-                        badge.innerText = typeText;
-                        el.querySelector('.fc-event-title')?.after(badge);
-                    }
-                    
-                    // 添加课件链接
-                    const materialLink = info.event.extendedProps.course?.material_link;
-                    if (materialLink && el) {
-                        const linkDiv = document.createElement('div');
-                        linkDiv.className = 'material-link-cal';
-                        linkDiv.innerHTML = `<a href="${materialLink}" target="_blank" style="color:rgba(255,255,255,0.8);"><i class="fas fa-link"></i> support</a>`;
-                        el.appendChild(linkDiv);
-                    }
-                    
-                    // ========== 添加删除按钮（小红✕）==========
-                    const deleteBtn = document.createElement('div');
-                    deleteBtn.className = 'fc-event-delete';
-                    deleteBtn.innerHTML = '✕';
-                    deleteBtn.title = 'Supprimer ce cours';
-                    deleteBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        showDeleteConfirm(info.event.id);
-                    };
-                    
-                    el.style.position = 'relative';
-                    el.appendChild(deleteBtn);
-                }
-            });
-            calendar.render();
+            // 添加类型标签
+            const typeText = info.event.extendedProps.typeText;
+            if (typeText && el) {
+                const badge = document.createElement('div');
+                badge.className = 'fc-event-type';
+                badge.innerText = typeText;
+                el.querySelector('.fc-event-title')?.after(badge);
+            }
+            
+            // 添加课件链接
+            const materialLink = info.event.extendedProps.course?.material_link;
+            if (materialLink && el) {
+                const linkDiv = document.createElement('div');
+                linkDiv.className = 'material-link-cal';
+                linkDiv.innerHTML = `<a href="${materialLink}" target="_blank" style="color:rgba(255,255,255,0.8);"><i class="fas fa-link"></i> support</a>`;
+                el.appendChild(linkDiv);
+            }
+            
+            // 添加删除按钮
+            const deleteBtn = document.createElement('div');
+            deleteBtn.className = 'fc-event-delete';
+            deleteBtn.innerHTML = '✕';
+            deleteBtn.title = 'Supprimer ce cours';
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                showDeleteConfirm(info.event.id);
+            };
+            
+            el.style.position = 'relative';
+            el.appendChild(deleteBtn);
         }
+    });
+    calendar.render();
+}
 
         function showConfirmDialog(eventInfo, newStart, newEnd) {
             const course = eventInfo.event.extendedProps.course;
