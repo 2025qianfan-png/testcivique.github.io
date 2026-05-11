@@ -227,6 +227,8 @@ function checkAccess(student) {
                  adminSpace: "Administration",
                 teacherSpace: "Espace intervenant",
                 studentSpace: "Espace étudiant",
+                footerWechat: "WeChat: qfparis",
+
                         
                 // Navigation
                 navHome: "Accueil",
@@ -409,6 +411,7 @@ function checkAccess(student) {
                 adminSpace: "管理后台",
                 teacherSpace: "教师空间",
                 studentSpace: "学生空间",
+                footerWechat: "微信号: qfparis",
               
                 // Navigation
                 navHome: "首页",
@@ -1060,10 +1063,10 @@ function initHamburger() {
     document.getElementById('langZh').classList.toggle('active', lang === 'zh');
     
     const data = translations[lang];
-    
     for (const [key, value] of Object.entries(data)) {
         const element = document.getElementById(key);
         if (element) {
+            // 对于包含 HTML 标签的内容使用 innerHTML，否则使用 textContent
             if (key.includes('Btn') || key.includes('Info') || key.includes('Title') || key.includes('Desc') || key.includes('Text')) {
                 element.innerHTML = value;
             } else {
@@ -1071,6 +1074,41 @@ function initHamburger() {
             }
         }
     }
+// 修复测试按钮的显示（确保图标和文字都正确）
+function fixTestButtons() {
+    // 免费测试按钮
+    const freeBtn = document.getElementById('freeTestBtn');
+    if (freeBtn) {
+        if (currentLang === 'fr') {
+            freeBtn.innerHTML = '<i class="fas fa-play-circle"></i> Commencer le test';
+        } else {
+            freeBtn.innerHTML = '<i class="fas fa-play-circle"></i> 开始测试';
+        }
+    }
+    
+    // 真题测试按钮
+    const annalesBtn = document.getElementById('annalesTestBtn');
+    if (annalesBtn) {
+        if (currentLang === 'fr') {
+            annalesBtn.innerHTML = '<i class="fas fa-play-circle"></i> Commencer le test';
+        } else {
+            annalesBtn.innerHTML = '<i class="fas fa-play-circle"></i> 开始测试';
+        }
+    }
+    
+    // 学员测试按钮
+    const studentBtn = document.getElementById('studentTestBtn');
+    if (studentBtn) {
+        if (currentLang === 'fr') {
+            studentBtn.innerHTML = '<i class="fas fa-play-circle"></i> Commencer le test';
+        } else {
+            studentBtn.innerHTML = '<i class="fas fa-play-circle"></i> 开始测试';
+        }
+    }
+}
+
+// 特殊处理：确保所有测试按钮的图标和文字正确显示
+fixTestButtons();
     
     // 切换FAQ回答的显示
     toggleFAQAnswers(lang);
@@ -1138,6 +1176,23 @@ function initResizeHandler() {
                 });
             }
         }
+        // 复制微信号
+function copyWechat() {
+    const wechatText = 'qfparis';
+    navigator.clipboard.writeText(wechatText).then(() => {
+        showToast(
+            currentLang === 'fr' ? 'WeChat copié' : '微信号已复制',
+            currentLang === 'fr' ? 'ID WeChat copié dans le presse-papier' : '微信号已复制到剪贴板',
+            'success'
+        );
+    }).catch(() => {
+        showToast(
+            currentLang === 'fr' ? 'Erreur' : '复制失败',
+            currentLang === 'fr' ? 'Impossible de copier' : '无法复制微信号',
+            'error'
+        );
+    });
+}
 
         function checkPWAInstallable() {
             window.addEventListener('beforeinstallprompt', (e) => {
@@ -1248,4 +1303,5 @@ function initResizeHandler() {
         window.closeInstallGuide = closeInstallGuide;
         window.showInstructions = showInstructions;
         window.installPWA = installPWA;
+        window.copyWechat = copyWechat;
    
