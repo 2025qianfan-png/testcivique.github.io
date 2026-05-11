@@ -528,7 +528,7 @@
         const dragConfirmDialog = document.getElementById('dragConfirmDialog');
         const deleteConfirmOverlay = document.getElementById('deleteConfirmOverlay');
 
-        // ========== 辅助函数 ==========
+        // ========== 辅助函数 (完全模仿 teacher.html 的方式) ==========
         function showToast(msg, type) {
             let t = document.createElement('div');
             t.className = `toast toast-${type || 'success'}`;
@@ -541,7 +541,7 @@
 
         function escapeHtml(s) {
             if (!s) return '';
-            return String(s).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+            return s.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
         }
 
         function formatDateTime(d) { 
@@ -687,6 +687,7 @@
             activeStudentsEl.textContent = activeStudents;
         }
 
+        // 关键修复：像 teacher.html 一样，直接使用数据库的本地时间字符串
         function getEventSource() {
             const filtered = allCourses.filter(c => 
                 (!filterType.value || c.course_type === filterType.value) &&
@@ -699,17 +700,15 @@
                 const s = allStudents.find(x => x.id === c.student_id);
                 const t = allTeachers.find(x => x.id === c.teacher_id);
                 
-                // 关键：数据库存的是 "YYYY-MM-DD HH:MM:SS"，需要转换为 ISO 格式给 FullCalendar
-                const startTimeISO = c.start_time.replace(' ', 'T');
-                const startDate = new Date(startTimeISO);
+                // 计算结束时间 (和 teacher.html 一样的方式)
+                const startDate = new Date(c.start_time);
                 const endDate = new Date(startDate.getTime() + (c.duration || 2) * 3600000);
-                const endTimeISO = endDate.toISOString().slice(0, 19).replace('T', ' ');
                 
                 return {
                     id: c.id,
                     title: `${s?.name || 'N/A'} - ${t?.name || 'N/A'}`,
-                    start: startTimeISO,
-                    end: endTimeISO,
+                    start: c.start_time,
+                    end: endDate.toISOString().slice(0, 19).replace('T', ' '),
                     duration: c.duration || 2,
                     backgroundColor: colors[c.status] || '#3498db',
                     borderColor: colors[c.status] || '#3498db',
@@ -725,7 +724,7 @@
             }
         }
 
-        // ========== 日历初始化 ==========
+        // ========== 日历初始化 (和 teacher.html 一样的配置) ==========
         function initCalendar() {
             if (calendar) calendar.destroy();
             const el = document.getElementById('calendar');
@@ -733,7 +732,7 @@
             calendar = new FullCalendar.Calendar(el, {
                 initialView: 'timeGridWeek',
                 locale: 'fr',
-                timeZone: 'local',
+                timeZone: 'local',  // 关键：使用本地时区
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
@@ -745,50 +744,20 @@
                 height: 'auto',
                 editable: true,
                 selectable: true,
-                snapDuration: '00:30:00',
-                slotDuration: '00:30:00',
-                slotLabelInterval: '01:00:00',
                 events: getEventSource(),
                 
                 eventDrop: async (info) => {
+                    // 和 teacher.html 不同，我们需要保存到数据库
                     let newStart = snapToGrid(info.event.start);
                     let newEnd = snapToGrid(info.event.end);
                     
-                    // 转换为数据库格式
+                    info.event.setStart(newStart);
+                    info.event.setEnd(newEnd);
+                    
                     const newStartStr = newStart.toISOString().slice(0, 19).replace('T', ' ');
                     const newDuration = (newEnd - newStart) / 3600000;
                     
-                    info.event.setStart(newStart);
-                    info.event.setEnd(newEnd);
                     showConfirmDialog(info, newStartStr, newDuration);
-                },
-                
-                eventResize: async (info) => {
-                    let newEnd = snapToGrid(info.event.end);
-                    info.event.setEnd(newEnd);
-                    const newDuration = (newEnd - info.event.start) / 3600000;
-                    const teacherId = info.event.extendedProps.course.teacher_id;
-                    const courseId = info.event.id;
-                    const startTimeStr = info.event.start.toISOString().slice(0, 19).replace('T', ' ');
-                    
-                    const hasConflict = checkConflict(teacherId, startTimeStr, courseId, newDuration);
-                    if (hasConflict) {
-                        showToast('Conflit horaire !', 'error');
-                        info.revert();
-                        return;
-                    }
-                    
-                    const supabase = window.supabaseAuth.getSupabaseClient();
-                    const { error } = await supabase.from('courses').update({ duration: newDuration }).eq('id', courseId);
-                    if (error) {
-                        showToast('Erreur', 'error');
-                        info.revert();
-                    } else {
-                        const idx = allCourses.findIndex(c => c.id === courseId);
-                        if (idx !== -1) allCourses[idx].duration = newDuration;
-                        updateStats();
-                        showToast('Durée modifiée', 'success');
-                    }
                 },
                 
                 select: (info) => {
@@ -946,7 +915,7 @@
             document.getElementById('teacherId').value = course.teacher_id;
             document.getElementById('courseType').value = course.course_type || 'training';
             
-            // 数据库格式 "YYYY-MM-DD HH:MM:SS" 转 datetime-local 格式 "YYYY-MM-DDTHH:MM"
+            // 数据库格式 "YYYY-MM-DD HH:MM:SS" 转 datetime-local 格式
             const startTimeISO = course.start_time.replace(' ', 'T');
             document.getElementById('startTime').value = startTimeISO.slice(0, 16);
             
