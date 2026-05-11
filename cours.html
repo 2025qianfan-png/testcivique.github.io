@@ -128,7 +128,6 @@
         }
         #calendar { max-width: 100%; }
         
-        /* 课程事件样式 - 删除按钮 */
         .fc-event {
             position: relative;
             overflow: visible !important;
@@ -158,7 +157,6 @@
             transform: scale(1.1);
             background: #c0392b;
         }
-        /* 移动端删除按钮更大 */
         @media (max-width: 768px) {
             .fc-event-delete {
                 width: 28px;
@@ -331,7 +329,6 @@
         .btn-confirm-ok { padding: 10px 24px; background: var(--green); color: white; border: none; border-radius: 30px; cursor: pointer; }
         .warning-text { color: var(--red); font-size: 0.85rem; margin-top: 10px; text-align: center; }
         
-        /* 删除确认对话框 */
         .delete-confirm-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -556,19 +553,81 @@
             });
         }
 
+        // 将本地时间字符串转换为 Date 对象（正确处理 "YYYY-MM-DD HH:MM:SS" 格式）
+        function parseLocalDateTime(dateTimeStr) {
+            if (!dateTimeStr) return null;
+            if (typeof dateTimeStr === 'string' && dateTimeStr.includes(' ')) {
+                const [datePart, timePart] = dateTimeStr.split(' ');
+                const [year, month, day] = datePart.split('-');
+                const [hours, minutes, seconds] = timePart.split(':');
+                return new Date(year, month - 1, day, hours, minutes, seconds || 0);
+            }
+            return new Date(dateTimeStr);
+        }
+
+        // 将 Date 对象转换为本地时间字符串 "YYYY-MM-DD HH:MM:SS"
+        function toLocalDateTimeString(date) {
+            if (!date || isNaN(date.getTime())) return '';
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+
+        // 计算结束时间字符串
+        function getEndTimeStr(startTimeStr, duration) {
+            const startDate = parseLocalDateTime(startTimeStr);
+            const endDate = new Date(startDate.getTime() + duration * 3600000);
+            return toLocalDateTimeString(endDate);
+        }
+
         // 检查冲突
         function checkConflict(teacherId, startTime, excludeId, duration = 2) {
             if (!teacherId || !startTime) return false;
-            const s = new Date(startTime).getTime();
+            const s = parseLocalDateTime(startTime).getTime();
             const e = s + duration * 3600000;
             return allCourses.some(c => {
                 if (c.teacher_id !== teacherId) return false;
                 if (excludeId && c.id === excludeId) return false;
                 if (c.status === 'cancelled') return false;
-                const cs = new Date(c.start_time).getTime();
+                const cs = parseLocalDateTime(c.start_time).getTime();
                 const ce = cs + (c.duration || 2) * 3600000;
                 return s < ce && e > cs;
             });
+        }
+
+        // 删除可用时间段（当课程安排后）
+        async function deleteAvailabilityForCourse(teacherId, startTimeStr, duration) {
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const endTimeStr = getEndTimeStr(startTimeStr, duration);
+            
+            try {
+                // 删除与课程时间重叠的可用时间段
+                const { error, data } = await supabase
+                    .from('availabilities')
+                    .delete()
+                    .eq('teacher_id', teacherId)
+                    .eq('status', 'available')
+                    .lte('start_time', startTimeStr)
+                    .gte('end_time', endTimeStr)
+                    .select();
+                
+                if (error) {
+                    console.error('删除可用时间段失败:', error);
+                    return false;
+                }
+                
+                if (data && data.length > 0) {
+                    console.log(`已删除 ${data.length} 个可用时间段`, data);
+                }
+                return true;
+            } catch (err) {
+                console.error('删除可用时间段异常:', err);
+                return false;
+            }
         }
 
         // 对齐30分钟
@@ -616,7 +675,7 @@
             const total = allCourses.length;
             const now = new Date();
             const monthCourses = allCourses.filter(c => {
-                const d = new Date(c.start_time);
+                const d = parseLocalDateTime(c.start_time);
                 return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
             }).length;
             const completed = allCourses.filter(c => c.status === 'completed').length;
@@ -632,52 +691,40 @@
         }
 
         function getEventSource() {
-    const filtered = allCourses.filter(c => 
-        (!filterType.value || c.course_type === filterType.value) &&
-        (!filterTeacher.value || c.teacher_id === filterTeacher.value)
-    );
-    const colors = { scheduled: '#3498db', completed: '#2ecc71', cancelled: '#e74c3c' };
-    const typeText = { training: '📚 培训', '4year': '🎫 四年', '10year': '🎟️ 十年', naturalization: '🛂 入籍' };
-    
-    return filtered.map(c => {
-        const s = allStudents.find(x => x.id === c.student_id);
-        const t = allTeachers.find(x => x.id === c.teacher_id);
-        
-        // 正确处理开始时间，避免时区问题
-        let startDateTime;
-        if (c.start_time && typeof c.start_time === 'string') {
-            // 如果数据库存储的是 "YYYY-MM-DD HH:MM:SS" 格式
-            if (c.start_time.includes(' ') && !c.start_time.includes('T')) {
-                startDateTime = new Date(c.start_time.replace(' ', 'T'));
-            } else {
-                startDateTime = new Date(c.start_time);
-            }
-        } else {
-            startDateTime = new Date(c.start_time);
+            const filtered = allCourses.filter(c => 
+                (!filterType.value || c.course_type === filterType.value) &&
+                (!filterTeacher.value || c.teacher_id === filterTeacher.value)
+            );
+            const colors = { scheduled: '#3498db', completed: '#2ecc71', cancelled: '#e74c3c' };
+            const typeText = { training: '📚 培训', '4year': '🎫 四年', '10year': '🎟️ 十年', naturalization: '🛂 入籍' };
+            
+            return filtered.map(c => {
+                const s = allStudents.find(x => x.id === c.student_id);
+                const t = allTeachers.find(x => x.id === c.teacher_id);
+                
+                // 使用本地时间解析
+                let startDateTime = parseLocalDateTime(c.start_time);
+                
+                if (isNaN(startDateTime.getTime())) {
+                    console.error('无效的日期:', c.start_time);
+                    return null;
+                }
+                
+                const durationMs = (c.duration || 2) * 3600000;
+                const endDateTime = new Date(startDateTime.getTime() + durationMs);
+                
+                return {
+                    id: c.id,
+                    title: `${s?.name || 'N/A'} - ${t?.name || 'N/A'}`,
+                    start: startDateTime.toISOString(),
+                    end: endDateTime.toISOString(),
+                    duration: c.duration || 2,
+                    backgroundColor: colors[c.status] || '#3498db',
+                    borderColor: colors[c.status] || '#3498db',
+                    extendedProps: { course: c, student: s, teacher: t, typeText: typeText[c.course_type] || '' }
+                };
+            }).filter(event => event !== null);
         }
-        
-        // 检查日期是否有效
-        if (isNaN(startDateTime.getTime())) {
-            console.error('无效的日期:', c.start_time);
-            return null;
-        }
-        
-        // 计算结束时间：开始时间 + 时长（小时）
-        const durationMs = (c.duration || 2) * 3600000;
-        const endDateTime = new Date(startDateTime.getTime() + durationMs);
-        
-        return {
-            id: c.id,
-            title: `${s?.name || 'N/A'} - ${t?.name || 'N/A'}`,
-            start: startDateTime.toISOString(),
-            end: endDateTime.toISOString(),
-            duration: c.duration || 2,
-            backgroundColor: colors[c.status] || '#3498db',
-            borderColor: colors[c.status] || '#3498db',
-            extendedProps: { course: c, student: s, teacher: t, typeText: typeText[c.course_type] || '' }
-        };
-    }).filter(event => event !== null);
-}
 
         function refreshCalendar() {
             if (calendar) {
@@ -688,116 +735,119 @@
 
         // ========== 日历初始化 ==========
         function initCalendar() {
-    if (calendar) calendar.destroy();
-    const el = document.getElementById('calendar');
-    
-    calendar = new FullCalendar.Calendar(el, {
-        initialView: 'timeGridWeek',
-        locale: 'fr',
-        timeZone: 'local',  // 添加这一行 - 使用本地时区
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
-        slotMinTime: '08:00:00',
-        slotMaxTime: '21:00:00',
-        allDaySlot: false,
-        height: 'auto',
-        editable: true,
-        selectable: true,
-        snapDuration: '00:30:00',
-        slotDuration: '00:30:00',
-        slotLabelInterval: '01:00:00',
-        events: getEventSource(),
-        
-        eventDrop: async (info) => {
-            let newStart = snapToGrid(info.event.start);
-            let newEnd = snapToGrid(info.event.end);
-            info.event.setStart(newStart);
-            info.event.setEnd(newEnd);
-            showConfirmDialog(info, newStart, newEnd);
-        },
-        
-        eventResize: async (info) => {
-            let newEnd = snapToGrid(info.event.end);
-            info.event.setEnd(newEnd);
-            const newDuration = (newEnd - info.event.start) / 3600000;
-            const teacherId = info.event.extendedProps.course.teacher_id;
-            const courseId = info.event.id;
-            const hasConflict = checkConflict(teacherId, info.event.start, courseId, newDuration);
-            if (hasConflict) {
-                showToast('Conflit horaire !', 'error');
-                info.revert();
-                return;
-            }
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            const { error } = await supabase.from('courses').update({ duration: newDuration }).eq('id', courseId);
-            if (error) {
-                showToast('Erreur', 'error');
-                info.revert();
-            } else {
-                const idx = allCourses.findIndex(c => c.id === courseId);
-                if (idx !== -1) allCourses[idx].duration = newDuration;
-                updateStats();
-                showToast('Durée modifiée', 'success');
-            }
-        },
-        
-        select: (info) => {
-            let start = snapToGrid(info.start);
-            let startStr = start.toISOString().slice(0, 16);
-            openCreateModal(startStr);
-        },
-        
-        eventClick: (info) => { openEditModal(info.event.id); },
-        
-        eventDidMount: (info) => {
-            const el = info.el;
-            const course = info.event.extendedProps.course;
+            if (calendar) calendar.destroy();
+            const el = document.getElementById('calendar');
             
-            // 添加类型标签
-            const typeText = info.event.extendedProps.typeText;
-            if (typeText && el) {
-                const badge = document.createElement('div');
-                badge.className = 'fc-event-type';
-                badge.innerText = typeText;
-                el.querySelector('.fc-event-title')?.after(badge);
-            }
-            
-            // 添加课件链接
-            const materialLink = info.event.extendedProps.course?.material_link;
-            if (materialLink && el) {
-                const linkDiv = document.createElement('div');
-                linkDiv.className = 'material-link-cal';
-                linkDiv.innerHTML = `<a href="${materialLink}" target="_blank" style="color:rgba(255,255,255,0.8);"><i class="fas fa-link"></i> support</a>`;
-                el.appendChild(linkDiv);
-            }
-            
-            // 添加删除按钮
-            const deleteBtn = document.createElement('div');
-            deleteBtn.className = 'fc-event-delete';
-            deleteBtn.innerHTML = '✕';
-            deleteBtn.title = 'Supprimer ce cours';
-            deleteBtn.onclick = (e) => {
-                e.stopPropagation();
-                showDeleteConfirm(info.event.id);
-            };
-            
-            el.style.position = 'relative';
-            el.appendChild(deleteBtn);
+            calendar = new FullCalendar.Calendar(el, {
+                initialView: 'timeGridWeek',
+                locale: 'fr',
+                timeZone: 'local',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                slotMinTime: '08:00:00',
+                slotMaxTime: '21:00:00',
+                allDaySlot: false,
+                height: 'auto',
+                editable: true,
+                selectable: true,
+                snapDuration: '00:30:00',
+                slotDuration: '00:30:00',
+                slotLabelInterval: '01:00:00',
+                events: getEventSource(),
+                
+                eventDrop: async (info) => {
+                    let newStart = snapToGrid(info.event.start);
+                    let newEnd = snapToGrid(info.event.end);
+                    info.event.setStart(newStart);
+                    info.event.setEnd(newEnd);
+                    showConfirmDialog(info, newStart, newEnd);
+                },
+                
+                eventResize: async (info) => {
+                    let newEnd = snapToGrid(info.event.end);
+                    info.event.setEnd(newEnd);
+                    const newDuration = (newEnd - info.event.start) / 3600000;
+                    const teacherId = info.event.extendedProps.course.teacher_id;
+                    const courseId = info.event.id;
+                    
+                    // 转换开始时间为本地字符串进行冲突检查
+                    const newStartLocal = toLocalDateTimeString(info.event.start);
+                    const hasConflict = checkConflict(teacherId, newStartLocal, courseId, newDuration);
+                    
+                    if (hasConflict) {
+                        showToast('Conflit horaire !', 'error');
+                        info.revert();
+                        return;
+                    }
+                    const supabase = window.supabaseAuth.getSupabaseClient();
+                    const { error } = await supabase.from('courses').update({ duration: newDuration }).eq('id', courseId);
+                    if (error) {
+                        showToast('Erreur', 'error');
+                        info.revert();
+                    } else {
+                        const idx = allCourses.findIndex(c => c.id === courseId);
+                        if (idx !== -1) allCourses[idx].duration = newDuration;
+                        updateStats();
+                        showToast('Durée modifiée', 'success');
+                    }
+                },
+                
+                select: (info) => {
+                    let start = snapToGrid(info.start);
+                    let startStr = start.toISOString().slice(0, 16);
+                    openCreateModal(startStr);
+                },
+                
+                eventClick: (info) => { openEditModal(info.event.id); },
+                
+                eventDidMount: (info) => {
+                    const el = info.el;
+                    const course = info.event.extendedProps.course;
+                    
+                    const typeText = info.event.extendedProps.typeText;
+                    if (typeText && el) {
+                        const badge = document.createElement('div');
+                        badge.className = 'fc-event-type';
+                        badge.innerText = typeText;
+                        el.querySelector('.fc-event-title')?.after(badge);
+                    }
+                    
+                    const materialLink = info.event.extendedProps.course?.material_link;
+                    if (materialLink && el) {
+                        const linkDiv = document.createElement('div');
+                        linkDiv.className = 'material-link-cal';
+                        linkDiv.innerHTML = `<a href="${materialLink}" target="_blank" style="color:rgba(255,255,255,0.8);"><i class="fas fa-link"></i> support</a>`;
+                        el.appendChild(linkDiv);
+                    }
+                    
+                    const deleteBtn = document.createElement('div');
+                    deleteBtn.className = 'fc-event-delete';
+                    deleteBtn.innerHTML = '✕';
+                    deleteBtn.title = 'Supprimer ce cours';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        showDeleteConfirm(info.event.id);
+                    };
+                    
+                    el.style.position = 'relative';
+                    el.appendChild(deleteBtn);
+                }
+            });
+            calendar.render();
         }
-    });
-    calendar.render();
-}
 
         function showConfirmDialog(eventInfo, newStart, newEnd) {
             const course = eventInfo.event.extendedProps.course;
             const student = allStudents.find(s => s.id === course.student_id);
             const teacher = allTeachers.find(t => t.id === course.teacher_id);
-            const oldStart = new Date(course.start_time);
+            const oldStart = parseLocalDateTime(course.start_time);
             const newDuration = (newEnd - newStart) / 3600000;
-            const hasConflict = checkConflict(course.teacher_id, newStart, course.id, newDuration);
+            
+            const newStartLocal = toLocalDateTimeString(newStart);
+            const hasConflict = checkConflict(course.teacher_id, newStartLocal, course.id, newDuration);
 
             document.getElementById('oldTimeValue').innerHTML = formatDateTime(oldStart) + ` (${course.duration || 2}h)`;
             document.getElementById('newTimeValue').innerHTML = formatDateTime(newStart) + ` (${newDuration.toFixed(1)}h)`;
@@ -821,24 +871,50 @@
                 eventInfo.revert();
                 return;
             }
+            
             const supabase = window.supabaseAuth.getSupabaseClient();
-            const { error } = await supabase.from('courses').update({
-                start_time: newStart.toISOString(),
-                duration: newDuration
-            }).eq('id', eventInfo.event.id);
-            if (error) {
-                showToast('Erreur', 'error');
-                eventInfo.revert();
-            } else {
-                const idx = allCourses.findIndex(c => c.id === eventInfo.event.id);
+            const teacherId = eventInfo.event.extendedProps.course.teacher_id;
+            const courseId = eventInfo.event.id;
+            
+            // 获取课程的旧时间
+            const oldCourse = allCourses.find(c => c.id === courseId);
+            const oldStartTimeStr = oldCourse?.start_time;
+            const oldDuration = oldCourse?.duration || 2;
+            
+            // 转换为本地时间字符串
+            const newStartLocal = toLocalDateTimeString(newStart);
+            const newEndLocal = toLocalDateTimeString(newEnd);
+            
+            try {
+                // 1. 更新课程时间
+                const { error } = await supabase.from('courses').update({
+                    start_time: newStartLocal,
+                    duration: newDuration
+                }).eq('id', courseId);
+                
+                if (error) throw error;
+                
+                // 2. 删除新时间段的可用时间段（老师这个时间被占用了）
+                await deleteAvailabilityForCourse(teacherId, newStartLocal, newDuration);
+                
+                // 注意：旧时间段的可用性是否需要恢复？如果需要，可以在这里添加恢复逻辑
+                // 目前不自动恢复，因为老师可能有其他安排
+                
+                const idx = allCourses.findIndex(c => c.id === courseId);
                 if (idx !== -1) {
-                    allCourses[idx].start_time = newStart.toISOString();
+                    allCourses[idx].start_time = newStartLocal;
                     allCourses[idx].duration = newDuration;
                 }
                 updateStats();
                 refreshCalendar();
                 showToast('Cours déplacé', 'success');
+                
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur lors du déplacement', 'error');
+                eventInfo.revert();
             }
+            
             dragConfirmDialog.classList.remove('active');
             pendingDragInfo = null;
         }
@@ -897,8 +973,8 @@
             document.getElementById('teacherId').value = course.teacher_id;
             document.getElementById('courseType').value = course.course_type || 'training';
             
-            // 使用本地时间格式显示
-            const startDate = new Date(course.start_time);
+            // 正确解析本地时间字符串
+            const startDate = parseLocalDateTime(course.start_time);
             const year = startDate.getFullYear();
             const month = String(startDate.getMonth() + 1).padStart(2, '0');
             const day = String(startDate.getDate()).padStart(2, '0');
@@ -943,7 +1019,7 @@
                 return;
             }
             
-            // 转换为 "YYYY-MM-DD HH:MM:00" 格式，不做时区转换
+            // 转换为 "YYYY-MM-DD HH:MM:00" 格式
             const startTimeStr = startTimeLocal.replace('T', ' ') + ':00';
             
             if (checkConflict(teacherId, startTimeStr, id || null, duration)) {
@@ -976,6 +1052,12 @@
                     result = await supabase.from('courses').insert([data]);
                 }
                 if (result.error) throw result.error;
+                
+                // 删除对应的可用时间段（仅当课程状态为 scheduled 时）
+                if (data.status === 'scheduled') {
+                    await deleteAvailabilityForCourse(teacherId, startTimeStr, duration);
+                }
+                
                 closeModal(courseModal);
                 await loadData();
                 showToast(id ? 'Cours modifié' : 'Cours créé', 'success');
@@ -995,31 +1077,87 @@
             
             pendingDeleteCourseId = courseId;
             document.getElementById('deleteCourseType').textContent = getTypeText(course.course_type);
-            document.getElementById('deleteCourseDate').textContent = formatDateTime(course.start_time);
+            document.getElementById('deleteCourseDate').textContent = formatDateTime(parseLocalDateTime(course.start_time));
             document.getElementById('deleteCourseTeacher').textContent = teacher?.name || 'N/A';
             document.getElementById('deleteCourseStudent').textContent = student?.name || 'N/A';
             
             deleteConfirmOverlay.classList.add('active');
         }
 
+        
         async function confirmDeleteCourse() {
-            if (!pendingDeleteCourseId) return;
-            
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            try {
-                const { error } = await supabase.from('courses').delete().eq('id', pendingDeleteCourseId);
-                if (error) throw error;
-                
-                deleteConfirmOverlay.classList.remove('active');
-                pendingDeleteCourseId = null;
-                await loadData();
-                showToast('Cours supprimé avec succès', 'success');
-            } catch (err) {
-                console.error(err);
-                showToast('Erreur lors de la suppression', 'error');
-            }
+    if (!pendingDeleteCourseId) return;
+    
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    try {
+        // 获取要删除的课程信息
+        const courseToDelete = allCourses.find(c => c.id === pendingDeleteCourseId);
+        
+        if (!courseToDelete) {
+            showToast('Cours non trouvé', 'error');
+            return;
         }
-
+        
+        // 1. 删除课程
+        const { error } = await supabase.from('courses').delete().eq('id', pendingDeleteCourseId);
+        if (error) throw error;
+        
+        // 2. 恢复可用时间段（仅当课程状态为 scheduled 时）
+        if (courseToDelete.status === 'scheduled') {
+            const teacherId = courseToDelete.teacher_id;
+            const startTimeStr = courseToDelete.start_time;
+            const duration = courseToDelete.duration || 2;
+            const endTimeStr = getEndTimeStr(startTimeStr, duration);
+            
+            // 检查是否已存在相同的可用时间段（避免重复插入）
+            const { data: existingAvail, error: checkError } = await supabase
+                .from('availabilities')
+                .select('id')
+                .eq('teacher_id', teacherId)
+                .eq('start_time', startTimeStr)
+                .eq('end_time', endTimeStr)
+                .eq('status', 'available')
+                .maybeSingle();
+            
+            if (checkError) {
+                console.error('检查可用时间段失败:', checkError);
+            }
+            
+            // 如果不存在，则重新插入
+            if (!existingAvail) {
+                const { error: insertError } = await supabase
+                    .from('availabilities')
+                    .insert([{
+                        teacher_id: teacherId,
+                        start_time: startTimeStr,
+                        end_time: endTimeStr,
+                        status: 'available',
+                        duration: duration,
+                        created_at: toLocalDateTimeString(new Date())
+                    }]);
+                
+                if (insertError) {
+                    console.error('恢复可用时间段失败:', insertError);
+                    showToast('课程已删除，但恢复可用时间失败', 'error');
+                } else {
+                    showToast('课程已删除，可用时间段已恢复', 'success');
+                }
+            } else {
+                showToast('课程已删除', 'success');
+            }
+        } else {
+            showToast('课程已删除', 'success');
+        }
+        
+        deleteConfirmOverlay.classList.remove('active');
+        pendingDeleteCourseId = null;
+        await loadData();
+        
+    } catch (err) {
+        console.error(err);
+        showToast('Erreur lors de la suppression', 'error');
+    }
+}
         function cancelDeleteCourse() {
             deleteConfirmOverlay.classList.remove('active');
             pendingDeleteCourseId = null;
@@ -1062,7 +1200,7 @@
                 teacher_comment: document.getElementById('teacherComment').value || null,
                 student_comment: document.getElementById('studentComment').value || null,
                 student_rating: parseInt(document.getElementById('studentRating').value) || null,
-                evaluated_at: new Date().toISOString(),
+                evaluated_at: toLocalDateTimeString(new Date()),
                 status: 'completed'
             };
             try {
