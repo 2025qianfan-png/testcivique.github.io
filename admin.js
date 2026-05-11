@@ -313,11 +313,11 @@
                 let typeClass = '';
                 let typeText = '';
                 switch(user.type) {
-                    case 'n': typeClass = 'type-n'; typeText = 'Type N (入籍)'; break;
-                    case 'r': typeClass = 'type-r'; typeText = 'Type R (十年卡)'; break;
-                    case 'm': typeClass = 'type-m'; typeText = 'Type M (多年卡)'; break;
-                    case 't': typeClass = 'type-t'; typeText = 'Type T'; break;
-                    default: typeClass = 'type-t'; typeText = 'Type T';
+                 case 'n': typeClass = 'type-n'; typeText = 'Type N'; break;
+                        case 'r': typeClass = 'type-r'; typeText = 'Type R'; break;
+                        case 'm': typeClass = 'type-m'; typeText = 'Type M'; break;
+                        case 't': typeClass = 'type-t'; typeText = 'Type T'; break;
+                        default: typeClass = 'type-t'; typeText = 'Type T';
                 }
                 
                 // 确定角色标签
