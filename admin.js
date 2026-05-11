@@ -450,7 +450,7 @@
                         return user.role === 'teacher';
                     } else if (currentFilter === 'expired') {
                         return isExpired(user);
-                    } else if (currentFilter === 'admin') {
+                    } else if (currentFilter === 'admin' || currentFilter === 'role-admin') {
                         return user.role === 'admin';
                     } else {
                         const type = currentFilter.split('-')[1];
