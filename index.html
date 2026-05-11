@@ -391,7 +391,90 @@
 
     <div class="toast-container" id="toastContainer"></div>
     <div id="pwa-install-button" class="pwa-install-btn" style="display: none;"><button onclick="showInstallGuide()" class="install-btn"><i class="fas fa-download"></i><span id="installBtnText">Installer l'app</span></button></div>
-    <div id="pwa-install-guide" class="pwa-install-guide" style="display: none;">...</div>
+   <div id="pwa-install-guide" class="pwa-install-guide" style="display: none;">
+    <div class="install-guide-content">
+        <div class="install-header">
+            <h3 id="installGuideTitle">Installer l'application</h3>
+            <button class="close-guide" onclick="closeInstallGuide()">&times;</button>
+        </div>
+        <div class="install-body">
+            <div class="device-selector">
+                <button class="device-btn active" id="iosBtn" onclick="showInstructions('ios')">
+                    <i class="fab fa-apple"></i> iOS
+                </button>
+                <button class="device-btn" id="androidBtn" onclick="showInstructions('android')">
+                    <i class="fab fa-android"></i> Android
+                </button>
+            </div>
+            
+            <div id="ios-instructions" class="instructions active">
+                <div class="install-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4 id="iosStep1">Ouvrez Safari</h4>
+                        <p id="iosStep1Desc">Accédez à cette page via Safari sur votre iPhone</p>
+                    </div>
+                </div>
+                <div class="install-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4 id="iosStep2">Cliquez sur "Partager"</h4>
+                        <p id="iosStep2Desc">Appuyez sur l'icône <i class="fas fa-share"></i> en bas de l'écran</p>
+                    </div>
+                </div>
+                <div class="install-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4 id="iosStep3">Ajouter à l'écran d'accueil</h4>
+                        <p id="iosStep3Desc">Faites défiler et sélectionnez "Sur l'écran d'accueil"</p>
+                    </div>
+                </div>
+                <div class="install-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4 id="iosStep4">Confirmer l'installation</h4>
+                        <p id="iosStep4Desc">Appuyez sur "Ajouter" en haut à droite</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="android-instructions" class="instructions">
+                <div class="install-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4 id="androidStep1">Ouvrez Chrome</h4>
+                        <p id="androidStep1Desc">Accédez à cette page via Chrome sur votre Android</p>
+                    </div>
+                </div>
+                <div class="install-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4 id="androidStep2">Menu des options</h4>
+                        <p id="androidStep2Desc">Appuyez sur les trois points <i class="fas fa-ellipsis-v"></i> en haut à droite</p>
+                    </div>
+                </div>
+                <div class="install-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4 id="androidStep3">Installer l'app</h4>
+                        <p id="androidStep3Desc">Sélectionnez "Ajouter à l'écran d'accueil" ou "Installer l'application"</p>
+                    </div>
+                </div>
+                <div class="install-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4 id="androidStep4">Confirmer</h4>
+                        <p id="androidStep4Desc">Appuyez sur "Installer" pour confirmer</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="install-footer">
+            <button class="btn btn-primary" onclick="installPWA()" id="installPwaBtn">Installer maintenant</button>
+            <button class="btn" onclick="closeInstallGuide()" id="closeGuideBtn">Fermer</button>
+        </div>
+    </div>
+</div>
     <div id="offline-notice" class="offline-notice" style="display: none;"><div class="offline-content"><i class="fas fa-wifi-slash"></i><span id="offlineText">Mode hors ligne - Vous pouvez continuer à utiliser l'application</span></div></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
