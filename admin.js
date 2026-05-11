@@ -58,10 +58,29 @@
         // ==============================
         // 页面加载初始化
         // ==============================
-        document.addEventListener('DOMContentLoaded', function() {
-            initEventListeners();
-            checkAdminSession();
-        });
+   document.addEventListener('DOMContentLoaded', function() {
+    initEventListeners();
+    
+    // 直接隐藏登录区域，显示管理区域
+    document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('adminContent').style.display = 'block';
+    
+    // 设置管理员信息
+    currentAdmin = {
+        id: 1,
+        name: "Administrateur",
+        role: "admin",
+        type: "t",
+        timer: null
+    };
+    
+    // 更新显示的管理员名字
+    if (currentAdminNameEl) currentAdminNameEl.textContent = currentAdmin.name;
+    if (currentAdminRoleEl) currentAdminRoleEl.textContent = "Rôle: Administrateur";
+    
+    // 加载用户数据
+    loadUsers();
+});
 
         // ==============================
         // 初始化事件监听器
