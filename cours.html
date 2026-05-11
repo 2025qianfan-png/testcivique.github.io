@@ -697,29 +697,51 @@
 
         // ========== 关键修复：使用 duration 字符串而不是 end ==========
         function getEventSource() {
-            const filtered = allCourses.filter(c => 
-                (!filterType.value || c.course_type === filterType.value) &&
-                (!filterTeacher.value || c.teacher_id === filterTeacher.value)
-            );
-            const colors = { scheduled: '#3498db', completed: '#2ecc71', cancelled: '#e74c3c' };
-            const typeText = { training: '📚 培训', '4year': '🎫 四年', '10year': '🎟️ 十年', naturalization: '🛂 入籍' };
-            
-            return filtered.map(c => {
-                const s = allStudents.find(x => x.id === c.student_id);
-                const t = allTeachers.find(x => x.id === c.teacher_id);
+                const filtered = allCourses.filter(c => 
+                    (!filterType.value || c.course_type === filterType.value) &&
+                    (!filterTeacher.value || c.teacher_id === filterTeacher.value)
+                );
+                const colors = { scheduled: '#3498db', completed: '#2ecc71', cancelled: '#e74c3c' };
+                const typeText = { training: '📚 培训', '4year': '🎫 四年', '10year': '🎟️ 十年', naturalization: '🛂 入籍' };
                 
-                return {
-                    id: c.id,
-                    title: `${s?.name || 'N/A'} - ${t?.name || 'N/A'}`,
-                    start: c.start_time,
-                    duration: getDurationString(c.duration || 2),
-                    backgroundColor: colors[c.status] || '#3498db',
-                    borderColor: colors[c.status] || '#3498db',
-                    extendedProps: { course: c, student: s, teacher: t, typeText: typeText[c.course_type] || '' }
-                };
-            });
-        }
-
+                return filtered.map(c => {
+                    const s = allStudents.find(x => x.id === c.student_id);
+                    const t = allTeachers.find(x => x.id === c.teacher_id);
+                    
+                    // 直接从开始时间字符串计算结束时间字符串（本地时间，无时区转换）
+                    let startStr = c.start_time;  // "2025-05-11 14:00:00"
+                    let [datePart, timePart] = startStr.split(' ');
+                    let [year, month, day] = datePart.split('-');
+                    let [hours, minutes] = timePart.split(':');
+                    
+                    // 计算结束时间
+                    let durationHours = c.duration || 2;
+                    let endHours = parseInt(hours) + durationHours;
+                    let endMinutes = minutes;
+                    let endDay = parseInt(day);
+                    let endMonth = parseInt(month);
+                    let endYear = parseInt(year);
+                    
+                    // 处理跨天
+                    while (endHours >= 24) {
+                        endHours -= 24;
+                        endDay++;
+                    }
+                    
+                    // 简单处理跨月（可以简化，因为课程一般不会跨月）
+                    let endTimeStr = `${endYear}-${String(endMonth).padStart(2,'0')}-${String(endDay).padStart(2,'0')} ${String(endHours).padStart(2,'0')}:${endMinutes}:00`;
+                    
+                    return {
+                        id: c.id,
+                        title: `${s?.name || 'N/A'} - ${t?.name || 'N/A'}`,
+                        start: startStr,
+                        end: endTimeStr,
+                        backgroundColor: colors[c.status] || '#3498db',
+                        borderColor: colors[c.status] || '#3498db',
+                        extendedProps: { course: c, student: s, teacher: t, typeText: typeText[c.course_type] || '' }
+                    };
+                });
+            }
         function refreshCalendar() {
             if (calendar) {
                 calendar.removeAllEvents();
