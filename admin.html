@@ -2,275 +2,293 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
     <title>Administration - Association Mille Voiles</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="admin.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
-    <style>
-        #loginSection {
-            display: none !important;
-        }
-        #adminContent {
-            display: block !important;
-        }
-    </style>
+    <script src="admin.js" defer></script>
 </head>
 <body>
+    <header class="main-header">
+        <div class="container">
+            <h1>Administration des utilisateurs</h1>
+            <p>Association Mille Voiles - Gestion des comptes étudiants et administrateurs</p>
+        </div>
+    </header>
 
-<header class="main-header">
-    <div class="container">
-        <h1>Administration des utilisateurs</h1>
-        <p>Association Mille Voiles - Gestion des comptes étudiants et administrateurs</p>
-    </div>
-</header>
+    <nav class="main-nav">
+        <div class="container">
+            <a href="index.html" class="back-home">
+                <i class="fas fa-arrow-left"></i> Retour à l'accueil
+            </a>
+        </div>
+    </nav>
 
-<nav class="main-nav">
-    <div class="container">
-        <a href="index.html" class="back-home">
-            <i class="fas fa-arrow-left"></i> Retour à l'accueil
-        </a>
-    </div>
-</nav>
-
-<main class="admin-content" id="adminContent">
-    <div class="container">
-        <section class="dashboard">
-            <div class="dashboard-header">
-                <div>
-                    <h1 class="dashboard-title">Tableau de bord administrateur</h1>
-                    <p>Gérez les utilisateurs et les paramètres de l'application</p>
+    <section class="login-section" id="loginSection">
+        <div class="login-card">
+            <div class="login-icon"><i class="fas fa-user-shield"></i></div>
+            <h2>Accès administration</h2>
+            <p>Veuillez vous connecter en tant qu'administrateur pour accéder au panneau de gestion</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="adminUsername"><i class="fas fa-user"></i> Nom d'utilisateur admin</label>
+                    <input type="text" id="adminUsername" placeholder="Entrez votre nom d'utilisateur" required>
+                    <div class="error-message" id="usernameError"></div>
                 </div>
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <div class="user-info">
-                        <i class="fas fa-user-circle"></i>
-                        <div>
-                            <div id="currentAdminName">Administrateur</div>
-                            <div style="font-size: 0.9rem; color: var(--medium-gray);">Rôle: Admin</div>
+                <div class="form-group">
+                    <label for="adminPassword"><i class="fas fa-lock"></i> Mot de passe admin</label>
+                    <input type="password" id="adminPassword" placeholder="Entrez votre mot de passe" required>
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+                <button type="submit" class="login-btn"><i class="fas fa-sign-in-alt"></i> Se connecter</button>
+            </form>
+        </div>
+    </section>
+
+    <main class="admin-content" id="adminContent">
+        <div class="container">
+            <section class="dashboard">
+                <div class="dashboard-header">
+                    <div>
+                        <h1 class="dashboard-title">Tableau de bord administrateur</h1>
+                        <p>Gérez les utilisateurs et les paramètres de l'application</p>
+                    </div>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div class="user-info">
+                            <i class="fas fa-user-circle"></i>
+                            <div>
+                                <div id="currentAdminName">Administrateur</div>
+                                <div style="font-size: 0.9rem; color: var(--medium-gray);" id="currentAdminRole">Rôle: Admin</div>
+                            </div>
                         </div>
+                        <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
                     </div>
                 </div>
+
+                <!-- 统计部分 - 原有5个 + 新增1个学员卡片 -->
+                <div class="stats-grid">
+                    <!-- 总用户数 -->
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-number" id="totalUsers">0</div>
+                        <div class="stat-label">Utilisateurs totaux</div>
+                    </div>
+                    <!-- 学员 (新增) -->
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
+                        <div class="stat-number" id="stuCount">0</div>
+                        <div class="stat-label">Élèves (学员)</div>
+                    </div>
+                    <!-- Type N -->
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-passport"></i></div>
+                        <div class="stat-number" id="typeNCount">0</div>
+                        <div class="stat-label">Type N<br>入籍学员</div>
+                    </div>
+                    <!-- Type R -->
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="stat-number" id="typeRCount">0</div>
+                        <div class="stat-label">Type R<br>十年卡学员</div>
+                    </div>
+                    <!-- Type M -->
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-id-card-alt"></i></div>
+                        <div class="stat-number" id="typeMCount">0</div>
+                        <div class="stat-label">Type M<br>多年卡学员</div>
+                    </div>
+                    <!-- Type T -->
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-user-tag"></i></div>
+                        <div class="stat-number" id="typeTCount">0</div>
+                        <div class="stat-label">Type T<br>其他类型</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 课程管理卡片 (新增) -->
+            <div class="course-card">
+                <div class="course-info">
+                    <h3><i class="fas fa-book-open"></i> Gestion des cours</h3>
+                    <p>Créer, modifier et organiser les cours de l'association</p>
+                </div>
+                <button class="course-btn" id="courseManageBtn">Accéder <i class="fas fa-arrow-right"></i></button>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-users"></i></div>
-                    <div class="stat-number" id="totalUsers">0</div>
-                    <div class="stat-label">Utilisateurs totaux</div>
+            <section class="users-table-container">
+                <div class="section-header">
+                    <h2>Gestion des utilisateurs</h2>
+                    <p>Visualisez, modifiez et gérez tous les utilisateurs de l'application</p>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
-                    <div class="stat-number" id="stuCount">0</div>
-                    <div class="stat-label">Élèves</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-passport"></i></div>
-                    <div class="stat-number" id="typeNCount">0</div>
-                    <div class="stat-label">Type N</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
-                    <div class="stat-number" id="typeRCount">0</div>
-                    <div class="stat-label">Type R</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-id-card-alt"></i></div>
-                    <div class="stat-number" id="typeMCount">0</div>
-                    <div class="stat-label">Type M</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-user-tag"></i></div>
-                    <div class="stat-number" id="typeTCount">0</div>
-                    <div class="stat-label">Type T</div>
-                </div>
-            </div>
-        </section>
 
-        <div class="course-card">
-            <div class="course-info">
-                <h3><i class="fas fa-book-open"></i> Gestion des cours</h3>
-                <p>Créer, modifier et organiser les cours de l'association</p>
-            </div>
-            <button class="course-btn" id="courseManageBtn">Accéder <i class="fas fa-arrow-right"></i></button>
+                <div class="controls">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Rechercher un utilisateur par nom...">
+                        <button class="search-btn" id="searchBtn"><i class="fas fa-search"></i> Rechercher</button>
+                    </div>
+                    <div class="filters">
+                        <button class="filter-btn active" data-filter="all">Tous</button>
+                        <button class="filter-btn" data-filter="type-n">Type N (入籍)</button>
+                        <button class="filter-btn" data-filter="type-r">Type R (十年卡)</button>
+                        <button class="filter-btn" data-filter="type-m">Type M (多年卡)</button>
+                        <button class="filter-btn" data-filter="type-t">Type T</button>
+                        <button class="filter-btn" data-filter="role-user">普通会员</button>
+                        <button class="filter-btn" data-filter="role-stu">学员</button>
+                        <button class="filter-btn" data-filter="role-teacher">老师</button>
+                        <button class="filter-btn" data-filter="role-admin">Administrateurs</button>
+                        <button class="filter-btn" data-filter="expired">Expirés</button>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="users-table">
+                        <thead>
+                            <tr><th>ID</th><th>Nom</th><th>Type</th><th>Rôle</th><th>Date de création</th><th>Date d'expiration</th><th>Mot de passe</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody id="usersTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="loading" id="tableLoading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Chargement des données...</p>
+                </div>
+
+                <!-- 添加用户按钮保持在原来位置（表格下方） -->
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="login-btn" id="addUserBtn" style="width: auto; padding: 12px 30px;">
+                        <i class="fas fa-user-plus"></i> Ajouter un nouvel utilisateur
+                    </button>
+                </div>
+            </section>
         </div>
+    </main>
 
-        <section class="users-table-container">
-            <div class="section-header">
-                <h2>Gestion des utilisateurs</h2>
-                <p>Visualisez, modifiez et gérez tous les utilisateurs de l'application</p>
+    <div class="modal" id="editUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Modifier l'utilisateur</h2>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
             </div>
-
-            <div class="controls">
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="Rechercher un utilisateur par nom...">
-                    <button class="search-btn" id="searchBtn"><i class="fas fa-search"></i> Rechercher</button>
+            <form id="editUserForm">
+                <input type="hidden" id="editUserId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editUserName">Nom d'utilisateur</label>
+                        <input type="text" id="editUserName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editUserPassword">Mot de passe (laisser vide pour ne pas changer)</label>
+                        <input type="password" id="editUserPassword" placeholder="Nouveau mot de passe">
+                    </div>
                 </div>
-                <div class="filters">
-                    <button class="filter-btn active" data-filter="all">Tous</button>
-                    <button class="filter-btn" data-filter="type-n">Type N</button>
-                    <button class="filter-btn" data-filter="type-r">Type R</button>
-                    <button class="filter-btn" data-filter="type-m">Type M</button>
-                    <button class="filter-btn" data-filter="type-t">Type T</button>
-                    <button class="filter-btn" data-filter="role-user">Membres</button>
-                    <button class="filter-btn" data-filter="role-stu">Élèves</button>
-                    <button class="filter-btn" data-filter="role-teacher">Enseignants</button>
-                    <button class="filter-btn" data-filter="role-admin">Admins</button>
-                    <button class="filter-btn" data-filter="expired">Expirés</button>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editUserType">Type d'utilisateur</label>
+                        <select id="editUserType" required>
+                            <option value="n">Type N (入籍学员)</option>
+                            <option value="r">Type R (十年卡学员)</option>
+                            <option value="m">Type M (多年卡学员)</option>
+                            <option value="t">Type T (其他类型)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editUserRole">Rôle</label>
+                        <select id="editUserRole">
+                            <option value="">Pas de rôle</option>
+                            <option value="user">普通会员</option>
+                            <option value="stu">学员</option>
+                            <option value="teacher">老师</option>
+                            <option value="admin">Administrateur</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-
-            <div class="table-wrapper">
-                <table class="users-table">
-                    <thead>
-                        <tr><th>ID</th><th>Nom</th><th>Type</th><th>Rôle</th><th>Date création</th><th>Expiration</th><th>Mot de passe</th><th>Actions</th></tr>
-                    </thead>
-                    <tbody id="usersTableBody"></tbody>
-                </table>
-            </div>
-
-            <div class="loading" id="tableLoading">
-                <i class="fas fa-spinner fa-spin"></i>
-                <p>Chargement des données...</p>
-            </div>
-
-            <div style="text-align: center; margin-top: 20px;">
-                <button class="login-btn" id="addUserBtn" style="width: auto; padding: 12px 30px;">
-                    <i class="fas fa-user-plus"></i> Ajouter un utilisateur
-                </button>
-            </div>
-        </section>
-    </div>
-</main>
-
-<!-- 编辑用户模态框 -->
-<div class="modal" id="editUserModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 class="modal-title" id="modalTitle">Modifier l'utilisateur</h2>
-            <button class="close-btn" id="closeModalBtn">&times;</button>
-        </div>
-        <form id="editUserForm">
-            <input type="hidden" id="editUserId">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="editUserName">Nom d'utilisateur</label>
-                    <input type="text" id="editUserName" required>
+                <div class="form-group form-full">
+                    <label>Date de création</label>
+                    <div style="padding: 15px; background: var(--light-gray); border-radius: 8px;" id="editUserCreatedAt">Chargement...</div>
                 </div>
-                <div class="form-group">
-                    <label for="editUserPassword">Mot de passe (laisser vide pour ne pas changer)</label>
-                    <input type="password" id="editUserPassword" placeholder="Nouveau mot de passe">
+                <div class="form-group form-full">
+                    <label>Date d'expiration (facultatif)</label>
+                    <input type="datetime-local" id="editUserTimer">
                 </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="editUserType">Type</label>
-                    <select id="editUserType" required>
-                        <option value="n">Type N</option>
-                        <option value="r">Type R</option>
-                        <option value="m">Type M</option>
-                        <option value="t">Type T</option>
-                    </select>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" id="cancelEditBtn">Annuler</button>
+                    <button type="submit" class="save-btn"><i class="fas fa-save"></i> Enregistrer les modifications</button>
                 </div>
-                <div class="form-group">
-                    <label for="editUserRole">Rôle</label>
-                    <select id="editUserRole">
-                        <option value="">Aucun</option>
-                        <option value="user">Membre</option>
-                        <option value="stu">Élève</option>
-                        <option value="teacher">Enseignant</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group form-full">
-                <label>Date de création</label>
-                <div style="padding: 15px; background: var(--light-gray); border-radius: 8px;" id="editUserCreatedAt">Chargement...</div>
-            </div>
-            <div class="form-group form-full">
-                <label>Date d'expiration</label>
-                <input type="datetime-local" id="editUserTimer">
-            </div>
-            <div class="form-actions">
-                <button type="button" class="cancel-btn" id="cancelEditBtn">Annuler</button>
-                <button type="submit" class="save-btn"><i class="fas fa-save"></i> Enregistrer</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- 添加用户模态框 -->
-<div class="modal" id="addUserModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 class="modal-title">Ajouter un utilisateur</h2>
-            <button class="close-btn" id="closeAddModalBtn">&times;</button>
-        </div>
-        <form id="addUserForm">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="addUserName">Nom d'utilisateur</label>
-                    <input type="text" id="addUserName" required>
-                </div>
-                <div class="form-group">
-                    <label for="addUserPassword">Mot de passe</label>
-                    <input type="password" id="addUserPassword" required>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="addUserType">Type</label>
-                    <select id="addUserType" required>
-                        <option value="n">Type N</option>
-                        <option value="r">Type R</option>
-                        <option value="m">Type M</option>
-                        <option value="t">Type T</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="addUserRole">Rôle</label>
-                    <select id="addUserRole">
-                        <option value="">Aucun</option>
-                        <option value="user">Membre</option>
-                        <option value="stu">Élève</option>
-                        <option value="teacher">Enseignant</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group form-full">
-                <label>Date d'expiration</label>
-                <input type="datetime-local" id="addUserTimer">
-            </div>
-            <div class="form-actions">
-                <button type="button" class="cancel-btn" id="cancelAddBtn">Annuler</button>
-                <button type="submit" class="save-btn"><i class="fas fa-user-plus"></i> Créer</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- 删除确认对话框 -->
-<div class="confirm-dialog" id="deleteConfirmDialog">
-    <div class="confirm-content">
-        <h3><i class="fas fa-exclamation-triangle" style="color: var(--red); margin-right: 10px;"></i> Confirmer la suppression</h3>
-        <p>Êtes-vous sûr de vouloir supprimer l'utilisateur <strong id="deleteUserName"></strong> ? Cette action est irréversible.</p>
-        <div class="confirm-actions">
-            <button class="confirm-btn confirm-cancel" id="cancelDeleteBtn">Annuler</button>
-            <button class="confirm-btn confirm-delete" id="confirmDeleteBtn"><i class="fas fa-trash"></i> Supprimer</button>
+            </form>
         </div>
     </div>
-</div>
 
-<footer class="main-footer">
-    <div class="container">
-        <div class="footer-bottom">
-            <p>&copy; 2025 Association Mille Voiles - Tous droits réservés.</p>
+    <div class="modal" id="addUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Ajouter un nouvel utilisateur</h2>
+                <button class="close-btn" id="closeAddModalBtn">&times;</button>
+            </div>
+            <form id="addUserForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="addUserName">Nom d'utilisateur</label>
+                        <input type="text" id="addUserName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addUserPassword">Mot de passe</label>
+                        <input type="password" id="addUserPassword" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="addUserType">Type d'utilisateur</label>
+                        <select id="addUserType" required>
+                            <option value="n">Type N (入籍学员)</option>
+                            <option value="r">Type R (十年卡学员)</option>
+                            <option value="m">Type M (多年卡学员)</option>
+                            <option value="t">Type T (其他类型)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="addUserRole">Rôle (facultatif)</label>
+                        <select id="addUserRole">
+                            <option value="">Pas de rôle</option>
+                            <option value="user">普通会员</option>
+                            <option value="stu">学员</option>
+                            <option value="teacher">老师</option>
+                            <option value="admin">Administrateur</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group form-full">
+                    <label>Date d'expiration (facultatif)</label>
+                    <input type="datetime-local" id="addUserTimer">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" id="cancelAddBtn">Annuler</button>
+                    <button type="submit" class="save-btn"><i class="fas fa-user-plus"></i> Créer l'utilisateur</button>
+                </div>
+            </form>
         </div>
     </div>
-</footer>
 
-<script src="admin.js"></script>
+    <div class="confirm-dialog" id="deleteConfirmDialog">
+        <div class="confirm-content">
+            <h3><i class="fas fa-exclamation-triangle" style="color: var(--red); margin-right: 10px;"></i> Confirmer la suppression</h3>
+            <p>Êtes-vous sûr de vouloir supprimer l'utilisateur <strong id="deleteUserName">Nom</strong> ? Cette action est irréversible.</p>
+            <div class="confirm-actions">
+                <button class="confirm-btn confirm-cancel" id="cancelDeleteBtn">Annuler</button>
+                <button class="confirm-btn confirm-delete" id="confirmDeleteBtn"><i class="fas fa-trash"></i> Supprimer définitivement</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2025 Association Mille Voiles - Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
