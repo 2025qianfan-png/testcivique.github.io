@@ -328,7 +328,7 @@
                     roleText = 'Administrateur';
                 } else if (user.role === 'user') {
                     roleClass = 'role-user';
-                    roleText = '普通会员';
+                    roleText = 'Membre';
                 } else if (user.role === 'stu') {
                     roleClass = 'role-stu';
                     roleText = 'Elève';
