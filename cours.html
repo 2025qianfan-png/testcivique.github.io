@@ -521,7 +521,6 @@
         const activeStudentsEl = document.getElementById('activeStudents');
         const filterType = document.getElementById('filterType');
         const filterTeacher = document.getElementById('filterTeacher');
-        const refreshBtn = document.getElementById('refreshCalendarBtn');
         const addCourseBtn = document.getElementById('addCourseBtn');
         const courseModal = document.getElementById('courseModal');
         const evaluationModal = document.getElementById('evaluationModal');
@@ -542,52 +541,51 @@
 
         function escapeHtml(s) {
             if (!s) return '';
-            return s.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+            return String(s).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
         }
 
-        function formatDateTime(date) {
-            if (!date) return '-';
-            return new Date(date).toLocaleString('fr-FR', { 
-                day: '2-digit', month: '2-digit', year: 'numeric', 
-                hour: '2-digit', minute: '2-digit' 
-            });
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '-';
+            // 处理 "YYYY-MM-DD HH:MM:SS" 格式
+            if (typeof dateStr === 'string' && dateStr.includes(' ')) {
+                const [datePart, timePart] = dateStr.split(' ');
+                const [year, month, day] = datePart.split('-');
+                const [hours, minutes] = timePart.split(':');
+                return `${day}/${month}/${year} ${hours}:${minutes}`;
+            }
+            const d = new Date(dateStr);
+            return d.toLocaleString('fr-FR');
         }
 
-        // 将本地时间字符串转换为 Date 对象（正确处理 "YYYY-MM-DD HH:MM:SS" 格式）
+        // 解析本地时间字符串为 Date 对象
         function parseLocalDateTime(dateTimeStr) {
             if (!dateTimeStr) return null;
             if (typeof dateTimeStr === 'string' && dateTimeStr.includes(' ')) {
                 const [datePart, timePart] = dateTimeStr.split(' ');
                 const [year, month, day] = datePart.split('-');
                 const [hours, minutes, seconds] = timePart.split(':');
-                return new Date(year, month - 1, day, hours, minutes, seconds || 0);
+                return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes), parseInt(seconds) || 0);
             }
             return new Date(dateTimeStr);
         }
 
-        // 将 Date 对象转换为本地时间字符串 "YYYY-MM-DD HH:MM:SS"
-        function toLocalDateTimeString(date) {
-            if (!date || isNaN(date.getTime())) return '';
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-        }
-
-        // 计算结束时间字符串
+        // 获取结束时间字符串
         function getEndTimeStr(startTimeStr, duration) {
             const startDate = parseLocalDateTime(startTimeStr);
             const endDate = new Date(startDate.getTime() + duration * 3600000);
-            return toLocalDateTimeString(endDate);
+            const year = endDate.getFullYear();
+            const month = String(endDate.getMonth() + 1).padStart(2, '0');
+            const day = String(endDate.getDate()).padStart(2, '0');
+            const hours = String(endDate.getHours()).padStart(2, '0');
+            const minutes = String(endDate.getMinutes()).padStart(2, '0');
+            const seconds = String(endDate.getSeconds()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         }
 
         // 检查冲突
-        function checkConflict(teacherId, startTime, excludeId, duration = 2) {
-            if (!teacherId || !startTime) return false;
-            const s = parseLocalDateTime(startTime).getTime();
+        function checkConflict(teacherId, startTimeStr, excludeId, duration = 2) {
+            if (!teacherId || !startTimeStr) return false;
+            const s = parseLocalDateTime(startTimeStr).getTime();
             const e = s + duration * 3600000;
             return allCourses.some(c => {
                 if (c.teacher_id !== teacherId) return false;
@@ -599,13 +597,12 @@
             });
         }
 
-        // 删除可用时间段（当课程安排后）
+        // 删除可用时间段
         async function deleteAvailabilityForCourse(teacherId, startTimeStr, duration) {
             const supabase = window.supabaseAuth.getSupabaseClient();
             const endTimeStr = getEndTimeStr(startTimeStr, duration);
             
             try {
-                // 删除与课程时间重叠的可用时间段
                 const { error, data } = await supabase
                     .from('availabilities')
                     .delete()
@@ -619,13 +616,55 @@
                     console.error('删除可用时间段失败:', error);
                     return false;
                 }
-                
                 if (data && data.length > 0) {
-                    console.log(`已删除 ${data.length} 个可用时间段`, data);
+                    console.log(`已删除 ${data.length} 个可用时间段`);
                 }
                 return true;
             } catch (err) {
                 console.error('删除可用时间段异常:', err);
+                return false;
+            }
+        }
+
+        // 恢复可用时间段
+        async function restoreAvailabilityForCourse(teacherId, startTimeStr, duration) {
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const endTimeStr = getEndTimeStr(startTimeStr, duration);
+            
+            try {
+                // 检查是否已存在
+                const { data: existing } = await supabase
+                    .from('availabilities')
+                    .select('id')
+                    .eq('teacher_id', teacherId)
+                    .eq('start_time', startTimeStr)
+                    .eq('end_time', endTimeStr)
+                    .eq('status', 'available')
+                    .maybeSingle();
+                
+                if (existing) {
+                    console.log('可用时间段已存在，无需恢复');
+                    return true;
+                }
+                
+                const { error } = await supabase
+                    .from('availabilities')
+                    .insert([{
+                        teacher_id: teacherId,
+                        start_time: startTimeStr,
+                        end_time: endTimeStr,
+                        status: 'available',
+                        duration: duration
+                    }]);
+                
+                if (error) {
+                    console.error('恢复可用时间段失败:', error);
+                    return false;
+                }
+                console.log(`已恢复可用时间段: ${startTimeStr} - ${endTimeStr}`);
+                return true;
+            } catch (err) {
+                console.error('恢复可用时间段异常:', err);
                 return false;
             }
         }
@@ -702,28 +741,21 @@
                 const s = allStudents.find(x => x.id === c.student_id);
                 const t = allTeachers.find(x => x.id === c.teacher_id);
                 
-                // 使用本地时间解析
-                let startDateTime = parseLocalDateTime(c.start_time);
-                
-                if (isNaN(startDateTime.getTime())) {
-                    console.error('无效的日期:', c.start_time);
-                    return null;
-                }
-                
-                const durationMs = (c.duration || 2) * 3600000;
-                const endDateTime = new Date(startDateTime.getTime() + durationMs);
+                // 直接使用本地时间字符串，不转换
+                const startTimeStr = c.start_time;
+                const endTimeStr = getEndTimeStr(c.start_time, c.duration || 2);
                 
                 return {
                     id: c.id,
                     title: `${s?.name || 'N/A'} - ${t?.name || 'N/A'}`,
-                    start: startDateTime.toISOString(),
-                    end: endDateTime.toISOString(),
+                    start: startTimeStr,
+                    end: endTimeStr,
                     duration: c.duration || 2,
                     backgroundColor: colors[c.status] || '#3498db',
                     borderColor: colors[c.status] || '#3498db',
                     extendedProps: { course: c, student: s, teacher: t, typeText: typeText[c.course_type] || '' }
                 };
-            }).filter(event => event !== null);
+            });
         }
 
         function refreshCalendar() {
@@ -759,29 +791,36 @@
                 events: getEventSource(),
                 
                 eventDrop: async (info) => {
-                    let newStart = snapToGrid(info.event.start);
-                    let newEnd = snapToGrid(info.event.end);
-                    info.event.setStart(newStart);
-                    info.event.setEnd(newEnd);
+                    // 直接使用事件中的开始和结束时间（已经是本地时间字符串格式）
+                    let newStartStr = info.event.startStr;
+                    let newEndStr = info.event.endStr;
+                    
+                    // 解析为Date对象用于显示
+                    let newStart = parseLocalDateTime(newStartStr);
+                    let newEnd = parseLocalDateTime(newEndStr);
+                    newStart = snapToGrid(newStart);
+                    newEnd = snapToGrid(newEnd);
+                    
+                    // 更新事件显示
+                    info.event.setStart(newStartStr);
+                    info.event.setEnd(newEndStr);
+                    
                     showConfirmDialog(info, newStart, newEnd);
                 },
                 
                 eventResize: async (info) => {
-                    let newEnd = snapToGrid(info.event.end);
-                    info.event.setEnd(newEnd);
-                    const newDuration = (newEnd - info.event.start) / 3600000;
+                    let newDuration = (info.event.end - info.event.start) / 3600000;
                     const teacherId = info.event.extendedProps.course.teacher_id;
                     const courseId = info.event.id;
+                    const startTimeStr = info.event.startStr;
                     
-                    // 转换开始时间为本地字符串进行冲突检查
-                    const newStartLocal = toLocalDateTimeString(info.event.start);
-                    const hasConflict = checkConflict(teacherId, newStartLocal, courseId, newDuration);
-                    
+                    const hasConflict = checkConflict(teacherId, startTimeStr, courseId, newDuration);
                     if (hasConflict) {
                         showToast('Conflit horaire !', 'error');
                         info.revert();
                         return;
                     }
+                    
                     const supabase = window.supabaseAuth.getSupabaseClient();
                     const { error } = await supabase.from('courses').update({ duration: newDuration }).eq('id', courseId);
                     if (error) {
@@ -796,8 +835,8 @@
                 },
                 
                 select: (info) => {
-                    let start = snapToGrid(info.start);
-                    let startStr = start.toISOString().slice(0, 16);
+                    // 直接从 FullCalendar 获取本地时间字符串
+                    let startStr = info.startStr;
                     openCreateModal(startStr);
                 },
                 
@@ -845,25 +884,25 @@
             const teacher = allTeachers.find(t => t.id === course.teacher_id);
             const oldStart = parseLocalDateTime(course.start_time);
             const newDuration = (newEnd - newStart) / 3600000;
+            const newStartStr = `${newStart.getFullYear()}-${String(newStart.getMonth()+1).padStart(2,'0')}-${String(newStart.getDate()).padStart(2,'0')} ${String(newStart.getHours()).padStart(2,'0')}:${String(newStart.getMinutes()).padStart(2,'0')}:00`;
             
-            const newStartLocal = toLocalDateTimeString(newStart);
-            const hasConflict = checkConflict(course.teacher_id, newStartLocal, course.id, newDuration);
+            const hasConflict = checkConflict(course.teacher_id, newStartStr, course.id, newDuration);
 
-            document.getElementById('oldTimeValue').innerHTML = formatDateTime(oldStart) + ` (${course.duration || 2}h)`;
-            document.getElementById('newTimeValue').innerHTML = formatDateTime(newStart) + ` (${newDuration.toFixed(1)}h)`;
+            document.getElementById('oldTimeValue').innerHTML = formatDateTime(course.start_time) + ` (${course.duration || 2}h)`;
+            document.getElementById('newTimeValue').innerHTML = formatDateTime(newStartStr) + ` (${newDuration.toFixed(1)}h)`;
             document.getElementById('detailStudent').textContent = student?.name || 'N/A';
             document.getElementById('detailTeacher').textContent = teacher?.name || 'N/A';
             document.getElementById('detailType').textContent = { training: '培训内容', '4year': '四年卡', '10year': '十年卡', naturalization: '入籍' }[course.course_type] || course.course_type;
             document.getElementById('detailDuration').textContent = newDuration.toFixed(1);
             document.getElementById('confirmConflictWarning').style.display = hasConflict ? 'block' : 'none';
 
-            pendingDragInfo = { eventInfo, newStart, newEnd, newDuration, hasConflict };
+            pendingDragInfo = { eventInfo, newStart: newStartStr, newDuration, hasConflict };
             dragConfirmDialog.classList.add('active');
         }
 
         async function executeDrag() {
             if (!pendingDragInfo) return;
-            const { eventInfo, newStart, newEnd, newDuration, hasConflict } = pendingDragInfo;
+            const { eventInfo, newStart, newDuration, hasConflict } = pendingDragInfo;
             if (hasConflict) {
                 showToast('Conflit horaire !', 'error');
                 dragConfirmDialog.classList.remove('active');
@@ -876,33 +915,21 @@
             const teacherId = eventInfo.event.extendedProps.course.teacher_id;
             const courseId = eventInfo.event.id;
             
-            // 获取课程的旧时间
-            const oldCourse = allCourses.find(c => c.id === courseId);
-            const oldStartTimeStr = oldCourse?.start_time;
-            const oldDuration = oldCourse?.duration || 2;
-            
-            // 转换为本地时间字符串
-            const newStartLocal = toLocalDateTimeString(newStart);
-            const newEndLocal = toLocalDateTimeString(newEnd);
-            
             try {
-                // 1. 更新课程时间
+                // 更新课程时间
                 const { error } = await supabase.from('courses').update({
-                    start_time: newStartLocal,
+                    start_time: newStart,
                     duration: newDuration
                 }).eq('id', courseId);
                 
                 if (error) throw error;
                 
-                // 2. 删除新时间段的可用时间段（老师这个时间被占用了）
-                await deleteAvailabilityForCourse(teacherId, newStartLocal, newDuration);
-                
-                // 注意：旧时间段的可用性是否需要恢复？如果需要，可以在这里添加恢复逻辑
-                // 目前不自动恢复，因为老师可能有其他安排
+                // 删除新时间段的可用时间段
+                await deleteAvailabilityForCourse(teacherId, newStart, newDuration);
                 
                 const idx = allCourses.findIndex(c => c.id === courseId);
                 if (idx !== -1) {
-                    allCourses[idx].start_time = newStartLocal;
+                    allCourses[idx].start_time = newStart;
                     allCourses[idx].duration = newDuration;
                 }
                 updateStats();
@@ -926,19 +953,21 @@
         }
 
         // ========== 添加/编辑课程 ==========
-        function openCreateModal(startTime) {
+        function openCreateModal(startTimeStr) {
             document.getElementById('courseForm').reset();
             document.getElementById('courseId').value = '';
             document.getElementById('modalTitle').innerText = 'Ajouter un cours';
             
-            if (startTime) {
-                const date = new Date(startTime);
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                const hours = String(date.getHours()).padStart(2, '0');
-                const minutes = String(date.getMinutes()).padStart(2, '0');
-                document.getElementById('startTime').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            if (startTimeStr) {
+                // startTimeStr 格式如 "2025-05-15T10:00:00" 或 "2025-05-15 10:00:00"
+                let cleanStart = startTimeStr.replace(' ', 'T');
+                if (cleanStart.length === 16) {
+                    document.getElementById('startTime').value = cleanStart;
+                } else if (cleanStart.includes('.')) {
+                    document.getElementById('startTime').value = cleanStart.slice(0, 16);
+                } else {
+                    document.getElementById('startTime').value = cleanStart.slice(0, 16);
+                }
             } else {
                 document.getElementById('startTime').value = '';
             }
@@ -973,7 +1002,7 @@
             document.getElementById('teacherId').value = course.teacher_id;
             document.getElementById('courseType').value = course.course_type || 'training';
             
-            // 正确解析本地时间字符串
+            // 解析本地时间字符串
             const startDate = parseLocalDateTime(course.start_time);
             const year = startDate.getFullYear();
             const month = String(startDate.getMonth() + 1).padStart(2, '0');
@@ -1053,7 +1082,7 @@
                 }
                 if (result.error) throw result.error;
                 
-                // 删除对应的可用时间段（仅当课程状态为 scheduled 时）
+                // 删除对应的可用时间段
                 if (data.status === 'scheduled') {
                     await deleteAvailabilityForCourse(teacherId, startTimeStr, duration);
                 }
@@ -1077,87 +1106,41 @@
             
             pendingDeleteCourseId = courseId;
             document.getElementById('deleteCourseType').textContent = getTypeText(course.course_type);
-            document.getElementById('deleteCourseDate').textContent = formatDateTime(parseLocalDateTime(course.start_time));
+            document.getElementById('deleteCourseDate').textContent = formatDateTime(course.start_time);
             document.getElementById('deleteCourseTeacher').textContent = teacher?.name || 'N/A';
             document.getElementById('deleteCourseStudent').textContent = student?.name || 'N/A';
             
             deleteConfirmOverlay.classList.add('active');
         }
 
-        
         async function confirmDeleteCourse() {
-    if (!pendingDeleteCourseId) return;
-    
-    const supabase = window.supabaseAuth.getSupabaseClient();
-    try {
-        // 获取要删除的课程信息
-        const courseToDelete = allCourses.find(c => c.id === pendingDeleteCourseId);
-        
-        if (!courseToDelete) {
-            showToast('Cours non trouvé', 'error');
-            return;
-        }
-        
-        // 1. 删除课程
-        const { error } = await supabase.from('courses').delete().eq('id', pendingDeleteCourseId);
-        if (error) throw error;
-        
-        // 2. 恢复可用时间段（仅当课程状态为 scheduled 时）
-        if (courseToDelete.status === 'scheduled') {
-            const teacherId = courseToDelete.teacher_id;
-            const startTimeStr = courseToDelete.start_time;
-            const duration = courseToDelete.duration || 2;
-            const endTimeStr = getEndTimeStr(startTimeStr, duration);
+            if (!pendingDeleteCourseId) return;
             
-            // 检查是否已存在相同的可用时间段（避免重复插入）
-            const { data: existingAvail, error: checkError } = await supabase
-                .from('availabilities')
-                .select('id')
-                .eq('teacher_id', teacherId)
-                .eq('start_time', startTimeStr)
-                .eq('end_time', endTimeStr)
-                .eq('status', 'available')
-                .maybeSingle();
-            
-            if (checkError) {
-                console.error('检查可用时间段失败:', checkError);
-            }
-            
-            // 如果不存在，则重新插入
-            if (!existingAvail) {
-                const { error: insertError } = await supabase
-                    .from('availabilities')
-                    .insert([{
-                        teacher_id: teacherId,
-                        start_time: startTimeStr,
-                        end_time: endTimeStr,
-                        status: 'available',
-                        duration: duration,
-                        created_at: toLocalDateTimeString(new Date())
-                    }]);
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            try {
+                const courseToDelete = allCourses.find(c => c.id === pendingDeleteCourseId);
                 
-                if (insertError) {
-                    console.error('恢复可用时间段失败:', insertError);
-                    showToast('课程已删除，但恢复可用时间失败', 'error');
-                } else {
+                const { error } = await supabase.from('courses').delete().eq('id', pendingDeleteCourseId);
+                if (error) throw error;
+                
+                // 恢复可用时间段
+                if (courseToDelete && courseToDelete.status === 'scheduled') {
+                    await restoreAvailabilityForCourse(courseToDelete.teacher_id, courseToDelete.start_time, courseToDelete.duration || 2);
                     showToast('课程已删除，可用时间段已恢复', 'success');
+                } else {
+                    showToast('Cours supprimé avec succès', 'success');
                 }
-            } else {
-                showToast('课程已删除', 'success');
+                
+                deleteConfirmOverlay.classList.remove('active');
+                pendingDeleteCourseId = null;
+                await loadData();
+                
+            } catch (err) {
+                console.error(err);
+                showToast('Erreur lors de la suppression', 'error');
             }
-        } else {
-            showToast('课程已删除', 'success');
         }
-        
-        deleteConfirmOverlay.classList.remove('active');
-        pendingDeleteCourseId = null;
-        await loadData();
-        
-    } catch (err) {
-        console.error(err);
-        showToast('Erreur lors de la suppression', 'error');
-    }
-}
+
         function cancelDeleteCourse() {
             deleteConfirmOverlay.classList.remove('active');
             pendingDeleteCourseId = null;
@@ -1200,7 +1183,7 @@
                 teacher_comment: document.getElementById('teacherComment').value || null,
                 student_comment: document.getElementById('studentComment').value || null,
                 student_rating: parseInt(document.getElementById('studentRating').value) || null,
-                evaluated_at: toLocalDateTimeString(new Date()),
+                evaluated_at: new Date().toISOString(),
                 status: 'completed'
             };
             try {
