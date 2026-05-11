@@ -6,8 +6,6 @@
     <title>Espace intervenant - Association Mille Voiles</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <style>
@@ -67,21 +65,11 @@
         .stat-card .stat-number { font-size: 2rem; font-weight: 700; color: var(--primary-blue); }
         .stat-card .stat-label { font-size: 0.8rem; color: #666; }
         
-        .calendar-container {
-            background: white;
-            border-radius: var(--border-radius);
-            padding: 20px;
-            box-shadow: var(--shadow);
-            margin-bottom: 30px;
-        }
-        #calendar { max-width: 100%; }
-        
         .courses-section {
             background: white;
             border-radius: var(--border-radius);
             padding: 20px;
             box-shadow: var(--shadow);
-            margin-top: 30px;
         }
         .section-header {
             margin-bottom: 20px;
@@ -153,6 +141,7 @@
         .btn-start { background: var(--green); color: white; }
         .btn-end { background: var(--red); color: white; }
         .btn-edit { background: #3498db; color: white; }
+        .btn-material { background: #9b59b6; color: white; }
         
         .modal {
             display: none;
@@ -171,7 +160,7 @@
             border-radius: var(--border-radius);
             padding: 30px;
             width: 100%;
-            max-width: 450px;
+            max-width: 500px;
             max-height: 90vh;
             overflow-y: auto;
             animation: modalSlideIn 0.3s ease;
@@ -205,110 +194,6 @@
         .save-btn { padding: 10px 20px; background: var(--green); color: white; border: none; border-radius: 30px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
         .save-btn:hover { background: #219653; transform: translateY(-2px); }
         
-        .time-slots {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 15px 0;
-        }
-        .time-slot {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 14px;
-            background: #f5f5f5;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 2px solid transparent;
-        }
-        .time-slot:hover { background: #e8e8e8; }
-        .time-slot.selected {
-            background: linear-gradient(135deg, var(--primary-blue), var(--primary-light-blue));
-            color: white;
-            border-color: var(--primary-yellow);
-        }
-        .time-slot.selected .slot-time { color: white; }
-        .time-slot.selected .slot-icon { color: var(--primary-yellow); }
-        .slot-time { font-weight: 600; flex: 1; font-size: 1rem; }
-        .slot-icon { width: 28px; text-align: center; font-size: 1.2rem; }
-        
-        .selected-date {
-            background: #f0f7ff;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 600;
-            color: var(--primary-blue);
-            margin-bottom: 15px;
-        }
-        
-        .confirm-dialog {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        .confirm-dialog.active { opacity: 1; visibility: visible; }
-        .confirm-card {
-            background: white;
-            border-radius: 24px;
-            width: 90%;
-            max-width: 420px;
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-        }
-        .confirm-dialog.active .confirm-card { transform: scale(1); }
-        .confirm-header {
-            background: linear-gradient(135deg, var(--red), #c0392b);
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        .confirm-header i { font-size: 3rem; margin-bottom: 10px; }
-        .confirm-header h3 { color: white; font-size: 1.3rem; }
-        .confirm-body { padding: 25px; text-align: center; }
-        .confirm-body p { color: #666; margin-bottom: 5px; }
-        .confirm-body .item-name { font-weight: 700; color: var(--primary-blue); font-size: 1.1rem; }
-        .confirm-footer {
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            border-top: 1px solid #eee;
-        }
-        .confirm-cancel {
-            padding: 10px 24px;
-            background: #eee;
-            border: none;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .confirm-cancel:hover { background: #ddd; }
-        .confirm-delete {
-            padding: 10px 24px;
-            background: var(--red);
-            color: white;
-            border: none;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .confirm-delete:hover { background: #c0392b; transform: translateY(-2px); }
-        
         .toast {
             position: fixed;
             bottom: 20px;
@@ -330,8 +215,15 @@
         }
         
         .footer { background: var(--primary-blue); color: white; text-align: center; padding: 20px; margin-top: 40px; }
-        .empty-state { text-align: center; padding: 40px; color: #999; }
-        .fc-event { cursor: pointer; }
+        .empty-state { text-align: center; padding: 40px; color: #999; font-size: 1rem; }
+        
+        .rating-stars-display {
+            display: inline-flex;
+            gap: 2px;
+            margin-left: 5px;
+        }
+        .star-small { color: #f1c40f; font-size: 0.8rem; }
+        .star-small.empty { color: #ddd; }
     </style>
 </head>
 <body>
@@ -347,13 +239,11 @@
     
     <main class="container" style="padding: 30px 0;">
         <div class="stats-grid">
-            <div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-number" id="dispoCount">0</div><div class="stat-label">Disponibilités</div></div>
             <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-check"></i></div><div class="stat-number" id="upcomingCount">0</div><div class="stat-label">Cours à venir</div></div>
             <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-number" id="totalStudents">0</div><div class="stat-label">Élèves</div></div>
             <div class="stat-card"><div class="stat-icon"><i class="fas fa-star"></i></div><div class="stat-number" id="avgRating">0</div><div class="stat-label">Note moyenne</div></div>
+            <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-number" id="completedCount">0</div><div class="stat-label">Cours terminés</div></div>
         </div>
-        
-        <div class="calendar-container"><div id="calendar"></div></div>
         
         <div class="courses-section">
             <div class="section-header"><h3><i class="fas fa-calendar-day"></i> Mes cours programmés</h3></div>
@@ -363,23 +253,7 @@
     
     <footer class="footer"><div class="container"><p>&copy; 2025 Association Mille Voiles</p></div></footer>
     
-    <!-- Modal ajout disponibilité -->
-    <div class="modal" id="addDispoModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title"><i class="fas fa-calendar-plus"></i> Ajouter des disponibilités</h2>
-                <button class="close-modal" id="closeModalBtn">&times;</button>
-            </div>
-            <div class="selected-date" id="selectedDateDisplay"></div>
-            <div class="time-slots" id="timeSlots"></div>
-            <div class="form-actions">
-                <button class="cancel-btn" id="cancelModalBtn">Annuler</button>
-                <button class="save-btn" id="confirmAddBtn">Ajouter</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal modification cours -->
+    <!-- Modal modification cours (lieu + lien meet) -->
     <div class="modal" id="editCourseModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -395,7 +269,7 @@
                 <div class="form-group">
                     <label><i class="fab fa-google"></i> Lien Google Meet</label>
                     <input type="url" id="editMeetingLink" placeholder="https://meet.google.com/...">
-                    <small>Les étudiants pourront cliquer pour rejoindre</small>
+                    <small style="display: block; margin-top: 5px; color: #666;">Les étudiants pourront cliquer pour rejoindre</small>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="cancel-btn" id="cancelEditBtn">Annuler</button>
@@ -405,56 +279,36 @@
         </div>
     </div>
     
-    <!-- Modal avis -->
-    <div class="modal" id="reviewModal">
+    <!-- Modal partage support / commentaire -->
+    <div class="modal" id="materialModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title"><i class="fas fa-star"></i> Évaluation du cours</h2>
-                <button class="close-modal" id="closeReviewBtn">&times;</button>
+                <h2 class="modal-title"><i class="fas fa-paperclip"></i> Partager un support</h2>
+                <button class="close-modal" id="closeMaterialBtn">&times;</button>
             </div>
-            <form id="reviewForm">
-                <input type="hidden" id="reviewCourseId">
+            <form id="materialForm">
+                <input type="hidden" id="materialCourseId">
                 <div class="form-group">
-                    <label><i class="fas fa-comment"></i> Commentaire de l'intervenant</label>
-                    <textarea id="teacherComment" rows="3" placeholder="Appréciation, points à améliorer..."></textarea>
+                    <label><i class="fas fa-link"></i> Lien du support / cours</label>
+                    <input type="url" id="materialLink" placeholder="https://...">
+                    <small style="display: block; margin-top: 5px; color: #666;">Les étudiants pourront consulter ce lien</small>
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-link"></i> Lien du support (optionnel)</label>
-                    <input type="url" id="materialLink" placeholder="https://...">
+                    <label><i class="fas fa-comment"></i> Commentaire sur le cours</label>
+                    <textarea id="teacherComment" rows="4" placeholder="Appréciation, points à améliorer, résumé du cours..."></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="cancel-btn" id="cancelReviewBtn">Annuler</button>
+                    <button type="button" class="cancel-btn" id="cancelMaterialBtn">Annuler</button>
                     <button type="submit" class="save-btn">Enregistrer</button>
                 </div>
             </form>
         </div>
     </div>
     
-    <!-- 确认删除对话框 -->
-    <div id="confirmDeleteDialog" class="confirm-dialog">
-        <div class="confirm-card">
-            <div class="confirm-header">
-                <i class="fas fa-trash-alt"></i>
-                <h3>Confirmer la suppression</h3>
-            </div>
-            <div class="confirm-body">
-                <p>Êtes-vous sûr de vouloir supprimer cette disponibilité ?</p>
-                <p class="item-name" id="deleteItemName"></p>
-            </div>
-            <div class="confirm-footer">
-                <button class="confirm-cancel" id="cancelDeleteBtn">Annuler</button>
-                <button class="confirm-delete" id="confirmDeleteBtn">Supprimer</button>
-            </div>
-        </div>
-    </div>
-    
     <script>
         // ========== 全局变量 ==========
         let currentTeacher = null;
-        let availabilities = [];
         let allCourses = [];
-        let calendar = null;
-        let pendingDeleteId = null;
         
         // ========== 获取用户信息 ==========
         function getTeacherFromToken() {
@@ -468,287 +322,144 @@
             } catch(e) { window.location.href = 'index.html'; return null; }
         }
         
-        // ========== 加载数据 ==========
-        async function loadAvailabilities() {
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            const { data } = await supabase
-                .from('availabilities')
-                .select('*')
-                .eq('teacher_id', currentTeacher.userId)
-                .eq('status', 'available');
-            availabilities = data || [];
-            document.getElementById('dispoCount').textContent = availabilities.length;
-            refreshCalendar();
-        }
-        
+        // ========== 加载课程 ==========
         async function loadCourses() {
             const supabase = window.supabaseAuth.getSupabaseClient();
             const { data } = await supabase
                 .from('courses')
-                .select('*, students!courses_student_id_fkey(name)')
+                .select('*, students!courses_student_id_fkey(id, name)')
                 .eq('teacher_id', currentTeacher.userId)
                 .order('start_time', { ascending: true });
             allCourses = data || [];
             
             const now = new Date();
-            const upcoming = allCourses.filter(c => new Date(c.start_time) > now && c.status !== 'completed');
-            document.getElementById('upcomingCount').textContent = upcoming.length;
+            const upcoming = allCourses.filter(c => new Date(c.start_time) > now && c.status !== 'completed' && c.status !== 'cancelled');
+            const completed = allCourses.filter(c => c.status === 'completed');
             const uniqueStudents = new Set(allCourses.map(c => c.student_id)).size;
-            document.getElementById('totalStudents').textContent = uniqueStudents;
             const rated = allCourses.filter(c => c.student_rating);
             const avg = rated.length ? (rated.reduce((s,c)=>s+c.student_rating,0)/rated.length).toFixed(1) : 0;
+            
+            document.getElementById('upcomingCount').textContent = upcoming.length;
+            document.getElementById('totalStudents').textContent = uniqueStudents;
             document.getElementById('avgRating').textContent = avg;
+            document.getElementById('completedCount').textContent = completed.length;
             
             renderCoursesList();
-            refreshCalendar();
+        }
+        
+        // ========== 课程类型显示 ==========
+        function getTypeText(t) { 
+            const types = {
+                'training': '📚 培训内容',
+                '4year': '🎫 四年卡',
+                '10year': '🎟️ 十年卡',
+                'naturalization': '🛂 入籍',
+                'ec': '1️⃣ 公民考试',
+                'ec110': '📚 十年卡全能班',
+                'ec14': '🎫 四年卡全能班',
+                'ec1f': '🛂 入籍全能班',
+                'ec210': '📚 十年卡速成',
+                'ec24': '🎫 四年卡速成',
+                'ec2f': '🛂 入籍速成',
+                'ec310': '📚 十年卡自选',
+                'ec34': '🎫 四年卡自选',
+                'ec3f': '🛂 入籍自选'
+            };
+            return types[t] || t;
+        }
+        
+        // ========== 格式化日期时间 ==========
+        function formatDateTime(d) { 
+            if (!d) return '-';
+            const date = new Date(d);
+            return `${date.getDate().toString().padStart(2,'0')}/${(date.getMonth()+1).toString().padStart(2,'0')}/${date.getFullYear()} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`; 
+        }
+        
+        function calculateEndTime(startTimeStr, duration) {
+            let d = new Date(startTimeStr);
+            d.setHours(d.getHours() + (duration || 2));
+            return d;
+        }
+        
+        function formatTimeRange(startTime, duration) {
+            const start = new Date(startTime);
+            const end = calculateEndTime(startTime, duration);
+            return `${start.getHours().toString().padStart(2,'0')}:${start.getMinutes().toString().padStart(2,'0')} - ${end.getHours().toString().padStart(2,'0')}:${end.getMinutes().toString().padStart(2,'0')}`;
+        }
+        
+        // ========== 显示星级 ==========
+        function renderStars(rating) {
+            if (!rating) return '';
+            let html = '<span class="rating-stars-display">';
+            for (let i = 1; i <= 5; i++) {
+                html += `<i class="fas fa-star star-small ${i > rating ? 'empty' : ''}"></i>`;
+            }
+            html += ` ${rating}/5</span>`;
+            return html;
         }
         
         // ========== 渲染课程列表 ==========
         function renderCoursesList() {
             const container = document.getElementById('coursesList');
             if (!container) return;
-            if (allCourses.length === 0) { container.innerHTML = '<div class="empty-state">Aucun cours programmé</div>'; return; }
+            if (allCourses.length === 0) { 
+                container.innerHTML = '<div class="empty-state">📭 Aucun cours programmé pour le moment</div>'; 
+                return; 
+            }
             
             container.innerHTML = allCourses.map(c => {
+                const now = new Date();
+                const courseStart = new Date(c.start_time);
+                const courseEnd = calculateEndTime(c.start_time, c.duration || 2);
+                const isNow = courseStart <= now && courseEnd >= now;
+                
                 let statusText = '', statusClass = '';
                 if (c.status === 'completed') {
-                    statusText = 'Terminé';
+                    statusText = '✅ Terminé';
                     statusClass = 'status-completed';
-                } else if (c.status === 'in_progress') {
-                    statusText = 'En cours';
+                } else if (c.teacher_started && c.student_confirmed && isNow) {
+                    statusText = '🔄 En cours';
                     statusClass = 'status-in-progress';
-                } else if (c.teacher_started && !c.student_confirmed) {
-                    statusText = 'En attente élève';
+                } else if (c.teacher_started && !c.student_confirmed && isNow) {
+                    statusText = '⏳ En attente élève';
                     statusClass = 'status-pending';
+                } else if (courseStart > now) {
+                    statusText = '📅 Planifié';
+                    statusClass = 'status-scheduled';
                 } else {
-                    statusText = 'Planifié';
+                    statusText = '📅 Planifié';
                     statusClass = 'status-scheduled';
                 }
+                
+                const timeRange = formatTimeRange(c.start_time, c.duration || 2);
                 
                 return `
                     <div class="course-card">
                         <div class="course-header">
-                            <span class="course-title">${getTypeText(c.course_type)} - ${formatDateTime(c.start_time)}</span>
+                            <span class="course-title">${getTypeText(c.course_type)} - ${formatDateTime(c.start_time)} (${timeRange})</span>
                             <span class="status-badge ${statusClass}">${statusText}</span>
                         </div>
                         <div class="course-details">
-                            <div class="detail-item"><i class="fas fa-user-graduate"></i> Élève: ${c.students?.name || 'N/A'}</div>
-                            <div class="detail-item"><i class="fas fa-map-marker-alt"></i> ${c.location || 'À définir'}</div>
-                            <div class="detail-item"><i class="fas fa-video"></i> ${c.meeting_link ? `<a href="${c.meeting_link}" target="_blank">Lien Meet</a>` : 'Non défini'}</div>
-                            ${c.student_rating ? `<div class="detail-item"><i class="fas fa-star"></i> Note: ${'★'.repeat(c.student_rating)}${'☆'.repeat(5-c.student_rating)} (${c.student_rating}/5)</div>` : ''}
-                            ${c.student_comment ? `<div class="detail-item"><i class="fas fa-comment-dots"></i> Élève: ${escapeHtml(c.student_comment)}</div>` : ''}
-                            ${c.teacher_comment ? `<div class="detail-item"><i class="fas fa-comment"></i> Votre avis: ${escapeHtml(c.teacher_comment)}</div>` : ''}
+                            <div class="detail-item"><i class="fas fa-user-graduate"></i> Élève: ${escapeHtml(c.students?.name || 'N/A')}</div>
+                            <div class="detail-item"><i class="fas fa-map-marker-alt"></i> ${c.location || '📍 À définir'}</div>
+                            <div class="detail-item"><i class="fas fa-video"></i> ${c.meeting_link ? `<a href="${c.meeting_link}" target="_blank">🔗 Lien Meet</a>` : '📹 Non défini'}</div>
+                            ${c.material_link ? `<div class="detail-item"><i class="fas fa-paperclip"></i> <a href="${c.material_link}" target="_blank">📎 Support de cours</a></div>` : ''}
+                            ${c.student_rating ? `<div class="detail-item"><i class="fas fa-star"></i> Note élève: ${renderStars(c.student_rating)}</div>` : ''}
+                            ${c.student_comment ? `<div class="detail-item"><i class="fas fa-comment-dots"></i> Commentaire élève: "${escapeHtml(c.student_comment)}"</div>` : ''}
+                            ${c.teacher_comment ? `<div class="detail-item"><i class="fas fa-comment"></i> Votre commentaire: "${escapeHtml(c.teacher_comment)}"</div>` : ''}
                         </div>
                         <div class="course-actions">
-                            ${c.status !== 'completed' ? `<button class="action-btn btn-edit" onclick="openEditCourse('${c.id}','${escapeHtml(c.location||'')}','${escapeHtml(c.meeting_link||'')}')"><i class="fas fa-map-marker-alt"></i> Modifier lieu/lien</button>` : ''}
-                            ${!c.teacher_started && c.status !== 'completed' ? `<button class="action-btn btn-start" onclick="startCourse('${c.id}')"><i class="fas fa-play"></i> Démarrer</button>` : ''}
-                            ${c.teacher_started && !c.student_confirmed ? `<button class="action-btn" disabled style="background:#f39c12;"><i class="fas fa-hourglass-half"></i> Attente élève</button>` : ''}
-                            ${c.teacher_started && c.student_confirmed && c.status !== 'completed' ? `<button class="action-btn btn-end" onclick="endCourse('${c.id}')"><i class="fas fa-stop"></i> Terminer</button>` : ''}
-                            ${c.status === 'completed' && !c.teacher_comment ? `<button class="action-btn btn-edit" onclick="openReview('${c.id}')"><i class="fas fa-star"></i> Ajouter avis</button>` : ''}
+                            ${c.status !== 'completed' ? `<button class="action-btn btn-edit" onclick="openEditCourse('${c.id}','${escapeHtml(c.location||'')}','${escapeHtml(c.meeting_link||'')}')"><i class="fas fa-map-marker-alt"></i> 📍 Lieu / Meet</button>` : ''}
+                            ${!c.teacher_started && c.status !== 'completed' && courseStart <= now ? `<button class="action-btn btn-start" onclick="startCourse('${c.id}')"><i class="fas fa-play"></i> ▶️ Démarrer</button>` : ''}
+                            ${!c.teacher_started && c.status !== 'completed' && courseStart > now ? `<button class="action-btn btn-start" onclick="startCourse('${c.id}')"><i class="fas fa-play"></i> 🚀 Démarrer (anticipé)</button>` : ''}
+                            ${c.teacher_started && !c.student_confirmed && isNow ? `<span class="action-btn" style="background:#f39c12; color:white; cursor:default;"><i class="fas fa-hourglass-half"></i> ⏳ Attente confirmation élève</span>` : ''}
+                            ${c.teacher_started && c.student_confirmed && c.status !== 'completed' && isNow ? `<button class="action-btn btn-end" onclick="endCourse('${c.id}')"><i class="fas fa-stop"></i> ⏹️ Terminer</button>` : ''}
+                            ${c.status !== 'completed' ? `<button class="action-btn btn-material" onclick="openMaterialModal('${c.id}','${escapeHtml(c.material_link||'')}','${escapeHtml(c.teacher_comment||'')}')"><i class="fas fa-paperclip"></i> 📎 Support / Commentaire</button>` : ''}
+                            ${c.status === 'completed' && !c.teacher_comment ? `<button class="action-btn btn-material" onclick="openMaterialModal('${c.id}','${escapeHtml(c.material_link||'')}','${escapeHtml(c.teacher_comment||'')}')"><i class="fas fa-comment"></i> 💬 Ajouter commentaire</button>` : ''}
                         </div>
                     </div>
                 `;
             }).join('');
-        }
-        
-        // ========== 日历 ==========
-        function refreshCalendar() {
-            if (!calendar) return;
-            const events = [];
-            availabilities.forEach(a => {
-                events.push({ 
-                    id: a.id, 
-                    title: '📅 Disponible', 
-                    start: a.start_time, 
-                    end: a.end_time, 
-                    backgroundColor: '#3498db', 
-                    borderColor: '#3498db', 
-                    extendedProps: { type: 'availability' } 
-                });
-            });
-            allCourses.forEach(c => {
-                let color = '#2ecc71';
-                if (c.status === 'completed') color = '#95a5a6';
-                else if (c.status === 'in_progress') color = '#f39c12';
-                else if (c.teacher_started && !c.student_confirmed) color = '#f39c12';
-                events.push({ 
-                    id: c.id, 
-                    title: `📚 ${getTypeText(c.course_type)} - ${c.students?.name || ''}`, 
-                    start: c.start_time, 
-                    backgroundColor: color, 
-                    borderColor: color, 
-                    extendedProps: { type: 'course' } 
-                });
-            });
-            calendar.removeAllEvents();
-            calendar.addEventSource(events);
-        }
-        
-        function initCalendar() {
-            const el = document.getElementById('calendar');
-            calendar = new FullCalendar.Calendar(el, {
-                initialView: 'timeGridWeek', 
-                locale: 'fr',
-                headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
-                slotMinTime: '08:00:00', 
-                slotMaxTime: '22:00:00', 
-                allDaySlot: false, 
-                height: 'auto',
-                dateClick: (info) => { openAddDispoModal(info.date); },
-                eventClick: (info) => { 
-                    if (info.event.extendedProps.type === 'course') {
-                        openEditCourseFromEvent(info.event.id);
-                    }
-                },
-                eventDidMount: (info) => {
-                    if (info.event.extendedProps.type === 'availability') {
-                        info.el.style.cursor = 'pointer';
-                        info.el.addEventListener('contextmenu', (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            pendingDeleteId = info.event.id;
-                            document.getElementById('deleteItemName').textContent = formatDateTime(info.event.start);
-                            document.getElementById('confirmDeleteDialog').classList.add('active');
-                        });
-                    }
-                }
-            });
-            calendar.render();
-        }
-        
-        // ========== 添加可用时间 ==========
-        const SLOTS = [
-            { start: '10:00', end: '12:00', label: '10:00 - 12:00' },
-            { start: '14:00', end: '16:00', label: '14:00 - 16:00' },
-            { start: '19:00', end: '21:00', label: '19:00 - 21:00' }
-        ];
-        
-        let selectedDate = null;
-        let selectedSlots = [];
-        
-        // 将本地时间转换为UTC存储（解决时区偏移）
-        function localToUTC(year, month, day, hour, minute) {
-            // month 从0开始，需要转换
-            const localDate = new Date(year, month, day, hour, minute);
-            return localDate.toISOString();
-        }
-        
-        function openAddDispoModal(date) {
-            selectedDate = date;
-            selectedSlots = [];
-            document.getElementById('selectedDateDisplay').innerHTML = `<i class="fas fa-calendar"></i> ${date.toLocaleDateString('fr-FR')}`;
-            document.getElementById('timeSlots').innerHTML = SLOTS.map(slot => `
-                <div class="time-slot" data-start="${slot.start}" data-end="${slot.end}">
-                    <span class="slot-icon"><i class="far fa-square"></i></span>
-                    <span class="slot-time">${slot.label}</span>
-                </div>
-            `).join('');
-            document.querySelectorAll('.time-slot').forEach(el => {
-                el.addEventListener('click', () => {
-                    el.classList.toggle('selected');
-                    const icon = el.querySelector('.slot-icon i');
-                    const start = el.dataset.start;
-                    if (el.classList.contains('selected')) {
-                        icon.className = 'fas fa-check-square';
-                        if (!selectedSlots.find(s => s.start === start)) selectedSlots.push({ start: start, end: el.dataset.end, label: el.querySelector('.slot-time').innerText });
-                    } else {
-                        icon.className = 'far fa-square';
-                        selectedSlots = selectedSlots.filter(s => s.start !== start);
-                    }
-                });
-            });
-            document.getElementById('addDispoModal').style.display = 'flex';
-        }
-        
-
-        async function addSelectedSlots() {
-    if (selectedSlots.length === 0) { 
-        showToast('Sélectionnez au moins un créneau', 'error'); 
-        return; 
-    }
-    const supabase = window.supabaseAuth.getSupabaseClient();
-    
-    // 获取日期
-    const year = selectedDate.getFullYear();
-    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-    const day = String(selectedDate.getDate()).padStart(2, '0');
-    const dateStr = `${year}-${month}-${day}`;
-    
-    // 获取当天已有的可用时间
-    const { data: existingAvail } = await supabase
-        .from('availabilities')
-        .select('start_time')
-        .eq('teacher_id', currentTeacher.userId)
-        .gte('start_time', `${dateStr} 00:00:00`)
-        .lte('start_time', `${dateStr} 23:59:59`);
-    
-    // 获取当天已有的课程（已预约的时间）
-    const { data: existingCourses } = await supabase
-        .from('courses')
-        .select('start_time')
-        .eq('teacher_id', currentTeacher.userId)
-        .gte('start_time', `${dateStr} 00:00:00`)
-        .lte('start_time', `${dateStr} 23:59:59`);
-    
-    // 收集所有已被占用的时间段（小时）
-    const occupiedHours = [
-        ...(existingAvail?.map(e => new Date(e.start_time).getHours()) || []),
-        ...(existingCourses?.map(e => new Date(e.start_time).getHours()) || [])
-    ];
-    
-    let added = 0;
-    for (const slot of selectedSlots) {
-        const startHour = parseInt(slot.start.split(':')[0]);
-        
-        // 检查是否已被占用（无论是可用时间还是已预约课程）
-        if (occupiedHours.includes(startHour)) {
-            showToast(`⚠️ ${slot.label} existe déjà ou est déjà réservé`, 'warning');
-            continue;
-        }
-        
-        const startTimeStr = `${dateStr} ${slot.start}:00`;
-        const endTimeStr = `${dateStr} ${slot.end}:00`;
-        
-        const { error } = await supabase
-            .from('availabilities')
-            .insert([{
-                teacher_id: currentTeacher.userId,
-                start_time: startTimeStr,
-                end_time: endTimeStr,
-                status: 'available'
-            }]);
-        
-        if (error) {
-            console.error('插入错误:', error);
-            showToast('Erreur', 'error');
-        } else {
-            added++;
-            occupiedHours.push(startHour);
-        }
-    }
-    
-    if (added > 0) {
-        document.getElementById('addDispoModal').style.display = 'none';
-        showToast(`${added} disponibilité(s) ajoutée(s)`, 'success');
-        await loadAvailabilities();
-        selectedSlots = [];
-    }
-}
-// ========== 删除可用时间 ==========
-        
-        
-        async function confirmDelete() {
-            if (!pendingDeleteId) return;
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            await supabase.from('availabilities').delete().eq('id', pendingDeleteId);
-            await loadAvailabilities();
-            showToast('Disponibilité supprimée', 'success');
-            closeDeleteDialog();
-        }
-        
-        function closeDeleteDialog() {
-            document.getElementById('confirmDeleteDialog').classList.remove('active');
-            pendingDeleteId = null;
         }
         
         // ========== 课程操作 ==========
@@ -757,11 +468,6 @@
             document.getElementById('editLocation').value = location;
             document.getElementById('editMeetingLink').value = meetLink;
             document.getElementById('editCourseModal').style.display = 'flex';
-        }
-        
-        function openEditCourseFromEvent(courseId) {
-            const course = allCourses.find(c => c.id === courseId);
-            if (course) openEditCourse(courseId, course.location || '', course.meeting_link || '');
         }
         
         async function saveCourseEdit(e) {
@@ -773,7 +479,7 @@
                 meeting_link: document.getElementById('editMeetingLink').value || null
             }).eq('id', id);
             document.getElementById('editCourseModal').style.display = 'none';
-            showToast('Informations mises à jour', 'success');
+            showToast('Informations mises à jour ✓', 'success');
             await loadCourses();
         }
         
@@ -781,10 +487,14 @@
             const supabase = window.supabaseAuth.getSupabaseClient();
             const { error } = await supabase
                 .from('courses')
-                .update({ teacher_started: true, actual_start: new Date().toISOString(), status: 'pending_student' })
+                .update({ 
+                    teacher_started: true, 
+                    actual_start: new Date().toISOString(), 
+                    status: 'in_progress' 
+                })
                 .eq('id', id);
-            if (error) { showToast('Erreur', 'error'); return; }
-            showToast('Cours démarré, en attente de l\'élève', 'success');
+            if (error) { showToast('Erreur lors du démarrage', 'error'); return; }
+            showToast('Cours démarré ! En attente de la confirmation de l\'élève ✓', 'success');
             await loadCourses();
         }
         
@@ -792,56 +502,40 @@
             const supabase = window.supabaseAuth.getSupabaseClient();
             const { error } = await supabase
                 .from('courses')
-                .update({ actual_end: new Date().toISOString(), status: 'completed' })
+                .update({ 
+                    actual_end: new Date().toISOString(), 
+                    status: 'completed' 
+                })
                 .eq('id', id);
             if (error) { showToast('Erreur', 'error'); return; }
-            showToast('Cours terminé', 'success');
+            showToast('Cours terminé ! Vous pouvez maintenant ajouter un commentaire ✓', 'success');
             await loadCourses();
         }
         
-        function openReview(id) {
-            const course = allCourses.find(c => c.id === id);
-            if (course) {
-                document.getElementById('reviewCourseId').value = id;
-                document.getElementById('teacherComment').value = course.teacher_comment || '';
-                document.getElementById('materialLink').value = course.material_link || '';
-                document.getElementById('reviewModal').style.display = 'flex';
-            }
+        function openMaterialModal(courseId, materialLink, teacherComment) {
+            document.getElementById('materialCourseId').value = courseId;
+            document.getElementById('materialLink').value = materialLink || '';
+            document.getElementById('teacherComment').value = teacherComment || '';
+            document.getElementById('materialModal').style.display = 'flex';
         }
         
-        async function saveReview(e) {
+        async function saveMaterial(e) {
             e.preventDefault();
             const supabase = window.supabaseAuth.getSupabaseClient();
-            const id = document.getElementById('reviewCourseId').value;
+            const id = document.getElementById('materialCourseId').value;
             await supabase.from('courses').update({
-                teacher_comment: document.getElementById('teacherComment').value || null,
-                material_link: document.getElementById('materialLink').value || null
+                material_link: document.getElementById('materialLink').value || null,
+                teacher_comment: document.getElementById('teacherComment').value || null
             }).eq('id', id);
-            document.getElementById('reviewModal').style.display = 'none';
-            showToast('Avis enregistré', 'success');
+            document.getElementById('materialModal').style.display = 'none';
+            showToast('Support et commentaire enregistrés ✓', 'success');
             await loadCourses();
         }
         
         // ========== 辅助函数 ==========
-        function getTypeText(t) { 
-            const types = {
-                'training': '📚 培训内容',
-                '4year': '🎫 四年卡',
-                '10year': '🎟️ 十年卡',
-                'naturalization': '🛂 入籍'
-            };
-            return types[t] || t;
-        }
-        
-        function formatDateTime(d) { 
-            return new Date(d).toLocaleString('fr-FR', { 
-                day:'2-digit', month:'2-digit', year:'numeric', 
-                hour:'2-digit', minute:'2-digit' 
-            }); 
-        }
-        
         function escapeHtml(s) { 
-            return s ? s.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])) : ''; 
+            if (!s) return '';
+            return s.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); 
         }
         
         function showToast(msg, type) { 
@@ -854,21 +548,16 @@
         
         // ========== 初始化模态框 ==========
         function initModals() {
-            document.getElementById('closeModalBtn').onclick = () => document.getElementById('addDispoModal').style.display = 'none';
-            document.getElementById('cancelModalBtn').onclick = () => document.getElementById('addDispoModal').style.display = 'none';
-            document.getElementById('confirmAddBtn').onclick = addSelectedSlots;
             document.getElementById('closeEditModalBtn').onclick = () => document.getElementById('editCourseModal').style.display = 'none';
             document.getElementById('cancelEditBtn').onclick = () => document.getElementById('editCourseModal').style.display = 'none';
-            document.getElementById('closeReviewBtn').onclick = () => document.getElementById('reviewModal').style.display = 'none';
-            document.getElementById('cancelReviewBtn').onclick = () => document.getElementById('reviewModal').style.display = 'none';
-            document.getElementById('cancelDeleteBtn').onclick = closeDeleteDialog;
-            document.getElementById('confirmDeleteBtn').onclick = confirmDelete;
+            document.getElementById('closeMaterialBtn').onclick = () => document.getElementById('materialModal').style.display = 'none';
+            document.getElementById('cancelMaterialBtn').onclick = () => document.getElementById('materialModal').style.display = 'none';
             document.getElementById('editCourseForm').addEventListener('submit', saveCourseEdit);
-            document.getElementById('reviewForm').addEventListener('submit', saveReview);
+            document.getElementById('materialForm').addEventListener('submit', saveMaterial);
+            
             window.onclick = (e) => {
-                if (e.target === document.getElementById('addDispoModal')) document.getElementById('addDispoModal').style.display = 'none';
                 if (e.target === document.getElementById('editCourseModal')) document.getElementById('editCourseModal').style.display = 'none';
-                if (e.target === document.getElementById('reviewModal')) document.getElementById('reviewModal').style.display = 'none';
+                if (e.target === document.getElementById('materialModal')) document.getElementById('materialModal').style.display = 'none';
             };
         }
         
@@ -878,9 +567,7 @@
             if (!currentTeacher) return;
             document.getElementById('teacherName').textContent = currentTeacher.name;
             document.getElementById('logoutBtn').onclick = () => window.location.href = 'index.html';
-            initCalendar();
             initModals();
-            await loadAvailabilities();
             await loadCourses();
         }
         
@@ -889,7 +576,7 @@
         window.openEditCourse = openEditCourse;
         window.startCourse = startCourse;
         window.endCourse = endCourse;
-        window.openReview = openReview;
+        window.openMaterialModal = openMaterialModal;
     </script>
 </body>
 </html>
