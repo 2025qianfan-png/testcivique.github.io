@@ -688,34 +688,29 @@
         }
 
         // 关键修复：像 teacher.html 一样，直接使用数据库的本地时间字符串
-        function getEventSource() {
-            const filtered = allCourses.filter(c => 
-                (!filterType.value || c.course_type === filterType.value) &&
-                (!filterTeacher.value || c.teacher_id === filterTeacher.value)
-            );
-            const colors = { scheduled: '#3498db', completed: '#2ecc71', cancelled: '#e74c3c' };
-            const typeText = { training: '📚 培训', '4year': '🎫 四年', '10year': '🎟️ 十年', naturalization: '🛂 入籍' };
-            
-            return filtered.map(c => {
-                const s = allStudents.find(x => x.id === c.student_id);
-                const t = allTeachers.find(x => x.id === c.teacher_id);
-                
-                // 计算结束时间 (和 teacher.html 一样的方式)
-                const startDate = new Date(c.start_time);
-                const endDate = new Date(startDate.getTime() + (c.duration || 2) * 3600000);
-                
-                return {
-                    id: c.id,
-                    title: `${s?.name || 'N/A'} - ${t?.name || 'N/A'}`,
-                    start: c.start_time,
-                    end: endDate.toISOString().slice(0, 19).replace('T', ' '),
-                    duration: c.duration || 2,
-                    backgroundColor: colors[c.status] || '#3498db',
-                    borderColor: colors[c.status] || '#3498db',
-                    extendedProps: { course: c, student: s, teacher: t, typeText: typeText[c.course_type] || '' }
-                };
-            });
-        }
+   function getEventSource() {
+    const filtered = allCourses.filter(c => 
+        (!filterType.value || c.course_type === filterType.value) &&
+        (!filterTeacher.value || c.teacher_id === filterTeacher.value)
+    );
+    const colors = { scheduled: '#3498db', completed: '#2ecc71', cancelled: '#e74c3c' };
+    const typeText = { training: '📚 培训', '4year': '🎫 四年', '10year': '🎟️ 十年', naturalization: '🛂 入籍' };
+    
+    return filtered.map(c => {
+        const s = allStudents.find(x => x.id === c.student_id);
+        const t = allTeachers.find(x => x.id === c.teacher_id);
+        
+        return {
+            id: c.id,
+            title: `${s?.name || 'N/A'} - ${t?.name || 'N/A'}`,
+            start: c.start_time,
+            duration: { hours: c.duration || 2 },
+            backgroundColor: colors[c.status] || '#3498db',
+            borderColor: colors[c.status] || '#3498db',
+            extendedProps: { course: c, student: s, teacher: t, typeText: typeText[c.course_type] || '' }
+        };
+    });
+}
 
         function refreshCalendar() {
             if (calendar) {
@@ -747,24 +742,41 @@
                 events: getEventSource(),
                 
                 eventDrop: async (info) => {
-                    // 和 teacher.html 不同，我们需要保存到数据库
-                    let newStart = snapToGrid(info.event.start);
-                    let newEnd = snapToGrid(info.event.end);
-                    
-                    info.event.setStart(newStart);
-                    info.event.setEnd(newEnd);
-                    
-                    const newStartStr = newStart.toISOString().slice(0, 19).replace('T', ' ');
-                    const newDuration = (newEnd - newStart) / 3600000;
-                    
-                    showConfirmDialog(info, newStartStr, newDuration);
-                },
+                        let newStart = snapToGrid(info.event.start);
+                        let newDuration = info.event.duration.as('hours');
+                        info.event.setStart(newStart);
+                        showConfirmDialog(info, newStart, newDuration);
+                    },
+
+select: (info) => {
+    let start = snapToGrid(info.start);
+    let year = start.getFullYear();
+    let month = String(start.getMonth() + 1).padStart(2, '0');
+    let day = String(start.getDate()).padStart(2, '0');
+    let hours = String(start.getHours()).padStart(2, '0');
+    let minutes = String(start.getMinutes()).padStart(2, '0');
+    let startStr = `${year}-${month}-${day}T${hours}:${minutes}`;
+    openCreateModal(startStr);
+},
                 
                 select: (info) => {
-                    let start = snapToGrid(info.start);
-                    let startStr = start.toISOString().slice(0, 16);
-                    openCreateModal(startStr);
-                },
+                        // 直接从 FullCalendar 获取日期，然后用本地时间构建字符串
+                        let year = info.start.getFullYear();
+                        let month = String(info.start.getMonth() + 1).padStart(2, '0');
+                        let day = String(info.start.getDate()).padStart(2, '0');
+                        let hours = String(info.start.getHours()).padStart(2, '0');
+                        let minutes = String(info.start.getMinutes()).padStart(2, '0');
+                        
+                        // 对齐到30分钟
+                        let minuteVal = parseInt(minutes);
+                        if (minuteVal < 15) minuteVal = 0;
+                        else if (minuteVal < 45) minuteVal = 30;
+                        else { minuteVal = 0; hours = String(parseInt(hours) + 1).padStart(2, '0'); }
+                        minutes = String(minuteVal).padStart(2, '0');
+                        
+                        let startStr = `${year}-${month}-${day}T${hours}:${minutes}`;
+                        openCreateModal(startStr);
+                    },
                 
                 eventClick: (info) => { openEditModal(info.event.id); },
                 
@@ -804,69 +816,70 @@
             calendar.render();
         }
 
-        function showConfirmDialog(eventInfo, newStartStr, newDuration) {
-            const course = eventInfo.event.extendedProps.course;
-            const student = allStudents.find(s => s.id === course.student_id);
-            const teacher = allTeachers.find(t => t.id === course.teacher_id);
-            const oldStart = course.start_time;
-            const hasConflict = checkConflict(course.teacher_id, newStartStr, course.id, newDuration);
+       function showConfirmDialog(eventInfo, newStart, newDuration) {
+    const course = eventInfo.event.extendedProps.course;
+    const student = allStudents.find(s => s.id === course.student_id);
+    const teacher = allTeachers.find(t => t.id === course.teacher_id);
+    const oldStart = course.start_time;
+    
+    const newStartStr = `${newStart.getFullYear()}-${String(newStart.getMonth()+1).padStart(2,'0')}-${String(newStart.getDate()).padStart(2,'0')} ${String(newStart.getHours()).padStart(2,'0')}:${String(newStart.getMinutes()).padStart(2,'0')}:00`;
+    
+    const hasConflict = checkConflict(course.teacher_id, newStartStr, course.id, newDuration);
 
-            document.getElementById('oldTimeValue').innerHTML = formatDateTime(oldStart) + ` (${course.duration || 2}h)`;
-            document.getElementById('newTimeValue').innerHTML = formatDateTime(newStartStr) + ` (${newDuration.toFixed(1)}h)`;
-            document.getElementById('detailStudent').textContent = student?.name || 'N/A';
-            document.getElementById('detailTeacher').textContent = teacher?.name || 'N/A';
-            document.getElementById('detailType').textContent = { training: '培训内容', '4year': '四年卡', '10year': '十年卡', naturalization: '入籍' }[course.course_type] || course.course_type;
-            document.getElementById('detailDuration').textContent = newDuration.toFixed(1);
-            document.getElementById('confirmConflictWarning').style.display = hasConflict ? 'block' : 'none';
+    document.getElementById('oldTimeValue').innerHTML = formatDateTime(oldStart) + ` (${course.duration || 2}h)`;
+    document.getElementById('newTimeValue').innerHTML = formatDateTime(newStartStr) + ` (${newDuration.toFixed(1)}h)`;
+    document.getElementById('detailStudent').textContent = student?.name || 'N/A';
+    document.getElementById('detailTeacher').textContent = teacher?.name || 'N/A';
+    document.getElementById('detailType').textContent = { training: '培训内容', '4year': '四年卡', '10year': '十年卡', naturalization: '入籍' }[course.course_type] || course.course_type;
+    document.getElementById('detailDuration').textContent = newDuration.toFixed(1);
+    document.getElementById('confirmConflictWarning').style.display = hasConflict ? 'block' : 'none';
 
-            pendingDragInfo = { eventInfo, newStart: newStartStr, newDuration, hasConflict };
-            dragConfirmDialog.classList.add('active');
-        }
-
+    pendingDragInfo = { eventInfo, newStart: newStartStr, newDuration, hasConflict };
+    dragConfirmDialog.classList.add('active');
+}
         async function executeDrag() {
-            if (!pendingDragInfo) return;
-            const { eventInfo, newStart, newDuration, hasConflict } = pendingDragInfo;
-            if (hasConflict) {
-                showToast('Conflit horaire !', 'error');
-                dragConfirmDialog.classList.remove('active');
-                pendingDragInfo = null;
-                eventInfo.revert();
-                return;
-            }
-            
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            const teacherId = eventInfo.event.extendedProps.course.teacher_id;
-            const courseId = eventInfo.event.id;
-            
-            try {
-                const { error } = await supabase.from('courses').update({
-                    start_time: newStart,
-                    duration: newDuration
-                }).eq('id', courseId);
-                
-                if (error) throw error;
-                
-                await deleteAvailabilityForCourse(teacherId, newStart, newDuration);
-                
-                const idx = allCourses.findIndex(c => c.id === courseId);
-                if (idx !== -1) {
-                    allCourses[idx].start_time = newStart;
-                    allCourses[idx].duration = newDuration;
-                }
-                updateStats();
-                refreshCalendar();
-                showToast('Cours déplacé', 'success');
-                
-            } catch (error) {
-                console.error(error);
-                showToast('Erreur lors du déplacement', 'error');
-                eventInfo.revert();
-            }
-            
-            dragConfirmDialog.classList.remove('active');
-            pendingDragInfo = null;
+    if (!pendingDragInfo) return;
+    const { eventInfo, newStart, newDuration, hasConflict } = pendingDragInfo;
+    if (hasConflict) {
+        showToast('Conflit horaire !', 'error');
+        dragConfirmDialog.classList.remove('active');
+        pendingDragInfo = null;
+        eventInfo.revert();
+        return;
+    }
+    
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const teacherId = eventInfo.event.extendedProps.course.teacher_id;
+    const courseId = eventInfo.event.id;
+    
+    try {
+        const { error } = await supabase.from('courses').update({
+            start_time: newStart,
+            duration: newDuration
+        }).eq('id', courseId);
+        
+        if (error) throw error;
+        
+        await deleteAvailabilityForCourse(teacherId, newStart, newDuration);
+        
+        const idx = allCourses.findIndex(c => c.id === courseId);
+        if (idx !== -1) {
+            allCourses[idx].start_time = newStart;
+            allCourses[idx].duration = newDuration;
         }
-
+        updateStats();
+        refreshCalendar();
+        showToast('Cours déplacé', 'success');
+        
+    } catch (error) {
+        console.error(error);
+        showToast('Erreur lors du déplacement', 'error');
+        eventInfo.revert();
+    }
+    
+    dragConfirmDialog.classList.remove('active');
+    pendingDragInfo = null;
+}
         function cancelDrag() {
             if (pendingDragInfo) pendingDragInfo.eventInfo.revert();
             pendingDragInfo = null;
@@ -874,29 +887,28 @@
         }
 
         // ========== 添加/编辑课程 ==========
-        function openCreateModal(startTimeStr) {
-            document.getElementById('courseForm').reset();
-            document.getElementById('courseId').value = '';
-            document.getElementById('modalTitle').innerText = 'Ajouter un cours';
-            
-            if (startTimeStr) {
-                document.getElementById('startTime').value = startTimeStr;
-            } else {
-                document.getElementById('startTime').value = '';
-            }
-            
-            document.getElementById('duration').value = 2;
-            document.getElementById('status').value = 'scheduled';
-            conflictWarning.style.display = 'none';
-            
-            const studentSelect = document.getElementById('studentId');
-            const teacherSelect = document.getElementById('teacherId');
-            studentSelect.innerHTML = '<option value="">Sélectionner...</option>' + allStudents.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
-            teacherSelect.innerHTML = '<option value="">Sélectionner...</option>' + allTeachers.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
-            
-            courseModal.style.display = 'flex';
-        }
-
+      function openCreateModal(startTimeStr) {
+    document.getElementById('courseForm').reset();
+    document.getElementById('courseId').value = '';
+    document.getElementById('modalTitle').innerText = 'Ajouter un cours';
+    
+    if (startTimeStr) {
+        document.getElementById('startTime').value = startTimeStr;
+    } else {
+        document.getElementById('startTime').value = '';
+    }
+    
+    document.getElementById('duration').value = 2;
+    document.getElementById('status').value = 'scheduled';
+    conflictWarning.style.display = 'none';
+    
+    const studentSelect = document.getElementById('studentId');
+    const teacherSelect = document.getElementById('teacherId');
+    studentSelect.innerHTML = '<option value="">Sélectionner...</option>' + allStudents.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+    teacherSelect.innerHTML = '<option value="">Sélectionner...</option>' + allTeachers.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+    
+    courseModal.style.display = 'flex';
+}
         async function openEditModal(courseId) {
             const course = allCourses.find(c => c.id === courseId);
             if (!course) return;
