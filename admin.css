@@ -73,6 +73,23 @@
             overflow-x: hidden;
         }
     }
+    /* 课时列样式 */
+        .credit-cell {
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .credit-student {
+            color: var(--green);
+        }
+        .credit-teacher {
+            color: var(--purple);
+        }
+        .credit-zero {
+            color: var(--red);
+        }
+
+
 
     /* 更小的手机 */
     @media (max-width: 480px) {

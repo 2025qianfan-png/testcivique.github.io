@@ -91,6 +91,15 @@
     
     // 添加用户按钮
     addUserBtn.addEventListener('click', showAddUserModal);
+    // 在 initEventListeners 函数中添加这个
+    document.getElementById('addUserRole').addEventListener('change', function() {
+        const creditGroup = document.getElementById('addCreditGroup');
+        if (this.value === 'stu') {
+            creditGroup.style.display = 'block';
+        } else {
+            creditGroup.style.display = 'none';
+        }
+    });
     
     // 模态框关闭按钮
     document.getElementById('closeModalBtn').addEventListener('click', () => closeModal(editUserModal));
@@ -261,6 +270,21 @@
                 showLoading(false);
             }
         }
+        // 渲染课时单元格（只有 stu 才显示课时）
+        function renderCreditCell(user) {
+            // 不是学生，显示 "-"
+            if (user.role !== 'stu') {
+                return '<span class="credit-na">—</span>';
+            }
+            
+            // 学生显示课时数
+            const credit = (user.credit !== undefined && user.credit !== null) ? user.credit : 0;
+            let creditClass = 'credit-normal';
+            if (credit <= 0) creditClass = 'credit-zero';
+            else if (credit <= 3) creditClass = 'credit-low';
+            
+            return `<span class="${creditClass}">📚 ${credit} h</span>`;
+        }
 
         function renderUsersTable() {
             if (filteredUsers.length === 0) {
@@ -340,37 +364,27 @@
                     roleText = '';
                 }
                 
-                row.innerHTML = `
-                    <td>${user.id}</td>
-                    <td><strong>${user.name}</strong></td>
-                    <td><span class="user-type ${typeClass}">${typeText}</span></td>
-                    <td>${roleText ? `<span class="role-tag ${roleClass}">${roleText}</span>` : ''}</td>
-                    <td>${createdAt}</td>
-                    <td class="${timerClass}">${timerInfo}</td>
-                    <td>
-                        <div style="display: flex; align-items: center;">
-                            <span style="font-family: monospace; background: #f0f0f0; padding: 4px 8px; border-radius: 4px; font-size: 0.9rem;">
-                                ${user.password || '—'}
-                            </span>
-                            ${user.password ? `
-                            <button class="copy-password-btn" data-password="${user.password}" style="margin-left: 8px; background: none; border: none; color: var(--primary-blue); cursor: pointer;" title="Copier le mot de passe">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                            ` : ''}
-                        </div>
-                    </td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="action-btn edit-btn" data-id="${user.id}">
-                                <i class="fas fa-edit"></i> Modifier
-                            </button>
-                            <button class="action-btn delete-btn" data-id="${user.id}" ${user.role === 'admin' && user.id === currentAdmin?.id ? 'disabled' : ''}>
-                                <i class="fas fa-trash"></i> Supprimer
-                            </button>
-                        </div>
-                    </td>
-                `;
-                
+              row.innerHTML = `
+                <td>${user.id}</td>
+                <td><strong>${escapeHtml(user.name)}</strong></td>
+                <td><span class="user-type ${typeClass}">${typeText}</span></td>
+                <td>${roleText ? `<span class="role-tag ${roleClass}">${roleText}</span>` : ''}</td>
+                <td>${createdAt}</td>
+                <td class="${timerClass}">${timerInfo}</td>
+                <td class="credit-cell">${renderCreditCell(user)}</td>   <!-- 新增的课时列 -->
+                <td>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-family: monospace; background: #f0f0f0; padding: 4px 8px; border-radius: 4px;">${user.password || '—'}</span>
+                        ${user.password ? `<button class="copy-password-btn" data-password="${escapeHtml(user.password)}" style="background: none; border: none; color: var(--primary-blue); cursor: pointer;"><i class="fas fa-copy"></i></button>` : ''}
+                    </div>
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="action-btn edit-btn" data-id="${user.id}"><i class="fas fa-edit"></i> Modifier</button>
+                        <button class="action-btn delete-btn" data-id="${user.id}" ${user.role === 'admin' && user.id === currentAdmin?.id ? 'disabled' : ''}><i class="fas fa-trash"></i> Supprimer</button>
+                    </div>
+                </td>
+            `;
                 usersTableBody.appendChild(row);
             });
             
@@ -470,127 +484,153 @@
         // 用户编辑功能
         // ==============================
         function openEditUserModal(userId) {
-            const user = allUsers.find(u => u.id.toString() === userId.toString());
-            if (!user) return;
-            
-            // 填充表单数据
-            document.getElementById('editUserId').value = user.id;
-            document.getElementById('editUserName').value = user.name;
-            document.getElementById('editUserType').value = user.type || 'n';
-            document.getElementById('editUserRole').value = user.role || '';
-            
-            // 格式化创建日期
-            const createdAt = user.created_at ? new Date(user.created_at).toLocaleDateString('fr-FR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            }) : 'Date non disponible';
-            document.getElementById('editUserCreatedAt').textContent = createdAt;
-            
-            // 设置过期日期
-            if (user.timer) {
-                const timerDate = new Date(user.timer);
-                const localDate = new Date(timerDate.getTime() - (timerDate.getTimezoneOffset() * 60000))
-                    .toISOString()
-                    .slice(0, 16);
-                document.getElementById('editUserTimer').value = localDate;
-            } else {
-                document.getElementById('editUserTimer').value = '';
-            }
-            
-            // 更新模态框标题
-            document.getElementById('modalTitle').textContent = `Modifier ${user.name}`;
-            
-            // 显示模态框
-            editUserModal.style.display = 'flex';
-        }
-
+    const user = allUsers.find(u => u.id.toString() === userId.toString());
+    if (!user) return;
+    
+    // 填充表单数据
+    document.getElementById('editUserId').value = user.id;
+    document.getElementById('editUserName').value = user.name;
+    document.getElementById('editUserType').value = user.type || 'n';
+    document.getElementById('editUserRole').value = user.role || '';
+    
+    // 格式化创建日期
+    const createdAt = user.created_at ? new Date(user.created_at).toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    }) : 'Date non disponible';
+    document.getElementById('editUserCreatedAt').textContent = createdAt;
+    
+    // 设置过期日期
+    if (user.timer) {
+        const timerDate = new Date(user.timer);
+        const localDate = new Date(timerDate.getTime() - (timerDate.getTimezoneOffset() * 60000))
+            .toISOString()
+            .slice(0, 16);
+        document.getElementById('editUserTimer').value = localDate;
+    } else {
+        document.getElementById('editUserTimer').value = '';
+    }
+    
+    // ========== 处理课时显示/隐藏 ==========
+    const creditGroup = document.getElementById('editCreditGroup');
+    const creditInput = document.getElementById('editUserCredit');
+    
+    if (user.role === 'stu') {
+        creditGroup.style.display = 'block';
+        creditInput.value = (user.credit !== undefined && user.credit !== null) ? user.credit : 0;
+    } else {
+        creditGroup.style.display = 'none';
+        creditInput.value = '';
+    }
+    // ========== 结束 ==========
+    
+    // 更新模态框标题
+    document.getElementById('modalTitle').textContent = `Modifier ${user.name}`;
+    
+    // 显示模态框
+    editUserModal.style.display = 'flex';
+}
         async function handleEditUser(e) {
-            e.preventDefault();
-            
-            const userId = document.getElementById('editUserId').value;
-            const username = document.getElementById('editUserName').value.trim();
-            const password = document.getElementById('editUserPassword').value;
-            const userType = document.getElementById('editUserType').value;
-            const userRole = document.getElementById('editUserRole').value;
-            const timer = document.getElementById('editUserTimer').value;
-            
-            // 验证输入
-            if (!username || !userType) {
-                showToast('Veuillez remplir tous les champs obligatoires', 'error');
-                return;
+    e.preventDefault();
+    
+    const userId = document.getElementById('editUserId').value;
+    const username = document.getElementById('editUserName').value.trim();
+    const password = document.getElementById('editUserPassword').value;
+    const userType = document.getElementById('editUserType').value;
+    const userRole = document.getElementById('editUserRole').value;
+    const timer = document.getElementById('editUserTimer').value;
+    
+    // 验证输入
+    if (!username || !userType) {
+        showToast('Veuillez remplir tous les champs obligatoires', 'error');
+        return;
+    }
+    
+    // 准备更新数据
+    const updateData = {
+        name: username,
+        type: userType
+    };
+    
+    // 如果提供了新密码，则更新
+    if (password.trim()) {
+        updateData.password = password;
+    }
+    
+    // 处理role字段
+    if (userRole) {
+        updateData.role = userRole;
+    } else {
+        updateData.role = null;
+    }
+    
+    // 处理timer字段
+    if (timer) {
+        try {
+            const date = new Date(timer);
+            if (isNaN(date.getTime())) {
+                throw new Error('Date invalide');
             }
-            
-            // 准备更新数据
-            const updateData = {
-                name: username,
-                type: userType
-            };
-            
-            // 如果提供了新密码，则更新
-            if (password.trim()) {
-                updateData.password = password;
-            }
-            
-            // 处理role字段
-            if (userRole) {
-                updateData.role = userRole;
-            } else {
-                updateData.role = null; // 清除role字段
-            }
-            
-            // 处理timer字段
-            if (timer) {
-                try {
-                    const date = new Date(timer);
-                    if (isNaN(date.getTime())) {
-                        throw new Error('Date invalide');
-                    }
-                    updateData.timer = date.toISOString();
-                } catch (error) {
-                    console.warn('日期格式错误，跳过timer字段');
-                }
-            } else {
-                updateData.timer = null; // 清除timer字段
-            }
-            
-            try {
-                const supabase = window.supabaseAuth.getSupabaseClient();
-                
-                console.log('更新用户数据:', updateData);
-                
-                // 更新用户数据
-                const { error } = await supabase
-                    .from('students')
-                    .update(updateData)
-                    .eq('id', userId);
-                
-                if (error) throw error;
-                
-                // 关闭模态框
-                closeModal(editUserModal);
-                
-                // 重新加载用户数据
-                await loadUsers();
-                
-                // 显示成功消息
-                showToast('Utilisateur modifié avec succès', 'success');
-                
-            } catch (error) {
-                console.error('修改用户错误:', error);
-                
-                let errorMessage = 'Erreur lors de la modification de l\'utilisateur';
-                if (error.code === '23505') {
-                    errorMessage = 'Ce nom d\'utilisateur existe déjà';
-                } else if (error.code === '23514') {
-                    errorMessage = 'Type d\'utilisateur invalide';
-                }
-                
-                showToast(errorMessage, 'error');
-            }
+            updateData.timer = date.toISOString();
+        } catch (error) {
+            console.warn('日期格式错误，跳过timer字段');
         }
+    } else {
+        updateData.timer = null;
+    }
+    
+    // ========== 新增：处理 credit 字段（只有学生才保存） ==========
+    if (userRole === 'stu') {
+        const creditValue = document.getElementById('editUserCredit').value;
+        if (creditValue !== '' && creditValue !== null) {
+            const creditNum = parseInt(creditValue);
+            if (!isNaN(creditNum)) {
+                updateData.credit = creditNum;
+            }
+        } else {
+            updateData.credit = 0;
+        }
+    }
+    // ========== 新增结束 ==========
+    
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        
+        console.log('更新用户数据:', updateData);
+        
+        // 更新用户数据
+        const { error } = await supabase
+            .from('students')
+            .update(updateData)
+            .eq('id', userId);
+        
+        if (error) throw error;
+        
+        // 关闭模态框
+        closeModal(editUserModal);
+        
+        // 重新加载用户数据
+        await loadUsers();
+        
+        // 显示成功消息
+        showToast('Utilisateur modifié avec succès', 'success');
+        
+    } catch (error) {
+        console.error('修改用户错误:', error);
+        
+        let errorMessage = 'Erreur lors de la modification de l\'utilisateur';
+        if (error.code === '23505') {
+            errorMessage = 'Ce nom d\'utilisateur existe déjà';
+        } else if (error.code === '23514') {
+            errorMessage = 'Type d\'utilisateur invalide';
+        }
+        
+        showToast(errorMessage, 'error');
+    }
+}
 
         // ==============================
         // 添加用户功能
@@ -600,110 +640,128 @@
             document.getElementById('addUserType').value = 'n';
             document.getElementById('addUserRole').value = '';
             document.getElementById('addUserTimer').value = '';
+            
+            // 默认隐藏课时输入框
+            document.getElementById('addCreditGroup').style.display = 'none';
+            
             addUserModal.style.display = 'flex';
         }
+    
 
         async function handleAddUser(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('addUserName').value.trim();
-            const password = document.getElementById('addUserPassword').value;
-            const userType = document.getElementById('addUserType').value;
-            const userRole = document.getElementById('addUserRole').value;
-            const timer = document.getElementById('addUserTimer').value;
-            
-            console.log('准备创建用户:', { username, userType, userRole, timer });
-            
-            // 验证输入
-            if (!username || !password || !userType) {
-                showToast('Veuillez remplir tous les champs obligatoires', 'error');
-                return;
+    e.preventDefault();
+    
+    const username = document.getElementById('addUserName').value.trim();
+    const password = document.getElementById('addUserPassword').value;
+    const userType = document.getElementById('addUserType').value;
+    const userRole = document.getElementById('addUserRole').value;
+    const timer = document.getElementById('addUserTimer').value;
+    
+    console.log('准备创建用户:', { username, userType, userRole, timer });
+    
+    // 验证输入
+    if (!username || !password || !userType) {
+        showToast('Veuillez remplir tous les champs obligatoires', 'error');
+        return;
+    }
+    
+    // 验证type值是否有效
+    const validTypes = ['n', 'r', 'm', 't'];
+    if (!validTypes.includes(userType)) {
+        showToast('Type d\'utilisateur invalide', 'error');
+        return;
+    }
+    
+    // 验证用户名是否已存在
+    const existingUser = allUsers.find(u => u.name === username);
+    if (existingUser) {
+        showToast('Ce nom d\'utilisateur existe déjà', 'error');
+        return;
+    }
+    
+    // 准备新用户数据
+    const newUser = {
+        name: username,
+        password: password,
+        type: userType,
+        created_at: new Date().toISOString()
+    };
+    
+    // 添加role字段（如果提供）
+    if (userRole) {
+        newUser.role = userRole;
+    }
+    
+    // ========== 新增：添加 credit 字段（只有学生才需要） ==========
+    if (userRole === 'stu') {
+        const creditValue = document.getElementById('addUserCredit').value;
+        if (creditValue && creditValue !== '') {
+            const creditNum = parseInt(creditValue);
+            if (!isNaN(creditNum)) {
+                newUser.credit = creditNum;
             }
-            
-            // 验证type值是否有效
-            const validTypes = ['n', 'r', 'm', 't'];
-            if (!validTypes.includes(userType)) {
-                showToast('Type d\'utilisateur invalide', 'error');
-                return;
-            }
-            
-            // 验证用户名是否已存在
-            const existingUser = allUsers.find(u => u.name === username);
-            if (existingUser) {
-                showToast('Ce nom d\'utilisateur existe déjà', 'error');
-                return;
-            }
-            
-            // 准备新用户数据
-            const newUser = {
-                name: username,
-                password: password,
-                type: userType,
-                created_at: new Date().toISOString()
-            };
-            
-            // 添加role字段（如果提供）
-            if (userRole) {
-                newUser.role = userRole;
-            }
-            
-            // 如果设置了过期时间，则添加
-            if (timer) {
-                try {
-                    const date = new Date(timer);
-                    if (isNaN(date.getTime())) {
-                        throw new Error('Date invalide');
-                    }
-                    newUser.timer = date.toISOString();
-                } catch (error) {
-                    console.warn('日期格式错误，跳过timer字段');
-                }
-            }
-            
-            console.log('最终用户数据:', newUser);
-            
-            try {
-                const supabase = window.supabaseAuth.getSupabaseClient();
-                
-                // 插入新用户
-                const { data, error } = await supabase
-                    .from('students')
-                    .insert([newUser])
-                    .select();
-                    
-                if (error) {
-                    console.error('Supabase插入错误:', error);
-                    
-                    let errorMessage = 'Erreur lors de la création';
-                    if (error.code === '23505') {
-                        errorMessage = 'Ce nom d\'utilisateur existe déjà';
-                    } else if (error.code === '23514') {
-                        errorMessage = 'Type d\'utilisateur invalide';
-                    } else if (error.message.includes('null value')) {
-                        errorMessage = 'Champ obligatoire manquant';
-                    }
-                    
-                    showToast(errorMessage, 'error');
-                    return;
-                }
-                
-                console.log('用户创建成功:', data);
-                
-                // 关闭模态框
-                closeModal(addUserModal);
-                
-                // 重新加载用户数据
-                await loadUsers();
-                
-                // 显示成功消息
-                showToast('Utilisateur créé avec succès', 'success');
-                
-            } catch (error) {
-                console.error('创建用户错误:', error);
-                showToast('Erreur technique lors de la création', 'error');
-            }
+        } else {
+            newUser.credit = 0;
         }
-
+    }
+    // ========== 新增结束 ==========
+    
+    // 如果设置了过期时间，则添加
+    if (timer) {
+        try {
+            const date = new Date(timer);
+            if (isNaN(date.getTime())) {
+                throw new Error('Date invalide');
+            }
+            newUser.timer = date.toISOString();
+        } catch (error) {
+            console.warn('日期格式错误，跳过timer字段');
+        }
+    }
+    
+    console.log('最终用户数据:', newUser);
+    
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        
+        // 插入新用户
+        const { data, error } = await supabase
+            .from('students')
+            .insert([newUser])
+            .select();
+            
+        if (error) {
+            console.error('Supabase插入错误:', error);
+            
+            let errorMessage = 'Erreur lors de la création';
+            if (error.code === '23505') {
+                errorMessage = 'Ce nom d\'utilisateur existe déjà';
+            } else if (error.code === '23514') {
+                errorMessage = 'Type d\'utilisateur invalide';
+            } else if (error.message.includes('null value')) {
+                errorMessage = 'Champ obligatoire manquant';
+            }
+            
+            showToast(errorMessage, 'error');
+            return;
+        }
+        
+        console.log('用户创建成功:', data);
+        
+        // 关闭模态框
+        closeModal(addUserModal);
+        
+        // 重新加载用户数据
+        await loadUsers();
+        
+        // 显示成功消息
+        showToast('Utilisateur créé avec succès', 'success');
+        
+    } catch (error) {
+        console.error('创建用户错误:', error);
+        showToast('Erreur technique lors de la création', 'error');
+    }
+}
         // ==============================
         // 删除用户功能
         // ==============================
@@ -769,6 +827,15 @@
 
         function closeModal(modal) {
             modal.style.display = 'none';
+        }
+        function escapeHtml(s) {
+            if (!s) return '';
+            return s.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
         }
 
         function showToast(message, type = 'success') {

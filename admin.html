@@ -138,7 +138,8 @@
                 <div class="table-wrapper">
                     <table class="users-table">
                         <thead>
-                            <tr><th>ID</th><th>Nom</th><th>Type</th><th>Rôle</th><th>Date de création</th><th>Date d'expiration</th><th>Mot de passe</th><th>Actions</th></tr>
+                           <th>ID</th><th>Nom</th><th>Type</th><th>Rôle</th><th>Date de création</th><th>Date d'expiration</th><th>📚 Crédits</th><th>Mot de passe</th><th>Actions</th>
+                        
                         </thead>
                         <tbody id="usersTableBody"></tbody>
                     </table>
@@ -158,110 +159,124 @@
         </div>
     </main>
 
-    <div class="modal" id="editUserModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="modalTitle">Modifier l'utilisateur</h2>
-                <button class="close-btn" id="closeModalBtn">&times;</button>
-            </div>
-            <form id="editUserForm">
-                <input type="hidden" id="editUserId">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editUserName">Nom d'utilisateur</label>
-                        <input type="text" id="editUserName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editUserPassword">Mot de passe (laisser vide pour ne pas changer)</label>
-                        <input type="password" id="editUserPassword" placeholder="Nouveau mot de passe">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editUserType">Type d'utilisateur</label>
-                        <select id="editUserType" required>
-                            <option value="n">Type N</option>
-                            <option value="r">Type R</option>
-                            <option value="m">Type M</option>
-                            <option value="t">Type T</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="editUserRole">Rôle</label>
-                        <select id="editUserRole">
-                            <option value="">Aucun rôle</option>
-                            <option value="user">Membre</option>
-                            <option value="stu">Élève</option>
-                            <option value="teacher">Intervenant</option>
-                            <option value="admin">Administrateur</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group form-full">
-                    <label>Date de création</label>
-                    <div style="padding: 15px; background: var(--light-gray); border-radius: 8px;" id="editUserCreatedAt">Chargement...</div>
-                </div>
-                <div class="form-group form-full">
-                    <label>Date d'expiration (facultatif)</label>
-                    <input type="datetime-local" id="editUserTimer">
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="cancel-btn" id="cancelEditBtn">Annuler</button>
-                    <button type="submit" class="save-btn"><i class="fas fa-save"></i> Enregistrer</button>
-                </div>
-            </form>
+ <div class="modal" id="editUserModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitle">Modifier l'utilisateur</h2>
+            <button class="close-btn" id="closeModalBtn">&times;</button>
         </div>
+        <form id="editUserForm">
+            <input type="hidden" id="editUserId">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="editUserName">Nom d'utilisateur</label>
+                    <input type="text" id="editUserName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUserPassword">Mot de passe (laisser vide pour ne pas changer)</label>
+                    <input type="password" id="editUserPassword" placeholder="Nouveau mot de passe">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="editUserType">Type d'utilisateur</label>
+                    <select id="editUserType" required>
+                        <option value="n">Type N</option>
+                        <option value="r">Type R</option>
+                        <option value="m">Type M</option>
+                        <option value="t">Type T</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editUserRole">Rôle</label>
+                    <select id="editUserRole">
+                        <option value="">Aucun rôle</option>
+                        <option value="user">Membre</option>
+                        <option value="stu">Élève</option>
+                        <option value="teacher">Intervenant</option>
+                        <option value="admin">Administrateur</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group form-full">
+                <label>Date de création</label>
+                <div style="padding: 15px; background: var(--light-gray); border-radius: 8px;" id="editUserCreatedAt">Chargement...</div>
+            </div>
+            <div class="form-group form-full">
+                <label>Date d'expiration (facultatif)</label>
+                <input type="datetime-local" id="editUserTimer">
+            </div>
+            <!-- ========== 新增：课时输入框（默认隐藏） ========== -->
+            <div class="form-group form-full" id="editCreditGroup" style="display: none;">
+                <label for="editUserCredit">📚 Crédits (heures de cours restantes)</label>
+                <input type="number" id="editUserCredit" min="0" step="1" value="0" placeholder="Nombre d'heures">
+                <small style="color: #666; display: block; margin-top: 5px;">Uniquement pour les élèves</small>
+            </div>
+            <!-- ========== 新增结束 ========== -->
+            <div class="form-actions">
+                <button type="button" class="cancel-btn" id="cancelEditBtn">Annuler</button>
+                <button type="submit" class="save-btn"><i class="fas fa-save"></i> Enregistrer</button>
+            </div>
+        </form>
     </div>
+</div>
 
     <div class="modal" id="addUserModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Ajouter un utilisateur</h2>
-                <button class="close-btn" id="closeAddModalBtn">&times;</button>
-            </div>
-            <form id="addUserForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="addUserName">Nom d'utilisateur</label>
-                        <input type="text" id="addUserName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="addUserPassword">Mot de passe</label>
-                        <input type="password" id="addUserPassword" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="addUserType">Type d'utilisateur</label>
-                        <select id="addUserType" required>
-                            <option value="n">Type N</option>
-                            <option value="r">Type R</option>
-                            <option value="m">Type M</option>
-                            <option value="t">Type T</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="addUserRole">Rôle (facultatif)</label>
-                        <select id="addUserRole">
-                            <option value="">Aucun rôle</option>
-                            <option value="user">Membre</option>
-                            <option value="stu">Élève</option>
-                            <option value="teacher">Intervenant</option>
-                            <option value="admin">Administrateur</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group form-full">
-                    <label>Date d'expiration (facultatif)</label>
-                    <input type="datetime-local" id="addUserTimer">
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="cancel-btn" id="cancelAddBtn">Annuler</button>
-                    <button type="submit" class="save-btn"><i class="fas fa-user-plus"></i> Créer</button>
-                </div>
-            </form>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Ajouter un utilisateur</h2>
+            <button class="close-btn" id="closeAddModalBtn">&times;</button>
         </div>
+        <form id="addUserForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="addUserName">Nom d'utilisateur</label>
+                    <input type="text" id="addUserName" required>
+                </div>
+                <div class="form-group">
+                    <label for="addUserPassword">Mot de passe</label>
+                    <input type="password" id="addUserPassword" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="addUserType">Type d'utilisateur</label>
+                    <select id="addUserType" required>
+                        <option value="n">Type N</option>
+                        <option value="r">Type R</option>
+                        <option value="m">Type M</option>
+                        <option value="t">Type T</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="addUserRole">Rôle (facultatif)</label>
+                    <select id="addUserRole">
+                        <option value="">Aucun rôle</option>
+                        <option value="user">Membre</option>
+                        <option value="stu">Élève</option>
+                        <option value="teacher">Intervenant</option>
+                        <option value="admin">Administrateur</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group form-full">
+                <label>Date d'expiration (facultatif)</label>
+                <input type="datetime-local" id="addUserTimer">
+            </div>
+            <!-- ========== 新增：课时输入框（默认隐藏，只有选择"Élève"时才显示） ========== -->
+            <div class="form-group form-full" id="addCreditGroup" style="display: none;">
+                <label for="addUserCredit">📚 Crédits (heures de cours)</label>
+                <input type="number" id="addUserCredit" min="0" step="1" value="5" placeholder="Ex: 5, 10, 20">
+                <small style="color: #666; display: block; margin-top: 5px;">Uniquement pour les élèves - nombre d'heures de cours</small>
+            </div>
+            <!-- ========== 新增结束 ========== -->
+            <div class="form-actions">
+                <button type="button" class="cancel-btn" id="cancelAddBtn">Annuler</button>
+                <button type="submit" class="save-btn"><i class="fas fa-user-plus"></i> Créer</button>
+            </div>
+        </form>
     </div>
+</div>
 
     <div class="confirm-dialog" id="deleteConfirmDialog">
         <div class="confirm-content">

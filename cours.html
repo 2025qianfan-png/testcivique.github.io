@@ -528,7 +528,11 @@
                     { name: '十年卡自选', code: 'ec310' },
                     { name: '四年卡自选', code: 'ec34' },
                     { name: '入籍自选', code: 'ec3f' }
-                ] }
+                ] },
+                { name: '➡️ 模拟考试', code: 'ex', children: [
+                    { name: '十年卡模拟考试', code: 'ex4' },
+                    { name: '四年卡模拟考试', code: 'ex10' },
+                    { name: '入籍模拟考试', code: 'exf' } ] } 
             ]
         };
 
@@ -667,6 +671,78 @@
             document.body.appendChild(t);
             setTimeout(() => t.remove(), 3000);
         }
+        // 扣减学生课时
+async function deductStudentCredit(studentId, hours, isEdit = false, oldHours = 0) {
+    if (!studentId || !hours || hours <= 0) return true;
+    
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const student = allStudents.find(s => s.id === studentId);
+    
+    if (!student) return true;
+    if (student.credit === undefined || student.credit === null) return true;
+    
+    const currentCredit = student.credit;
+    if (currentCredit < hours) {
+        showToast(`课时不足！学生 ${student.name} 只有 ${currentCredit} 小时，需要 ${hours} 小时`, 'error');
+        return false;
+    }
+    
+    const newCredit = currentCredit - hours;
+    const { error } = await supabase
+        .from('students')
+        .update({ credit: newCredit })
+        .eq('id', studentId);
+    
+    if (error) {
+        console.error('扣减课时失败:', error);
+        return false;
+    }
+    
+    student.credit = newCredit;
+    return true;
+}
+
+// 返还学生课时
+async function refundStudentCredit(studentId, hours) {
+    if (!studentId || !hours || hours <= 0) return true;
+    
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const student = allStudents.find(s => s.id === studentId);
+    
+    if (!student) return true;
+    if (student.credit === undefined || student.credit === null) return true;
+    
+    const newCredit = (student.credit || 0) + hours;
+    const { error } = await supabase
+        .from('students')
+        .update({ credit: newCredit })
+        .eq('id', studentId);
+    
+    if (error) {
+        console.error('返还课时失败:', error);
+        return false;
+    }
+    
+    student.credit = newCredit;
+    return true;
+}
+
+// 调整课时（编辑时使用）
+async function adjustStudentCredit(studentId, oldHours, newHours) {
+    if (!studentId) return true;
+    if (oldHours === newHours) return true;
+    
+    const diff = newHours - oldHours;
+    
+    if (diff > 0) {
+        // 需要扣减差额
+        return await deductStudentCredit(studentId, diff);
+    } else if (diff < 0) {
+        // 需要返还差额
+        return await refundStudentCredit(studentId, -diff);
+    }
+    return true;
+}
 
         function closeModal(modal) { modal.style.display = 'none'; }
         
@@ -806,11 +882,12 @@ function initCourseFilters() {
                                 <span class="course-title">${typeText} - ${startTime} à ${endTime.split(' ')[1]}</span>
                                 <span class="status-badge ${statusClass}">${statusText}</span>
                             </div>
-                            <div class="course-details">
+                           <div class="course-details">
                                 <div class="detail-item"><i class="fas fa-user-graduate"></i> Élève: ${escapeHtml(s?.name || 'N/A')}</div>
                                 <div class="detail-item"><i class="fas fa-chalkboard-user"></i> Intervenant: ${escapeHtml(t?.name || 'N/A')}</div>
                                 <div class="detail-item"><i class="fas fa-map-marker-alt"></i> Lieu: ${c.location || 'À définir'}</div>
                                 <div class="detail-item"><i class="fas fa-clock"></i> Durée: ${c.duration || 2} heures</div>
+                                ${s && s.credit !== undefined && s.credit !== null && s.role === 'stu' ? `<div class="detail-item"><i class="fas fa-hourglass-half"></i> 📚 Crédits restants: ${s.credit} h</div>` : ''}
                                 ${c.material_link ? `<div class="detail-item"><i class="fas fa-link"></i> <a href="${c.material_link}" target="_blank">📚 Lien du cours</a></div>` : ''}
                                 ${c.meeting_link ? `<div class="detail-item"><i class="fas fa-video"></i> <a href="${c.meeting_link}" target="_blank">🎥 Lien visio</a></div>` : ''}
                                 ${c.notes ? `<div class="detail-item"><i class="fas fa-sticky-note"></i> Notes: ${escapeHtml(c.notes)}</div>` : ''}
@@ -825,7 +902,6 @@ function initCourseFilters() {
                 }).join('');
             }
 
-     
 async function loadData() {
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
@@ -836,7 +912,7 @@ async function loadData() {
         
         const [coursesRes, studentsRes, teachersRes] = await Promise.all([
             supabase.from('courses').select('*').order('start_time'),
-            supabase.from('students').select('id, name').eq('role', 'stu'),
+            supabase.from('students').select('id, name, credit, role').eq('role', 'stu'),
             supabase.from('students').select('id, name').eq('role', 'teacher')
         ]);
         
@@ -848,20 +924,19 @@ async function loadData() {
         allStudents = studentsRes.data || [];
         allTeachers = teachersRes.data || [];
 
-        // 更新老师筛选下拉框
         filterTeacher.innerHTML = '<option value="">Tous les intervenants</option>' + 
             allTeachers.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
         
         updateFilterOptions();
         updateStats();
-        initCourseFilters();  // 初始化过滤按钮
+        initCourseFilters();
         renderCoursesList();
     } catch (err) {
         console.error(err);
         showToast('Erreur chargement: ' + err.message, 'error');
     }
 }
-        function refreshData() {
+function refreshData() {
             loadData();
         }
 
@@ -962,67 +1037,130 @@ async function loadData() {
         }
 
         async function saveCourse(e) {
-            e.preventDefault();
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            const id = document.getElementById('courseId').value;
-            const teacherId = document.getElementById('teacherId').value;
-            const startTimeLocal = document.getElementById('startTime').value;
-            const duration = parseFloat(document.getElementById('duration').value) || 2;
-            const courseType = document.getElementById('courseTypeValue').value;
-            
-            if (!startTimeLocal) {
-                showToast('Veuillez sélectionner une date et heure', 'error');
-                return;
+    e.preventDefault();
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const id = document.getElementById('courseId').value;
+    const teacherId = document.getElementById('teacherId').value;
+    const studentId = document.getElementById('studentId').value;
+    const startTimeLocal = document.getElementById('startTime').value;
+    const duration = parseFloat(document.getElementById('duration').value) || 2;
+    const courseType = document.getElementById('courseTypeValue').value;
+    const newStatus = document.getElementById('status').value;
+    
+    if (!startTimeLocal) {
+        showToast('Veuillez sélectionner une date et heure', 'error');
+        return;
+    }
+    if (!courseType) {
+        showToast('Veuillez sélectionner un type de cours', 'error');
+        return;
+    }
+    
+    const [datePart, timePart] = startTimeLocal.split('T');
+    const startTimeStr = `${datePart} ${timePart}:00`;
+    
+    if (checkConflict(teacherId, startTimeStr, id || null, duration)) {
+        showToast('Conflit horaire avec un autre cours !', 'error');
+        return;
+    }
+    
+    const data = {
+        student_id: studentId,
+        teacher_id: teacherId,
+        course_type: courseType,
+        start_time: startTimeStr,
+        duration: duration,
+        location: document.getElementById('location').value || null,
+        material_link: document.getElementById('materialLink').value || null,
+        meeting_link: document.getElementById('meetingLink').value || null,
+        notes: document.getElementById('notes').value || null,
+        status: newStatus
+    };
+    
+    if (!data.student_id || !data.teacher_id) {
+        showToast('Veuillez sélectionner un élève et un intervenant', 'error');
+        return;
+    }
+    
+    try {
+        const isNewCourse = !id;
+        
+        if (isNewCourse) {
+            // ========== 新建课程 ==========
+            // 只有 scheduled 或 completed 状态才扣课时
+            if (newStatus === 'scheduled' || newStatus === 'completed') {
+                const canDeduct = await deductStudentCredit(studentId, duration);
+                if (!canDeduct) return;
             }
-            if (!courseType) {
-                showToast('Veuillez sélectionner un type de cours', 'error');
-                return;
-            }
             
-            const [datePart, timePart] = startTimeLocal.split('T');
-            const startTimeStr = `${datePart} ${timePart}:00`;
+            const { error } = await supabase.from('courses').insert([data]);
+            if (error) throw error;
             
-            if (checkConflict(teacherId, startTimeStr, id || null, duration)) {
-                showToast('Conflit horaire avec un autre cours !', 'error');
-                return;
-            }
+        } else {
+            // ========== 编辑课程 ==========
+            const oldCourse = allCourses.find(c => c.id === id);
+            if (!oldCourse) throw new Error('Cours non trouvé');
             
-            const data = {
-                student_id: document.getElementById('studentId').value,
-                teacher_id: teacherId,
-                course_type: courseType,
-                start_time: startTimeStr,
-                duration: duration,
-                location: document.getElementById('location').value || null,
-                material_link: document.getElementById('materialLink').value || null,
-                meeting_link: document.getElementById('meetingLink').value || null,
-                notes: document.getElementById('notes').value || null,
-                status: document.getElementById('status').value
-            };
+            const oldStatus = oldCourse.status;
+            const oldDuration = oldCourse.duration || 2;
+            const oldStudentId = oldCourse.student_id;
             
-            if (!data.student_id || !data.teacher_id) {
-                showToast('Veuillez sélectionner un élève et un intervenant', 'error');
-                return;
-            }
+            // 判断哪些状态会消耗课时
+            // 判断哪些状态会消耗课时（创建时扣减过的状态）
+            const isConsumingStatus = (status) => status === 'scheduled' || status === 'in_progress' || status === 'completed';
+            const oldConsumes = isConsumingStatus(oldStatus);
+            const newConsumes = isConsumingStatus(newStatus);
             
-            try {
-                let result;
-                if (id) {
-                    result = await supabase.from('courses').update(data).eq('id', id);
-                } else {
-                    result = await supabase.from('courses').insert([data]);
+            // 情况1：学生换了，需要处理旧学生的课时返还和新学生的课时扣减
+            if (oldStudentId !== studentId) {
+                // 返还旧学生的课时（如果旧课程消耗课时）
+                if (oldConsumes) {
+                    await refundStudentCredit(oldStudentId, oldDuration);
                 }
-                if (result.error) throw result.error;
-                
-                closeModal(courseModal);
-                await loadData();
-                showToast(id ? 'Cours modifié' : 'Cours créé', 'success');
-            } catch (err) {
-                console.error(err);
-                showToast('Erreur: ' + (err.message || 'Vérifiez la console'), 'error');
+                // 扣减新学生的课时（如果新课程消耗课时）
+                if (newConsumes) {
+                    const canDeduct = await deductStudentCredit(studentId, duration);
+                    if (!canDeduct) return;
+                }
+            } else {
+                // 情况2：同一个学生
+                if (oldConsumes && !newConsumes) {
+                    // 从消耗状态变为不消耗状态（如 scheduled -> cancelled）→ 返还课时
+                    await refundStudentCredit(studentId, oldDuration);
+                } 
+                else if (!oldConsumes && newConsumes) {
+                    // 从不消耗状态变为消耗状态（如 cancelled -> scheduled）→ 扣减课时
+                    const canDeduct = await deductStudentCredit(studentId, duration);
+                    if (!canDeduct) return;
+                }
+                else if (oldConsumes && newConsumes) {
+                    // 都是消耗状态 → 调整课时差额
+                    const diff = duration - oldDuration;
+                    if (diff > 0) {
+                        // 课时变多了，需要多扣
+                        const canDeduct = await deductStudentCredit(studentId, diff);
+                        if (!canDeduct) return;
+                    } else if (diff < 0) {
+                        // 课时变少了，需要返还
+                        await refundStudentCredit(studentId, -diff);
+                    }
+                }
             }
+            
+            // 更新课程
+            const { error } = await supabase.from('courses').update(data).eq('id', id);
+            if (error) throw error;
         }
-
+        
+        closeModal(courseModal);
+        await loadData();
+        showToast(id ? 'Cours modifié' : 'Cours créé', 'success');
+        
+    } catch (err) {
+        console.error(err);
+        showToast('Erreur: ' + (err.message || 'Vérifiez la console'), 'error');
+    }
+}
         function showDeleteConfirm(courseId) {
             const course = allCourses.find(c => c.id === courseId);
             if (!course) return;
@@ -1039,24 +1177,30 @@ async function loadData() {
             deleteConfirmOverlay.classList.add('active');
         }
 
-        async function confirmDeleteCourse() {
-            if (!pendingDeleteCourseId) return;
-            
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            try {
-                const { error } = await supabase.from('courses').delete().eq('id', pendingDeleteCourseId);
-                if (error) throw error;
-                
-                deleteConfirmOverlay.classList.remove('active');
-                pendingDeleteCourseId = null;
-                await loadData();
-                showToast('Cours supprimé avec succès', 'success');
-            } catch (err) {
-                console.error(err);
-                showToast('Erreur lors de la suppression', 'error');
-            }
+       async function confirmDeleteCourse() {
+    if (!pendingDeleteCourseId) return;
+    
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const courseToDelete = allCourses.find(c => c.id === pendingDeleteCourseId);
+    
+    try {
+        // 如果课程是 scheduled 或 completed 状态，返还课时
+         if (courseToDelete && (courseToDelete.status === 'scheduled' || courseToDelete.status === 'in_progress' || courseToDelete.status === 'completed')) {
+            await refundStudentCredit(courseToDelete.student_id, courseToDelete.duration || 2);
         }
-
+        
+        const { error } = await supabase.from('courses').delete().eq('id', pendingDeleteCourseId);
+        if (error) throw error;
+        
+        deleteConfirmOverlay.classList.remove('active');
+        pendingDeleteCourseId = null;
+        await loadData();
+        showToast('Cours supprimé avec succès', 'success');
+    } catch (err) {
+        console.error(err);
+        showToast('Erreur lors de la suppression', 'error');
+    }
+}
         function cancelDeleteCourse() {
             deleteConfirmOverlay.classList.remove('active');
             pendingDeleteCourseId = null;
