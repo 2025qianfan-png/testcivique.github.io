@@ -375,6 +375,24 @@
             border-radius: 20px;
             font-size: 0.8rem;
         }
+        .filter-btn-active {
+            background: var(--primary-blue);
+            color: white;
+            padding: 6px 14px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .filter-btn-inactive {
+            background: #95a5a6;
+            color: white;
+            padding: 6px 14px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -402,6 +420,10 @@
             <div class="filters-bar">
                 <select id="filterType" class="filter-select"><option value="">Tous les types</option></select>
                 <select id="filterTeacher" class="filter-select"><option value="">Tous les intervenants</option></select>
+                <div style="display: flex; gap: 10px; margin-left: auto;">
+                    <button id="showUpcomingBtn" class="filter-btn-active" style="padding: 6px 14px; border: none; border-radius: 30px; cursor: pointer; font-weight: 600; background: var(--primary-blue); color: white;">📅 À venir</button>
+                    <button id="showPastBtn" class="filter-btn-inactive" style="padding: 6px 14px; border: none; border-radius: 30px; cursor: pointer; font-weight: 600; background: #95a5a6; color: white;">📜 Historique</button>
+                </div>
                 <button id="refreshBtn" class="btn-refresh"><i class="fas fa-sync-alt"></i> Rafraîchir</button>
                 <button id="addCourseBtn" class="btn-add"><i class="fas fa-plus"></i> Ajouter un cours</button>
             </div>
@@ -621,6 +643,7 @@
         let allStudents = [];
         let allTeachers = [];
         let pendingDeleteCourseId = null;
+        let showOnlyUpcoming = true;  // true=即将上课, false=历史课程
 
         // DOM 元素
         const totalCoursesEl = document.getElementById('totalCourses');
@@ -699,102 +722,146 @@
             }
             filterType.innerHTML = typeOptions;
         }
-
-        function renderCoursesList() {
-            const container = document.getElementById('coursesList');
-            if (!container) return;
-            
-            let filtered = [...allCourses];
-            if (filterType.value) {
-                filtered = filtered.filter(c => c.course_type === filterType.value);
+        function getFilteredCourses() {
+            const now = new Date();
+            if (showOnlyUpcoming) {
+                // 即将上课：未完成 且 开始时间 > 现在
+                return allCourses.filter(c => c.status !== 'completed' && c.status !== 'cancelled' && new Date(c.start_time) > now);
+            } else {
+                // 历史课程：已完成 或 已取消
+                return allCourses.filter(c => c.status === 'completed' || c.status === 'cancelled');
             }
-            if (filterTeacher.value) {
-                filtered = filtered.filter(c => c.teacher_id === filterTeacher.value);
-            }
-            
-            if (filtered.length === 0) {
-                container.innerHTML = '<div class="empty-state">Aucun cours trouvé</div>';
-                return;
-            }
-            
-            container.innerHTML = filtered.map(c => {
-                const s = allStudents.find(x => x.id === c.student_id);
-                const t = allTeachers.find(x => x.id === c.teacher_id);
-                
-                const statusText = {
-                    'scheduled': '📅 计划',
-                    'completed': '✅ 完成',
-                    'cancelled': '❌ 取消'
-                }[c.status] || c.status;
-                
-                const statusClass = {
-                    'scheduled': 'status-scheduled',
-                    'completed': 'status-completed',
-                    'cancelled': 'status-cancelled'
-                }[c.status] || 'status-scheduled';
-                
-                const typeText = getTypeDisplayText(c.course_type);
-                const startTime = formatDateTime(c.start_time);
-                const endTime = formatDateTime(new Date(new Date(c.start_time).getTime() + (c.duration || 2) * 3600000));
-                
-                return `
-                    <div class="course-card" data-id="${c.id}">
-                        <div class="course-header">
-                            <span class="course-title">${typeText} - ${startTime} à ${endTime.split(' ')[1]}</span>
-                            <span class="status-badge ${statusClass}">${statusText}</span>
-                        </div>
-                        <div class="course-details">
-                            <div class="detail-item"><i class="fas fa-user-graduate"></i> Élève: ${escapeHtml(s?.name || 'N/A')}</div>
-                            <div class="detail-item"><i class="fas fa-chalkboard-user"></i> Intervenant: ${escapeHtml(t?.name || 'N/A')}</div>
-                            <div class="detail-item"><i class="fas fa-map-marker-alt"></i> Lieu: ${c.location || 'À définir'}</div>
-                            <div class="detail-item"><i class="fas fa-clock"></i> Durée: ${c.duration || 2} heures</div>
-                            ${c.material_link ? `<div class="detail-item"><i class="fas fa-link"></i> <a href="${c.material_link}" target="_blank">📚 Lien du cours</a></div>` : ''}
-                            ${c.meeting_link ? `<div class="detail-item"><i class="fas fa-video"></i> <a href="${c.meeting_link}" target="_blank">🎥 Lien visio</a></div>` : ''}
-                            ${c.notes ? `<div class="detail-item"><i class="fas fa-sticky-note"></i> Notes: ${escapeHtml(c.notes)}</div>` : ''}
-                        </div>
-                        <div class="course-actions">
-                            <button class="action-btn btn-edit" onclick="openEditModal('${c.id}')"><i class="fas fa-edit"></i> Modifier</button>
-                            ${c.status === 'completed' && !c.student_rating ? `<button class="action-btn btn-rate" onclick="openEvaluationModal('${c.id}')"><i class="fas fa-star"></i> Évaluer</button>` : ''}
-                            <button class="action-btn btn-delete" onclick="showDeleteConfirm('${c.id}')"><i class="fas fa-trash"></i> Supprimer</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
         }
 
-        async function loadData() {
-            try {
-                const supabase = window.supabaseAuth.getSupabaseClient();
-                if (!supabase) {
-                    showToast('Supabase 未初始化', 'error');
+
+// 初始化过滤按钮
+function initCourseFilters() {
+    const upcomingBtn = document.getElementById('showUpcomingBtn');
+    const pastBtn = document.getElementById('showPastBtn');
+    
+    if (upcomingBtn && pastBtn) {
+        upcomingBtn.onclick = () => {
+            showOnlyUpcoming = true;
+            upcomingBtn.style.background = 'var(--primary-blue)';
+            upcomingBtn.style.color = 'white';
+            pastBtn.style.background = '#95a5a6';
+            pastBtn.style.color = 'white';
+            renderCoursesList();
+        };
+        
+        pastBtn.onclick = () => {
+            showOnlyUpcoming = false;
+            pastBtn.style.background = 'var(--primary-blue)';
+            pastBtn.style.color = 'white';
+            upcomingBtn.style.background = '#95a5a6';
+            upcomingBtn.style.color = 'white';
+            renderCoursesList();
+        };
+    }
+}
+            function renderCoursesList() {
+                const container = document.getElementById('coursesList');
+                if (!container) return;
+                
+                // 先按时间和状态过滤
+                let filtered = getFilteredCourses();
+                
+                // 再按类型过滤
+                if (filterType.value) {
+                    filtered = filtered.filter(c => c.course_type === filterType.value);
+                }
+                // 再按老师过滤
+                if (filterTeacher.value) {
+                    filtered = filtered.filter(c => c.teacher_id === filterTeacher.value);
+                }
+                
+                if (filtered.length === 0) {
+                    const emptyMsg = showOnlyUpcoming ? '📭 Aucun cours à venir' : '📭 Aucun cours passé';
+                    container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
                     return;
                 }
                 
-                const [coursesRes, studentsRes, teachersRes] = await Promise.all([
-                    supabase.from('courses').select('*').order('start_time'),
-                    supabase.from('students').select('id, name').eq('role', 'stu'),
-                    supabase.from('students').select('id, name').eq('role', 'teacher')
-                ]);
-                if (coursesRes.error) throw coursesRes.error;
-                if (studentsRes.error) throw studentsRes.error;
-                if (teachersRes.error) throw teachersRes.error;
-
-                allCourses = coursesRes.data || [];
-                allStudents = studentsRes.data || [];
-                allTeachers = teachersRes.data || [];
-
-                filterTeacher.innerHTML = '<option value="">Tous les intervenants</option>' + 
-                    allTeachers.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
-                
-                updateFilterOptions();
-                updateStats();
-                renderCoursesList();
-            } catch (err) {
-                console.error(err);
-                showToast('Erreur chargement: ' + err.message, 'error');
+                container.innerHTML = filtered.map(c => {
+                    const s = allStudents.find(x => x.id === c.student_id);
+                    const t = allTeachers.find(x => x.id === c.teacher_id);
+                    
+                    const statusText = {
+                        'scheduled': '📅 计划',
+                        'completed': '✅ 完成',
+                        'cancelled': '❌ 取消'
+                    }[c.status] || c.status;
+                    
+                    const statusClass = {
+                        'scheduled': 'status-scheduled',
+                        'completed': 'status-completed',
+                        'cancelled': 'status-cancelled'
+                    }[c.status] || 'status-scheduled';
+                    
+                    const typeText = getTypeDisplayText(c.course_type);
+                    const startTime = formatDateTime(c.start_time);
+                    const endTime = formatDateTime(new Date(new Date(c.start_time).getTime() + (c.duration || 2) * 3600000));
+                    
+                    return `
+                        <div class="course-card" data-id="${c.id}">
+                            <div class="course-header">
+                                <span class="course-title">${typeText} - ${startTime} à ${endTime.split(' ')[1]}</span>
+                                <span class="status-badge ${statusClass}">${statusText}</span>
+                            </div>
+                            <div class="course-details">
+                                <div class="detail-item"><i class="fas fa-user-graduate"></i> Élève: ${escapeHtml(s?.name || 'N/A')}</div>
+                                <div class="detail-item"><i class="fas fa-chalkboard-user"></i> Intervenant: ${escapeHtml(t?.name || 'N/A')}</div>
+                                <div class="detail-item"><i class="fas fa-map-marker-alt"></i> Lieu: ${c.location || 'À définir'}</div>
+                                <div class="detail-item"><i class="fas fa-clock"></i> Durée: ${c.duration || 2} heures</div>
+                                ${c.material_link ? `<div class="detail-item"><i class="fas fa-link"></i> <a href="${c.material_link}" target="_blank">📚 Lien du cours</a></div>` : ''}
+                                ${c.meeting_link ? `<div class="detail-item"><i class="fas fa-video"></i> <a href="${c.meeting_link}" target="_blank">🎥 Lien visio</a></div>` : ''}
+                                ${c.notes ? `<div class="detail-item"><i class="fas fa-sticky-note"></i> Notes: ${escapeHtml(c.notes)}</div>` : ''}
+                            </div>
+                            <div class="course-actions">
+                                <button class="action-btn btn-edit" onclick="openEditModal('${c.id}')"><i class="fas fa-edit"></i> Modifier</button>
+                                ${c.status === 'completed' && !c.student_rating ? `<button class="action-btn btn-rate" onclick="openEvaluationModal('${c.id}')"><i class="fas fa-star"></i> Évaluer</button>` : ''}
+                                <button class="action-btn btn-delete" onclick="showDeleteConfirm('${c.id}')"><i class="fas fa-trash"></i> Supprimer</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
             }
-        }
 
+     
+async function loadData() {
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        if (!supabase) {
+            showToast('Supabase 未初始化', 'error');
+            return;
+        }
+        
+        const [coursesRes, studentsRes, teachersRes] = await Promise.all([
+            supabase.from('courses').select('*').order('start_time'),
+            supabase.from('students').select('id, name').eq('role', 'stu'),
+            supabase.from('students').select('id, name').eq('role', 'teacher')
+        ]);
+        
+        if (coursesRes.error) throw coursesRes.error;
+        if (studentsRes.error) throw studentsRes.error;
+        if (teachersRes.error) throw teachersRes.error;
+
+        allCourses = coursesRes.data || [];
+        allStudents = studentsRes.data || [];
+        allTeachers = teachersRes.data || [];
+
+        // 更新老师筛选下拉框
+        filterTeacher.innerHTML = '<option value="">Tous les intervenants</option>' + 
+            allTeachers.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+        
+        updateFilterOptions();
+        updateStats();
+        initCourseFilters();  // 初始化过滤按钮
+        renderCoursesList();
+    } catch (err) {
+        console.error(err);
+        showToast('Erreur chargement: ' + err.message, 'error');
+    }
+}
         function refreshData() {
             loadData();
         }
