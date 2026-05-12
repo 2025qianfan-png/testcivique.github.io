@@ -722,10 +722,10 @@
             }
             filterType.innerHTML = typeOptions;
         }
-        function getFilteredCourses() {
+      function getFilteredCourses() {
     const now = new Date();
     if (showOnlyUpcoming) {
-        // 即将上课：所有未完成、未取消的课程（老师可以补点开始/结束）
+        // 即将上课：所有未完成的课程（包括 in_progress、scheduled，不管时间是否已过）
         return allCourses.filter(c => c.status !== 'completed' && c.status !== 'cancelled');
     } else {
         // 历史课程：已完成 或 已取消
