@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html>getFilteredCourses 
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -492,14 +492,14 @@
             renderCoursesList();
         }
         
-        function getFilteredCourses() {
+      function getFilteredCourses() {
             const now = new Date();
             if (showOnlyUpcoming) {
-                // 即将上课：未完成 且 开始时间 > 现在
-                return myCourses.filter(c => c.status !== 'completed' && new Date(c.start_time) > now);
+                // 即将上课：所有未完成的课程（不管时间是否已过，学生可以补确认）
+                return myCourses.filter(c => c.status !== 'completed');
             } else {
-                // 历史课程：已完成 或者 已过期的
-                return myCourses.filter(c => c.status === 'completed' || new Date(c.start_time) <= now);
+                // 历史课程：已完成
+                return myCourses.filter(c => c.status === 'completed');
             }
         }
         
