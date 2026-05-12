@@ -147,6 +147,8 @@
         .action-btn:hover { transform: translateY(-2px); }
         .btn-confirm { background: var(--green); color: white; }
         .btn-rate { background: #f39c12; color: white; }
+        .filter-btn-active { background: var(--primary-blue); color: white; }
+        .filter-btn-inactive { background: #95a5a6; color: white; }
         
         .modal {
             display: none;
@@ -255,7 +257,13 @@
         </div>
         
         <div class="courses-section">
-            <div class="section-header"><h3 id="myCoursesTitle"><i class="fas fa-calendar-day"></i> Mes cours</h3></div>
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <h3 id="myCoursesTitle"><i class="fas fa-calendar-day"></i> Mes cours</h3>
+                <div style="display: flex; gap: 10px;">
+                    <button id="showUpcomingBtn" class="filter-btn-active" style="padding: 6px 14px; border: none; border-radius: 30px; cursor: pointer; font-weight: 600;">📅 À venir</button>
+                    <button id="showPastBtn" class="filter-btn-inactive" style="padding: 6px 14px; border: none; border-radius: 30px; cursor: pointer; font-weight: 600;">📜 Historique</button>
+                </div>
+            </div>
             <div id="coursesList"><div class="empty-state" id="emptyCoursesMsg">Chargement...</div></div>
         </div>
     </main>
@@ -323,7 +331,8 @@
                 statRatingLabel: "Note moyenne",
                 statTeacherLabel: "Intervenants",
                 myCoursesTitle: "Mes cours",
-                emptyCourses: "Aucun cours",
+                emptyCoursesUpcoming: "📭 Aucun cours à venir",
+                emptyCoursesPast: "📭 Aucun cours passé",
                 ratingTitle: "Évaluer le cours",
                 ratingLabel: "Note (1 à 5)",
                 commentLabel: "Commentaire",
@@ -351,7 +360,8 @@
                 statRatingLabel: "平均评分",
                 statTeacherLabel: "老师人数",
                 myCoursesTitle: "我的课程",
-                emptyCourses: "暂无课程",
+                emptyCoursesUpcoming: "📭 暂无即将开始的课程",
+                emptyCoursesPast: "📭 暂无历史课程",
                 ratingTitle: "评价课程",
                 ratingLabel: "评分 (1到5)",
                 commentLabel: "评论",
@@ -374,6 +384,7 @@
         };
         
         let currentLang = 'fr';
+        let showOnlyUpcoming = true;  // true=即将上课, false=历史课程
         
         function updateUIText() {
             const t = translations[currentLang];
@@ -404,7 +415,6 @@
         // ========== 全局变量 ==========
         let currentStudent = null;
         let myCourses = [];
-        let teachers = [];
         
         function getTypeText(t) {
             const types = {
@@ -453,14 +463,14 @@
         async function loadMyCourses() {
             const supabase = window.supabaseAuth.getSupabaseClient();
             const { data } = await supabase
-            .from('courses')
-            .select(`
-                *,
-                teachers:teacher_id(id, name)
-            `)
-            .eq('student_id', currentStudent.userId)
-    .order('start_time', { ascending: true });
-
+                .from('courses')
+                .select(`
+                    *,
+                    teachers:teacher_id(id, name)
+                `)
+                .eq('student_id', currentStudent.userId)
+                .order('start_time', { ascending: true });
+            
             myCourses = data || [];
             
             // 统计老师数量
@@ -469,7 +479,6 @@
                 .from('students')
                 .select('id, name')
                 .in('id', teacherIds);
-            teachers = teacherData || [];
             
             const toCome = myCourses.filter(c => c.status !== 'completed' && new Date(c.start_time) > new Date()).length;
             const completed = myCourses.filter(c => c.status === 'completed' || c.student_rating).length;
@@ -479,17 +488,35 @@
             document.getElementById('bookedCount').textContent = toCome;
             document.getElementById('completedCount').textContent = completed;
             document.getElementById('avgRating').textContent = avg;
-            document.getElementById('teacherCount').textContent = teachers.length;
+            document.getElementById('teacherCount').textContent = teacherData?.length || 0;
             renderCoursesList();
+        }
+        
+        function getFilteredCourses() {
+            const now = new Date();
+            if (showOnlyUpcoming) {
+                // 即将上课：未完成 且 开始时间 > 现在
+                return myCourses.filter(c => c.status !== 'completed' && new Date(c.start_time) > now);
+            } else {
+                // 历史课程：已完成 或者 已过期的
+                return myCourses.filter(c => c.status === 'completed' || new Date(c.start_time) <= now);
+            }
         }
         
         function renderCoursesList() {
             const container = document.getElementById('coursesList');
             const t = translations[currentLang];
             if (!container) return;
-            if (myCourses.length === 0) { container.innerHTML = `<div class="empty-state">${t.emptyCourses}</div>`; return; }
             
-            container.innerHTML = myCourses.map(c => {
+            const filteredCourses = getFilteredCourses();
+            
+            if (filteredCourses.length === 0) { 
+                const emptyMsg = showOnlyUpcoming ? t.emptyCoursesUpcoming : t.emptyCoursesPast;
+                container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`; 
+                return; 
+            }
+            
+            container.innerHTML = filteredCourses.map(c => {
                 const teacher = c.teachers;
                 const endTime = calculateEndTime(c.start_time, c.duration || 2);
                 const timeDisplay = `${formatDateTime(c.start_time)} - ${endTime.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}`;
@@ -651,6 +678,29 @@
             document.getElementById('langZhBtn').onclick = () => switchLanguage('zh');
         }
         
+        function initFilters() {
+            const upcomingBtn = document.getElementById('showUpcomingBtn');
+            const pastBtn = document.getElementById('showPastBtn');
+            
+            upcomingBtn.onclick = () => {
+                showOnlyUpcoming = true;
+                upcomingBtn.className = 'filter-btn-active';
+                upcomingBtn.style.background = 'var(--primary-blue)';
+                pastBtn.className = 'filter-btn-inactive';
+                pastBtn.style.background = '#95a5a6';
+                renderCoursesList();
+            };
+            
+            pastBtn.onclick = () => {
+                showOnlyUpcoming = false;
+                pastBtn.className = 'filter-btn-active';
+                pastBtn.style.background = 'var(--primary-blue)';
+                upcomingBtn.className = 'filter-btn-inactive';
+                upcomingBtn.style.background = '#95a5a6';
+                renderCoursesList();
+            };
+        }
+        
         async function init() {
             currentStudent = await getStudentFromToken();
             if (!currentStudent) return;
@@ -661,6 +711,7 @@
             };
             updateUIText();
             initModals();
+            initFilters();
             await loadMyCourses();
         }
         

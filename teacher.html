@@ -75,8 +75,31 @@
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid var(--primary-yellow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .section-header h3 { font-size: 1.2rem; }
+        .filter-btn-active {
+            background: var(--primary-blue);
+            color: white;
+            padding: 6px 14px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .filter-btn-inactive {
+            background: #95a5a6;
+            color: white;
+            padding: 6px 14px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+        }
         
         .course-card {
             border: 1px solid #eee;
@@ -246,7 +269,13 @@
         </div>
         
         <div class="courses-section">
-            <div class="section-header"><h3><i class="fas fa-calendar-day"></i> Mes cours programmés</h3></div>
+            <div class="section-header">
+                <h3><i class="fas fa-calendar-day"></i> Mes cours programmés</h3>
+                <div style="display: flex; gap: 10px;">
+                    <button id="showUpcomingBtn" class="filter-btn-active">📅 À venir</button>
+                    <button id="showPastBtn" class="filter-btn-inactive">📜 Terminés</button>
+                </div>
+            </div>
             <div id="coursesList"><div class="empty-state">Chargement...</div></div>
         </div>
     </main>
@@ -309,6 +338,7 @@
         // ========== 全局变量 ==========
         let currentTeacher = null;
         let allCourses = [];
+        let showOnlyUpcoming = true;  // true=即将上课, false=历史课程
         
         // ========== 获取用户信息 ==========
         function getTeacherFromToken() {
@@ -322,6 +352,18 @@
             } catch(e) { window.location.href = 'index.html'; return null; }
         }
         
+        // ========== 获取过滤后的课程 ==========
+        function getFilteredCourses() {
+            const now = new Date();
+            if (showOnlyUpcoming) {
+                // 即将上课：未完成 且 开始时间 > 现在
+                return allCourses.filter(c => c.status !== 'completed' && c.status !== 'cancelled' && new Date(c.start_time) > now);
+            } else {
+                // 历史课程：已完成
+                return allCourses.filter(c => c.status === 'completed');
+            }
+        }
+        
         // ========== 加载课程 ==========
         async function loadCourses() {
             const supabase = window.supabaseAuth.getSupabaseClient();
@@ -332,7 +374,7 @@
                     students:student_id(id, name)
                 `)
                 .eq('teacher_id', currentTeacher.userId)
-    .order('start_time', { ascending: true });
+                .order('start_time', { ascending: true });
             allCourses = data || [];
             
             const now = new Date();
@@ -405,12 +447,16 @@
         function renderCoursesList() {
             const container = document.getElementById('coursesList');
             if (!container) return;
-            if (allCourses.length === 0) { 
-                container.innerHTML = '<div class="empty-state">📭 Aucun cours programmé pour le moment</div>'; 
+            
+            const filteredCourses = getFilteredCourses();
+            
+            if (filteredCourses.length === 0) { 
+                const emptyMsg = showOnlyUpcoming ? '📭 Aucun cours à venir' : '📭 Aucun cours terminé';
+                container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`; 
                 return; 
             }
             
-            container.innerHTML = allCourses.map(c => {
+            container.innerHTML = filteredCourses.map(c => {
                 const now = new Date();
                 const courseStart = new Date(c.start_time);
                 const courseEnd = calculateEndTime(c.start_time, c.duration || 2);
@@ -456,7 +502,7 @@
                             ${!c.teacher_started && c.status !== 'completed' && courseStart <= now ? `<button class="action-btn btn-start" onclick="startCourse('${c.id}')"><i class="fas fa-play"></i> ▶️ Démarrer</button>` : ''}
                             ${!c.teacher_started && c.status !== 'completed' && courseStart > now ? `<button class="action-btn btn-start" onclick="startCourse('${c.id}')"><i class="fas fa-play"></i> 🚀 Démarrer (anticipé)</button>` : ''}
                             ${c.teacher_started && !c.student_confirmed && isNow ? `<span class="action-btn" style="background:#f39c12; color:white; cursor:default;"><i class="fas fa-hourglass-half"></i> ⏳ Attente confirmation élève</span>` : ''}
-                           ${c.teacher_started && c.student_confirmed && c.status !== 'completed' ? `<button class="action-btn btn-end" onclick="endCourse('${c.id}')"><i class="fas fa-stop"></i> ⏹️ Terminer</button>` : ''}
+                            ${c.teacher_started && c.student_confirmed && c.status !== 'completed' ? `<button class="action-btn btn-end" onclick="endCourse('${c.id}')"><i class="fas fa-stop"></i> ⏹️ Terminer</button>` : ''}
                             ${c.status !== 'completed' ? `<button class="action-btn btn-material" onclick="openMaterialModal('${c.id}','${escapeHtml(c.material_link||'')}','${escapeHtml(c.teacher_comment||'')}')"><i class="fas fa-paperclip"></i> 📎 Support / Commentaire</button>` : ''}
                             ${c.status === 'completed' && !c.teacher_comment ? `<button class="action-btn btn-material" onclick="openMaterialModal('${c.id}','${escapeHtml(c.material_link||'')}','${escapeHtml(c.teacher_comment||'')}')"><i class="fas fa-comment"></i> 💬 Ajouter commentaire</button>` : ''}
                         </div>
@@ -549,7 +595,7 @@
             setTimeout(() => t.remove(), 3000); 
         }
         
-        // ========== 初始化模态框 ==========
+        // ========== 初始化模态框和过滤器 ==========
         function initModals() {
             document.getElementById('closeEditModalBtn').onclick = () => document.getElementById('editCourseModal').style.display = 'none';
             document.getElementById('cancelEditBtn').onclick = () => document.getElementById('editCourseModal').style.display = 'none';
@@ -564,6 +610,25 @@
             };
         }
         
+        function initFilters() {
+            const upcomingBtn = document.getElementById('showUpcomingBtn');
+            const pastBtn = document.getElementById('showPastBtn');
+            
+            upcomingBtn.onclick = () => {
+                showOnlyUpcoming = true;
+                upcomingBtn.className = 'filter-btn-active';
+                pastBtn.className = 'filter-btn-inactive';
+                renderCoursesList();
+            };
+            
+            pastBtn.onclick = () => {
+                showOnlyUpcoming = false;
+                pastBtn.className = 'filter-btn-active';
+                upcomingBtn.className = 'filter-btn-inactive';
+                renderCoursesList();
+            };
+        }
+        
         // ========== 初始化 ==========
         async function init() {
             currentTeacher = getTeacherFromToken();
@@ -571,6 +636,7 @@
             document.getElementById('teacherName').textContent = currentTeacher.name;
             document.getElementById('logoutBtn').onclick = () => window.location.href = 'index.html';
             initModals();
+            initFilters();
             await loadCourses();
         }
         
