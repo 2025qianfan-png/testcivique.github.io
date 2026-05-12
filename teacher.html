@@ -327,9 +327,12 @@
             const supabase = window.supabaseAuth.getSupabaseClient();
             const { data } = await supabase
                 .from('courses')
-                .select('*, students!courses_student_id_fkey(id, name)')
+                .select(`
+                    *,
+                    students:student_id(id, name)
+                `)
                 .eq('teacher_id', currentTeacher.userId)
-                .order('start_time', { ascending: true });
+    .order('start_time', { ascending: true });
             allCourses = data || [];
             
             const now = new Date();
@@ -453,7 +456,7 @@
                             ${!c.teacher_started && c.status !== 'completed' && courseStart <= now ? `<button class="action-btn btn-start" onclick="startCourse('${c.id}')"><i class="fas fa-play"></i> ▶️ Démarrer</button>` : ''}
                             ${!c.teacher_started && c.status !== 'completed' && courseStart > now ? `<button class="action-btn btn-start" onclick="startCourse('${c.id}')"><i class="fas fa-play"></i> 🚀 Démarrer (anticipé)</button>` : ''}
                             ${c.teacher_started && !c.student_confirmed && isNow ? `<span class="action-btn" style="background:#f39c12; color:white; cursor:default;"><i class="fas fa-hourglass-half"></i> ⏳ Attente confirmation élève</span>` : ''}
-                            ${c.teacher_started && c.student_confirmed && c.status !== 'completed' && isNow ? `<button class="action-btn btn-end" onclick="endCourse('${c.id}')"><i class="fas fa-stop"></i> ⏹️ Terminer</button>` : ''}
+                           ${c.teacher_started && c.student_confirmed && c.status !== 'completed' ? `<button class="action-btn btn-end" onclick="endCourse('${c.id}')"><i class="fas fa-stop"></i> ⏹️ Terminer</button>` : ''}
                             ${c.status !== 'completed' ? `<button class="action-btn btn-material" onclick="openMaterialModal('${c.id}','${escapeHtml(c.material_link||'')}','${escapeHtml(c.teacher_comment||'')}')"><i class="fas fa-paperclip"></i> 📎 Support / Commentaire</button>` : ''}
                             ${c.status === 'completed' && !c.teacher_comment ? `<button class="action-btn btn-material" onclick="openMaterialModal('${c.id}','${escapeHtml(c.material_link||'')}','${escapeHtml(c.teacher_comment||'')}')"><i class="fas fa-comment"></i> 💬 Ajouter commentaire</button>` : ''}
                         </div>

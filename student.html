@@ -453,10 +453,14 @@
         async function loadMyCourses() {
             const supabase = window.supabaseAuth.getSupabaseClient();
             const { data } = await supabase
-                .from('courses')
-                .select('*, students!teacher_id(name)')
-                .eq('student_id', currentStudent.userId)
-                .order('start_time', { ascending: true });
+            .from('courses')
+            .select(`
+                *,
+                teachers:teacher_id(id, name)
+            `)
+            .eq('student_id', currentStudent.userId)
+    .order('start_time', { ascending: true });
+
             myCourses = data || [];
             
             // 统计老师数量
@@ -486,7 +490,7 @@
             if (myCourses.length === 0) { container.innerHTML = `<div class="empty-state">${t.emptyCourses}</div>`; return; }
             
             container.innerHTML = myCourses.map(c => {
-                const teacher = teachers.find(t => t.id === c.teacher_id);
+                const teacher = c.teachers;
                 const endTime = calculateEndTime(c.start_time, c.duration || 2);
                 const timeDisplay = `${formatDateTime(c.start_time)} - ${endTime.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}`;
                 
