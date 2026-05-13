@@ -344,7 +344,6 @@ function renderUsersTable() {
             roleText = '';
         }
         
-        // 注意：删除了 ID 列
         row.innerHTML = `
             <td><strong>${escapeHtml(user.name)}</strong></td>
             <td><span class="user-type ${typeClass}">${typeText}</span></td>
@@ -368,7 +367,35 @@ function renderUsersTable() {
         usersTableBody.appendChild(row);
     });
     
-    // ... 后面的事件监听器代码保持不变
+    // ========== 添加事件监听器 ==========
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const userId = this.dataset.id;
+            openEditUserModal(userId);
+        });
+    });
+    
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        if (!btn.disabled) {
+            btn.addEventListener('click', function() {
+                const userId = this.dataset.id;
+                showDeleteConfirmation(userId);
+            });
+        }
+    });
+    
+    document.querySelectorAll('.copy-password-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const password = this.dataset.password;
+            if (!password) return;
+            navigator.clipboard.writeText(password).then(() => {
+                showToast('Mot de passe copié!', 'success');
+            }).catch(() => {
+                showToast('Erreur lors de la copie', 'error');
+            });
+        });
+    });
 }
 // ==============================
 // 统计功能
