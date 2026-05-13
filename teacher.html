@@ -782,34 +782,63 @@ body {
             await loadCourses();
         }
         
-        async function startCourse(id) {
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            const { error } = await supabase
-                .from('courses')
-                .update({ 
-                    teacher_started: true, 
-                    actual_start: new Date().toISOString(), 
-                    status: 'in_progress' 
-                })
-                .eq('id', id);
-            if (error) { showToast('Erreur lors du démarrage', 'error'); return; }
-            showToast('Cours démarré ! En attente de la confirmation de l\'élève ✓', 'success');
-            await loadCourses();
-        }
-        
+       async function startCourse(id) {
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    
+    // 使用本地时间，格式与 start_time 一致
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const localTimeStr = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    
+    const { error } = await supabase
+        .from('courses')
+        .update({ 
+            teacher_started: true, 
+            actual_start: localTimeStr,
+            status: 'in_progress' 
+        })
+        .eq('id', id);
+    if (error) { 
+        console.error('开始课程错误:', error);
+        showToast('Erreur lors du démarrage', 'error'); 
+        return; 
+    }
+    showToast('Cours démarré ! En attente de la confirmation de l\'élève ✓', 'success');
+    await loadCourses();
+}
         async function endCourse(id) {
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            const { error } = await supabase
-                .from('courses')
-                .update({ 
-                    actual_end: new Date().toISOString(), 
-                    status: 'completed' 
-                })
-                .eq('id', id);
-            if (error) { showToast('Erreur', 'error'); return; }
-            showToast('Cours terminé ! Vous pouvez maintenant ajouter un commentaire ✓', 'success');
-            await loadCourses();
-        }
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    
+    // 使用本地时间
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const localTimeStr = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    
+    const { error } = await supabase
+        .from('courses')
+        .update({ 
+            actual_end: localTimeStr, 
+            status: 'completed' 
+        })
+        .eq('id', id);
+    if (error) { 
+        console.error('结束课程错误:', error);
+        showToast('Erreur', 'error'); 
+        return; 
+    }
+    showToast('Cours terminé ! Vous pouvez maintenant ajouter un commentaire ✓', 'success');
+    await loadCourses();
+}
         
         function openMaterialModal(courseId, materialLink, teacherComment) {
             document.getElementById('materialCourseId').value = courseId;
