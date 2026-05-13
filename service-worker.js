@@ -1,4 +1,4 @@
-const CACHE_NAME = 'civique-exam-v1.43';
+const CACHE_NAME = 'civique-exam-v1.44';
 const urlsToCache = [
   '/',
   '/index.html',
