@@ -13,9 +13,28 @@ if (typeof window.supabaseAuth === 'undefined') {
 // ==============================
 // Token 解析函数
 // ==============================
-function parseTokenFromUrl() {
+// ========== Token 解析函数（支持 URL 参数和 sessionStorage）==========
+function getAdminToken() {
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
+    let token = urlParams.get('token');
+    
+    if (token) {
+        sessionStorage.setItem('adminToken', token);
+        return token;
+    }
+    
+    token = sessionStorage.getItem('adminToken');
+    if (token) {
+        const newUrl = window.location.pathname + '?token=' + token;
+        window.history.replaceState({}, '', newUrl);
+        return token;
+    }
+    
+    return null;
+}
+
+function parseTokenFromUrl() {
+    const token = getAdminToken();
     if (!token) {
         console.error('没有找到 token');
         return null;
@@ -143,9 +162,11 @@ document.addEventListener('DOMContentLoaded', function() {
 // ==============================
 function initEventListeners() {
     // 登出按钮 - 跳转到首页
-    logoutBtn.addEventListener('click', function() {
-        window.location.href = 'index.html';
-    });
+  logoutBtn.addEventListener('click', function() {
+    sessionStorage.removeItem('adminToken');
+    sessionStorage.removeItem('adminUser');
+    window.location.href = 'index.html';
+});
     
     // 搜索功能
     searchBtn.addEventListener('click', handleSearch);
