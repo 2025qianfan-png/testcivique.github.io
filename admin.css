@@ -1170,3 +1170,194 @@
     ::-webkit-scrollbar-thumb:hover {
         background: var(--primary-light-blue);
     }
+/* ==================== 移动端优化 ==================== */
+
+/* 手机端 (小于 768px) */
+@media (max-width: 768px) {
+    /* 统计卡片内边距减小 */
+    .stat-card {
+        padding: 15px;
+    }
+    
+    .stat-card .stat-icon {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+    }
+    
+    .stat-card .stat-number {
+        font-size: 1.3rem;
+    }
+    
+    .stat-card .stat-label {
+        font-size: 0.7rem;
+    }
+    
+    /* 课程管理卡片优化 */
+    .course-card {
+        padding: 15px 20px;
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .course-card h3 {
+        font-size: 1.1rem;
+    }
+    
+    .course-card p {
+        font-size: 0.75rem;
+    }
+    
+    .course-btn {
+        padding: 8px 20px;
+        font-size: 0.85rem;
+    }
+    
+    /* 用户表格容器 - 允许横向滚动 */
+    .users-table-container {
+        padding: 15px;
+    }
+    
+    .section-header h2 {
+        font-size: 1.3rem;
+    }
+    
+    .section-header p {
+        font-size: 0.8rem;
+    }
+    
+    /* 搜索框优化 */
+    .search-box input {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+    
+    .search-btn {
+        padding: 10px 20px;
+        font-size: 0.85rem;
+    }
+    
+    /* 筛选按钮优化 */
+    .filters {
+        gap: 8px;
+    }
+    
+    .filter-btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+    
+    /* 表格单元格优化 */
+    .users-table th,
+    .users-table td {
+        padding: 10px 8px;
+        font-size: 0.75rem;
+    }
+    
+    /* 操作按钮优化 */
+    .action-buttons {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .action-btn {
+        padding: 5px 10px;
+        font-size: 0.7rem;
+        justify-content: center;
+    }
+    
+    /* 课时列样式 */
+    .credit-cell {
+        font-size: 0.8rem;
+    }
+    
+    /* 密码列优化 */
+    .users-table td:nth-child(7) {
+        max-width: 100px;
+    }
+    
+    .users-table td:nth-child(7) div {
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+    
+    .copy-password-btn {
+        padding: 3px 6px;
+    }
+}
+
+/* 超小手机 (小于 480px) */
+@media (max-width: 480px) {
+    /* 统计卡片变成 2 列 */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .stat-card {
+        padding: 12px;
+    }
+    
+    .stat-card .stat-icon {
+        font-size: 1.2rem;
+    }
+    
+    .stat-card .stat-number {
+        font-size: 1.1rem;
+    }
+    
+    .stat-card .stat-label {
+        font-size: 0.65rem;
+    }
+    
+    /* 表格字体更小 */
+    .users-table th,
+    .users-table td {
+        padding: 6px 4px;
+        font-size: 0.65rem;
+    }
+    
+    /* 隐藏不太重要的列（可选：隐藏创建日期） */
+    .users-table th:nth-child(4),
+    .users-table td:nth-child(4) {
+        display: none;
+    }
+    
+    /* 操作按钮文字隐藏，只显示图标 */
+    .action-btn span {
+        display: none;
+    }
+    
+    .action-btn i {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+    
+    .action-btn {
+        padding: 6px 8px;
+    }
+    
+    /* 密码列优化 */
+    .users-table td:nth-child(6) span {
+        max-width: 60px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+/* 小屏平板 (768px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .users-table th,
+    .users-table td {
+        padding: 12px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .action-btn span {
+        display: inline;
+    }
+}
