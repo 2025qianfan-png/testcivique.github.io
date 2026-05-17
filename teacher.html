@@ -630,73 +630,104 @@ body {
             document.getElementById('cancelCourseModal').style.display = 'flex';
         }
         
-        function initCancelModalEvents() {
-            // 点击选项
-            document.querySelectorAll('.cancel-reason-option').forEach(option => {
-                option.addEventListener('click', () => {
-                    const radio = option.querySelector('input[type="radio"]');
-                    radio.checked = true;
-                    document.querySelectorAll('.cancel-reason-option').forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
-                    
-                    if (option.dataset.reason === 'other') {
-                        document.getElementById('customReasonContainer').classList.add('show');
-                    } else {
-                        document.getElementById('customReasonContainer').classList.remove('show');
-                    }
-                });
-            });
+       function initCancelModalEvents() {
+    // 点击选项
+    document.querySelectorAll('.cancel-reason-option').forEach(option => {
+        option.addEventListener('click', () => {
+            const radio = option.querySelector('input[type="radio"]');
+            radio.checked = true;
+            document.querySelectorAll('.cancel-reason-option').forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
             
-            document.getElementById('confirmCancelBtn').onclick = async () => {
-                let selectedReason = null;
-                document.querySelectorAll('input[name="cancelReason"]').forEach(r => {
-                    if (r.checked) selectedReason = r.value;
-                });
-                
-                if (selectedReason === '其他') {
-                    const customReason = document.getElementById('customReason').value.trim();
-                    if (customReason) selectedReason = customReason;
-                }
-                
-                if (!selectedReason) {
-                    showToast('Veuillez sélectionner un motif d\'annulation', 'error');
-                    return;
-                }
-                
-                const supabase = window.supabaseAuth.getSupabaseClient();
-                const { error } = await supabase
-                    .from('courses')
-                    .update({ 
-                        status: 'cancelled',
-                        cancel_reason: selectedReason
-                    })
-                    .eq('id', pendingCancelCourse.courseId);
-                
-                if (error) {
-                    showToast('Erreur lors de l\'annulation', 'error');
-                } else {
-                    showToast('Cours annulé ✓', 'success');
-                    document.getElementById('cancelCourseModal').style.display = 'none';
-                    await loadCourses();
-                }
-                pendingCancelCourse = null;
-            };
-            
-            document.getElementById('closeCancelModalBtn').onclick = () => {
-                document.getElementById('cancelCourseModal').style.display = 'none';
-                pendingCancelCourse = null;
-            };
-            document.getElementById('cancelCancelBtn').onclick = () => {
-                document.getElementById('cancelCourseModal').style.display = 'none';
-                pendingCancelCourse = null;
-            };
-            document.getElementById('cancelCourseModal').onclick = (e) => {
-                if (e.target === document.getElementById('cancelCourseModal')) {
-                    document.getElementById('cancelCourseModal').style.display = 'none';
-                    pendingCancelCourse = null;
-                }
-            };
+            if (option.dataset.reason === 'other') {
+                document.getElementById('customReasonContainer').classList.add('show');
+            } else {
+                document.getElementById('customReasonContainer').classList.remove('show');
+            }
+        });
+    });
+    
+    document.getElementById('confirmCancelBtn').onclick = async () => {
+        let selectedReason = null;
+        document.querySelectorAll('input[name="cancelReason"]').forEach(r => {
+            if (r.checked) selectedReason = r.value;
+        });
+        
+        if (selectedReason === '其他') {
+            const customReason = document.getElementById('customReason').value.trim();
+            if (customReason) selectedReason = customReason;
         }
+        
+        if (!selectedReason) {
+            showToast('Veuillez sélectionner un motif d\'annulation', 'error');
+            return;
+        }
+        
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        
+        // 1. 获取课程信息（用于返还课时）
+        const { data: courseData } = await supabase
+            .from('courses')
+            .select('student_id, duration, status')
+            .eq('id', pendingCancelCourse.courseId)
+            .single();
+        
+        if (courseData) {
+            // 2. 如果课程是消耗课时的状态（scheduled/in_progress/completed），返还课时
+            const isConsumingStatus = courseData.status === 'scheduled' || courseData.status === 'in_progress' || courseData.status === 'completed';
+            if (isConsumingStatus && courseData.student_id && courseData.duration) {
+                // 获取学生当前课时
+                const { data: studentData } = await supabase
+                    .from('students')
+                    .select('credit')
+                    .eq('id', courseData.student_id)
+                    .single();
+                
+                if (studentData) {
+                    const newCredit = (studentData.credit || 0) + courseData.duration;
+                    await supabase
+                        .from('students')
+                        .update({ credit: newCredit })
+                        .eq('id', courseData.student_id);
+                    console.log(`课时已返还: +${courseData.duration}小时，学生新课时: ${newCredit}`);
+                }
+            }
+        }
+        
+        // 3. 更新课程状态为 cancelled，记录取消原因
+        const { error } = await supabase
+            .from('courses')
+            .update({ 
+                status: 'cancelled',
+                cancel_reason: selectedReason
+            })
+            .eq('id', pendingCancelCourse.courseId);
+        
+        if (error) {
+            showToast('Erreur lors de l\'annulation', 'error');
+        } else {
+            showToast('Cours annulé ✓ (crédits restitués)', 'success');
+            document.getElementById('cancelCourseModal').style.display = 'none';
+            await loadCourses();
+        }
+        pendingCancelCourse = null;
+    };
+    
+    document.getElementById('closeCancelModalBtn').onclick = () => {
+        document.getElementById('cancelCourseModal').style.display = 'none';
+        pendingCancelCourse = null;
+    };
+    document.getElementById('cancelCancelBtn').onclick = () => {
+        document.getElementById('cancelCourseModal').style.display = 'none';
+        pendingCancelCourse = null;
+    };
+    document.getElementById('cancelCourseModal').onclick = (e) => {
+        if (e.target === document.getElementById('cancelCourseModal')) {
+            document.getElementById('cancelCourseModal').style.display = 'none';
+            pendingCancelCourse = null;
+        }
+    };
+}
         
         // ========== 渲染课程列表 ==========
         function renderCoursesList() {
