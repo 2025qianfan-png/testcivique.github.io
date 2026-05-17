@@ -34,14 +34,9 @@ body {
     padding: 0 20px;
     width: 100%;
 }
-
-/* 响应式断点 */
 @media (max-width: 768px) {
-    .container {
-        padding: 0 15px;
-    }
+    .container { padding: 0 15px; }
 }
-
 .header {
     background: linear-gradient(135deg, var(--primary-blue), var(--primary-light-blue));
     color: white;
@@ -54,15 +49,8 @@ body {
     flex-wrap: wrap;
     gap: 15px;
 }
-.header h1 {
-    color: white;
-    font-size: 1.5rem;
-}
-@media (max-width: 768px) {
-    .header h1 {
-        font-size: 1.2rem;
-    }
-}
+.header h1 { color: white; font-size: 1.5rem; }
+@media (max-width: 768px) { .header h1 { font-size: 1.2rem; } }
 .user-info {
     display: flex;
     align-items: center;
@@ -72,11 +60,7 @@ body {
     border-radius: 30px;
 }
 @media (max-width: 480px) {
-    .user-info {
-        padding: 6px 12px;
-        gap: 8px;
-        font-size: 0.85rem;
-    }
+    .user-info { padding: 6px 12px; gap: 8px; font-size: 0.85rem; }
 }
 .logout-btn {
     background: var(--red);
@@ -87,10 +71,7 @@ body {
     cursor: pointer;
     transition: all 0.2s;
 }
-.logout-btn:hover {
-    background: #c0392b;
-    transform: translateY(-2px);
-}
+.logout-btn:hover { background: #c0392b; transform: translateY(-2px); }
 
 .stats-grid {
     display: grid;
@@ -99,16 +80,9 @@ body {
     margin: 30px 0;
 }
 @media (max-width: 768px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-    }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
 }
-@media (max-width: 480px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-}
+@media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } }
 .stat-card {
     background: white;
     border-radius: var(--border-radius);
@@ -117,29 +91,11 @@ body {
     box-shadow: var(--shadow);
     transition: all 0.3s;
 }
-.stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
-}
-.stat-card .stat-icon {
-    font-size: 2rem;
-    color: var(--primary-blue);
-    margin-bottom: 10px;
-}
-.stat-card .stat-number {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--primary-blue);
-}
-@media (max-width: 480px) {
-    .stat-card .stat-number {
-        font-size: 1.5rem;
-    }
-}
-.stat-card .stat-label {
-    font-size: 0.8rem;
-    color: #666;
-}
+.stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+.stat-card .stat-icon { font-size: 2rem; color: var(--primary-blue); margin-bottom: 10px; }
+.stat-card .stat-number { font-size: 2rem; font-weight: 700; color: var(--primary-blue); }
+@media (max-width: 480px) { .stat-card .stat-number { font-size: 1.5rem; } }
+.stat-card .stat-label { font-size: 0.8rem; color: #666; }
 
 .courses-section {
     background: white;
@@ -147,11 +103,7 @@ body {
     padding: 20px;
     box-shadow: var(--shadow);
 }
-@media (max-width: 768px) {
-    .courses-section {
-        padding: 15px;
-    }
-}
+@media (max-width: 768px) { .courses-section { padding: 15px; } }
 .section-header {
     margin-bottom: 20px;
     padding-bottom: 10px;
@@ -162,14 +114,8 @@ body {
     flex-wrap: wrap;
     gap: 10px;
 }
-.section-header h3 {
-    font-size: 1.2rem;
-}
-@media (max-width: 480px) {
-    .section-header h3 {
-        font-size: 1rem;
-    }
-}
+.section-header h3 { font-size: 1.2rem; }
+@media (max-width: 480px) { .section-header h3 { font-size: 1rem; } }
 .filter-btn-active {
     background: var(--primary-blue);
     color: white;
@@ -189,10 +135,7 @@ body {
     font-weight: 600;
 }
 @media (max-width: 480px) {
-    .filter-btn-active, .filter-btn-inactive {
-        padding: 4px 10px;
-        font-size: 0.75rem;
-    }
+    .filter-btn-active, .filter-btn-inactive { padding: 4px 10px; font-size: 0.75rem; }
 }
 
 .course-card {
@@ -202,15 +145,8 @@ body {
     margin-bottom: 15px;
     transition: all 0.3s;
 }
-.course-card:hover {
-    box-shadow: var(--shadow);
-    transform: translateX(5px);
-}
-@media (max-width: 768px) {
-    .course-card {
-        padding: 15px;
-    }
-}
+.course-card:hover { box-shadow: var(--shadow); transform: translateX(5px); }
+@media (max-width: 768px) { .course-card { padding: 15px; } }
 .course-header {
     display: flex;
     justify-content: space-between;
@@ -219,16 +155,8 @@ body {
     gap: 10px;
     margin-bottom: 15px;
 }
-.course-title {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--primary-blue);
-}
-@media (max-width: 480px) {
-    .course-title {
-        font-size: 0.9rem;
-    }
-}
+.course-title { font-weight: 700; font-size: 1.1rem; color: var(--primary-blue); }
+@media (max-width: 480px) { .course-title { font-size: 0.9rem; } }
 .status-badge {
     padding: 4px 12px;
     border-radius: 20px;
@@ -240,6 +168,7 @@ body {
 .status-in-progress { background: rgba(46,204,113,0.1); color: #2ecc71; }
 .status-completed { background: rgba(46,204,113,0.1); color: #2ecc71; }
 .status-cancelled { background: rgba(149,165,166,0.2); color: #7f8c8d; }
+
 .course-details {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -250,10 +179,7 @@ body {
     border-radius: 8px;
 }
 @media (max-width: 480px) {
-    .course-details {
-        grid-template-columns: 1fr;
-        gap: 8px;
-    }
+    .course-details { grid-template-columns: 1fr; gap: 8px; }
 }
 .detail-item {
     display: flex;
@@ -262,18 +188,9 @@ body {
     font-size: 0.85rem;
     flex-wrap: wrap;
 }
-.detail-item i {
-    width: 20px;
-    color: var(--primary-blue);
-}
-.detail-item a {
-    color: var(--primary-blue);
-    text-decoration: none;
-    word-break: break-all;
-}
-.detail-item a:hover {
-    text-decoration: underline;
-}
+.detail-item i { width: 20px; color: var(--primary-blue); }
+.detail-item a { color: var(--primary-blue); text-decoration: none; word-break: break-all; }
+.detail-item a:hover { text-decoration: underline; }
 
 .course-actions {
     display: flex;
@@ -282,13 +199,8 @@ body {
     margin-top: 15px;
 }
 @media (max-width: 480px) {
-    .course-actions {
-        gap: 8px;
-    }
-    .action-btn {
-        padding: 6px 12px;
-        font-size: 0.75rem;
-    }
+    .course-actions { gap: 8px; }
+    .action-btn { padding: 6px 12px; font-size: 0.75rem; }
 }
 .action-btn {
     padding: 8px 16px;
@@ -301,14 +213,12 @@ body {
     gap: 6px;
     transition: all 0.2s;
 }
-.action-btn:hover {
-    transform: translateY(-2px);
-    filter: brightness(0.95);
-}
+.action-btn:hover { transform: translateY(-2px); filter: brightness(0.95); }
 .btn-start { background: var(--green); color: white; }
 .btn-end { background: var(--red); color: white; }
 .btn-edit { background: #3498db; color: white; }
 .btn-material { background: #9b59b6; color: white; }
+.btn-cancel { background: #7f8c8d; color: white; }
 
 .modal {
     display: none;
@@ -334,11 +244,7 @@ body {
     overflow-y: auto;
     animation: modalSlideIn 0.3s ease;
 }
-@media (max-width: 480px) {
-    .modal-content {
-        padding: 20px;
-    }
-}
+@media (max-width: 480px) { .modal-content { padding: 20px; } }
 @keyframes modalSlideIn {
     from { opacity: 0; transform: translateY(-30px); }
     to { opacity: 1; transform: translateY(0); }
@@ -349,15 +255,8 @@ body {
     align-items: center;
     margin-bottom: 20px;
 }
-.modal-title {
-    font-size: 1.4rem;
-    color: var(--primary-blue);
-}
-@media (max-width: 480px) {
-    .modal-title {
-        font-size: 1.2rem;
-    }
-}
+.modal-title { font-size: 1.4rem; color: var(--primary-blue); }
+@media (max-width: 480px) { .modal-title { font-size: 1.2rem; } }
 .close-modal {
     background: none;
     border: none;
@@ -366,19 +265,10 @@ body {
     color: #999;
     transition: all 0.2s;
 }
-.close-modal:hover {
-    color: var(--red);
-}
+.close-modal:hover { color: var(--red); }
 
-.form-group {
-    margin-bottom: 15px;
-}
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
-    color: var(--primary-blue);
-}
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--primary-blue); }
 .form-group input, .form-group select, .form-group textarea {
     width: 100%;
     padding: 12px;
@@ -392,7 +282,6 @@ body {
     border-color: var(--primary-blue);
     box-shadow: 0 0 0 3px rgba(0,64,128,0.1);
 }
-
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -408,9 +297,7 @@ body {
     font-weight: 600;
     transition: all 0.2s;
 }
-.cancel-btn:hover {
-    background: #ddd;
-}
+.cancel-btn:hover { background: #ddd; }
 .save-btn {
     padding: 10px 20px;
     background: var(--green);
@@ -421,10 +308,7 @@ body {
     font-weight: 600;
     transition: all 0.2s;
 }
-.save-btn:hover {
-    background: #219653;
-    transform: translateY(-2px);
-}
+.save-btn:hover { background: #219653; transform: translateY(-2px); }
 
 .toast {
     position: fixed;
@@ -439,13 +323,7 @@ body {
     box-shadow: var(--shadow);
 }
 @media (max-width: 480px) {
-    .toast {
-        bottom: 10px;
-        right: 10px;
-        left: 10px;
-        padding: 10px 16px;
-        font-size: 0.85rem;
-    }
+    .toast { bottom: 10px; right: 10px; left: 10px; padding: 10px 16px; font-size: 0.85rem; }
 }
 .toast-success { background: var(--green); }
 .toast-error { background: var(--red); }
@@ -462,18 +340,8 @@ body {
     padding: 20px;
     margin-top: 40px;
 }
-@media (max-width: 768px) {
-    .footer {
-        padding: 15px;
-        font-size: 0.8rem;
-    }
-}
-.empty-state {
-    text-align: center;
-    padding: 40px;
-    color: #999;
-    font-size: 1rem;
-}
+@media (max-width: 768px) { .footer { padding: 15px; font-size: 0.8rem; } }
+.empty-state { text-align: center; padding: 40px; color: #999; font-size: 1rem; }
 
 .rating-stars-display {
     display: inline-flex;
@@ -481,13 +349,33 @@ body {
     margin-left: 5px;
     flex-wrap: wrap;
 }
-.star-small {
-    color: #f1c40f;
-    font-size: 0.8rem;
+.star-small { color: #f1c40f; font-size: 0.8rem; }
+.star-small.empty { color: #ddd; }
+
+/* 取消原因选项样式 */
+.cancel-reason-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
 }
-.star-small.empty {
-    color: #ddd;
+.cancel-reason-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
+.cancel-reason-option:hover { background: #f5f5f5; border-color: var(--primary-blue); }
+.cancel-reason-option.selected { background: rgba(0,64,128,0.05); border-color: var(--primary-blue); }
+.cancel-reason-option i { width: 24px; color: var(--primary-blue); }
+.cancel-reason-option span { flex: 1; }
+.cancel-reason-option input[type="radio"] { width: 18px; height: 18px; cursor: pointer; }
+.custom-reason-input { margin-top: 10px; display: none; }
+.custom-reason-input.show { display: block; }
     </style>
 </head>
 <body>
@@ -539,7 +427,7 @@ body {
                 <div class="form-group">
                     <label><i class="fab fa-google"></i> Lien Google Meet</label>
                     <input type="url" id="editMeetingLink" placeholder="https://meet.google.com/...">
-                    <small style="display: block; margin-top: 5px; color: #666;">Les étudiants pourront cliquer pour rejoindre</small>
+                    <small>Les étudiants pourront cliquer pour rejoindre</small>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="cancel-btn" id="cancelEditBtn">Annuler</button>
@@ -561,7 +449,7 @@ body {
                 <div class="form-group">
                     <label><i class="fas fa-link"></i> Lien du support / cours</label>
                     <input type="url" id="materialLink" placeholder="https://...">
-                    <small style="display: block; margin-top: 5px; color: #666;">Les étudiants pourront consulter ce lien</small>
+                    <small>Les étudiants pourront consulter ce lien</small>
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-comment"></i> Commentaire sur le cours</label>
@@ -574,12 +462,60 @@ body {
             </form>
         </div>
     </div>
+
+    <!-- Modal 取消课程 -->
+    <div class="modal" id="cancelCourseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-ban"></i> Annuler le cours</h2>
+                <button class="close-modal" id="closeCancelModalBtn">&times;</button>
+            </div>
+            <div id="cancelCourseInfo" style="margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 8px;">
+                <p><strong>📚 Cours:</strong> <span id="cancelCourseTitle">-</span></p>
+                <p><strong>👨‍🎓 Élève:</strong> <span id="cancelStudentName">-</span></p>
+                <p><strong>📅 Date:</strong> <span id="cancelCourseDate">-</span></p>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-info-circle"></i> Motif d'annulation</label>
+                <div class="cancel-reason-group">
+                    <label class="cancel-reason-option" data-reason="student_leave">
+                        <i class="fas fa-user-graduate"></i>
+                        <span>📖 学生请假</span>
+                        <input type="radio" name="cancelReason" value="学生请假">
+                    </label>
+                    <label class="cancel-reason-option" data-reason="teacher_busy">
+                        <i class="fas fa-chalkboard-user"></i>
+                        <span>👨‍🏫 老师有事</span>
+                        <input type="radio" name="cancelReason" value="老师有事">
+                    </label>
+                    <label class="cancel-reason-option" data-reason="student_absent">
+                        <i class="fas fa-user-slash"></i>
+                        <span>❌ 学生缺席</span>
+                        <input type="radio" name="cancelReason" value="学生缺席">
+                    </label>
+                    <label class="cancel-reason-option" data-reason="other">
+                        <i class="fas fa-ellipsis-h"></i>
+                        <span>📝 其他</span>
+                        <input type="radio" name="cancelReason" value="其他">
+                    </label>
+                </div>
+                <div id="customReasonContainer" class="custom-reason-input">
+                    <input type="text" id="customReason" class="form-control" placeholder="Précisez le motif..." style="width:100%; margin-top:10px;">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="cancel-btn" id="cancelCancelBtn">Annuler</button>
+                <button type="button" class="save-btn" id="confirmCancelBtn">Confirmer l'annulation</button>
+            </div>
+        </div>
+    </div>
     
     <script>
         // ========== 全局变量 ==========
         let currentTeacher = null;
         let allCourses = [];
-        let showOnlyUpcoming = true;  // true=即将上课, false=历史课程
+        let showOnlyUpcoming = true;
+        let pendingCancelCourse = null;
         
         // ========== 获取用户信息 ==========
         function getTeacherFromToken() {
@@ -595,12 +531,9 @@ body {
         
         // ========== 获取过滤后的课程 ==========
         function getFilteredCourses() {
-            const now = new Date();
             if (showOnlyUpcoming) {
-                // 即将上课：所有未完成、未取消的课程（不管时间是否已过，都显示在这里）
                 return allCourses.filter(c => c.status !== 'completed' && c.status !== 'cancelled');
             } else {
-                // 历史课程：已完成 或 已取消
                 return allCourses.filter(c => c.status === 'completed' || c.status === 'cancelled');
             }
         }
@@ -610,10 +543,7 @@ body {
             const supabase = window.supabaseAuth.getSupabaseClient();
             const { data } = await supabase
                 .from('courses')
-                .select(`
-                    *,
-                    students:student_id(id, name)
-                `)
+                .select(`*, students:student_id(id, name)`)
                 .eq('teacher_id', currentTeacher.userId)
                 .order('start_time', { ascending: true });
             allCourses = data || [];
@@ -633,9 +563,9 @@ body {
             renderCoursesList();
         }
         
-        // ========== 课程类型显示 =========AQ=
-         function getTypeText(t) {
-               const types = {
+        // ========== 课程类型显示 ==========
+        function getTypeText(t) {
+            const types = {
                 'ec': '1️⃣ 公民考试',
                 'ec110': '📚 十年卡全能班',
                 'ec14': '🎫 四年卡全能班',
@@ -646,12 +576,11 @@ body {
                 'ec310': '📚 十年卡自选',
                 'ec34': '🎫 四年卡自选',
                 'ec3f': '🛂 入籍自选',
-                'ex10': '📝 十年卡模拟考试',  // 改成你想要的图标
-                'ex4': '📝 四年卡模拟考试' , // 改成你想要的图标
-                'exf': '📝 入籍模拟考试'  // 改成你想要的图标
-
+                'ex10': '📝 十年卡模拟考试',
+                'ex4': '📝 四年卡模拟考试',
+                'exf': '📝 入籍模拟考试'
             };
-           return types[t] || t;
+            return types[t] || t;
         }
         
         // ========== 格式化日期时间 ==========
@@ -673,7 +602,6 @@ body {
             return `${start.getHours().toString().padStart(2,'0')}:${start.getMinutes().toString().padStart(2,'0')} - ${end.getHours().toString().padStart(2,'0')}:${end.getMinutes().toString().padStart(2,'0')}`;
         }
         
-        // ========== 显示星级 ==========
         function renderStars(rating) {
             if (!rating) return '';
             let html = '<span class="rating-stars-display">';
@@ -684,101 +612,175 @@ body {
             return html;
         }
         
-        // ========== 渲染课程列表 ==========
-        // ========== 渲染课程列表 ==========
-function renderCoursesList() {
-    const container = document.getElementById('coursesList');
-    if (!container) return;
-    
-    const filteredCourses = getFilteredCourses();
-    
-    if (filteredCourses.length === 0) { 
-        const emptyMsg = showOnlyUpcoming ? '📭 Aucun cours à venir' : '📭 Aucun cours terminé';
-        container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`; 
-        return; 
-    }
-    
-    container.innerHTML = filteredCourses.map(c => {
-        const now = new Date();
-        const courseStart = new Date(c.start_time);
-        const courseEnd = calculateEndTime(c.start_time, c.duration || 2);
-        const isNow = courseStart <= now && courseEnd >= now;
-        const isExpired = now > courseEnd;
-        
-        let statusText = '', statusClass = '';
-        
-        // 优先处理取消状态
-        if (c.status === 'cancelled') {
-            statusText = '❌ Annulé';
-            statusClass = 'status-cancelled';
-        } else if (c.status === 'completed') {
-            statusText = '✅ Terminé';
-            statusClass = 'status-completed';
-        } else if (c.teacher_started && c.student_confirmed && isNow) {
-            statusText = '🔄 En cours';
-            statusClass = 'status-in-progress';
-        } else if (c.teacher_started && !c.student_confirmed && isNow) {
-            statusText = '⏳ En attente élève';
-            statusClass = 'status-pending';
-        } else if (courseStart > now) {
-            statusText = '📅 Planifié';
-            statusClass = 'status-scheduled';
-        } else if (isExpired && !c.teacher_started) {
-            statusText = '⏰ Délai dépassé';
-            statusClass = 'status-cancelled';
-        } else {
-            statusText = '📅 Planifié';
-            statusClass = 'status-scheduled';
+        // ========== 取消课程 ==========
+        function openCancelModal(courseId, courseType, studentName, startTime) {
+            pendingCancelCourse = { courseId, courseType, studentName, startTime };
+            document.getElementById('cancelCourseTitle').textContent = getTypeText(courseType);
+            document.getElementById('cancelStudentName').textContent = studentName;
+            document.getElementById('cancelCourseDate').textContent = formatDateTime(startTime);
+            
+            // 重置表单
+            document.querySelectorAll('input[name="cancelReason"]').forEach(r => r.checked = false);
+            document.getElementById('customReason').value = '';
+            document.getElementById('customReasonContainer').classList.remove('show');
+            
+            // 移除所有选中样式
+            document.querySelectorAll('.cancel-reason-option').forEach(opt => opt.classList.remove('selected'));
+            
+            document.getElementById('cancelCourseModal').style.display = 'flex';
         }
         
-        const timeRange = formatTimeRange(c.start_time, c.duration || 2);
+        function initCancelModalEvents() {
+            // 点击选项
+            document.querySelectorAll('.cancel-reason-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const radio = option.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    document.querySelectorAll('.cancel-reason-option').forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    
+                    if (option.dataset.reason === 'other') {
+                        document.getElementById('customReasonContainer').classList.add('show');
+                    } else {
+                        document.getElementById('customReasonContainer').classList.remove('show');
+                    }
+                });
+            });
+            
+            document.getElementById('confirmCancelBtn').onclick = async () => {
+                let selectedReason = null;
+                document.querySelectorAll('input[name="cancelReason"]').forEach(r => {
+                    if (r.checked) selectedReason = r.value;
+                });
+                
+                if (selectedReason === '其他') {
+                    const customReason = document.getElementById('customReason').value.trim();
+                    if (customReason) selectedReason = customReason;
+                }
+                
+                if (!selectedReason) {
+                    showToast('Veuillez sélectionner un motif d\'annulation', 'error');
+                    return;
+                }
+                
+                const supabase = window.supabaseAuth.getSupabaseClient();
+                const { error } = await supabase
+                    .from('courses')
+                    .update({ 
+                        status: 'cancelled',
+                        cancel_reason: selectedReason
+                    })
+                    .eq('id', pendingCancelCourse.courseId);
+                
+                if (error) {
+                    showToast('Erreur lors de l\'annulation', 'error');
+                } else {
+                    showToast('Cours annulé ✓', 'success');
+                    document.getElementById('cancelCourseModal').style.display = 'none';
+                    await loadCourses();
+                }
+                pendingCancelCourse = null;
+            };
+            
+            document.getElementById('closeCancelModalBtn').onclick = () => {
+                document.getElementById('cancelCourseModal').style.display = 'none';
+                pendingCancelCourse = null;
+            };
+            document.getElementById('cancelCancelBtn').onclick = () => {
+                document.getElementById('cancelCourseModal').style.display = 'none';
+                pendingCancelCourse = null;
+            };
+            document.getElementById('cancelCourseModal').onclick = (e) => {
+                if (e.target === document.getElementById('cancelCourseModal')) {
+                    document.getElementById('cancelCourseModal').style.display = 'none';
+                    pendingCancelCourse = null;
+                }
+            };
+        }
         
-        // 判断是否可以操作（取消的课程不能操作）
-        const isCancelled = c.status === 'cancelled';
-        
-        return `
-            <div class="course-card">
-                <div class="course-header">
-                    <span class="course-title">${getTypeText(c.course_type)} - ${formatDateTime(c.start_time)} (${timeRange})</span>
-                    <span class="status-badge ${statusClass}">${statusText}</span>
-                </div>
-                <div class="course-details">
-                    <div class="detail-item"><i class="fas fa-user-graduate"></i> Élève: ${escapeHtml(c.students?.name || 'N/A')}</div>
-                    <div class="detail-item"><i class="fas fa-map-marker-alt"></i> ${c.location || '📍 À définir'}</div>
-                    <div class="detail-item"><i class="fas fa-video"></i> ${c.meeting_link ? `<a href="${c.meeting_link}" target="_blank">🔗 Lien Meet</a>` : '📹 Non défini'}</div>
-                    ${c.material_link ? `<div class="detail-item"><i class="fas fa-paperclip"></i> <a href="${c.material_link}" target="_blank">📎 Support de cours</a></div>` : ''}
-                    ${c.student_rating ? `<div class="detail-item"><i class="fas fa-star"></i> Note élève: ${renderStars(c.student_rating)}</div>` : ''}
-                    ${c.student_comment ? `<div class="detail-item"><i class="fas fa-comment-dots"></i> Commentaire élève: "${escapeHtml(c.student_comment)}"</div>` : ''}
-                    ${c.teacher_comment ? `<div class="detail-item"><i class="fas fa-comment"></i> Votre commentaire: "${escapeHtml(c.teacher_comment)}"</div>` : ''}
-                </div>
-                <div class="course-actions">
-                    ${!isCancelled && c.status !== 'completed' ? `<button class="action-btn btn-edit" onclick="openEditCourse('${c.id}','${escapeHtml(c.location||'')}','${escapeHtml(c.meeting_link||'')}')"><i class="fas fa-map-marker-alt"></i> 📍 Lieu / Meet</button>` : ''}
-                    
-                    <!-- 未取消 + 未开始 + 时间未过 → 显示开始按钮 -->
-                    ${!isCancelled && !c.teacher_started && c.status !== 'completed' && !isExpired ? `<button class="action-btn btn-start" onclick="startCourse('${c.id}')"><i class="fas fa-play"></i> ▶️ Démarrer le cours</button>` : ''}
-                    
-                    <!-- 取消的课程显示禁用提示 -->
-                    ${isCancelled ? `<span class="action-btn" style="background:#95a5a6; color:white; cursor:default;"><i class="fas fa-ban"></i> Cours annulé</span>` : ''}
-                    
-                    <!-- 时间已过 + 未开始 → 显示红色提示 -->
-                    ${!isCancelled && !c.teacher_started && c.status !== 'completed' && isExpired ? `<span class="action-btn" style="background:#e74c3c; color:white; cursor:default;"><i class="fas fa-exclamation-triangle"></i> ⏰ Délai dépassé - contacter l'admin</span>` : ''}
-                    
-                    <!-- 等待学生确认 -->
-                    ${!isCancelled && c.teacher_started && !c.student_confirmed ? `<span class="action-btn" style="background:#f39c12; color:white; cursor:default;"><i class="fas fa-hourglass-half"></i> ⏳ Attente confirmation élève</span>` : ''}
-                    
-                    <!-- 终止课程按钮 -->
-                    ${!isCancelled && c.teacher_started && c.status !== 'completed' ? `<button class="action-btn btn-end" onclick="endCourse('${c.id}')"><i class="fas fa-stop"></i> ⏹️ Terminer</button>` : ''}
-                    
-                    <!-- 分享支持/评论按钮 -->
-                    ${!isCancelled && c.status !== 'completed' ? `<button class="action-btn btn-material" onclick="openMaterialModal('${c.id}','${escapeHtml(c.material_link||'')}','${escapeHtml(c.teacher_comment||'')}')"><i class="fas fa-paperclip"></i> 📎 Support / Commentaire</button>` : ''}
-                    
-                    <!-- 已完成但无评论 -->
-                    ${!isCancelled && c.status === 'completed' && !c.teacher_comment ? `<button class="action-btn btn-material" onclick="openMaterialModal('${c.id}','${escapeHtml(c.material_link||'')}','${escapeHtml(c.teacher_comment||'')}')"><i class="fas fa-comment"></i> 💬 Ajouter commentaire</button>` : ''}
-                </div>
-            </div>
-        `;
-    }).join('');
-}
+        // ========== 渲染课程列表 ==========
+        function renderCoursesList() {
+            const container = document.getElementById('coursesList');
+            if (!container) return;
+            
+            const filteredCourses = getFilteredCourses();
+            
+            if (filteredCourses.length === 0) { 
+                const emptyMsg = showOnlyUpcoming ? '📭 Aucun cours à venir' : '📭 Aucun cours terminé';
+                container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`; 
+                return; 
+            }
+            
+            container.innerHTML = filteredCourses.map(c => {
+                const now = new Date();
+                const courseStart = new Date(c.start_time);
+                const courseEnd = calculateEndTime(c.start_time, c.duration || 2);
+                const isNow = courseStart <= now && courseEnd >= now;
+                const isExpired = now > courseEnd;
+                const isCancelled = c.status === 'cancelled';
+                const timeRange = formatTimeRange(c.start_time, c.duration || 2);
+                
+                let statusText = '', statusClass = '';
+                if (isCancelled) {
+                    statusText = '❌ Annulé';
+                    statusClass = 'status-cancelled';
+                } else if (c.status === 'completed') {
+                    statusText = '✅ Terminé';
+                    statusClass = 'status-completed';
+                } else if (c.teacher_started && c.student_confirmed && isNow) {
+                    statusText = '🔄 En cours';
+                    statusClass = 'status-in-progress';
+                } else if (c.teacher_started && !c.student_confirmed && isNow) {
+                    statusText = '⏳ En attente élève';
+                    statusClass = 'status-pending';
+                } else if (courseStart > now) {
+                    statusText = '📅 Planifié';
+                    statusClass = 'status-scheduled';
+                } else if (isExpired && !c.teacher_started) {
+                    statusText = '⏰ Délai dépassé';
+                    statusClass = 'status-cancelled';
+                } else {
+                    statusText = '📅 Planifié';
+                    statusClass = 'status-scheduled';
+                }
+                
+                return `
+                    <div class="course-card">
+                        <div class="course-header">
+                            <span class="course-title">${getTypeText(c.course_type)} - ${formatDateTime(c.start_time)} (${timeRange})</span>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="course-details">
+                            <div class="detail-item"><i class="fas fa-user-graduate"></i> Élève: ${escapeHtml(c.students?.name || 'N/A')}</div>
+                            <div class="detail-item"><i class="fas fa-map-marker-alt"></i> ${c.location || '📍 À définir'}</div>
+                            <div class="detail-item"><i class="fas fa-video"></i> ${c.meeting_link ? `<a href="${c.meeting_link}" target="_blank">🔗 Lien Meet</a>` : '📹 Non défini'}</div>
+                            ${c.material_link ? `<div class="detail-item"><i class="fas fa-paperclip"></i> <a href="${c.material_link}" target="_blank">📎 Support de cours</a></div>` : ''}
+                            ${c.cancel_reason ? `<div class="detail-item"><i class="fas fa-ban"></i> Motif annulation: "${escapeHtml(c.cancel_reason)}"</div>` : ''}
+                            ${c.student_rating ? `<div class="detail-item"><i class="fas fa-star"></i> Note élève: ${renderStars(c.student_rating)}</div>` : ''}
+                            ${c.student_comment ? `<div class="detail-item"><i class="fas fa-comment-dots"></i> Commentaire élève: "${escapeHtml(c.student_comment)}"</div>` : ''}
+                            ${c.teacher_comment ? `<div class="detail-item"><i class="fas fa-comment"></i> Votre commentaire: "${escapeHtml(c.teacher_comment)}"</div>` : ''}
+                        </div>
+                        <div class="course-actions">
+                            ${!isCancelled && c.status !== 'completed' ? `<button class="action-btn btn-edit" onclick="openEditCourse('${c.id}','${escapeHtml(c.location||'')}','${escapeHtml(c.meeting_link||'')}')"><i class="fas fa-map-marker-alt"></i> 📍 Lieu / Meet</button>` : ''}
+                            
+                            ${!isCancelled && !c.teacher_started && c.status !== 'completed' && !isExpired ? `<button class="action-btn btn-start" onclick="startCourse('${c.id}')"><i class="fas fa-play"></i> ▶️ Démarrer</button>` : ''}
+                            
+                            ${!isCancelled && c.status === 'scheduled' && !c.teacher_started ? `<button class="action-btn btn-cancel" onclick="openCancelModal('${c.id}','${c.course_type}','${escapeHtml(c.students?.name || '')}','${c.start_time}')"><i class="fas fa-ban"></i> ❌ Annuler</button>` : ''}
+                            
+                            ${!isCancelled && !c.teacher_started && c.status !== 'completed' && isExpired ? `<span class="action-btn" style="background:#e74c3c; color:white; cursor:default;"><i class="fas fa-exclamation-triangle"></i> ⏰ Délai dépassé</span>` : ''}
+                            
+                            ${!isCancelled && c.teacher_started && !c.student_confirmed ? `<span class="action-btn" style="background:#f39c12; color:white; cursor:default;"><i class="fas fa-hourglass-half"></i> ⏳ Attente élève</span>` : ''}
+                            
+                            ${!isCancelled && c.teacher_started && c.status !== 'completed' ? `<button class="action-btn btn-end" onclick="endCourse('${c.id}')"><i class="fas fa-stop"></i> ⏹️ Terminer</button>` : ''}
+                            
+                            ${!isCancelled && c.status !== 'completed' ? `<button class="action-btn btn-material" onclick="openMaterialModal('${c.id}','${escapeHtml(c.material_link||'')}','${escapeHtml(c.teacher_comment||'')}')"><i class="fas fa-paperclip"></i> 📎 Support / Commentaire</button>` : ''}
+                            
+                            ${!isCancelled && c.status === 'completed' && !c.teacher_comment ? `<button class="action-btn btn-material" onclick="openMaterialModal('${c.id}','${escapeHtml(c.material_link||'')}','${escapeHtml(c.teacher_comment||'')}')"><i class="fas fa-comment"></i> 💬 Ajouter commentaire</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
         
         // ========== 课程操作 ==========
         function openEditCourse(courseId, location, meetLink) {
@@ -801,63 +803,33 @@ function renderCoursesList() {
             await loadCourses();
         }
         
-       async function startCourse(id) {
-    const supabase = window.supabaseAuth.getSupabaseClient();
-    
-    // 使用本地时间，格式与 start_time 一致
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const localTimeStr = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    
-    const { error } = await supabase
-        .from('courses')
-        .update({ 
-            teacher_started: true, 
-            actual_start: localTimeStr,
-            status: 'in_progress' 
-        })
-        .eq('id', id);
-    if (error) { 
-        console.error('开始课程错误:', error);
-        showToast('Erreur lors du démarrage', 'error'); 
-        return; 
-    }
-    showToast('Cours démarré ! En attente de la confirmation de l\'élève ✓', 'success');
-    await loadCourses();
-}
+        async function startCourse(id) {
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const now = new Date();
+            const localTimeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+            
+            const { error } = await supabase
+                .from('courses')
+                .update({ teacher_started: true, actual_start: localTimeStr, status: 'in_progress' })
+                .eq('id', id);
+            if (error) { showToast('Erreur lors du démarrage', 'error'); return; }
+            showToast('Cours démarré ! En attente de l\'élève ✓', 'success');
+            await loadCourses();
+        }
+        
         async function endCourse(id) {
-    const supabase = window.supabaseAuth.getSupabaseClient();
-    
-    // 使用本地时间
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const localTimeStr = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    
-    const { error } = await supabase
-        .from('courses')
-        .update({ 
-            actual_end: localTimeStr, 
-            status: 'completed' 
-        })
-        .eq('id', id);
-    if (error) { 
-        console.error('结束课程错误:', error);
-        showToast('Erreur', 'error'); 
-        return; 
-    }
-    showToast('Cours terminé ! Vous pouvez maintenant ajouter un commentaire ✓', 'success');
-    await loadCourses();
-}
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const now = new Date();
+            const localTimeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+            
+            const { error } = await supabase
+                .from('courses')
+                .update({ actual_end: localTimeStr, status: 'completed' })
+                .eq('id', id);
+            if (error) { showToast('Erreur', 'error'); return; }
+            showToast('Cours terminé ! ✓', 'success');
+            await loadCourses();
+        }
         
         function openMaterialModal(courseId, materialLink, teacherComment) {
             document.getElementById('materialCourseId').value = courseId;
@@ -879,7 +851,6 @@ function renderCoursesList() {
             await loadCourses();
         }
         
-        // ========== 辅助函数 ==========
         function escapeHtml(s) { 
             if (!s) return '';
             return s.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); 
@@ -893,7 +864,6 @@ function renderCoursesList() {
             setTimeout(() => t.remove(), 3000); 
         }
         
-        // ========== 初始化模态框和过滤器 ==========
         function initModals() {
             document.getElementById('closeEditModalBtn').onclick = () => document.getElementById('editCourseModal').style.display = 'none';
             document.getElementById('cancelEditBtn').onclick = () => document.getElementById('editCourseModal').style.display = 'none';
@@ -906,6 +876,8 @@ function renderCoursesList() {
                 if (e.target === document.getElementById('editCourseModal')) document.getElementById('editCourseModal').style.display = 'none';
                 if (e.target === document.getElementById('materialModal')) document.getElementById('materialModal').style.display = 'none';
             };
+            
+            initCancelModalEvents();
         }
         
         function initFilters() {
@@ -918,7 +890,6 @@ function renderCoursesList() {
                 pastBtn.className = 'filter-btn-inactive';
                 renderCoursesList();
             };
-            
             pastBtn.onclick = () => {
                 showOnlyUpcoming = false;
                 pastBtn.className = 'filter-btn-active';
@@ -927,7 +898,6 @@ function renderCoursesList() {
             };
         }
         
-        // ========== 初始化 ==========
         async function init() {
             currentTeacher = getTeacherFromToken();
             if (!currentTeacher) return;
@@ -944,6 +914,7 @@ function renderCoursesList() {
         window.startCourse = startCourse;
         window.endCourse = endCourse;
         window.openMaterialModal = openMaterialModal;
+        window.openCancelModal = openCancelModal;
     </script>
 </body>
 </html>
