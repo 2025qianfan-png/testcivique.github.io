@@ -430,7 +430,6 @@
             font-weight: 600;
         }
 
-        /* 取消原因选项样式 */
         .cancel-reason-group {
             display: flex;
             flex-direction: column;
@@ -476,7 +475,6 @@
     </header>
     
     <main class="container" style="padding: 30px 0;">
-        <!-- 第一行：课程统计 -->
         <div class="stats-grid">
             <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-check"></i></div><div class="stat-number" id="upcomingCount">0</div><div class="stat-label" id="statBookedLabel">Cours à venir</div></div>
             <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-number" id="completedCount">0</div><div class="stat-label" id="statCompletedLabel">Cours terminés</div></div>
@@ -484,7 +482,6 @@
             <div class="stat-card"><div class="stat-icon"><i class="fas fa-chalkboard-user"></i></div><div class="stat-number" id="teacherCount">0</div><div class="stat-label" id="statTeacherLabel">Intervenants</div></div>
         </div>
 
-        <!-- 第二行：课时统计卡片 -->
         <div class="credit-stats-grid">
             <div class="stat-card credit-blue">
                 <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
@@ -531,7 +528,6 @@
         </div>
     </footer>
     
-    <!-- 评价模态框 -->
     <div class="modal" id="ratingModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -563,7 +559,6 @@
         </div>
     </div>
     
-    <!-- 取消课程模态框 -->
     <div class="modal" id="cancelCourseModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -571,9 +566,9 @@
                 <button class="close-modal" id="closeCancelModalBtn">&times;</button>
             </div>
             <div id="cancelCourseInfo" style="margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 8px;">
-                <p><strong id="cancelCourseLabel">📚 Cours:</strong> <span id="cancelCourseType">-</span></p>
-                <p><strong id="cancelTeacherLabel">👨‍🏫 Intervenant:</strong> <span id="cancelCourseTeacher">-</span></p>
-                <p><strong id="cancelDateLabel">📅 Date:</strong> <span id="cancelCourseDate">-</span></p>
+                <p><strong>📚 Cours:</strong> <span id="cancelCourseType">-</span></p>
+                <p><strong>👨‍🏫 Intervenant:</strong> <span id="cancelCourseTeacher">-</span></p>
+                <p><strong>📅 Date:</strong> <span id="cancelCourseDate">-</span></p>
             </div>
             <div class="form-group">
                 <label id="cancelReasonLabel">📝 Motif d'annulation</label>
@@ -610,7 +605,6 @@
         </div>
     </div>
     
-    <!-- 教师评语模态框 -->
     <div class="modal" id="teacherCommentModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -619,13 +613,12 @@
             </div>
             <div id="teacherCommentContent" style="padding: 10px 0; line-height: 1.6;"></div>
             <div class="form-actions">
-                <button type="button" class="cancel-btn" id="closeTeacherCommentModalBtn"><span id="closeText">Fermer</span></button>
+                <button type="button" class="cancel-btn" id="closeTeacherCommentModalBtn">Fermer</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ========== 双语翻译 ==========
         const translations = {
             fr: {
                 pageTitle: "Espace étudiant",
@@ -655,7 +648,6 @@
                 toastRating: "Merci pour votre évaluation !",
                 toastCancelled: "Cours annulé, crédits restitués",
                 teacherCommentTitle: "Avis de l'intervenant",
-                closeText: "Fermer",
                 teacherCommentLabel: "Avis du professeur:",
                 statusScheduled: "📅 Planifié",
                 statusInProgress: "🔄 En cours",
@@ -664,9 +656,6 @@
                 pendingConfirm: "En attente de confirmation",
                 teacherCommentBtn: "Voir l'avis",
                 cancelModalTitle: "Annuler le cours",
-                cancelCourseLabel: "📚 Cours:",
-                cancelTeacherLabel: "👨‍🏫 Intervenant:",
-                cancelDateLabel: "📅 Date:",
                 cancelReasonLabel: "📝 Motif d'annulation",
                 reasonStudentLeave: "📖 Étudiant absent (justifié)",
                 reasonTeacherBusy: "👨‍🏫 Enseignant indisponible",
@@ -706,7 +695,6 @@
                 toastRating: "感谢您的评价！",
                 toastCancelled: "课程已取消，课时已返还",
                 teacherCommentTitle: "老师的评语",
-                closeText: "关闭",
                 teacherCommentLabel: "老师评语:",
                 statusScheduled: "📅 计划中",
                 statusInProgress: "🔄 进行中",
@@ -715,9 +703,6 @@
                 pendingConfirm: "等待您确认",
                 teacherCommentBtn: "查看评语",
                 cancelModalTitle: "取消课程",
-                cancelCourseLabel: "📚 课程:",
-                cancelTeacherLabel: "👨‍🏫 老师:",
-                cancelDateLabel: "📅 日期:",
                 cancelReasonLabel: "📝 取消原因",
                 reasonStudentLeave: "📖 学生请假",
                 reasonTeacherBusy: "👨‍🏫 老师有事",
@@ -738,41 +723,37 @@
         let studentCredit = 0;
         let pendingCancelCourse = null;
         
-        // ========== 更新界面文字 ==========
-       function updateUIText() {
-    const t = translations[currentLang];
-    document.getElementById('pageTitle').textContent = t.pageTitle;
-    document.getElementById('logoutText').textContent = t.logoutText;
-    document.getElementById('statBookedLabel').textContent = t.statBookedLabel;
-    document.getElementById('statCompletedLabel').textContent = t.statCompletedLabel;
-    document.getElementById('statRatingLabel').textContent = t.statRatingLabel;
-    document.getElementById('statTeacherLabel').textContent = t.statTeacherLabel;
-    document.getElementById('totalCreditLabel').textContent = t.totalCreditLabel;
-    document.getElementById('scheduledHoursLabel').textContent = t.scheduledHoursLabel;
-    document.getElementById('inProgressHoursLabel').textContent = t.inProgressHoursLabel;
-    document.getElementById('usedHoursLabel').textContent = t.usedHoursLabel;
-    document.getElementById('remainingCreditLabel').textContent = t.remainingCreditLabel;
-    document.getElementById('myCoursesTitle').innerHTML = `<i class="fas fa-calendar-day"></i> ${t.myCoursesTitle}`;
-    document.getElementById('ratingTitle').innerHTML = `<i class="fas fa-star"></i> ${t.ratingTitle}`;
-    document.getElementById('ratingLabel').textContent = t.ratingLabel;
-    document.getElementById('commentLabel').textContent = t.commentLabel;
-    document.getElementById('saveRatingText').textContent = t.saveRatingText;
-    document.getElementById('cancelRatingText').textContent = t.cancelRatingText;
-    document.getElementById('teacherCommentTitle').textContent = t.teacherCommentTitle;
-    document.getElementById('closeTeacherCommentModalBtn').textContent = t.closeText;
-    document.getElementById('cancelModalTitle').textContent = t.cancelModalTitle;
-    document.getElementById('cancelCourseLabel').innerHTML = t.cancelCourseLabel;
-    document.getElementById('cancelTeacherLabel').innerHTML = t.cancelTeacherLabel;
-    document.getElementById('cancelDateLabel').innerHTML = t.cancelDateLabel;
-    document.getElementById('cancelReasonLabel').textContent = t.cancelReasonLabel;
-    document.getElementById('reasonStudentLeave').textContent = t.reasonStudentLeave;
-    document.getElementById('reasonTeacherBusy').textContent = t.reasonTeacherBusy;
-    document.getElementById('reasonStudentAbsent').textContent = t.reasonStudentAbsent;
-    document.getElementById('reasonOther').textContent = t.reasonOther;
-    document.getElementById('cancelBtnText').textContent = t.cancelBtnText;
-    document.getElementById('confirmCancelBtnText').textContent = t.confirmCancelBtnText;
-    renderCoursesList();
-}
+        function updateUIText() {
+            const t = translations[currentLang];
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('logoutText').textContent = t.logoutText;
+            document.getElementById('statBookedLabel').textContent = t.statBookedLabel;
+            document.getElementById('statCompletedLabel').textContent = t.statCompletedLabel;
+            document.getElementById('statRatingLabel').textContent = t.statRatingLabel;
+            document.getElementById('statTeacherLabel').textContent = t.statTeacherLabel;
+            document.getElementById('totalCreditLabel').textContent = t.totalCreditLabel;
+            document.getElementById('scheduledHoursLabel').textContent = t.scheduledHoursLabel;
+            document.getElementById('inProgressHoursLabel').textContent = t.inProgressHoursLabel;
+            document.getElementById('usedHoursLabel').textContent = t.usedHoursLabel;
+            document.getElementById('remainingCreditLabel').textContent = t.remainingCreditLabel;
+            document.getElementById('myCoursesTitle').innerHTML = `<i class="fas fa-calendar-day"></i> ${t.myCoursesTitle}`;
+            document.getElementById('ratingTitle').innerHTML = `<i class="fas fa-star"></i> ${t.ratingTitle}`;
+            document.getElementById('ratingLabel').textContent = t.ratingLabel;
+            document.getElementById('commentLabel').textContent = t.commentLabel;
+            document.getElementById('saveRatingText').textContent = t.saveRatingText;
+            document.getElementById('cancelRatingText').textContent = t.cancelRatingText;
+            document.getElementById('teacherCommentTitle').textContent = t.teacherCommentTitle;
+            document.getElementById('cancelModalTitle').textContent = t.cancelModalTitle;
+            document.getElementById('cancelReasonLabel').textContent = t.cancelReasonLabel;
+            document.getElementById('reasonStudentLeave').textContent = t.reasonStudentLeave;
+            document.getElementById('reasonTeacherBusy').textContent = t.reasonTeacherBusy;
+            document.getElementById('reasonStudentAbsent').textContent = t.reasonStudentAbsent;
+            document.getElementById('reasonOther').textContent = t.reasonOther;
+            document.getElementById('cancelBtnText').textContent = t.cancelBtnText;
+            document.getElementById('confirmCancelBtnText').textContent = t.confirmCancelBtnText;
+            document.getElementById('closeTeacherCommentModalBtn').textContent = "Fermer";
+            renderCoursesList();
+        }
         
         function switchLanguage(lang) {
             currentLang = lang;
@@ -781,7 +762,6 @@
             updateUIText();
         }
         
-        // ========== 辅助函数 ==========
         function getTypeText(t) {
             const types = {
                 'ec': '1️⃣ 公民考试',
@@ -833,11 +813,10 @@
             setTimeout(() => toast.remove(), 3000);
         }
         
-        // ========== 返还课时 ==========
         async function refundStudentCredit(studentId, hours) {
             if (!studentId || !hours || hours <= 0) return true;
             const supabase = window.supabaseAuth.getSupabaseClient();
-            const student = allStudents?.find(s => s.id === studentId);
+            const { data: student } = await supabase.from('students').select('credit').eq('id', studentId).single();
             if (!student) return true;
             const newCredit = (student.credit || 0) + hours;
             const { error } = await supabase.from('students').update({ credit: newCredit }).eq('id', studentId);
@@ -845,11 +824,9 @@
                 console.error('返还课时失败:', error);
                 return false;
             }
-            student.credit = newCredit;
             return true;
         }
         
-        // ========== 课时统计更新 ==========
         function updateCreditStats() {
             const remainingCredit = studentCredit || 0;
             const scheduledCourses = myCourses.filter(c => c.status === 'scheduled');
@@ -868,18 +845,14 @@
             document.getElementById('remainingCredit').textContent = remainingCredit;
         }
         
-        // ========== 课程过滤 ==========
         function getFilteredCourses() {
             if (showOnlyUpcoming) {
-                // 即将上课：scheduled, pending, in_progress（未完成的课）
                 return myCourses.filter(c => c.status !== 'completed' && c.status !== 'cancelled');
             } else {
-                // 历史课程：completed + cancelled
                 return myCourses.filter(c => c.status === 'completed' || c.status === 'cancelled');
             }
         }
         
-        // ========== 打开取消模态框 ==========
         function openCancelModal(courseId, startTime, teacherName, courseType) {
             const t = translations[currentLang];
             if (!isMoreThan24HoursAhead(startTime)) {
@@ -891,7 +864,6 @@
             document.getElementById('cancelCourseTeacher').textContent = teacherName;
             document.getElementById('cancelCourseDate').textContent = formatDateTime(startTime);
             
-            // 重置表单
             document.querySelectorAll('input[name="cancelReason"]').forEach(r => r.checked = false);
             document.getElementById('customReason').value = '';
             document.getElementById('customReasonContainer').classList.remove('show');
@@ -900,13 +872,11 @@
             document.getElementById('cancelCourseModal').style.display = 'flex';
         }
         
-        // ========== 执行取消（返还课时） ==========
         async function executeCancelCourse() {
             if (!pendingCancelCourse) return;
             const t = translations[currentLang];
             const { courseId, startTime, teacherName, courseType } = pendingCancelCourse;
             
-            // 获取选中的原因
             let selectedReason = null;
             document.querySelectorAll('input[name="cancelReason"]').forEach(r => {
                 if (r.checked) selectedReason = r.value;
@@ -921,28 +891,17 @@
             }
             
             const supabase = window.supabaseAuth.getSupabaseClient();
-            
-            // 1. 获取课程原信息
             const course = myCourses.find(c => c.id === courseId);
             if (!course) return;
             
-            // 2. 返还课时（如果课程消耗了课时）
             const isConsumingStatus = course.status === 'scheduled' || course.status === 'in_progress' || course.status === 'completed';
             if (isConsumingStatus) {
-                const refunded = await refundStudentCredit(course.student_id, course.duration || 2);
-                if (!refunded) {
-                    showToast(t.cancelFail, 'error');
-                    return;
-                }
+                await refundStudentCredit(course.student_id, course.duration || 2);
             }
             
-            // 3. 更新课程状态为 cancelled，记录取消原因
             const { error: updateError } = await supabase
                 .from('courses')
-                .update({ 
-                    status: 'cancelled',
-                    cancel_reason: selectedReason
-                })
+                .update({ status: 'cancelled', cancel_reason: selectedReason })
                 .eq('id', courseId);
             
             if (updateError) {
@@ -961,7 +920,6 @@
             pendingCancelCourse = null;
         }
         
-        // ========== 渲染课程列表 ==========
         function renderCoursesList() {
             const container = document.getElementById('coursesList');
             const t = translations[currentLang];
@@ -1019,12 +977,12 @@
                             <span class="status-badge ${statusClass}">${statusText}</span>
                         </div>
                         <div class="course-details">
-                            <div class="detail-item"><i class="fas fa-chalkboard-user"></i> ${currentLang === 'fr' ? 'Intervenant:' : '老师:'} ${escapeHtml(teacher?.name || 'N/A')}</div>
-                            <div class="detail-item"><i class="fas fa-map-marker-alt"></i> ${c.location || (currentLang === 'fr' ? 'À définir' : '待定')}</div>
-                            <div class="detail-item"><i class="fas fa-clock"></i> ${currentLang === 'fr' ? 'Durée:' : '时长:'} ${c.duration || 2} ${currentLang === 'fr' ? 'heures' : '小时'}</div>
-                            ${c.material_link ? `<div class="detail-item"><i class="fas fa-link"></i> <a href="${c.material_link}" target="_blank">${currentLang === 'fr' ? 'Support' : '课件'}</a></div>` : ''}
-                            ${c.meeting_link ? `<div class="detail-item"><i class="fas fa-video"></i> <a href="${c.meeting_link}" target="_blank">${currentLang === 'fr' ? 'Lien Meet' : '会议链接'}</a></div>` : ''}
-                            ${isCancelled && c.cancel_reason ? `<div class="detail-item"><i class="fas fa-ban"></i> ${t.cancelReasonLabel} ${escapeHtml(c.cancel_reason)}</div>` : ''}
+                            <div class="detail-item"><i class="fas fa-chalkboard-user"></i> Intervenant: ${escapeHtml(teacher?.name || 'N/A')}</div>
+                            <div class="detail-item"><i class="fas fa-map-marker-alt"></i> ${c.location || 'À définir'}</div>
+                            <div class="detail-item"><i class="fas fa-clock"></i> Durée: ${c.duration || 2} heures</div>
+                            ${c.material_link ? `<div class="detail-item"><i class="fas fa-link"></i> <a href="${c.material_link}" target="_blank">Support</a></div>` : ''}
+                            ${c.meeting_link ? `<div class="detail-item"><i class="fas fa-video"></i> <a href="${c.meeting_link}" target="_blank">Lien Meet</a></div>` : ''}
+                            ${isCancelled && c.cancel_reason ? `<div class="detail-item"><i class="fas fa-ban"></i> Motif: ${escapeHtml(c.cancel_reason)}</div>` : ''}
                         </div>
                         ${hasTeacherComment ? `
                             <div class="teacher-comment-area">
@@ -1042,7 +1000,6 @@
             }).join('');
         }
         
-        // ========== 用户验证 ==========
         async function getStudentFromToken() {
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
@@ -1054,33 +1011,20 @@
             } catch(e) { window.location.href = 'index.html'; return null; }
         }
         
-        // ========== 加载课程和数据 ==========
         async function loadMyCourses() {
             const supabase = window.supabaseAuth.getSupabaseClient();
             
             const [coursesRes, studentRes] = await Promise.all([
-                supabase
-                    .from('courses')
-                    .select(`*, teachers:teacher_id(id, name)`)
-                    .eq('student_id', currentStudent.userId)
-                    .order('start_time', { ascending: true }),
-                supabase
-                    .from('students')
-                    .select('credit')
-                    .eq('id', currentStudent.userId)
-                    .single()
+                supabase.from('courses').select(`*, teachers:teacher_id(id, name)`).eq('student_id', currentStudent.userId).order('start_time', { ascending: true }),
+                supabase.from('students').select('credit').eq('id', currentStudent.userId).single()
             ]);
             
             myCourses = coursesRes.data || [];
             studentCredit = studentRes.data?.credit || 0;
             
             const teacherIds = [...new Set(myCourses.map(c => c.teacher_id))];
-            const { data: teacherData } = await supabase
-                .from('students')
-                .select('id, name')
-                .in('id', teacherIds);
+            const { data: teacherData } = await supabase.from('students').select('id, name').in('id', teacherIds);
             
-            // 统计（排除取消的课程）
             const activeCourses = myCourses.filter(c => c.status !== 'cancelled');
             const toCome = activeCourses.filter(c => c.status !== 'completed' && new Date(c.start_time) > new Date()).length;
             const completed = activeCourses.filter(c => c.status === 'completed').length;
@@ -1096,18 +1040,11 @@
             renderCoursesList();
         }
         
-        // ========== 课程操作 ==========
         async function confirmCourse(courseId) {
             const supabase = window.supabaseAuth.getSupabaseClient();
             const t = translations[currentLang];
-            const { error } = await supabase.from('courses').update({ 
-                student_confirmed: true, 
-                status: 'in_progress' 
-            }).eq('id', courseId);
-            if (error) { 
-                showToast(t.toastError, 'error'); 
-                return; 
-            }
+            const { error } = await supabase.from('courses').update({ student_confirmed: true, status: 'in_progress' }).eq('id', courseId);
+            if (error) { showToast(t.toastError, 'error'); return; }
             showToast(t.toastConfirmed, 'success');
             await loadMyCourses();
         }
@@ -1139,24 +1076,14 @@
             const courseId = document.getElementById('ratingCourseId').value;
             const rating = parseInt(document.getElementById('studentRating').value);
             const comment = document.getElementById('studentComment').value;
-            if (!rating || rating < 1 || rating > 5) { 
-                showToast('Note 1-5', 'error'); 
-                return; 
-            }
-            const { error } = await supabase.from('courses').update({ 
-                student_rating: rating, 
-                student_comment: comment || null 
-            }).eq('id', courseId);
-            if (error) { 
-                showToast(t.toastError, 'error'); 
-                return; 
-            }
+            if (!rating || rating < 1 || rating > 5) { showToast('Note 1-5', 'error'); return; }
+            const { error } = await supabase.from('courses').update({ student_rating: rating, student_comment: comment || null }).eq('id', courseId);
+            if (error) { showToast(t.toastError, 'error'); return; }
             document.getElementById('ratingModal').style.display = 'none';
             showToast(t.toastRating, 'success');
             await loadMyCourses();
         }
         
-        // ========== 过滤器 ==========
         function initFilters() {
             const upcomingBtn = document.getElementById('showUpcomingBtn');
             const pastBtn = document.getElementById('showPastBtn');
@@ -1176,7 +1103,6 @@
         }
         
         function initCancelModalEvents() {
-            // 点击选项
             document.querySelectorAll('.cancel-reason-option').forEach(option => {
                 option.addEventListener('click', () => {
                     const radio = option.querySelector('input[type="radio"]');
@@ -1208,8 +1134,7 @@
             document.getElementById('closeTeacherCommentBtn').onclick = () => document.getElementById('teacherCommentModal').style.display = 'none';
             document.getElementById('closeTeacherCommentModalBtn').onclick = () => document.getElementById('teacherCommentModal').style.display = 'none';
             document.getElementById('teacherCommentModal').onclick = (e) => {
-                if (e.target === document.getElementById('teacherCommentModal')) 
-                    document.getElementById('teacherCommentModal').style.display = 'none';
+                if (e.target === document.getElementById('teacherCommentModal')) document.getElementById('teacherCommentModal').style.display = 'none';
             };
             
             document.querySelectorAll('#ratingStars .star').forEach(star => { 
@@ -1220,8 +1145,7 @@
                 }); 
             });
             document.getElementById('ratingModal').onclick = (e) => {
-                if (e.target === document.getElementById('ratingModal')) 
-                    document.getElementById('ratingModal').style.display = 'none';
+                if (e.target === document.getElementById('ratingModal')) document.getElementById('ratingModal').style.display = 'none';
             };
             
             document.getElementById('langFrBtn').onclick = () => switchLanguage('fr');
@@ -1230,15 +1154,11 @@
             initCancelModalEvents();
         }
         
-        // ========== 初始化 ==========
         async function init() {
             currentStudent = await getStudentFromToken();
             if (!currentStudent) return;
             document.getElementById('studentName').textContent = currentStudent.name;
-            document.getElementById('logoutBtn').onclick = () => { 
-                sessionStorage.clear(); 
-                window.location.href = 'index.html'; 
-            };
+            document.getElementById('logoutBtn').onclick = () => { sessionStorage.clear(); window.location.href = 'index.html'; };
             updateUIText();
             initModals();
             initFilters();
