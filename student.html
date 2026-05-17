@@ -739,41 +739,40 @@
         let pendingCancelCourse = null;
         
         // ========== 更新界面文字 ==========
-        function updateUIText() {
-            const t = translations[currentLang];
-            document.getElementById('pageTitle').textContent = t.pageTitle;
-            document.getElementById('logoutText').textContent = t.logoutText;
-            document.getElementById('statBookedLabel').textContent = t.statBookedLabel;
-            document.getElementById('statCompletedLabel').textContent = t.statCompletedLabel;
-            document.getElementById('statRatingLabel').textContent = t.statRatingLabel;
-            document.getElementById('statTeacherLabel').textContent = t.statTeacherLabel;
-            document.getElementById('totalCreditLabel').textContent = t.totalCreditLabel;
-            document.getElementById('scheduledHoursLabel').textContent = t.scheduledHoursLabel;
-            document.getElementById('inProgressHoursLabel').textContent = t.inProgressHoursLabel;
-            document.getElementById('usedHoursLabel').textContent = t.usedHoursLabel;
-            document.getElementById('remainingCreditLabel').textContent = t.remainingCreditLabel;
-            document.getElementById('myCoursesTitle').innerHTML = `<i class="fas fa-calendar-day"></i> ${t.myCoursesTitle}`;
-            document.getElementById('ratingTitle').innerHTML = `<i class="fas fa-star"></i> ${t.ratingTitle}`;
-            document.getElementById('ratingLabel').textContent = t.ratingLabel;
-            document.getElementById('commentLabel').textContent = t.commentLabel;
-            document.getElementById('saveRatingText').textContent = t.saveRatingText;
-            document.getElementById('cancelRatingText').textContent = t.cancelRatingText;
-            document.getElementById('teacherCommentTitle').textContent = t.teacherCommentTitle;
-            document.getElementById('closeTeacherCommentModalBtn').textContent = t.closeText;
-            document.getElementById('closeText').textContent = t.closeText;
-            document.getElementById('cancelModalTitle').textContent = t.cancelModalTitle;
-            document.getElementById('cancelCourseLabel').innerHTML = t.cancelCourseLabel;
-            document.getElementById('cancelTeacherLabel').innerHTML = t.cancelTeacherLabel;
-            document.getElementById('cancelDateLabel').innerHTML = t.cancelDateLabel;
-            document.getElementById('cancelReasonLabel').textContent = t.cancelReasonLabel;
-            document.getElementById('reasonStudentLeave').textContent = t.reasonStudentLeave;
-            document.getElementById('reasonTeacherBusy').textContent = t.reasonTeacherBusy;
-            document.getElementById('reasonStudentAbsent').textContent = t.reasonStudentAbsent;
-            document.getElementById('reasonOther').textContent = t.reasonOther;
-            document.getElementById('cancelBtnText').textContent = t.cancelBtnText;
-            document.getElementById('confirmCancelBtnText').textContent = t.confirmCancelBtnText;
-            renderCoursesList();
-        }
+       function updateUIText() {
+    const t = translations[currentLang];
+    document.getElementById('pageTitle').textContent = t.pageTitle;
+    document.getElementById('logoutText').textContent = t.logoutText;
+    document.getElementById('statBookedLabel').textContent = t.statBookedLabel;
+    document.getElementById('statCompletedLabel').textContent = t.statCompletedLabel;
+    document.getElementById('statRatingLabel').textContent = t.statRatingLabel;
+    document.getElementById('statTeacherLabel').textContent = t.statTeacherLabel;
+    document.getElementById('totalCreditLabel').textContent = t.totalCreditLabel;
+    document.getElementById('scheduledHoursLabel').textContent = t.scheduledHoursLabel;
+    document.getElementById('inProgressHoursLabel').textContent = t.inProgressHoursLabel;
+    document.getElementById('usedHoursLabel').textContent = t.usedHoursLabel;
+    document.getElementById('remainingCreditLabel').textContent = t.remainingCreditLabel;
+    document.getElementById('myCoursesTitle').innerHTML = `<i class="fas fa-calendar-day"></i> ${t.myCoursesTitle}`;
+    document.getElementById('ratingTitle').innerHTML = `<i class="fas fa-star"></i> ${t.ratingTitle}`;
+    document.getElementById('ratingLabel').textContent = t.ratingLabel;
+    document.getElementById('commentLabel').textContent = t.commentLabel;
+    document.getElementById('saveRatingText').textContent = t.saveRatingText;
+    document.getElementById('cancelRatingText').textContent = t.cancelRatingText;
+    document.getElementById('teacherCommentTitle').textContent = t.teacherCommentTitle;
+    document.getElementById('closeTeacherCommentModalBtn').textContent = t.closeText;
+    document.getElementById('cancelModalTitle').textContent = t.cancelModalTitle;
+    document.getElementById('cancelCourseLabel').innerHTML = t.cancelCourseLabel;
+    document.getElementById('cancelTeacherLabel').innerHTML = t.cancelTeacherLabel;
+    document.getElementById('cancelDateLabel').innerHTML = t.cancelDateLabel;
+    document.getElementById('cancelReasonLabel').textContent = t.cancelReasonLabel;
+    document.getElementById('reasonStudentLeave').textContent = t.reasonStudentLeave;
+    document.getElementById('reasonTeacherBusy').textContent = t.reasonTeacherBusy;
+    document.getElementById('reasonStudentAbsent').textContent = t.reasonStudentAbsent;
+    document.getElementById('reasonOther').textContent = t.reasonOther;
+    document.getElementById('cancelBtnText').textContent = t.cancelBtnText;
+    document.getElementById('confirmCancelBtnText').textContent = t.confirmCancelBtnText;
+    renderCoursesList();
+}
         
         function switchLanguage(lang) {
             currentLang = lang;
