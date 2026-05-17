@@ -393,6 +393,31 @@
             cursor: pointer;
             font-weight: 600;
         }
+        
+        /* 取消原因样式 */
+        .cancel-reason-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .cancel-reason-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .cancel-reason-option:hover { background: #f5f5f5; border-color: var(--primary-blue); }
+        .cancel-reason-option.selected { background: rgba(0,64,128,0.05); border-color: var(--primary-blue); }
+        .cancel-reason-option i { width: 24px; color: var(--primary-blue); }
+        .cancel-reason-option span { flex: 1; }
+        .cancel-reason-option input[type="radio"] { width: 18px; height: 18px; cursor: pointer; }
+        .custom-reason-input { margin-top: 10px; display: none; }
+        .custom-reason-input.show { display: block; }
     </style>
 </head>
 <body>
@@ -508,6 +533,48 @@
         </div>
     </div>
 
+    <!-- 取消原因模态框 -->
+    <div id="cancelReasonModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-ban"></i> Motif d'annulation</h2>
+                <button class="close-btn" id="closeCancelReasonBtn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>📝 Sélectionnez ou saisissez le motif</label>
+                <div class="cancel-reason-group">
+                    <label class="cancel-reason-option" data-reason="student_leave">
+                        <i class="fas fa-user-graduate"></i>
+                        <span>📖 学生请假</span>
+                        <input type="radio" name="cancelReason" value="学生请假">
+                    </label>
+                    <label class="cancel-reason-option" data-reason="teacher_busy">
+                        <i class="fas fa-chalkboard-user"></i>
+                        <span>👨‍🏫 老师有事</span>
+                        <input type="radio" name="cancelReason" value="老师有事">
+                    </label>
+                    <label class="cancel-reason-option" data-reason="student_absent">
+                        <i class="fas fa-user-slash"></i>
+                        <span>❌ 学生缺席</span>
+                        <input type="radio" name="cancelReason" value="学生缺席">
+                    </label>
+                    <label class="cancel-reason-option" data-reason="other">
+                        <i class="fas fa-ellipsis-h"></i>
+                        <span>📝 其他</span>
+                        <input type="radio" name="cancelReason" value="其他">
+                    </label>
+                </div>
+                <div id="customCancelReasonContainer" class="custom-reason-input">
+                    <input type="text" id="customCancelReason" placeholder="Précisez le motif..." style="width:100%; margin-top:10px;">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="cancel-btn" id="cancelReasonModalBtn">Annuler</button>
+                <button type="button" class="save-btn" id="confirmCancelReasonBtn">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ========== 课程类型三级菜单配置 ==========
         const courseTypeConfig = {
@@ -540,6 +607,7 @@
         const DEFAULT_MEETING_LINK = 'https://meet.google.com/bof-kzvo-ndh';
         const HE_TEACHER_LINK = 'https://meet.google.com/sgn-haij-aeh';
         const ZHOU_TEACHER_LINK = 'https://meet.google.com/bof-kzvo-ndh';
+        
         function getTypeDisplayText(code) {
             if (!code) return '';
             if (code === 'ec') return '1️⃣ 公民考试';
@@ -647,7 +715,8 @@
         let allStudents = [];
         let allTeachers = [];
         let pendingDeleteCourseId = null;
-        let showOnlyUpcoming = true;  // true=即将上课, false=历史课程
+        let showOnlyUpcoming = true;
+        let pendingCancelData = null;
 
         // DOM 元素
         const totalCoursesEl = document.getElementById('totalCourses');
@@ -671,78 +740,45 @@
             document.body.appendChild(t);
             setTimeout(() => t.remove(), 3000);
         }
+
         // 扣减学生课时
-async function deductStudentCredit(studentId, hours, isEdit = false, oldHours = 0) {
-    if (!studentId || !hours || hours <= 0) return true;
-    
-    const supabase = window.supabaseAuth.getSupabaseClient();
-    const student = allStudents.find(s => s.id === studentId);
-    
-    if (!student) return true;
-    if (student.credit === undefined || student.credit === null) return true;
-    
-    const currentCredit = student.credit;
-    if (currentCredit < hours) {
-        showToast(`课时不足！学生 ${student.name} 只有 ${currentCredit} 小时，需要 ${hours} 小时`, 'error');
-        return false;
-    }
-    
-    const newCredit = currentCredit - hours;
-    const { error } = await supabase
-        .from('students')
-        .update({ credit: newCredit })
-        .eq('id', studentId);
-    
-    if (error) {
-        console.error('扣减课时失败:', error);
-        return false;
-    }
-    
-    student.credit = newCredit;
-    return true;
-}
+        async function deductStudentCredit(studentId, hours) {
+            if (!studentId || !hours || hours <= 0) return true;
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const student = allStudents.find(s => s.id === studentId);
+            if (!student) return true;
+            if (student.credit === undefined || student.credit === null) return true;
+            const currentCredit = student.credit;
+            if (currentCredit < hours) {
+                showToast(`课时不足！学生 ${student.name} 只有 ${currentCredit} 小时，需要 ${hours} 小时`, 'error');
+                return false;
+            }
+            const newCredit = currentCredit - hours;
+            const { error } = await supabase.from('students').update({ credit: newCredit }).eq('id', studentId);
+            if (error) {
+                console.error('扣减课时失败:', error);
+                return false;
+            }
+            student.credit = newCredit;
+            return true;
+        }
 
-// 返还学生课时
-async function refundStudentCredit(studentId, hours) {
-    if (!studentId || !hours || hours <= 0) return true;
-    
-    const supabase = window.supabaseAuth.getSupabaseClient();
-    const student = allStudents.find(s => s.id === studentId);
-    
-    if (!student) return true;
-    if (student.credit === undefined || student.credit === null) return true;
-    
-    const newCredit = (student.credit || 0) + hours;
-    const { error } = await supabase
-        .from('students')
-        .update({ credit: newCredit })
-        .eq('id', studentId);
-    
-    if (error) {
-        console.error('返还课时失败:', error);
-        return false;
-    }
-    
-    student.credit = newCredit;
-    return true;
-}
-
-// 调整课时（编辑时使用）
-async function adjustStudentCredit(studentId, oldHours, newHours) {
-    if (!studentId) return true;
-    if (oldHours === newHours) return true;
-    
-    const diff = newHours - oldHours;
-    
-    if (diff > 0) {
-        // 需要扣减差额
-        return await deductStudentCredit(studentId, diff);
-    } else if (diff < 0) {
-        // 需要返还差额
-        return await refundStudentCredit(studentId, -diff);
-    }
-    return true;
-}
+        // 返还学生课时
+        async function refundStudentCredit(studentId, hours) {
+            if (!studentId || !hours || hours <= 0) return true;
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const student = allStudents.find(s => s.id === studentId);
+            if (!student) return true;
+            if (student.credit === undefined || student.credit === null) return true;
+            const newCredit = (student.credit || 0) + hours;
+            const { error } = await supabase.from('students').update({ credit: newCredit }).eq('id', studentId);
+            if (error) {
+                console.error('返还课时失败:', error);
+                return false;
+            }
+            student.credit = newCredit;
+            return true;
+        }
 
         function closeModal(modal) { modal.style.display = 'none'; }
         
@@ -798,191 +834,183 @@ async function adjustStudentCredit(studentId, oldHours, newHours) {
             }
             filterType.innerHTML = typeOptions;
         }
-      function getFilteredCourses() {
-    const now = new Date();
-    if (showOnlyUpcoming) {
-        // 即将上课：所有未完成的课程（包括 in_progress、scheduled，不管时间是否已过）
-        return allCourses.filter(c => c.status !== 'completed' && c.status !== 'cancelled');
-    } else {
-        // 历史课程：已完成 或 已取消
-        return allCourses.filter(c => c.status === 'completed' || c.status === 'cancelled');
-    }
-}
 
-// 初始化过滤按钮
-function initCourseFilters() {
-    const upcomingBtn = document.getElementById('showUpcomingBtn');
-    const pastBtn = document.getElementById('showPastBtn');
-    
-    if (upcomingBtn && pastBtn) {
-        upcomingBtn.onclick = () => {
-            showOnlyUpcoming = true;
-            upcomingBtn.style.background = 'var(--primary-blue)';
-            upcomingBtn.style.color = 'white';
-            pastBtn.style.background = '#95a5a6';
-            pastBtn.style.color = 'white';
-            renderCoursesList();
-        };
-        
-        pastBtn.onclick = () => {
-            showOnlyUpcoming = false;
-            pastBtn.style.background = 'var(--primary-blue)';
-            pastBtn.style.color = 'white';
-            upcomingBtn.style.background = '#95a5a6';
-            upcomingBtn.style.color = 'white';
-            renderCoursesList();
-        };
-    }
-}
-            function renderCoursesList() {
-                const container = document.getElementById('coursesList');
-                if (!container) return;
+        function getFilteredCourses() {
+            if (showOnlyUpcoming) {
+                return allCourses.filter(c => c.status !== 'completed' && c.status !== 'cancelled');
+            } else {
+                return allCourses.filter(c => c.status === 'completed' || c.status === 'cancelled');
+            }
+        }
+
+        function initCourseFilters() {
+            const upcomingBtn = document.getElementById('showUpcomingBtn');
+            const pastBtn = document.getElementById('showPastBtn');
+            
+            if (upcomingBtn && pastBtn) {
+                upcomingBtn.onclick = () => {
+                    showOnlyUpcoming = true;
+                    upcomingBtn.style.background = 'var(--primary-blue)';
+                    upcomingBtn.style.color = 'white';
+                    pastBtn.style.background = '#95a5a6';
+                    pastBtn.style.color = 'white';
+                    renderCoursesList();
+                };
+                pastBtn.onclick = () => {
+                    showOnlyUpcoming = false;
+                    pastBtn.style.background = 'var(--primary-blue)';
+                    pastBtn.style.color = 'white';
+                    upcomingBtn.style.background = '#95a5a6';
+                    upcomingBtn.style.color = 'white';
+                    renderCoursesList();
+                };
+            }
+        }
+
+        function renderCoursesList() {
+            const container = document.getElementById('coursesList');
+            if (!container) return;
+            
+            let filtered = getFilteredCourses();
+            if (filterType.value) {
+                filtered = filtered.filter(c => c.course_type === filterType.value);
+            }
+            if (filterTeacher.value) {
+                filtered = filtered.filter(c => c.teacher_id === filterTeacher.value);
+            }
+            
+            if (filtered.length === 0) {
+                const emptyMsg = showOnlyUpcoming ? '📭 Aucun cours à venir' : '📭 Aucun cours passé';
+                container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
+                return;
+            }
+            
+            container.innerHTML = filtered.map(c => {
+                const s = allStudents.find(x => x.id === c.student_id);
+                const t = allTeachers.find(x => x.id === c.teacher_id);
                 
-                // 先按时间和状态过滤
-                let filtered = getFilteredCourses();
+                const statusText = {
+                    'scheduled': '📅 计划',
+                    'completed': '✅ 完成',
+                    'cancelled': '❌ 取消'
+                }[c.status] || c.status;
                 
-                // 再按类型过滤
-                if (filterType.value) {
-                    filtered = filtered.filter(c => c.course_type === filterType.value);
-                }
-                // 再按老师过滤
-                if (filterTeacher.value) {
-                    filtered = filtered.filter(c => c.teacher_id === filterTeacher.value);
-                }
+                const statusClass = {
+                    'scheduled': 'status-scheduled',
+                    'completed': 'status-completed',
+                    'cancelled': 'status-cancelled'
+                }[c.status] || 'status-scheduled';
                 
-                if (filtered.length === 0) {
-                    const emptyMsg = showOnlyUpcoming ? '📭 Aucun cours à venir' : '📭 Aucun cours passé';
-                    container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
+                const typeText = getTypeDisplayText(c.course_type);
+                const startTime = formatDateTime(c.start_time);
+                const endTime = formatDateTime(new Date(new Date(c.start_time).getTime() + (c.duration || 2) * 3600000));
+                
+                return `
+                    <div class="course-card" data-id="${c.id}">
+                        <div class="course-header">
+                            <span class="course-title">${typeText} - ${startTime} à ${endTime.split(' ')[1]}</span>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="course-details">
+                            <div class="detail-item"><i class="fas fa-user-graduate"></i> Élève: ${escapeHtml(s?.name || 'N/A')}</div>
+                            <div class="detail-item"><i class="fas fa-chalkboard-user"></i> Intervenant: ${escapeHtml(t?.name || 'N/A')}</div>
+                            <div class="detail-item"><i class="fas fa-map-marker-alt"></i> Lieu: ${c.location || 'À définir'}</div>
+                            <div class="detail-item"><i class="fas fa-clock"></i> Durée: ${c.duration || 2} heures</div>
+                            ${s && s.credit !== undefined && s.credit !== null && s.role === 'stu' ? `<div class="detail-item"><i class="fas fa-hourglass-half"></i> 📚 Crédits restants: ${s.credit} h</div>` : ''}
+                            ${c.material_link ? `<div class="detail-item"><i class="fas fa-link"></i> <a href="${c.material_link}" target="_blank">📚 Lien du cours</a></div>` : ''}
+                            ${c.meeting_link ? `<div class="detail-item"><i class="fas fa-video"></i> <a href="${c.meeting_link}" target="_blank">🎥 Lien visio</a></div>` : ''}
+                            ${c.notes ? `<div class="detail-item"><i class="fas fa-sticky-note"></i> Notes: ${escapeHtml(c.notes)}</div>` : ''}
+                            ${c.cancel_reason ? `<div class="detail-item"><i class="fas fa-ban"></i> Motif annulation: "${escapeHtml(c.cancel_reason)}"</div>` : ''}
+                        </div>
+                        <div class="course-actions">
+                            <button class="action-btn btn-edit" onclick="openEditModal('${c.id}')"><i class="fas fa-edit"></i> Modifier</button>
+                            ${c.status === 'completed' && !c.student_rating ? `<button class="action-btn btn-rate" onclick="openEvaluationModal('${c.id}')"><i class="fas fa-star"></i> Évaluer</button>` : ''}
+                            <button class="action-btn btn-delete" onclick="showDeleteConfirm('${c.id}')"><i class="fas fa-trash"></i> Supprimer</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function loadData() {
+            try {
+                const supabase = window.supabaseAuth.getSupabaseClient();
+                if (!supabase) {
+                    showToast('Supabase 未初始化', 'error');
                     return;
                 }
                 
-                container.innerHTML = filtered.map(c => {
-                    const s = allStudents.find(x => x.id === c.student_id);
-                    const t = allTeachers.find(x => x.id === c.teacher_id);
-                    
-                    const statusText = {
-                        'scheduled': '📅 计划',
-                        'completed': '✅ 完成',
-                        'cancelled': '❌ 取消'
-                    }[c.status] || c.status;
-                    
-                    const statusClass = {
-                        'scheduled': 'status-scheduled',
-                        'completed': 'status-completed',
-                        'cancelled': 'status-cancelled'
-                    }[c.status] || 'status-scheduled';
-                    
-                    const typeText = getTypeDisplayText(c.course_type);
-                    const startTime = formatDateTime(c.start_time);
-                    const endTime = formatDateTime(new Date(new Date(c.start_time).getTime() + (c.duration || 2) * 3600000));
-                    
-                    return `
-                        <div class="course-card" data-id="${c.id}">
-                            <div class="course-header">
-                                <span class="course-title">${typeText} - ${startTime} à ${endTime.split(' ')[1]}</span>
-                                <span class="status-badge ${statusClass}">${statusText}</span>
-                            </div>
-                           <div class="course-details">
-                                <div class="detail-item"><i class="fas fa-user-graduate"></i> Élève: ${escapeHtml(s?.name || 'N/A')}</div>
-                                <div class="detail-item"><i class="fas fa-chalkboard-user"></i> Intervenant: ${escapeHtml(t?.name || 'N/A')}</div>
-                                <div class="detail-item"><i class="fas fa-map-marker-alt"></i> Lieu: ${c.location || 'À définir'}</div>
-                                <div class="detail-item"><i class="fas fa-clock"></i> Durée: ${c.duration || 2} heures</div>
-                                ${s && s.credit !== undefined && s.credit !== null && s.role === 'stu' ? `<div class="detail-item"><i class="fas fa-hourglass-half"></i> 📚 Crédits restants: ${s.credit} h</div>` : ''}
-                                ${c.material_link ? `<div class="detail-item"><i class="fas fa-link"></i> <a href="${c.material_link}" target="_blank">📚 Lien du cours</a></div>` : ''}
-                                ${c.meeting_link ? `<div class="detail-item"><i class="fas fa-video"></i> <a href="${c.meeting_link}" target="_blank">🎥 Lien visio</a></div>` : ''}
-                                ${c.notes ? `<div class="detail-item"><i class="fas fa-sticky-note"></i> Notes: ${escapeHtml(c.notes)}</div>` : ''}
-                            </div>
-                            <div class="course-actions">
-                                <button class="action-btn btn-edit" onclick="openEditModal('${c.id}')"><i class="fas fa-edit"></i> Modifier</button>
-                                ${c.status === 'completed' && !c.student_rating ? `<button class="action-btn btn-rate" onclick="openEvaluationModal('${c.id}')"><i class="fas fa-star"></i> Évaluer</button>` : ''}
-                                <button class="action-btn btn-delete" onclick="showDeleteConfirm('${c.id}')"><i class="fas fa-trash"></i> Supprimer</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                const [coursesRes, studentsRes, teachersRes] = await Promise.all([
+                    supabase.from('courses').select('*').order('start_time'),
+                    supabase.from('students').select('id, name, credit, role').eq('role', 'stu'),
+                    supabase.from('students').select('id, name').eq('role', 'teacher')
+                ]);
+                
+                if (coursesRes.error) throw coursesRes.error;
+                if (studentsRes.error) throw studentsRes.error;
+                if (teachersRes.error) throw teachersRes.error;
+
+                allCourses = coursesRes.data || [];
+                allStudents = studentsRes.data || [];
+                allTeachers = teachersRes.data || [];
+
+                filterTeacher.innerHTML = '<option value="">Tous les intervenants</option>' + 
+                    allTeachers.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+                
+                updateFilterOptions();
+                updateStats();
+                initCourseFilters();
+                renderCoursesList();
+                initCancelReasonModalEvents();
+            } catch (err) {
+                console.error(err);
+                showToast('Erreur chargement: ' + err.message, 'error');
             }
-
-async function loadData() {
-    try {
-        const supabase = window.supabaseAuth.getSupabaseClient();
-        if (!supabase) {
-            showToast('Supabase 未初始化', 'error');
-            return;
         }
-        
-        const [coursesRes, studentsRes, teachersRes] = await Promise.all([
-            supabase.from('courses').select('*').order('start_time'),
-            supabase.from('students').select('id, name, credit, role').eq('role', 'stu'),
-            supabase.from('students').select('id, name').eq('role', 'teacher')
-        ]);
-        
-        if (coursesRes.error) throw coursesRes.error;
-        if (studentsRes.error) throw studentsRes.error;
-        if (teachersRes.error) throw teachersRes.error;
 
-        allCourses = coursesRes.data || [];
-        allStudents = studentsRes.data || [];
-        allTeachers = teachersRes.data || [];
-
-        filterTeacher.innerHTML = '<option value="">Tous les intervenants</option>' + 
-            allTeachers.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
-        
-        updateFilterOptions();
-        updateStats();
-        initCourseFilters();
-        renderCoursesList();
-    } catch (err) {
-        console.error(err);
-        showToast('Erreur chargement: ' + err.message, 'error');
-    }
-}
-function refreshData() {
+        function refreshData() {
             loadData();
         }
 
-       function openCreateModal(startTimeStr) {
-    document.getElementById('courseForm').reset();
-    document.getElementById('courseId').value = '';
-    document.getElementById('modalTitle').innerText = 'Ajouter un cours';
-    document.getElementById('startTime').value = startTimeStr || '';
-    document.getElementById('duration').value = 2;
-    document.getElementById('status').value = 'scheduled';
-    conflictWarning.style.display = 'none';
-    document.getElementById('courseTypeValue').value = '';
-    document.getElementById('selectedTypeDisplay').style.display = 'none';
-    
-    // 设置会议链接默认值
-    document.getElementById('meetingLink').value = DEFAULT_MEETING_LINK;
-    
-    const studentSelect = document.getElementById('studentId');
-    const teacherSelect = document.getElementById('teacherId');
-    studentSelect.innerHTML = '<option value="">Sélectionner...</option>' + allStudents.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
-    teacherSelect.innerHTML = '<option value="">Sélectionner...</option>' + allTeachers.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
-    
-    // 老师选择变化时自动更新会议链接
-    teacherSelect.onchange = function() {
-        const selectedTeacherId = this.value;
-        const selectedTeacher = allTeachers.find(t => t.id === selectedTeacherId);
-        
-        if (selectedTeacher) {
-            const teacherName = selectedTeacher.name;
+        function openCreateModal(startTimeStr) {
+            document.getElementById('courseForm').reset();
+            document.getElementById('courseId').value = '';
+            document.getElementById('modalTitle').innerText = 'Ajouter un cours';
+            document.getElementById('startTime').value = startTimeStr || '';
+            document.getElementById('duration').value = 2;
+            document.getElementById('status').value = 'scheduled';
+            conflictWarning.style.display = 'none';
+            document.getElementById('courseTypeValue').value = '';
+            document.getElementById('selectedTypeDisplay').style.display = 'none';
             
-            // 根据老师名字设置不同的会议链接
-            if (teacherName === 'HE') {
-                document.getElementById('meetingLink').value = HE_TEACHER_LINK;
-            } else if (teacherName === 'ZHOU' ) {
-                document.getElementById('meetingLink').value = ZHOU_TEACHER_LINK;
-            } else {
-                document.getElementById('meetingLink').value = DEFAULT_MEETING_LINK;
-            }
-        } else {
             document.getElementById('meetingLink').value = DEFAULT_MEETING_LINK;
+            
+            const studentSelect = document.getElementById('studentId');
+            const teacherSelect = document.getElementById('teacherId');
+            studentSelect.innerHTML = '<option value="">Sélectionner...</option>' + allStudents.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+            teacherSelect.innerHTML = '<option value="">Sélectionner...</option>' + allTeachers.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+            
+            teacherSelect.onchange = function() {
+                const selectedTeacherId = this.value;
+                const selectedTeacher = allTeachers.find(t => t.id === selectedTeacherId);
+                if (selectedTeacher) {
+                    const teacherName = selectedTeacher.name;
+                    if (teacherName === 'HE') {
+                        document.getElementById('meetingLink').value = HE_TEACHER_LINK;
+                    } else if (teacherName === 'ZHOU') {
+                        document.getElementById('meetingLink').value = ZHOU_TEACHER_LINK;
+                    } else {
+                        document.getElementById('meetingLink').value = DEFAULT_MEETING_LINK;
+                    }
+                } else {
+                    document.getElementById('meetingLink').value = DEFAULT_MEETING_LINK;
+                }
+            };
+            
+            renderCourseTypeSelector('');
+            courseModal.style.display = 'flex';
         }
-    };
-    
-    renderCourseTypeSelector('');
-    courseModal.style.display = 'flex';
-}
+
         async function openEditModal(courseId) {
             const course = allCourses.find(c => c.id === courseId);
             if (!course) return;
@@ -1036,131 +1064,213 @@ function refreshData() {
             return true;
         }
 
-        async function saveCourse(e) {
-    e.preventDefault();
-    const supabase = window.supabaseAuth.getSupabaseClient();
-    const id = document.getElementById('courseId').value;
-    const teacherId = document.getElementById('teacherId').value;
-    const studentId = document.getElementById('studentId').value;
-    const startTimeLocal = document.getElementById('startTime').value;
-    const duration = parseFloat(document.getElementById('duration').value) || 2;
-    const courseType = document.getElementById('courseTypeValue').value;
-    const newStatus = document.getElementById('status').value;
-    
-    if (!startTimeLocal) {
-        showToast('Veuillez sélectionner une date et heure', 'error');
-        return;
-    }
-    if (!courseType) {
-        showToast('Veuillez sélectionner un type de cours', 'error');
-        return;
-    }
-    
-    const [datePart, timePart] = startTimeLocal.split('T');
-    const startTimeStr = `${datePart} ${timePart}:00`;
-    
-    if (checkConflict(teacherId, startTimeStr, id || null, duration)) {
-        showToast('Conflit horaire avec un autre cours !', 'error');
-        return;
-    }
-    
-    const data = {
-        student_id: studentId,
-        teacher_id: teacherId,
-        course_type: courseType,
-        start_time: startTimeStr,
-        duration: duration,
-        location: document.getElementById('location').value || null,
-        material_link: document.getElementById('materialLink').value || null,
-        meeting_link: document.getElementById('meetingLink').value || null,
-        notes: document.getElementById('notes').value || null,
-        status: newStatus
-    };
-    
-    if (!data.student_id || !data.teacher_id) {
-        showToast('Veuillez sélectionner un élève et un intervenant', 'error');
-        return;
-    }
-    
-    try {
-        const isNewCourse = !id;
-        
-        if (isNewCourse) {
-            // ========== 新建课程 ==========
-            // 只有 scheduled 或 completed 状态才扣课时
-            if (newStatus === 'scheduled' || newStatus === 'completed') {
-                const canDeduct = await deductStudentCredit(studentId, duration);
-                if (!canDeduct) return;
-            }
-            
-            const { error } = await supabase.from('courses').insert([data]);
-            if (error) throw error;
-            
-        } else {
-            // ========== 编辑课程 ==========
-            const oldCourse = allCourses.find(c => c.id === id);
-            if (!oldCourse) throw new Error('Cours non trouvé');
-            
-            const oldStatus = oldCourse.status;
-            const oldDuration = oldCourse.duration || 2;
-            const oldStudentId = oldCourse.student_id;
-            
-            // 判断哪些状态会消耗课时
-            // 判断哪些状态会消耗课时（创建时扣减过的状态）
-            const isConsumingStatus = (status) => status === 'scheduled' || status === 'in_progress' || status === 'completed';
-            const oldConsumes = isConsumingStatus(oldStatus);
-            const newConsumes = isConsumingStatus(newStatus);
-            
-            // 情况1：学生换了，需要处理旧学生的课时返还和新学生的课时扣减
-            if (oldStudentId !== studentId) {
-                // 返还旧学生的课时（如果旧课程消耗课时）
-                if (oldConsumes) {
-                    await refundStudentCredit(oldStudentId, oldDuration);
-                }
-                // 扣减新学生的课时（如果新课程消耗课时）
-                if (newConsumes) {
-                    const canDeduct = await deductStudentCredit(studentId, duration);
-                    if (!canDeduct) return;
-                }
-            } else {
-                // 情况2：同一个学生
-                if (oldConsumes && !newConsumes) {
-                    // 从消耗状态变为不消耗状态（如 scheduled -> cancelled）→ 返还课时
-                    await refundStudentCredit(studentId, oldDuration);
-                } 
-                else if (!oldConsumes && newConsumes) {
-                    // 从不消耗状态变为消耗状态（如 cancelled -> scheduled）→ 扣减课时
-                    const canDeduct = await deductStudentCredit(studentId, duration);
-                    if (!canDeduct) return;
-                }
-                else if (oldConsumes && newConsumes) {
-                    // 都是消耗状态 → 调整课时差额
-                    const diff = duration - oldDuration;
-                    if (diff > 0) {
-                        // 课时变多了，需要多扣
-                        const canDeduct = await deductStudentCredit(studentId, diff);
-                        if (!canDeduct) return;
-                    } else if (diff < 0) {
-                        // 课时变少了，需要返还
-                        await refundStudentCredit(studentId, -diff);
-                    }
-                }
-            }
-            
-            // 更新课程
-            const { error } = await supabase.from('courses').update(data).eq('id', id);
-            if (error) throw error;
+        function openCancelReasonModal() {
+            document.querySelectorAll('#cancelReasonModal input[name="cancelReason"]').forEach(r => r.checked = false);
+            document.getElementById('customCancelReason').value = '';
+            document.getElementById('customCancelReasonContainer').classList.remove('show');
+            document.querySelectorAll('#cancelReasonModal .cancel-reason-option').forEach(opt => opt.classList.remove('selected'));
+            document.getElementById('cancelReasonModal').style.display = 'flex';
         }
-        
-        closeModal(courseModal);
-        await loadData();
-        showToast(id ? 'Cours modifié' : 'Cours créé', 'success');
-        
-    } catch (err) {
-        console.error(err);
-        showToast('Erreur: ' + (err.message || 'Vérifiez la console'), 'error');
-    }
-}
+
+        async function executeSaveCourseWithCancelReason(selectedReason) {
+            const { id, data, oldCourse } = pendingCancelData;
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            
+            try {
+                const isNewCourse = !id;
+                
+                if (isNewCourse) {
+                    const { error } = await supabase.from('courses').insert([{ ...data, cancel_reason: selectedReason }]);
+                    if (error) throw error;
+                } else {
+                    const oldStatus = oldCourse.status;
+                    const oldDuration = oldCourse.duration || 2;
+                    const oldStudentId = oldCourse.student_id;
+                    
+                    const isConsumingStatus = (status) => status === 'scheduled' || status === 'in_progress' || status === 'completed';
+                    const oldConsumes = isConsumingStatus(oldStatus);
+                    
+                    if (oldConsumes && oldStudentId) {
+                        await refundStudentCredit(oldStudentId, oldDuration);
+                    }
+                    
+                    const { error } = await supabase.from('courses').update({ ...data, cancel_reason: selectedReason }).eq('id', id);
+                    if (error) throw error;
+                }
+                
+                closeModal(courseModal);
+                document.getElementById('cancelReasonModal').style.display = 'none';
+                await loadData();
+                showToast(id ? 'Cours modifié' : 'Cours créé', 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Erreur: ' + (err.message || 'Vérifiez la console'), 'error');
+            }
+            pendingCancelData = null;
+        }
+
+        function initCancelReasonModalEvents() {
+            document.querySelectorAll('#cancelReasonModal .cancel-reason-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const radio = option.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    document.querySelectorAll('#cancelReasonModal .cancel-reason-option').forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    
+                    if (option.dataset.reason === 'other') {
+                        document.getElementById('customCancelReasonContainer').classList.add('show');
+                    } else {
+                        document.getElementById('customCancelReasonContainer').classList.remove('show');
+                    }
+                });
+            });
+            
+            document.getElementById('confirmCancelReasonBtn').onclick = async () => {
+                let selectedReason = null;
+                document.querySelectorAll('#cancelReasonModal input[name="cancelReason"]').forEach(r => {
+                    if (r.checked) selectedReason = r.value;
+                });
+                
+                if (selectedReason === '其他') {
+                    const customReason = document.getElementById('customCancelReason').value.trim();
+                    if (customReason) selectedReason = customReason;
+                }
+                
+                if (!selectedReason) {
+                    showToast('Veuillez sélectionner un motif d\'annulation', 'error');
+                    return;
+                }
+                
+                await executeSaveCourseWithCancelReason(selectedReason);
+            };
+            
+            document.getElementById('closeCancelReasonBtn').onclick = () => {
+                document.getElementById('cancelReasonModal').style.display = 'none';
+                pendingCancelData = null;
+            };
+            document.getElementById('cancelReasonModalBtn').onclick = () => {
+                document.getElementById('cancelReasonModal').style.display = 'none';
+                pendingCancelData = null;
+            };
+            document.getElementById('cancelReasonModal').onclick = (e) => {
+                if (e.target === document.getElementById('cancelReasonModal')) {
+                    document.getElementById('cancelReasonModal').style.display = 'none';
+                    pendingCancelData = null;
+                }
+            };
+        }
+
+        async function saveCourse(e) {
+            e.preventDefault();
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const id = document.getElementById('courseId').value;
+            const teacherId = document.getElementById('teacherId').value;
+            const studentId = document.getElementById('studentId').value;
+            const startTimeLocal = document.getElementById('startTime').value;
+            const duration = parseFloat(document.getElementById('duration').value) || 2;
+            const courseType = document.getElementById('courseTypeValue').value;
+            const newStatus = document.getElementById('status').value;
+            
+            if (!startTimeLocal) {
+                showToast('Veuillez sélectionner une date et heure', 'error');
+                return;
+            }
+            if (!courseType) {
+                showToast('Veuillez sélectionner un type de cours', 'error');
+                return;
+            }
+            
+            const [datePart, timePart] = startTimeLocal.split('T');
+            const startTimeStr = `${datePart} ${timePart}:00`;
+            
+            if (checkConflict(teacherId, startTimeStr, id || null, duration)) {
+                showToast('Conflit horaire avec un autre cours !', 'error');
+                return;
+            }
+            
+            const data = {
+                student_id: studentId,
+                teacher_id: teacherId,
+                course_type: courseType,
+                start_time: startTimeStr,
+                duration: duration,
+                location: document.getElementById('location').value || null,
+                material_link: document.getElementById('materialLink').value || null,
+                meeting_link: document.getElementById('meetingLink').value || null,
+                notes: document.getElementById('notes').value || null,
+                status: newStatus
+            };
+            
+            if (!data.student_id || !data.teacher_id) {
+                showToast('Veuillez sélectionner un élève et un intervenant', 'error');
+                return;
+            }
+            
+            // 如果状态变为 cancelled，弹出模态框选择取消原因
+            if (newStatus === 'cancelled') {
+                pendingCancelData = { id, data, oldCourse: id ? allCourses.find(c => c.id === id) : null };
+                openCancelReasonModal();
+                return;
+            }
+            
+            try {
+                const isNewCourse = !id;
+                
+                if (isNewCourse) {
+                    if (newStatus === 'scheduled' || newStatus === 'completed') {
+                        const canDeduct = await deductStudentCredit(studentId, duration);
+                        if (!canDeduct) return;
+                    }
+                    const { error } = await supabase.from('courses').insert([data]);
+                    if (error) throw error;
+                } else {
+                    const oldCourse = allCourses.find(c => c.id === id);
+                    if (!oldCourse) throw new Error('Cours non trouvé');
+                    
+                    const oldStatus = oldCourse.status;
+                    const oldDuration = oldCourse.duration || 2;
+                    const oldStudentId = oldCourse.student_id;
+                    
+                    const isConsumingStatus = (status) => status === 'scheduled' || status === 'in_progress' || status === 'completed';
+                    const oldConsumes = isConsumingStatus(oldStatus);
+                    const newConsumes = isConsumingStatus(newStatus);
+                    
+                    if (oldStudentId !== studentId) {
+                        if (oldConsumes) await refundStudentCredit(oldStudentId, oldDuration);
+                        if (newConsumes) {
+                            const canDeduct = await deductStudentCredit(studentId, duration);
+                            if (!canDeduct) return;
+                        }
+                    } else {
+                        if (oldConsumes && !newConsumes) {
+                            await refundStudentCredit(studentId, oldDuration);
+                        } else if (!oldConsumes && newConsumes) {
+                            const canDeduct = await deductStudentCredit(studentId, duration);
+                            if (!canDeduct) return;
+                        } else if (oldConsumes && newConsumes) {
+                            const diff = duration - oldDuration;
+                            if (diff > 0) {
+                                const canDeduct = await deductStudentCredit(studentId, diff);
+                                if (!canDeduct) return;
+                            } else if (diff < 0) {
+                                await refundStudentCredit(studentId, -diff);
+                            }
+                        }
+                    }
+                    
+                    const { error } = await supabase.from('courses').update(data).eq('id', id);
+                    if (error) throw error;
+                }
+                
+                closeModal(courseModal);
+                await loadData();
+                showToast(id ? 'Cours modifié' : 'Cours créé', 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Erreur: ' + (err.message || 'Vérifiez la console'), 'error');
+            }
+        }
+
         function showDeleteConfirm(courseId) {
             const course = allCourses.find(c => c.id === courseId);
             if (!course) return;
@@ -1177,30 +1287,30 @@ function refreshData() {
             deleteConfirmOverlay.classList.add('active');
         }
 
-       async function confirmDeleteCourse() {
-    if (!pendingDeleteCourseId) return;
-    
-    const supabase = window.supabaseAuth.getSupabaseClient();
-    const courseToDelete = allCourses.find(c => c.id === pendingDeleteCourseId);
-    
-    try {
-        // 如果课程是 scheduled 或 completed 状态，返还课时
-         if (courseToDelete && (courseToDelete.status === 'scheduled' || courseToDelete.status === 'in_progress' || courseToDelete.status === 'completed')) {
-            await refundStudentCredit(courseToDelete.student_id, courseToDelete.duration || 2);
+        async function confirmDeleteCourse() {
+            if (!pendingDeleteCourseId) return;
+            
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const courseToDelete = allCourses.find(c => c.id === pendingDeleteCourseId);
+            
+            try {
+                if (courseToDelete && (courseToDelete.status === 'scheduled' || courseToDelete.status === 'in_progress' || courseToDelete.status === 'completed')) {
+                    await refundStudentCredit(courseToDelete.student_id, courseToDelete.duration || 2);
+                }
+                
+                const { error } = await supabase.from('courses').delete().eq('id', pendingDeleteCourseId);
+                if (error) throw error;
+                
+                deleteConfirmOverlay.classList.remove('active');
+                pendingDeleteCourseId = null;
+                await loadData();
+                showToast('Cours supprimé avec succès', 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Erreur lors de la suppression', 'error');
+            }
         }
-        
-        const { error } = await supabase.from('courses').delete().eq('id', pendingDeleteCourseId);
-        if (error) throw error;
-        
-        deleteConfirmOverlay.classList.remove('active');
-        pendingDeleteCourseId = null;
-        await loadData();
-        showToast('Cours supprimé avec succès', 'success');
-    } catch (err) {
-        console.error(err);
-        showToast('Erreur lors de la suppression', 'error');
-    }
-}
+
         function cancelDeleteCourse() {
             deleteConfirmOverlay.classList.remove('active');
             pendingDeleteCourseId = null;
