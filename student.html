@@ -538,7 +538,7 @@ body {
     max-width: 420px;
     transform: scale(0.9);
     transition: transform 0.3s ease;
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
     overflow: hidden;
 }
 .confirm-dialog.active .confirm-card { transform: scale(1); }
@@ -771,7 +771,8 @@ body {
                 cancelTeacherLabel: "👨‍🏫 Intervenant:",
                 cancelInfoMsg: "Le créneau sera à nouveau disponible pour d'autres étudiants.",
                 noBtnText: "Non, garder",
-                yesBtnText: "Oui, annuler"
+                yesBtnText: "Oui, annuler",
+                cancelReasonLabel: "📝 Motif d'annulation:"
             },
             zh: {
                 pageTitle: "学生空间",
@@ -817,7 +818,8 @@ body {
                 cancelTeacherLabel: "👨‍🏫 老师:",
                 cancelInfoMsg: "该时段将重新对其他学生开放。",
                 noBtnText: "不，保留",
-                yesBtnText: "是，取消"
+                yesBtnText: "是，取消",
+                cancelReasonLabel: "📝 取消原因:"
             }
         };
         
@@ -1059,6 +1061,7 @@ body {
                             <div class="detail-item"><i class="fas fa-clock"></i> ${currentLang === 'fr' ? 'Durée:' : '时长:'} ${c.duration || 2} ${currentLang === 'fr' ? 'heures' : '小时'}</div>
                             ${c.material_link ? `<div class="detail-item"><i class="fas fa-link"></i> <a href="${c.material_link}" target="_blank">${currentLang === 'fr' ? 'Support' : '课件'}</a></div>` : ''}
                             ${c.meeting_link ? `<div class="detail-item"><i class="fas fa-video"></i> <a href="${c.meeting_link}" target="_blank">${currentLang === 'fr' ? 'Lien Meet' : '会议链接'}</a></div>` : ''}
+                            ${isCancelled && c.cancel_reason ? `<div class="detail-item"><i class="fas fa-ban"></i> ${t.cancelReasonLabel} ${escapeHtml(c.cancel_reason)}</div>` : ''}
                         </div>
                         ${hasTeacherComment ? `
                             <div class="teacher-comment-area">
