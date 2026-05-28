@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>历史长河 · 法兰西岁月 | 海军蓝时间轴大师 · 完整30事件</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #004080;
+            --primary-light-blue: #0066cc;
+            --primary-yellow: #ffd633;
+            --primary-light-yellow: #ffe066;
+            --dark-gray: #2c3e50;
+            --medium-gray: #5d6e7e;
+            --light-gray: #f0f4f9;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: 'Open Sans', 'Segoe UI', 'Noto Sans CJK SC', sans-serif;
+            background: linear-gradient(145deg, #eef2f7 0%, #e0e8f0 100%);
+            min-height: 100vh;
+            color: var(--dark-gray);
+        }
+
+        .game-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px 28px 40px;
+        }
+
+        /* 海军蓝华丽头部 */
+        .navy-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #0a2e5a 100%);
+            border-radius: 36px;
+            padding: 24px 36px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        .navy-header::before {
+            content: "⚓🌊⚜️";
+            font-size: 150px;
+            position: absolute;
+            right: -20px;
+            bottom: -50px;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .title-box h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.3px;
+        }
+        .title-box h1 i { color: var(--primary-yellow); margin-right: 14px; }
+        .title-box p { color: rgba(255,255,240,0.85); font-size: 0.85rem; margin-top: 8px; }
+        
+        /* 进度大卡片 — 同一行美观显示 */
+        .progress-master {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(12px);
+            border-radius: 80px;
+            padding: 12px 28px;
+            min-width: 240px;
+            text-align: center;
+            border: 1px solid var(--primary-yellow);
+        }
+        .progress-digits {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Montserrat', monospace;
+        }
+        .progress-digits .current {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-yellow);
+            line-height: 1;
+        }
+        .progress-digits .total {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: rgba(255,255,200,0.9);
+        }
+        .progress-label {
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            color: #ffefc0;
+            margin-top: 4px;
+        }
+        .progress-bar-bg {
+            margin-top: 10px;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary-yellow);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        /* 反馈条 */
+        .feedback-card {
+            background: var(--white);
+            border-radius: 60px;
+            padding: 14px 28px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-left: 8px solid var(--primary-yellow);
+        }
+        .feedback-icon { font-size: 1.6rem; color: var(--primary-blue); }
+        .feedback-text { font-weight: 600; font-size: 0.95rem; color: #1e4663; flex: 1; }
+
+        /* 时间轴长河 */
+        .timeline-card {
+            background: var(--white);
+            border-radius: 48px;
+            padding: 28px 20px 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 28px;
+        }
+        .scroll-river {
+            overflow-x: auto;
+            padding: 0.8rem 0 2rem;
+            scroll-behavior: smooth;
+            cursor: grab;
+        }
+        .scroll-river:active { cursor: grabbing; }
+        .river-container { position: relative; min-width: max-content; padding: 0 30px; }
+        .golden-line {
+            height: 6px;
+            background: linear-gradient(90deg, #c9a03d, var(--primary-yellow), #b8860b);
+            border-radius: 10px;
+            margin: 20px 0 30px;
+        }
+        .markers-row {
+            display: flex;
+            gap: 28px;
+        }
+        .date-marker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 120px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .date-marker:hover { transform: translateY(-5px); }
+        .date-marker.top .date-badge { margin-bottom: 18px; order: 1; }
+        .date-marker.top .dot-pivot { order: 2; }
+        .date-marker.bottom .date-badge { margin-top: 18px; order: 2; }
+        .date-marker.bottom .dot-pivot { order: 1; }
+        .dot-pivot {
+            width: 20px; height: 20px;
+            background: radial-gradient(circle, #f5bc70, #d4942e);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px var(--primary-blue);
+        }
+        .date-badge {
+            background: linear-gradient(145deg, #f9f3e0, #f0e5ce);
+            padding: 8px 20px;
+            border-radius: 60px;
+            font-weight: 800;
+            font-family: 'Montserrat', monospace;
+            font-size: 0.82rem;
+            color: var(--primary-blue);
+            white-space: nowrap;
+            border-bottom: 2px solid #cfb26e;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .date-marker.drop-active .date-badge {
+            background: var(--primary-yellow);
+            transform: scale(1.04);
+            box-shadow: 0 0 0 3px white, 0 0 0 5px var(--primary-blue);
+        }
+
+        /* 双栏布局更优雅 */
+        .dual-panel {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .event-pool {
+            background: #fefef7;
+            border-radius: 32px;
+            padding: 22px 24px;
+            border-left: 8px solid var(--primary-yellow);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .fixed-panel {
+            background: #eef3fc;
+            border-radius: 32px;
+            padding: 22px 24px;
+            border: 1px solid #cfe0ed;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .section-title {
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 18px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .events-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            max-height: 280px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+        .event-tile {
+            background: white;
+            border-left: 8px solid var(--primary-light-blue);
+            padding: 10px 28px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #1f3e5c;
+            cursor: grab;
+            transition: 0.08s linear;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            white-space: nowrap;
+        }
+        .event-tile:active { cursor: grabbing; transform: scale(0.97);}
+        .event-tile.dragging { opacity: 0.3; }
+        .fixed-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+        .history-badge {
+            background: white;
+            border-radius: 60px;
+            padding: 8px 20px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #1f4e6e;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--primary-yellow);
+            cursor: pointer;
+            transition: 0.1s;
+            display: inline-flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+        .history-badge:hover { background: #fff3dd; transform: translateY(-2px);}
+        .history-badge .date-chip {
+            background: var(--primary-blue);
+            color: white;
+            padding: 2px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .reset-button {
+            background: var(--primary-blue);
+            border: none;
+            padding: 14px 42px;
+            border-radius: 60px;
+            font-weight: 800;
+            color: white;
+            cursor: pointer;
+            display: block;
+            margin: 12px auto 0;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            width: fit-content;
+        }
+        .reset-button:hover { background: var(--primary-light-blue); transform: scale(0.97);}
+
+        /* 模态框 */
+        .epic-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(12px);
+            z-index: 2000; display: flex; align-items: center; justify-content: center;
+            animation: fadeIn 0.2s;
+        }
+        .epic-card {
+            background: #fffef7; max-width: 660px; width: 90%;
+            border-radius: 48px; padding: 28px 32px;
+            border-left: 14px solid var(--primary-yellow);
+            max-height: 85vh; overflow-y: auto;
+        }
+        .epic-card h2 { font-size: 1.7rem; color: var(--primary-blue); font-weight: 800; margin-bottom: 8px; }
+        .date-tag { background: #e9cf9a; display: inline-block; padding: 4px 18px; border-radius: 40px; margin-bottom: 18px; font-weight: 700; }
+        .fr-block, .zh-block { padding: 12px 18px; border-radius: 24px; margin: 12px 0; line-height: 1.55; }
+        .fr-block { background: #eef3fc; color: #004080; }
+        .zh-block { background: #fef8e7; color: #2c3e2f; }
+        .fun-block { background: #fcf2e0; padding: 16px; border-radius: 28px; border-left: 6px solid #f4b942; margin-top: 16px; }
+        .close-epic { background: var(--primary-blue); border: none; width: 100%; padding: 12px; border-radius: 60px; color: white; font-weight: bold; margin-top: 24px; cursor: pointer; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        ::-webkit-scrollbar { height: 6px; background: #cfdde8; border-radius: 10px;}
+        ::-webkit-scrollbar-thumb { background: var(--primary-yellow); border-radius: 10px;}
+        
+        @media (max-width: 960px) {
+            .dual-panel { grid-template-columns: 1fr; }
+            .game-container { padding: 16px; }
+            .date-marker { min-width: 100px; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <!-- 海军蓝头部 + 进度一体化 -->
+    <div class="navy-header">
+        <div class="header-row">
+            <div class="title-box">
+                <h1><i class="fas fa-water"></i> 历史长河 · 法兰西岁月</h1>
+                <p><i class="fas fa-flag-checkered"></i> 中法双语 | 拖拽事件至正确日期 → 自动弹出史诗扩展 | 点击徽章重温历史 | 完整30个重大事件</p>
+            </div>
+            <div class="progress-master">
+                <div class="progress-digits">
+                    <span class="current" id="scoreCurrent">0</span>
+                    <span class="total">/ <span id="totalEvents">30</span></span>
+                </div>
+                <div class="progress-label">ÉVÉNEMENTS ANCRÉS · 已锚定事件</div>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 反馈栏 -->
+    <div class="feedback-card">
+        <div class="feedback-icon"><i class="fas fa-compass"></i></div>
+        <div class="feedback-text" id="globalFeedback">✨ 将事件卡片拖到金色日期标签上，正确匹配会弹出丰富历史扩展 (完整30个事件) ✨</div>
+    </div>
+
+    <!-- 时间轴河流 -->
+    <div class="timeline-card">
+        <div class="scroll-river" id="scrollWrapper">
+            <div class="river-container">
+                <div class="golden-line"></div>
+                <div class="markers-row" id="timelineMarkers"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 双栏布局：待拖拽事件 + 已锚定事件 -->
+    <div class="dual-panel">
+        <div class="event-pool">
+            <div class="section-title"><i class="fas fa-dragon"></i> 待启航的事件 · À placer</div>
+            <div class="events-grid" id="draggableList"></div>
+        </div>
+        <div class="fixed-panel">
+            <div class="section-title"><i class="fas fa-anchor"></i> 已锚定历史坐标 · Fixés (cliquez pour détails)</div>
+            <div class="fixed-badges" id="fixedListArea"></div>
+        </div>
+    </div>
+
+    <button class="reset-button" id="resetGameBtn"><i class="fas fa-undo-alt"></i> 重新启航 · Recommencer</button>
+</div>
+
+<script>
+    // ======================= 完整30个事件库（包含第五共和国改革、巴黎圣母院等，无删减） =======================
+    const FULL_EVENTS = [
+        { name: "Révolution française / 法国大革命", rawDate: "1789", descFR: "1789 Prise de la Bastille, Déclaration des Droits de l'Homme, fin de l'Ancien Régime.", descZH: "1789年攻占巴士底狱，发布《人权宣言》，推翻封建专制。", funFactFR: "Les femmes marchèrent sur Versailles. La devise 'Liberté, Égalité, Fraternité' s'impose.", funFactZH: "凡尔赛妇女大游行，迫使国王迁回巴黎。‘自由、平等、博爱’成为法国格言。" },
+        { name: "Déclaration des droits de l'homme / 人权宣言", rawDate: "1789", descFR: "Texte fondamental des droits naturels, influencé par les Lumières.", descZH: "《人权和公民权宣言》，17条核心原则，现代宪法精神。", funFactFR: "Rédigé par La Fayette avec l'aide de Thomas Jefferson.", funFactZH: "拉法耶特侯爵起草，美国杰斐逊参与建议。" },
+        { name: "Coup d'État de Napoléon / 雾月政变", rawDate: "1799", descFR: "Napoléon Bonaparte renverse le Directoire, devient Premier consul.", descZH: "拿破仑发动雾月政变，结束督政府，开启执政府时代。", funFactFR: "Coup d'État des 9-10 novembre 1799.", funFactZH: "依靠军队和演说扭转局势，奠定拿破仑时代。" },
+        { name: "Premier Empire / 第一帝国", rawDate: "1804", descFR: "Napoléon Ier sacré empereur, conquêtes européennes et Code civil.", descZH: "拿破仑加冕称帝，法兰西第一帝国，称霸欧陆。", funFactFR: "Napoléon se couronne lui-même pour défier le pape.", funFactZH: "自戴皇冠，彰显权力高于教权。" },
+        { name: "Code civil / 拿破仑法典", rawDate: "1804", descFR: "Unification du droit civil, propriété privée, égalité civile.", descZH: "统一民法，确立私有财产权，影响欧洲立法。", funFactFR: "Toujours en vigueur, inspirant de nombreux codes civils.", funFactZH: "至今仍是法国法律基础，全球四十余国借鉴。" },
+        { name: "Abolition de l'esclavage / 废除奴隶制", rawDate: "1848", descFR: "Décret du 27 avril 1848, abolition définitive sous Victor Schœlcher.", descZH: "法国彻底废除殖民地奴隶制，维克多·舍尔彻推动。", funFactFR: "Première abolition en 1794 (rétablie par Napoléon en 1802).", funFactZH: "1848年终获彻底废除，人道主义胜利。" },
+        { name: "Lois Jules Ferry / 费里法案", rawDate: "1881-1882", descFR: "École gratuite, laïque et obligatoire (6-13 ans).", descZH: "免费、世俗、义务教育法案，奠定共和教育体系。", funFactFR: "Jules Ferry, fervent républicain, impose l'école publique.", funFactZH: "使法兰西成为教育强国，打击教会影响。" },
+        { name: "Loi de séparation Église-État / 政教分离法", rawDate: "1905", descFR: "Loi du 9 décembre 1905, laïcité et neutralité de l'État.", descZH: "1905年政教分离法，国家不资助宗教，世俗主义基石。", funFactFR: "Toujours au cœur du principe de laïcité française.", funFactZH: "法国世俗宪法的灵魂条款。" },
+        { name: "Première Guerre mondiale / 第一次世界大战", rawDate: "1914-1918", descFR: "Guerre industrielle meurtrière, 9 millions de morts, traité de Versailles.", descZH: "残酷工业战争，凡尔赛条约，深刻改变世界格局。", funFactFR: "Bataille de Verdun (1916) : 'Ils ne passeront pas'.", funFactZH: "凡尔登战役成为‘绞肉机’，法军誓死抵抗。" },
+        { name: "Seconde Guerre mondiale / 第二次世界大战", rawDate: "1939-1945", descFR: "Conflit planétaire, France occupée, Résistance, Libération.", descZH: "全球冲突，法国沦陷，维希政权，抵抗运动，最终解放。", funFactFR: "Le débarquement de Normandie (6 juin 1944) est un tournant.", funFactZH: "诺曼底登陆是人类史上最大规模登陆战。" },
+        { name: "Appel du 18 Juin / 戴高乐号召", rawDate: "18 juin 1940", descFR: "Le général de Gaulle lance depuis Londres l'appel à résister.", descZH: "戴高乐伦敦广播，号召继续抗战，自由法国象征。", funFactFR: "L'appel fut peu entendu mais devint mythe fondateur.", funFactZH: "成为法国永不屈服的标志。" },
+        { name: "Débarquement de Normandie / 诺曼底登陆", rawDate: "6 juin 1944", descFR: "Opération Overlord, libération de l'Europe occidentale.", descZH: "盟军登陆诺曼底，开辟第二战场，加速纳粹崩溃。", funFactFR: "Plus de 150 000 soldats débarquèrent le jour J.", funFactZH: "D-Day投入超过15万士兵。" },
+        { name: "Libération de Paris / 巴黎解放", rawDate: "août 1944", descFR: "Insurrection parisienne, entrée de la 2e DB, fin de l'occupation.", descZH: "巴黎起义与盟军会师，德军投降，巴黎重获自由。", funFactFR: "Hitler ordonna de détruire Paris, mais von Choltitz désobéit.", funFactZH: "德军将领违令保住巴黎文化瑰宝。" },
+        { name: "Shoah / 犹太人大屠杀", rawDate: "Shoah", descFR: "Génocide des Juifs par l'Allemagne nazie, 6 millions de morts.", descZH: "纳粹系统性灭绝犹太人，600万遇难，人类悲剧。", funFactFR: "Le mot 'Shoah' signifie 'catastrophe' en hébreu.", funFactZH: "法国维希政权参与迫害，成为集体记忆核心。" },
+        { name: "Création de l'ONU / 联合国成立", rawDate: "1945", descFR: "Organisation des Nations unies, paix et coopération internationale.", descZH: "联合国成立，维护全球和平与发展。", funFactFR: "La France est membre permanent du Conseil de sécurité.", funFactZH: "法国为安理会五大常任理事国之一。" },
+        { name: "Jean Moulin & CNR / 全国抵抗委员会", rawDate: "1943", descFR: "Jean Moulin unifie la Résistance, crée le CNR, mort pour la France.", descZH: "让·穆兰统一抵抗运动，创建全国抵抗委员会，后牺牲。", funFactFR: "Ses cendres transférées au Panthéon en 1964.", funFactZH: "穆兰成为法兰西抵抗英雄，入祀先贤祠。" },
+        { name: "Droit de vote des femmes / 女性选举权", rawDate: "1944", descFR: "Ordonnance du 21 avril 1944 : les Françaises deviennent électrices.", descZH: "1944年法国女性获得选举与被选举权。", funFactFR: "Premières élections municipales avec femmes en 1945.", funFactZH: "法国是西欧较晚赋予女性投票权的国家。" },
+        { name: "Vème République / 第五共和国", rawDate: "1958", descFR: "Constitution du 4 octobre 1958, régime semi-présidentiel, De Gaulle.", descZH: "戴高乐推动新宪法，建立半总统制，第五共和国延续至今。", funFactFR: "La Vᵉ République est le régime le plus long après la IIIᵉ.", funFactZH: "第五共和国是法国最长寿的共和政权。" },
+        { name: "Constitution de 1958 / 第五共和国宪法", rawDate: "1958", descFR: "Texte fondateur, renforcement du pouvoir exécutif, référendum.", descZH: "全民公投通过，强化总统权力，奠定现代法国架构。", funFactFR: "Rédigée par Michel Debré, approuvée à près de 80%.", funFactZH: "宪法赋予总统特殊权力，如第16条紧急状态。" },
+        { name: "Élection président au suffrage universel / 总统普选", rawDate: "1962", descFR: "Référendum de 1962 : le président élu au suffrage universel direct.", descZH: "修宪确立总统由全民直选，加强民主合法性。", funFactFR: "Première élection présidentielle directe en 1965.", funFactZH: "1965年第一次总统普选，戴高乐获胜。" },
+        { name: "Abolition de la peine de mort / 废除死刑", rawDate: "1981", descFR: "Loi Badinter (9 octobre 1981), abolition de la peine capitale.", descZH: "罗贝尔·巴丹戴尔推动，法国全面废除死刑。", funFactFR: "La dernière exécution en France date de 1977.", funFactZH: "法国成为欧洲废除死刑先驱。" },
+        { name: "Mariage pour tous / 同性婚姻合法", rawDate: "2013", descFR: "Loi Taubira, mariage et adoption pour les couples de même sexe.", descZH: "同性婚姻与领养权合法化，平权里程碑。", funFactFR: "La France est le 14e pays à légaliser.", funFactZH: "法案编号2013-404，激烈辩论后通过。" },
+        { name: "IVG inscrite dans la Constitution / 堕胎权入宪", rawDate: "2024", descFR: "Inscription de la liberté de l'IVG dans la Constitution (mars 2024).", descZH: "法国成为全球首个将自愿终止妊娠自由写入宪法的国家。", funFactFR: "Le Congrès a voté à 780 voix pour, 72 contre.", funFactZH: "2024年3月历史性表决，保障女性身体自主权。" },
+        { name: "Guerre d'Indochine / 印度支那战争", rawDate: "1946-1954", descFR: "Conflit de décolonisation, défaite de Diên Biên Phu (1954).", descZH: "越南独立战争，法军奠边府惨败。", funFactFR: "Les Vietminh transportèrent l'artillerie par des chemins impossibles.", funFactZH: "越军用自行车+人力将火炮拖上山地。" },
+        { name: "Guerre d'Algérie / 阿尔及利亚战争", rawDate: "1954-1962", descFR: "Indépendance algérienne, accords d'Évian, fin de l'Algérie française.", descZH: "阿尔及利亚独立战争，1962年埃维昂协议。", funFactFR: "La guerre provoque le retour de De Gaulle.", funFactZH: "战争直接导致第五共和国诞生。" },
+        { name: "Indépendance Afrique / 非洲独立年", rawDate: "1960", descFR: "Année de l'Afrique : 17 États d'Afrique francophone indépendants.", descZH: "17个法属非洲国家独立，殖民帝国瓦解。", funFactFR: "1960, tournant de la décolonisation.", funFactZH: "1960年被称为‘非洲独立年’，重塑国际版图。" },
+        { name: "CECA / 欧洲煤钢共同体", rawDate: "1951", descFR: "Traité de Paris, première communauté européenne, ancêtre de l'UE.", descZH: "欧洲一体化起点，法德和解关键一步。", funFactFR: "Robert Schuman et Jean Monnet, pères fondateurs.", funFactZH: "舒曼宣言，奠定欧盟雏形。" },
+        { name: "Traité de Rome / 罗马条约", rawDate: "1957", descFR: "Création de la CEE, marché commun, libre circulation.", descZH: "建立欧洲经济共同体，走向共同市场。", funFactFR: "Six pays signataires : France, Allemagne, Italie, Benelux.", funFactZH: "六国签署，为欧盟经济一体化基石。" },
+        { name: "Traité de Maastricht / 马斯特里赫特条约", rawDate: "1992", descFR: "Naissance de l'Union européenne, citoyenneté européenne, prélude à l'euro.", descZH: "欧盟正式成立，引入欧元框架。", funFactFR: "Référendum français approuvé à 51%.", funFactZH: "法国公投以微弱优势通过，开启欧洲新纪元。" },
+        { name: "Euro / 欧元流通", rawDate: "2002", descFR: "Mise en circulation des pièces et billets en euros, monnaie unique.", descZH: "欧元纸币硬币正式流通，经济一体化巅峰。", funFactFR: "12 pays adoptent l'euro en 2002, 20 aujourd'hui.", funFactZH: "欧元成为第二大国际储备货币。" },
+        { name: "Incendie Notre-Dame / 巴黎圣母院火灾", rawDate: "2019", descFR: "15 avril 2019, un violent incendie ravage la cathédrale Notre-Dame de Paris.", descZH: "2019年4月15日，巴黎圣母院发生严重火灾，尖顶倒塌。", funFactFR: "La restauration a permis de découvrir des vestiges médiévaux.", funFactZH: "修复工程发现中世纪古墓，计划2024年底重新开放。" }
+    ];
+
+    // 严格历史顺序的时间轴 (30个日期)
+    const TIMELINE_ORDER = [
+        "1789", "1799", "1804", "1848", "1881-1882", "1905", "1914-1918", "18 juin 1940",
+        "1939-1945", "6 juin 1944", "août 1944", "Shoah", "1943", "1944", "1945", "1946-1954",
+        "1951", "1954-1962", "1957", "1958", "1960", "1962", "1981", "1992", "2002", "2013", "2019", "2024"
+    ];
+
+    function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+
+    let gameEvents = shuffle([...FULL_EVENTS]);
+    let pending = [], anchored = [];
+    const total = FULL_EVENTS.length;
+    document.getElementById("totalEvents").innerText = total;
+
+    function matchDate(evDate, marker) {
+        let a = String(evDate).trim().toLowerCase(), b = String(marker).trim().toLowerCase();
+        if (a === b) return true;
+        const norm = { "1881-1882":"1881-1882","18 juin 1940":"18 juin 1940","6 juin 1944":"6 juin 1944","août 1944":"août 1944","shoah":"shoah","1914-1918":"1914-1918","1939-1945":"1939-1945","1946-1954":"1946-1954","1954-1962":"1954-1962","1943":"1943","1944":"1944","1945":"1945","1958":"1958","1962":"1962","1981":"1981","2013":"2013","2024":"2024","1960":"1960","1951":"1951","1957":"1957","1992":"1992","2002":"2002","2019":"2019","1789":"1789","1799":"1799","1804":"1804","1848":"1848","1905":"1905"};
+        return norm[a] === b;
+    }
+
+    function setMessage(msg, isErr = false) {
+        const fbDiv = document.getElementById("globalFeedback");
+        fbDiv.innerHTML = msg;
+        fbDiv.style.color = isErr ? "#c0392b" : "#1e4663";
+        if(isErr) setTimeout(() => { if(anchored.length !== total) fbDiv.style.color = "#1e4663"; }, 2000);
+        else setTimeout(() => { if(anchored.length !== total) fbDiv.style.color = "#1e4663"; }, 1800);
+    }
+
+    function showDetail(ev) {
+        const modalDiv = document.createElement("div"); modalDiv.className = "epic-modal";
+        modalDiv.innerHTML = `
+            <div class="epic-card">
+                <h2><i class="fas fa-landmark"></i> ${ev.name}</h2>
+                <div class="date-tag"><i class="far fa-calendar-alt"></i> ${ev.fixedOnMarker || ev.rawDate}</div>
+                <div class="fr-block"><strong>🇫🇷 Récit :</strong><br>${ev.descFR}</div>
+                <div class="zh-block"><strong>🇨🇳 历史详述：</strong><br>${ev.descZH}</div>
+                <div class="fun-block"><i class="fas fa-star-of-life"></i> <strong>📖 秘闻 · Anecdote</strong><br>✨ ${ev.funFactZH}<br>✨ ${ev.funFactFR}</div>
+                <button class="close-epic"><i class="fas fa-compass"></i> 返回长河</button>
+            </div>
+        `;
+        document.body.appendChild(modalDiv);
+        modalDiv.querySelector(".close-epic").addEventListener("click", () => modalDiv.remove());
+        modalDiv.addEventListener("click", (e) => { if(e.target === modalDiv) modalDiv.remove(); });
+    }
+
+    function renderTimeline() {
+        const container = document.getElementById("timelineMarkers"); container.innerHTML = "";
+        TIMELINE_ORDER.forEach((mark, idx) => {
+            const node = document.createElement("div"); node.className = `date-marker ${idx % 2 === 0 ? "top" : "bottom"}`;
+            node.setAttribute("data-date", mark);
+            const dot = document.createElement("div"); dot.className = "dot-pivot";
+            const label = document.createElement("div"); label.className = "date-badge"; label.innerText = mark;
+            node.appendChild(dot); node.appendChild(label);
+            node.addEventListener("click", () => { const found = anchored.find(f => matchDate(f.rawDate, mark)); if(found) showDetail(found); else setMessage(`📅 ${mark} 尚无锚定事件`, false); });
+            node.addEventListener("dragover", (e) => { e.preventDefault(); node.classList.add("drop-active"); });
+            node.addEventListener("dragleave", () => node.classList.remove("drop-active"));
+            node.addEventListener("drop", (e) => {
+                e.preventDefault(); node.classList.remove("drop-active");
+                const targetDate = node.getAttribute("data-date");
+                const evName = e.dataTransfer.getData("text/plain");
+                const idxEv = pending.findIndex(p => p.name === evName);
+                if(idxEv === -1) { setMessage("⚠️ 事件已固定或无效", true); return; }
+                const ev = pending[idxEv];
+                if(matchDate(ev.rawDate, targetDate)) {
+                    anchored.push({ ...ev, fixedOnMarker: targetDate });
+                    pending.splice(idxEv, 1);
+                    fullRender();
+                    setMessage(`🎉 正确！「${ev.name.split('/')[0]}」归位于 ${targetDate} ！弹出扩展 🎉`, false);
+                    showDetail({ ...ev, fixedOnMarker: targetDate });
+                    if(anchored.length === total) setMessage("🏆 历史大师！所有30个事件完美锚定！点击徽章继续探索 🏆", false);
+                } else { setMessage(`❌ 错误：「${ev.name.split('/')[0]}」不属于 ${targetDate}，再试一次 ❌`, true); }
+            });
+            container.appendChild(node);
+        });
+    }
+
+    function renderPending() {
+        const area = document.getElementById("draggableList"); area.innerHTML = "";
+        if(pending.length === 0) { area.innerHTML = "<div style='background:#c9e0cf; border-radius:60px; padding:10px 24px;'>🏆 全历史大师！30个事件全部锚定 🏆</div>"; return; }
+        pending.forEach(ev => {
+            const card = document.createElement("div"); card.className = "event-tile";
+            card.innerHTML = `<i class="fas fa-scroll"></i> ${ev.name.split('/')[0]}`;
+            card.setAttribute("draggable", "true");
+            card.setAttribute("data-ev", ev.name);
+            card.addEventListener("dragstart", (e) => { e.dataTransfer.setData("text/plain", ev.name); card.classList.add("dragging"); });
+            card.addEventListener("dragend", () => card.classList.remove("dragging"));
+            area.appendChild(card);
+        });
+    }
+
+    function renderAnchored() {
+        const area = document.getElementById("fixedListArea"); area.innerHTML = "";
+        if(anchored.length === 0) { area.innerHTML = "<div style='opacity:0.7;'>🏺 暂无锚定，拖拽事件至正确时间坐标 (0/30)</div>"; return; }
+        const sorted = [...anchored].sort((a,b) => TIMELINE_ORDER.indexOf(a.fixedOnMarker) - TIMELINE_ORDER.indexOf(b.fixedOnMarker));
+        sorted.forEach(ev => {
+            const badge = document.createElement("div"); badge.className = "history-badge";
+            badge.innerHTML = `<span class="date-chip">${ev.fixedOnMarker}</span> <span>📌 ${ev.name.split('/')[0]}</span>`;
+            badge.addEventListener("click", () => showDetail(ev));
+            area.appendChild(badge);
+        });
+    }
+
+    function updateProgress() {
+        document.getElementById("scoreCurrent").innerText = anchored.length;
+        const percent = (anchored.length / total) * 100;
+        document.getElementById("progressFill").style.width = `${percent}%`;
+    }
+
+    function fullRender() { renderPending(); renderAnchored(); updateProgress(); }
+
+    function resetGame() {
+        gameEvents = shuffle([...FULL_EVENTS]);
+        pending = gameEvents.map(ev => ({ ...ev }));
+        anchored = [];
+        fullRender();
+        setMessage("⟳ 时间重置，30个事件重新洗牌，再次挑战历史长河！⟳", false);
+        document.getElementById("scrollWrapper").scrollLeft = 0;
+    }
+
+    // 拖动滚动逻辑
+    const scrollDiv = document.getElementById("scrollWrapper");
+    let isDragging = false, dragStartX, scrollStart;
+    scrollDiv.addEventListener("mousedown", (e) => { if(e.target.closest(".event-tile")) return; isDragging = true; dragStartX = e.pageX - scrollDiv.offsetLeft; scrollStart = scrollDiv.scrollLeft; scrollDiv.style.cursor = "grabbing"; });
+    window.addEventListener("mouseup", () => { isDragging = false; scrollDiv.style.cursor = "grab"; });
+    window.addEventListener("mousemove", (e) => { if(!isDragging) return; const x = e.pageX - scrollDiv.offsetLeft; const walk = (x - dragStartX) * 1.2; scrollDiv.scrollLeft = scrollStart - walk; });
+    document.body.addEventListener("dragover", e => e.preventDefault()); document.body.addEventListener("drop", e => e.preventDefault());
+    scrollDiv.style.cursor = "grab";
+
+    function init() {
+        renderTimeline();
+        pending = gameEvents.map(ev => ({ ...ev }));
+        anchored = [];
+        fullRender();
+        document.getElementById("resetGameBtn").addEventListener("click", resetGame);
+    }
+    init();
+</script>
+</body>
+</html>

@@ -625,6 +625,17 @@
                 width: 160px;
             }
         }
+        .btn-green {
+            background-color: var(--green);
+            color: var(--white);
+        }
+
+        .btn-green:hover {
+            background-color: #219a52;
+        }
+        .action-card-3 .action-card-icon {
+    color: var(--green);
+}
     </style>
 </head>
 <body>
@@ -926,6 +937,17 @@
                         <i class="fas fa-play-circle"></i> Commencer le test
                     </a>
                 </div>
+                <!-- Card 3: Jeu - Histoire de France -->
+                <div class="action-card action-card-3">
+                    <div class="action-card-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h3 id="gameTitle">Jeu : Histoire de France</h3>
+                    <p id="gameDescription">Testez vos connaissances avec notre jeu interactif sur les grands événements historiques français. Associez les dates aux événements et devenez un expert !</p>
+                    <a href="game.html" class="btn btn-green" id="gameBtn">
+                        <i class="fas fa-play"></i> Jouer maintenant
+                    </a>
+                </div>
             </div>
         </div>
     </section>
@@ -1067,9 +1089,16 @@
                 footerWebsite: "Association Mille Voiles",
                 footerAddress: "94800 Villejuif",
                 footerCopyright: "© 2025 Association Mille Voiles / 千帆协会 - Tous droits réservés. | ",
-                footerPrivacy: "Mentions légales"
+                footerPrivacy: "Mentions légales",
+                // 在 fr 对象中
+                gameTitle: "Jeu : Histoire de France",
+                gameDescription: "Testez vos connaissances avec notre jeu interactif sur les grands événements historiques français. Associez les dates aux événements et devenez un expert !",
+                gameBtn: '<i class="fas fa-play"></i> Jouer maintenant',
             },
             zh: {
+                gameTitle: "游戏：法国历史事件",
+                gameDescription: "通过我们的互动游戏测试您对法国重大历史事件的了解。将日期与事件配对，成为专家！",
+                gameBtn: '<i class="fas fa-play"></i> 开始游戏',
                 // Header
                 mainTitle: "历史、地理与文化",
                 mainSubtitle: "历史演变、法国领土与文化传承 - 公民考试准备",
