@@ -1688,27 +1688,19 @@ function selectQuestionsByTheme() {
     
     console.log("题库分类分布:", Object.keys(questionsByCategory));
     
-    // 2. 定义允许的3个主题
-    const targetCategories = [
-        "Démocratie et droit de vote",
-        "Institutions",
-        "Union européenne"
-    ];
-    
-    // 3. 根据新主题分布选择题目
+    // 2. 根据新主题分布选择题目
     selectedQuestions = [];
     let totalSelected = 0;
     
-    // 选择"Démocratie et droit de vote"题目 (8题)
+    // 选择"Obligations et devoirs"题目 (8题)
     const obligationsQuestions = questionsByCategory["Démocratie et droit de vote"] || [];
     if (obligationsQuestions.length > 0) {
         const shuffled = shuffleArray([...obligationsQuestions]);
         const selected = shuffled.slice(0, Math.min(8, obligationsQuestions.length));
         selectedQuestions.push(...selected);
         totalSelected += selected.length;
-        console.log(`选择了 ${selected.length} 道Démocratie et droit de vote题目 (需要8道)`);
     } else {
-        console.warn("⚠️ 没有找到Démocratie et droit de vote题目");
+        console.warn("警告：没有找到Démocratie et droit de vote题目");
     }
     
     // 选择"Institutions"题目 (8题)
@@ -1718,9 +1710,8 @@ function selectQuestionsByTheme() {
         const selected = shuffled.slice(0, Math.min(8, institutionsQuestions.length));
         selectedQuestions.push(...selected);
         totalSelected += selected.length;
-        console.log(`选择了 ${selected.length} 道Institutions题目 (需要8道)`);
     } else {
-        console.warn("⚠️ 没有找到Institutions题目");
+        console.warn("警告：没有找到Institutions题目");
     }
     
     // 选择"Union européenne"题目 (4题)
@@ -1730,67 +1721,35 @@ function selectQuestionsByTheme() {
         const selected = shuffled.slice(0, Math.min(4, europeQuestions.length));
         selectedQuestions.push(...selected);
         totalSelected += selected.length;
-        console.log(`选择了 ${selected.length} 道Union européenne题目 (需要4道)`);
     } else {
-        console.warn("⚠️ 没有找到Union européenne题目");
+        console.warn("警告：没有找到Union européenne题目");
     }
     
-    console.log(`已选择 ${totalSelected} 题 (需要20题)`);
+    console.log(`已选择 ${totalSelected} 题`);
     
-    // ✅ 方案一：如果题目不足20，只从指定的3个主题中补充
+    // 3. 如果题目不足20，从其他题目中补充
     if (totalSelected < 20) {
         const needed = 20 - totalSelected;
-        console.log(`需要补充 ${needed} 题，只从指定的3个主题中选取`);
         
-        // 收集所有属于3个主题的题目（排除已选的）
-        let availableFromTargets = [];
-        targetCategories.forEach(cat => {
-            const questions = questionsByCategory[cat] || [];
-            // 排除已选的题目
-            const selectedIds = new Set(selectedQuestions.map(q => q.id));
-            const filtered = questions.filter(q => !selectedIds.has(q.id));
-            availableFromTargets.push(...filtered);
-        });
+        const selectedSet = new Set(selectedQuestions);
+        const availableQuestions = allQuestions.filter(q => !selectedSet.has(q));
         
-        console.log(`从3个主题中找到 ${availableFromTargets.length} 道可用题目`);
-        
-        if (availableFromTargets.length > 0) {
-            const shuffled = shuffleArray([...availableFromTargets]);
-            const toAdd = shuffled.slice(0, Math.min(needed, availableFromTargets.length));
+        if (availableQuestions.length > 0) {
+            const shuffled = shuffleArray([...availableQuestions]);
+            const toAdd = shuffled.slice(0, Math.min(needed, availableQuestions.length));
             selectedQuestions.push(...toAdd);
-            totalSelected += toAdd.length;
-            console.log(`✅ 从指定主题补充了 ${toAdd.length} 道题`);
-        } else {
-            console.warn(`⚠️ 指定主题没有更多题目可补充，只能有 ${totalSelected} 题`);
         }
     }
     
     // 如果题目太多，截取前20题
     if (selectedQuestions.length > 20) {
         selectedQuestions = selectedQuestions.slice(0, 20);
-        console.log(`截取前20题`);
     }
     
     // 最终随机打乱所有题目顺序
     selectedQuestions = shuffleArray(selectedQuestions);
     
-    console.log(`最终选择 ${selectedQuestions.length} 题 (只包含指定主题)`);
-    
-    // 检查是否所有题目都属于3个主题
-    const allFromTarget = selectedQuestions.every(q => {
-        const category = q.category || "Autre";
-        return targetCategories.some(target => category === target);
-    });
-    
-    if (!allFromTarget) {
-        console.warn("⚠️ 警告：有题目不属于指定的3个主题！");
-        // 过滤掉不属于3个主题的题目
-        selectedQuestions = selectedQuestions.filter(q => {
-            const category = q.category || "Autre";
-            return targetCategories.some(target => category === target);
-        });
-        console.log(`过滤后剩余 ${selectedQuestions.length} 题`);
-    }
+    console.log(`最终选择 ${selectedQuestions.length} 题`);
     
     // 4. 为新主题添加标签
     selectedQuestions = selectedQuestions.map((question) => {
@@ -1798,8 +1757,8 @@ function selectQuestionsByTheme() {
         let tags = [];
         
         // 根据category添加标签
-        if (category.includes("Démocratie") || category.includes("droit de vote")) {
-            tags.push("Démocratie");
+        if (category.includes("Obligations") || category.includes("devoirs")) {
+            tags.push("Obligations");
         } else if (category.includes("Institutions")) {
             tags.push("Institutions");
         } else if (category.includes("Union européenne") || category.includes("UE")) {
@@ -1822,8 +1781,6 @@ function selectQuestionsByTheme() {
             theme: category // 使用category作为theme
         };
     });
-    
-    console.log("✅ 选题完成，所有题目都属于指定主题");
 }
 // Fisher-Yates 洗牌算法
 function shuffleArray(array) {
