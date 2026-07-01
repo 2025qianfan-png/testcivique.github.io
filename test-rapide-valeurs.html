@@ -1661,7 +1661,14 @@ function selectQuestionsByTheme() {
     
     console.log("题库主题分布:", Object.keys(questionsByTheme));
     
-    // 2. 专门处理Mises en situation - 从si001到si0047中随机选择
+    // 2. 定义允许的3个主题
+    const targetThemes = [
+        "Laïcité",
+        "Devise et symboles de la République",
+        "Mises en situation"
+    ];
+    
+    // 3. 专门处理Mises en situation - 从si001到si0047中随机选择
     let situationQuestions = [];
     if (questionsByTheme["Mises en situation"]) {
         situationQuestions = questionsByTheme["Mises en situation"];
@@ -1673,69 +1680,112 @@ function selectQuestionsByTheme() {
         });
     }
     
-    console.log("Mises en situation题目数量:", situationQuestions.length);
+    console.log(`找到Mises en situation题目: ${situationQuestions.length}道 (需要10道)`);
     
-    // 3. 根据配置选择题目
+    // 4. 根据配置选择题目
     selectedQuestions = [];
     let totalSelected = 0;
     
-    // 选择Laïcité题目
+    // 选择Laïcité题目 (3题)
     const laiciteQuestions = questionsByTheme["Laïcité"] || [];
     if (laiciteQuestions.length > 0) {
         const shuffled = shuffleArray([...laiciteQuestions]);
         const selected = shuffled.slice(0, Math.min(3, laiciteQuestions.length));
         selectedQuestions.push(...selected);
         totalSelected += selected.length;
+        console.log(`选择了 ${selected.length} 道Laïcité题目 (需要3道)`);
     } else {
-        console.warn("警告：没有找到Laïcité题目");
+        console.warn("⚠️ 没有找到Laïcité题目");
     }
     
-    // 选择Devise et symboles题目
+    // 选择Devise et symboles题目 (7题)
     const deviseQuestions = questionsByTheme["Devise et symboles de la République"] || [];
     if (deviseQuestions.length > 0) {
         const shuffled = shuffleArray([...deviseQuestions]);
         const selected = shuffled.slice(0, Math.min(7, deviseQuestions.length));
         selectedQuestions.push(...selected);
         totalSelected += selected.length;
+        console.log(`选择了 ${selected.length} 道Devise et symboles题目 (需要7道)`);
     } else {
-        console.warn("警告：没有找到Devise et symboles de la République题目");
+        console.warn("⚠️ 没有找到Devise et symboles de la République题目");
     }
     
-    // 选择Mises en situation题目
+    // 选择Mises en situation题目 (10题)
     if (situationQuestions.length > 0) {
         const shuffled = shuffleArray([...situationQuestions]);
         const selected = shuffled.slice(0, Math.min(10, situationQuestions.length));
         selectedQuestions.push(...selected);
         totalSelected += selected.length;
+        console.log(`选择了 ${selected.length} 道Mises en situation题目 (需要10道)`);
     } else {
-        console.warn("警告：没有找到Mises en situation题目");
+        console.warn("⚠️ 没有找到Mises en situation题目");
     }
     
-    console.log(`已选择 ${totalSelected} 题`);
+    console.log(`已选择 ${totalSelected} 题 (需要20题)`);
     
-    // 4. 如果题目不足20，从其他题目中补充
+    // ✅ 方案一：如果题目不足20，只从指定的3个主题中补充
     if (totalSelected < 20) {
         const needed = 20 - totalSelected;
+        console.log(`需要补充 ${needed} 题，只从指定的3个主题中选取`);
         
-        const selectedSet = new Set(selectedQuestions);
-        const availableQuestions = allQuestions.filter(q => !selectedSet.has(q));
+        // 收集所有属于3个主题的题目（排除已选的）
+        let availableFromTargets = [];
+        targetThemes.forEach(theme => {
+            let questions = [];
+            if (theme === "Mises en situation") {
+                // 情境题使用已经筛选过的 situationQuestions
+                questions = situationQuestions;
+            } else {
+                questions = questionsByTheme[theme] || [];
+            }
+            // 排除已选的题目
+            const selectedIds = new Set(selectedQuestions.map(q => q.id));
+            const filtered = questions.filter(q => !selectedIds.has(q.id));
+            availableFromTargets.push(...filtered);
+        });
         
-        if (availableQuestions.length > 0) {
-            const shuffled = shuffleArray([...availableQuestions]);
-            const toAdd = shuffled.slice(0, Math.min(needed, availableQuestions.length));
+        console.log(`从3个主题中找到 ${availableFromTargets.length} 道可用题目`);
+        
+        if (availableFromTargets.length > 0) {
+            const shuffled = shuffleArray([...availableFromTargets]);
+            const toAdd = shuffled.slice(0, Math.min(needed, availableFromTargets.length));
             selectedQuestions.push(...toAdd);
+            totalSelected += toAdd.length;
+            console.log(`✅ 从指定主题补充了 ${toAdd.length} 道题`);
+        } else {
+            console.warn(`⚠️ 指定主题没有更多题目可补充，只能有 ${totalSelected} 题`);
         }
     }
     
     // 如果题目太多，截取前20题
     if (selectedQuestions.length > 20) {
         selectedQuestions = selectedQuestions.slice(0, 20);
+        console.log(`截取前20题`);
     }
     
     // 最终随机打乱所有题目顺序
     selectedQuestions = shuffleArray(selectedQuestions);
     
-    console.log(`最终选择 ${selectedQuestions.length} 题`);
+    console.log(`最终选择 ${selectedQuestions.length} 题 (只包含指定主题)`);
+    
+    // 检查是否所有题目都属于3个主题
+    const allFromTarget = selectedQuestions.every(q => {
+        const theme = q.theme || q.category || "Autre";
+        // 检查是否属于3个主题之一
+        return targetThemes.some(target => theme.includes(target)) ||
+               (q.id && q.id.toLowerCase().startsWith("si"));
+    });
+    
+    if (!allFromTarget) {
+        console.warn("⚠️ 警告：有题目不属于指定的3个主题！");
+        // 过滤掉不属于3个主题的题目
+        selectedQuestions = selectedQuestions.filter(q => {
+            const theme = q.theme || q.category || "Autre";
+            return targetThemes.some(target => theme.includes(target)) ||
+                   (q.id && q.id.toLowerCase().startsWith("si"));
+        });
+        console.log(`过滤后剩余 ${selectedQuestions.length} 题`);
+    }
     
     // 为题目添加标签 - 修复重复标签问题
     selectedQuestions = selectedQuestions.map((question) => {
@@ -1767,8 +1817,9 @@ function selectQuestionsByTheme() {
             theme: theme // 确保theme字段存在
         };
     });
+    
+    console.log("✅ 选题完成，所有题目都属于指定主题");
 }
-
 // Fisher-Yates 洗牌算法
 function shuffleArray(array) {
     const newArray = [...array];

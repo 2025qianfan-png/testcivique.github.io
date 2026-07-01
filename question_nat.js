@@ -149,6 +149,317 @@ FR : Faux. La loi de 1905 organise la séparation des Églises et de l’État, 
 FR : Faux. Le Code civil régit le droit civil, pas directement la laïcité.
 中：错误。民法典主要规范民事法律，不是世俗原则的基础文本。`
   },
+  // ==================== Laïcité 补充题目 ====================
+
+{
+  id: "la0031",
+  type: "naturalisation",
+  category: "Laïcité",
+  difficulté: "moyen",
+  typeQuestion: "examen original",
+  question: "Que signifie le principe de laïcité dans une école publique ?",
+  options: [
+    "Les élèves doivent suivre une éducation religieuse",
+    "L'école doit garantir la neutralité et le respect de toutes les croyances",
+    "Les enseignants peuvent imposer leurs convictions religieuses",
+    "Seuls les élèves croyants peuvent s'exprimer sur leur religion"
+  ],
+  answer: 1,
+  explanation: `❌ A. Les élèves doivent suivre une éducation religieuse
+FR : Faux. L'école publique est laïque, elle n'impose aucune éducation religieuse.
+中：错误。公立学校是世俗的，不强制任何宗教教育。
+
+✅ B. L'école doit garantir la neutralité et le respect de toutes les croyances
+FR : Correct ! La laïcité à l'école garantit la neutralité et le respect des croyances de chacun.
+中：正确。学校世俗原则确保中立和对每个人信仰的尊重。
+
+❌ C. Les enseignants peuvent imposer leurs convictions religieuses
+FR : Faux. Les enseignants doivent respecter la neutralité religieuse dans l'exercice de leurs fonctions.
+中：错误。教师在履行职责时必须保持宗教中立。
+
+❌ D. Seuls les élèves croyants peuvent s'exprimer sur leur religion
+FR : Faux. La liberté de conscience s'applique à tous, croyants ou non.
+中：错误。良心自由适用于所有人，无论信教与否。`
+},
+
+{
+  id: "la0032",
+  type: "naturalisation",
+  category: "Laïcité",
+  difficulté: "simple",
+  typeQuestion: "examen original",
+  question: "La loi de 1905 sur la séparation des Églises et de l'État garantit :",
+  options: [
+    "La liberté de conscience et la neutralité de l'État",
+    "Le financement des religions par l'État",
+    "L'obligation de pratiquer une religion",
+    "L'interdiction totale des religions en France"
+  ],
+  answer: 0,
+  explanation: `✅ A. La liberté de conscience et la neutralité de l'État
+FR : Correct ! La loi de 1905 garantit la liberté de conscience et la neutralité de l'État.
+中：正确。1905年法律保障信仰自由和国家中立。
+
+❌ B. Le financement des religions par l'État
+FR : Faux. La loi de 1905 interdit le financement des religions par l'État.
+中：错误。1905年法律禁止国家资助宗教。
+
+❌ C. L'obligation de pratiquer une religion
+FR : Faux. La loi garantit la liberté de ne pas pratiquer.
+中：错误。法律保障不信仰宗教的自由。
+
+❌ D. L'interdiction totale des religions en France
+FR : Faux. La loi garantit la liberté religieuse, elle n'interdit pas les religions.
+中：错误。法律保障宗教自由，不禁止宗教。`
+},
+
+{
+  id: "la0033",
+  type: "naturalisation",
+  category: "Laïcité",
+  difficulté: "moyen",
+  typeQuestion: "examen original",
+  question: "Dans les services publics français, les agents doivent respecter :",
+  options: [
+    "Leur liberté de prosélytisme",
+    "Le principe de neutralité religieuse",
+    "L'obligation de pratiquer une religion",
+    "Le droit d'imposer leurs croyances"
+  ],
+  answer: 1,
+  explanation: `❌ A. Leur liberté de prosélytisme
+FR : Faux. Les agents publics ne peuvent pas faire de prosélytisme.
+中：错误。公职人员不能进行宗教宣传。
+
+✅ B. Le principe de neutralité religieuse
+FR : Correct ! Les agents publics doivent être neutres vis-à-vis des usagers.
+中：正确。公职人员必须对服务对象保持中立。
+
+❌ C. L'obligation de pratiquer une religion
+FR : Faux. Aucune obligation religieuse n'est imposée.
+中：错误。没有任何宗教义务。
+
+❌ D. Le droit d'imposer leurs croyances
+FR : Faux. Les agents publics ne peuvent imposer leurs croyances.
+中：错误。公职人员不能强加自己的信仰。`
+},
+
+{
+  id: "la0034",
+  type: "naturalisation",
+  category: "Laïcité",
+  difficulté: "simple",
+  typeQuestion: "examen original",
+  question: "En France, est-il autorisé de porter des signes religieux ostentatoires à l'école publique ?",
+  options: [
+    "Oui, pour tous les élèves",
+    "Non, c'est interdit par la loi de 2004",
+    "Oui, mais seulement pour les enseignants",
+    "Non, c'est interdit uniquement dans les grandes villes"
+  ],
+  answer: 1,
+  explanation: `❌ A. Oui, pour tous les élèves
+FR : Faux. La loi de 2004 interdit les signes religieux ostentatoires à l'école.
+中：错误。2004年法律禁止在学校佩戴明显宗教标志。
+
+✅ B. Non, c'est interdit par la loi de 2004
+FR : Correct ! La loi du 15 mars 2004 interdit le port de signes religieux ostentatoires dans les écoles publiques.
+中：正确。2004年3月15日法律禁止在公立学校佩戴明显宗教标志。
+
+❌ C. Oui, mais seulement pour les enseignants
+FR : Faux. Les enseignants doivent également respecter la neutralité.
+中：错误。教师同样必须保持中立。
+
+❌ D. Non, c'est interdit uniquement dans les grandes villes
+FR : Faux. L'interdiction s'applique sur tout le territoire.
+中：错误。禁令适用于全国。`
+},
+
+{
+  id: "la0035",
+  type: "naturalisation",
+  category: "Laïcité",
+  difficulté: "moyen",
+  typeQuestion: "examen original",
+  question: "Comment la laïcité protège-t-elle la liberté de conscience ?",
+  options: [
+    "En imposant une religion d'État",
+    "En garantissant le droit de croire ou de ne pas croire",
+    "En interdisant toute pratique religieuse",
+    "En obligeant les citoyens à déclarer leur religion"
+  ],
+  answer: 1,
+  explanation: `❌ A. En imposant une religion d'État
+FR : Faux. La laïcité interdit toute religion d'État.
+中：错误。世俗原则禁止任何国教。
+
+✅ B. En garantissant le droit de croire ou de ne pas croire
+FR : Correct ! La laïcité garantit la liberté de conscience.
+中：正确。世俗原则保障信仰自由。
+
+❌ C. En interdisant toute pratique religieuse
+FR : Faux. La laïcité protège la liberté de pratiquer sa religion.
+中：错误。世俗原则保护宗教活动自由。
+
+❌ D. En obligeant les citoyens à déclarer leur religion
+FR : Faux. Les convictions religieuses relèvent de la vie privée.
+中：错误。宗教信仰属于私人领域。`
+},
+
+{
+  id: "la0036",
+  type: "naturalisation",
+  category: "Laïcité",
+  difficulté: "simple",
+  typeQuestion: "examen original",
+  question: "Un agent public peut-il refuser de servir un usager pour des raisons religieuses ?",
+  options: [
+    "Oui, s'il est croyant",
+    "Non, il doit servir tous les usagers sans discrimination",
+    "Oui, s'il a une objection de conscience",
+    "Non, seulement s'il est athée"
+  ],
+  answer: 1,
+  explanation: `❌ A. Oui, s'il est croyant
+FR : Faux. Un agent public ne peut pas refuser de servir pour des raisons religieuses.
+中：错误。公职人员不能因宗教原因拒绝提供服务。
+
+✅ B. Non, il doit servir tous les usagers sans discrimination
+FR : Correct ! Le service public doit être accessible à tous sans discrimination.
+中：正确。公共服务必须对所有人开放，不得歧视。
+
+❌ C. Oui, s'il a une objection de conscience
+FR : Faux. L'objection de conscience n'est pas un motif de refus de service.
+中：错误。良心反对不是拒绝服务的理由。
+
+❌ D. Non, seulement s'il est athée
+FR : Faux. La règle s'applique à tous les agents publics.
+中：错误。规则适用于所有公职人员。`
+},
+
+{
+  id: "la0037",
+  type: "naturalisation",
+  category: "Laïcité",
+  difficulté: "difficile",
+  typeQuestion: "examen original",
+  question: "La Charte de la laïcité à l'école a été publiée en :",
+  options: [
+    "2004",
+    "2013",
+    "2015",
+    "2018"
+  ],
+  answer: 1,
+  explanation: `❌ A. 2004
+FR : Faux. 2004 est l'année de la loi sur les signes religieux, pas de la Charte.
+中：错误。2004年是关于宗教标志的法律年份，不是宪章。
+
+✅ B. 2013
+FR : Correct ! La Charte de la laïcité à l'école a été publiée en septembre 2013.
+中：正确。学校世俗宪章于2013年9月发布。
+
+❌ C. 2015
+FR : Faux. Ce n'est pas l'année de publication de la Charte.
+中：错误。不是宪章发布年份。
+
+❌ D. 2018
+FR : Faux. Ce n'est pas l'année de publication de la Charte.
+中：错误。不是宪章发布年份。`
+},
+
+{
+  id: "la0038",
+  type: "naturalisation",
+  category: "Laïcité",
+  difficulté: "simple",
+  typeQuestion: "examen original",
+  question: "La laïcité en France permet-elle de critiquer une religion ?",
+  options: [
+    "Oui, dans le respect de la loi (pas d'insulte ni de provocation à la haine)",
+    "Non, aucune critique n'est autorisée",
+    "Oui, sans aucune limite",
+    "Non, seule la critique de l'athéisme est autorisée"
+  ],
+  answer: 0,
+  explanation: `✅ A. Oui, dans le respect de la loi (pas d'insulte ni de provocation à la haine)
+FR : Correct ! La liberté d'expression permet de critiquer les religions, mais dans le respect de la loi (pas d'insultes ni de provocation à la haine).
+中：正确。言论自由允许批评宗教，但必须遵守法律（不得侮辱或煽动仇恨）。
+
+❌ B. Non, aucune critique n'est autorisée
+FR : Faux. La critique des religions est autorisée dans le cadre légal.
+中：错误。在法律框架内允许批评宗教。
+
+❌ C. Oui, sans aucune limite
+FR : Faux. La liberté d'expression a des limites légales (diffamation, incitation à la haine).
+中：错误。言论自由有法律限制（诽谤、煽动仇恨）。
+
+❌ D. Non, seule la critique de l'athéisme est autorisée
+FR : Faux. La laïcité protège toutes les croyances et non-croyances.
+中：错误。世俗原则保护所有信仰和非信仰。`
+},
+
+{
+  id: "la0039",
+  type: "naturalisation",
+  category: "Laïcité",
+  difficulté: "simple",
+  typeQuestion: "examen original",
+  question: "Quel est le jour officiel de la laïcité en France ?",
+  options: [
+    "Le 14 juillet",
+    "Le 9 décembre",
+    "Le 11 novembre",
+    "Le 1er mai"
+  ],
+  answer: 1,
+  explanation: `❌ A. Le 14 juillet
+FR : Faux. Le 14 juillet est la fête nationale.
+中：错误。7月14日是国庆日。
+
+✅ B. Le 9 décembre
+FR : Correct ! Le 9 décembre est la journée nationale de la laïcité.
+中：正确。12月9日是法国国家世俗日。
+
+❌ C. Le 11 novembre
+FR : Faux. Le 11 novembre est l'armistice de 1918.
+中：错误。11月11日是1918年停战日。
+
+❌ D. Le 1er mai
+FR : Faux. Le 1er mai est la fête du Travail.
+中：错误。5月1日是劳动节。`
+},
+
+{
+  id: "la0040",
+  type: "naturalisation",
+  category: "Laïcité",
+  difficulté: "moyen",
+  typeQuestion: "examen original",
+  question: "La laïcité est inscrite dans quel texte fondamental ?",
+  options: [
+    "La Déclaration des droits de l'homme et du citoyen de 1789",
+    "La Constitution de 1958 (article 1er)",
+    "Le Code civil de 1804",
+    "Le Code pénal"
+  ],
+  answer: 1,
+  explanation: `❌ A. La Déclaration des droits de l'homme et du citoyen de 1789
+FR : Faux. La Déclaration énonce la liberté de conscience, mais la laïcité est dans la Constitution de 1958.
+中：错误。宣言提到了信仰自由，但世俗原则在1958年宪法中。
+
+✅ B. La Constitution de 1958 (article 1er)
+FR : Correct ! L'article 1er de la Constitution dispose : "La France est une République indivisible, laïque, démocratique et sociale."
+中：正确。宪法第1条规定："法国是一个不可分割、世俗、民主和社会的共和国。"
+
+❌ C. Le Code civil de 1804
+FR : Faux. Le Code civil régit le droit privé, pas la laïcité.
+中：错误。民法典属于私法，不涉及世俗原则。
+
+❌ D. Le Code pénal
+FR : Faux. Le Code pénal ne définit pas la laïcité.
+中：错误。刑法典不定义世俗原则。`
+},
   {
     id: "ds0103",
     type: "naturalisation",

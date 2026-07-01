@@ -1700,7 +1700,15 @@ function selectQuestionsByTheme() {
     
     console.log("题库分类分布:", Object.keys(questionsByCategory));
     
-    // 2. 根据新主题分布选择题目
+    // 2. 定义允许的4个主题
+    const targetCategories = [
+        "Travail",
+        "Accès aux soins",
+        "Autorité parentale et système éducatif",
+        "S'installer et résider en France"
+    ];
+    
+    // 3. 根据新主题分布选择题目
     selectedQuestions = [];
     let totalSelected = 0;
     
@@ -1711,9 +1719,9 @@ function selectQuestionsByTheme() {
         const selected = shuffled.slice(0, Math.min(5, travailQuestions.length));
         selectedQuestions.push(...selected);
         totalSelected += selected.length;
-        console.log(`选择了${selected.length}道工作相关题目`);
+        console.log(`选择了 ${selected.length} 道工作相关题目 (需要5道)`);
     } else {
-        console.warn("警告：没有找到Travail题目");
+        console.warn("⚠️ 没有找到Travail题目");
     }
     
     // 选择"Accès aux soins"题目 (5题)
@@ -1723,9 +1731,9 @@ function selectQuestionsByTheme() {
         const selected = shuffled.slice(0, Math.min(5, soinsQuestions.length));
         selectedQuestions.push(...selected);
         totalSelected += selected.length;
-        console.log(`选择了${selected.length}道医疗相关题目`);
+        console.log(`选择了 ${selected.length} 道医疗相关题目 (需要5道)`);
     } else {
-        console.warn("警告：没有找到Accès aux soins题目");
+        console.warn("⚠️ 没有找到Accès aux soins题目");
     }
     
     // 选择"Autorité parentale et système éducatif"题目 (5题)
@@ -1735,9 +1743,9 @@ function selectQuestionsByTheme() {
         const selected = shuffled.slice(0, Math.min(5, educationQuestions.length));
         selectedQuestions.push(...selected);
         totalSelected += selected.length;
-        console.log(`选择了${selected.length}道教育和监护权题目`);
+        console.log(`选择了 ${selected.length} 道教育和监护权题目 (需要5道)`);
     } else {
-        console.warn("警告：没有找到Autorité parentale et système éducatif题目");
+        console.warn("⚠️ 没有找到Autorité parentale et système éducatif题目");
     }
     
     // 选择"S'installer et résider en France"题目 (5题)
@@ -1747,37 +1755,67 @@ function selectQuestionsByTheme() {
         const selected = shuffled.slice(0, Math.min(5, residenceQuestions.length));
         selectedQuestions.push(...selected);
         totalSelected += selected.length;
-        console.log(`选择了${selected.length}道居住相关题目`);
+        console.log(`选择了 ${selected.length} 道居住相关题目 (需要5道)`);
     } else {
-        console.warn("警告：没有找到S'installer et résider en France题目");
+        console.warn("⚠️ 没有找到S'installer et résider en France题目");
     }
     
-    console.log(`已选择 ${totalSelected} 题`);
+    console.log(`已选择 ${totalSelected} 题 (需要20题)`);
     
-    // 3. 如果题目不足20，从其他题目中补充
+    // ✅ 方案一：如果题目不足20，只从指定的4个主题中补充
     if (totalSelected < 20) {
         const needed = 20 - totalSelected;
+        console.log(`需要补充 ${needed} 题，只从指定的4个主题中选取`);
         
-        const selectedSet = new Set(selectedQuestions);
-        const availableQuestions = allQuestions.filter(q => !selectedSet.has(q));
+        // 收集所有属于4个主题的题目（排除已选的）
+        let availableFromTargets = [];
+        targetCategories.forEach(cat => {
+            const questions = questionsByCategory[cat] || [];
+            // 排除已选的题目
+            const selectedIds = new Set(selectedQuestions.map(q => q.id));
+            const filtered = questions.filter(q => !selectedIds.has(q.id));
+            availableFromTargets.push(...filtered);
+        });
         
-        if (availableQuestions.length > 0) {
-            const shuffled = shuffleArray([...availableQuestions]);
-            const toAdd = shuffled.slice(0, Math.min(needed, availableQuestions.length));
+        console.log(`从4个主题中找到 ${availableFromTargets.length} 道可用题目`);
+        
+        if (availableFromTargets.length > 0) {
+            const shuffled = shuffleArray([...availableFromTargets]);
+            const toAdd = shuffled.slice(0, Math.min(needed, availableFromTargets.length));
             selectedQuestions.push(...toAdd);
-            console.log(`补充了${toAdd.length}道其他题目`);
+            totalSelected += toAdd.length;
+            console.log(`✅ 从指定主题补充了 ${toAdd.length} 道题`);
+        } else {
+            console.warn(`⚠️ 指定主题没有更多题目可补充，只能有 ${totalSelected} 题`);
         }
     }
     
     // 如果题目太多，截取前20题
     if (selectedQuestions.length > 20) {
         selectedQuestions = selectedQuestions.slice(0, 20);
+        console.log(`截取前20题`);
     }
     
     // 最终随机打乱所有题目顺序
     selectedQuestions = shuffleArray(selectedQuestions);
     
-    console.log(`最终选择 ${selectedQuestions.length} 题`);
+    console.log(`最终选择 ${selectedQuestions.length} 题 (只包含指定主题)`);
+    
+    // 检查是否所有题目都属于4个主题
+    const allFromTarget = selectedQuestions.every(q => {
+        const category = q.category || "Autre";
+        return targetCategories.some(target => category === target);
+    });
+    
+    if (!allFromTarget) {
+        console.warn("⚠️ 警告：有题目不属于指定的4个主题！");
+        // 过滤掉不属于4个主题的题目
+        selectedQuestions = selectedQuestions.filter(q => {
+            const category = q.category || "Autre";
+            return targetCategories.some(target => category === target);
+        });
+        console.log(`过滤后剩余 ${selectedQuestions.length} 题`);
+    }
     
     // 4. 为新主题添加标签
     selectedQuestions = selectedQuestions.map((question) => {
@@ -1811,6 +1849,8 @@ function selectQuestionsByTheme() {
             theme: category
         };
     });
+    
+    console.log("✅ 选题完成，所有题目都属于指定主题");
 }
 // Fisher-Yates 洗牌算法
 function shuffleArray(array) {

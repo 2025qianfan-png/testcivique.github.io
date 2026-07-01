@@ -1682,6 +1682,7 @@ function startTest() {
     }, 1500);
 }
 // ==================== 根据主题分布选择题目 ====================
+// ==================== 根据主题分布选择题目 ====================
 function selectQuestionsByTheme() {
     console.log("开始按主题分布选择题目...");
     
@@ -1698,7 +1699,7 @@ function selectQuestionsByTheme() {
     
     console.log("题库分类分布:", Object.keys(questionsByCategory));
     
-    // 2. 专门处理Mises en situation - 筛选si048到si0105
+    // 2. 专门处理Mises en situation - 筛选si048到si105
     let situationQuestions = [];
     
     // 先尝试从分类中找
@@ -1717,7 +1718,7 @@ function selectQuestionsByTheme() {
             if (!numMatch) return false;
             
             const num = parseInt(numMatch[1]);
-            // 只选择si048到si0105的题目
+            // 只选择si048到si105的题目
             return num >= 48 && num <= 105;
         });
     } else {
@@ -1734,7 +1735,7 @@ function selectQuestionsByTheme() {
         });
     }
     
-    console.log(`找到Mises en situation (si048-si0105)题目: ${situationQuestions.length}道`);
+    console.log(`找到Mises en situation (si048-si105)题目: ${situationQuestions.length}道`);
     
     // 3. 根据新主题分布选择题目
     selectedQuestions = [];
@@ -1747,8 +1748,9 @@ function selectQuestionsByTheme() {
         const selected = shuffled.slice(0, Math.min(5, droitsQuestions.length));
         selectedQuestions.push(...selected);
         totalSelected += selected.length;
+        console.log(`选择了 ${selected.length} 道 Droits fondamentaux (需要5道)`);
     } else {
-        console.warn("警告：没有找到Droits fondamentaux题目");
+        console.warn("⚠️ 没有找到Droits fondamentaux题目");
     }
     
     // 选择"Obligations et devoirs"题目 (5题)
@@ -1758,19 +1760,20 @@ function selectQuestionsByTheme() {
         const selected = shuffled.slice(0, Math.min(5, obligationsQuestions.length));
         selectedQuestions.push(...selected);
         totalSelected += selected.length;
+        console.log(`选择了 ${selected.length} 道 Obligations et devoirs (需要5道)`);
     } else {
-        console.warn("警告：没有找到Obligations et devoirs des personnes résidant en France题目");
+        console.warn("⚠️ 没有找到Obligations et devoirs des personnes résidant en France题目");
     }
     
-    // 选择"Mises en situation"题目 (10题) - 从si048到si0105
+    // 选择"Mises en situation"题目 (10题) - 从si048到si105
     if (situationQuestions.length > 0) {
         const shuffled = shuffleArray([...situationQuestions]);
         const selected = shuffled.slice(0, Math.min(10, situationQuestions.length));
         selectedQuestions.push(...selected);
         totalSelected += selected.length;
-        console.log(`选择了${selected.length}道情境题 (si048-si0105)`);
+        console.log(`选择了 ${selected.length} 道 Mises en situation (si048-si105，需要10道)`);
     } else {
-        console.warn("警告：没有找到Mises en situation (si048-si0105)题目");
+        console.warn("⚠️ 没有找到Mises en situation (si048-si105)题目");
         // 如果没有足够的情境题，从其他情境题中补充
         const allSituation = questionsByCategory["Mises en situation"] || 
                             allQuestions.filter(q => (q.id || "").toLowerCase().startsWith("si"));
@@ -1779,35 +1782,89 @@ function selectQuestionsByTheme() {
             const needed = 10 - (selectedQuestions.length % 10);
             const selected = shuffled.slice(0, Math.min(needed, allSituation.length));
             selectedQuestions.push(...selected);
+            totalSelected += selected.length;
+            console.log(`从其他情境题补充了 ${selected.length} 道`);
         }
     }
     
-    console.log(`已选择 ${totalSelected} 题`);
+    console.log(`已选择 ${totalSelected} 题 (需要20题)`);
     
-    // 4. 如果题目不足20，从其他题目中补充
+    // ✅ 方案一：如果题目不足20，只从指定的3个主题中补充
     if (totalSelected < 20) {
         const needed = 20 - totalSelected;
+        console.log(`需要补充 ${needed} 题，只从指定的3个主题中选取`);
         
-        const selectedSet = new Set(selectedQuestions);
-        const availableQuestions = allQuestions.filter(q => !selectedSet.has(q));
+        // 定义允许的3个主题
+        const targetCategories = [
+            "Droits fondamentaux",
+            "Obligations et devoirs des personnes résidant en France",
+            "Mises en situation"
+        ];
         
-        if (availableQuestions.length > 0) {
-            const shuffled = shuffleArray([...availableQuestions]);
-            const toAdd = shuffled.slice(0, Math.min(needed, availableQuestions.length));
+        // 收集所有属于3个主题的题目（排除已选的）
+        let availableFromTargets = [];
+        targetCategories.forEach(cat => {
+            let questions = [];
+            if (cat === "Mises en situation") {
+                // 情境题使用已经筛选过的 situationQuestions
+                questions = situationQuestions;
+            } else {
+                questions = questionsByCategory[cat] || [];
+            }
+            
+            // 排除已选的题目
+            const selectedIds = new Set(selectedQuestions.map(q => q.id));
+            const filtered = questions.filter(q => !selectedIds.has(q.id));
+            availableFromTargets.push(...filtered);
+        });
+        
+        console.log(`从3个主题中找到 ${availableFromTargets.length} 道可用题目`);
+        
+        if (availableFromTargets.length > 0) {
+            const shuffled = shuffleArray([...availableFromTargets]);
+            const toAdd = shuffled.slice(0, Math.min(needed, availableFromTargets.length));
             selectedQuestions.push(...toAdd);
-            console.log(`补充了${toAdd.length}道其他题目`);
+            totalSelected += toAdd.length;
+            console.log(`✅ 从指定主题补充了 ${toAdd.length} 道题`);
+        } else {
+            console.warn(`⚠️ 指定主题没有更多题目可补充，只能有 ${totalSelected} 题`);
         }
     }
     
     // 如果题目太多，截取前20题
     if (selectedQuestions.length > 20) {
         selectedQuestions = selectedQuestions.slice(0, 20);
+        console.log(`截取前20题`);
     }
     
     // 最终随机打乱所有题目顺序
     selectedQuestions = shuffleArray(selectedQuestions);
     
-    console.log(`最终选择 ${selectedQuestions.length} 题`);
+    console.log(`最终选择 ${selectedQuestions.length} 题 (只包含指定主题)`);
+    
+    // 检查是否所有题目都属于3个主题
+    const targetCategories = [
+        "Droits fondamentaux",
+        "Obligations et devoirs des personnes résidant en France",
+        "Mises en situation"
+    ];
+    const allFromTarget = selectedQuestions.every(q => {
+        const category = q.category || "Autre";
+        // 检查是否属于3个主题之一
+        return targetCategories.some(target => category.includes(target)) ||
+               (q.id && q.id.toLowerCase().startsWith("si"));
+    });
+    
+    if (!allFromTarget) {
+        console.warn("⚠️ 警告：有题目不属于指定的3个主题！");
+        // 过滤掉不属于3个主题的题目
+        selectedQuestions = selectedQuestions.filter(q => {
+            const category = q.category || "Autre";
+            return targetCategories.some(target => category.includes(target)) ||
+                   (q.id && q.id.toLowerCase().startsWith("si"));
+        });
+        console.log(`过滤后剩余 ${selectedQuestions.length} 题`);
+    }
     
     // 5. 为新主题添加标签
     selectedQuestions = selectedQuestions.map((question) => {
@@ -1840,7 +1897,10 @@ function selectQuestionsByTheme() {
             theme: category
         };
     });
+    
+    console.log("✅ 选题完成，所有题目都属于指定主题");
 }
+
 // Fisher-Yates 洗牌算法
 function shuffleArray(array) {
     const newArray = [...array];
