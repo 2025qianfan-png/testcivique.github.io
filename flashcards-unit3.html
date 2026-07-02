@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>模块三 · 权利与公民 - Mille Voiles</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-blue: #004080;
+      --primary-light-blue: #0066cc;
+      --primary-yellow: #ffd633;
+      --primary-light-yellow: #ffe066;
+      --dark-gray: #333333;
+      --medium-gray: #666666;
+      --light-gray: #f5f7fa;
+      --white: #ffffff;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.12);
+      --border-radius: 12px;
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      color: var(--dark-gray);
+      background: var(--light-gray);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .main-header {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light-blue) 100%);
+      color: var(--white);
+      padding: 25px 30px;
+      border-radius: var(--border-radius) var(--border-radius) 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .main-header .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .main-header .logo-area i {
+      font-size: 2rem;
+      color: var(--primary-yellow);
+    }
+
+    .main-header .logo-area h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1.6rem;
+      color: var(--white);
+    }
+
+    .main-header .logo-area .badge {
+      background: var(--primary-yellow);
+      color: var(--primary-blue);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.8rem;
+      border-radius: 50px;
+      margin-left: 0.5rem;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .header-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 8px 18px;
+      border-radius: 50px;
+      color: var(--white);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Montserrat', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .header-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      color: var(--white);
+    }
+
+    .header-btn i {
+      font-size: 1rem;
+    }
+
+    .main-nav {
+      background-color: var(--white);
+      padding: 12px 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .main-nav .logo {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--primary-blue);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .main-nav .logo i {
+      color: var(--primary-yellow);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 25px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--dark-gray);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary-blue);
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: var(--primary-blue);
+      transition: var(--transition);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .breadcrumb {
+      padding: 15px 30px;
+      background-color: var(--white);
+      border-bottom: 1px solid #eee;
+    }
+
+    .breadcrumb-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+    }
+
+    .breadcrumb-links a {
+      color: var(--medium-gray);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .breadcrumb-links a:hover {
+      color: var(--primary-blue);
+    }
+
+    .breadcrumb-links i {
+      font-size: 0.7rem;
+      color: var(--medium-gray);
+    }
+
+    .breadcrumb-links .current {
+      color: var(--primary-blue);
+      font-weight: 600;
+    }
+
+    .app-card {
+      background: var(--white);
+      border-radius: 0 0 var(--border-radius) var(--border-radius);
+      padding: 2rem 2rem 2.5rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .app-card .unit-banner {
+      background: linear-gradient(135deg, #e8f0fe 0%, #d4e2f7 100%);
+      border-radius: var(--border-radius);
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      border-left: 4px solid var(--primary-blue);
+    }
+
+    .app-card .unit-banner h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.2rem;
+      color: var(--primary-blue);
+    }
+
+    .app-card .unit-banner h2 i {
+      margin-right: 8px;
+      color: var(--primary-yellow);
+    }
+
+    .app-card .unit-banner .unit-stats {
+      font-size: 0.85rem;
+      color: var(--medium-gray);
+    }
+
+    .app-card .unit-banner .unit-stats span {
+      font-weight: 700;
+      color: var(--primary-blue);
+    }
+
+    .mode-switch {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--light-gray);
+      border-radius: 50px;
+      padding: 0.3rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .mode-btn {
+      border: none;
+      background: transparent;
+      padding: 0.6rem 1.6rem;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: var(--medium-gray);
+      transition: var(--transition);
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .mode-btn:hover {
+      color: var(--primary-blue);
+    }
+
+    .mode-btn.active {
+      background: var(--primary-yellow);
+      color: var(--primary-blue);
+      box-shadow: var(--shadow);
+    }
+
+    .mode-btn i {
+      margin-right: 6px;
+    }
+
+    .flashcard {
+      width: 100%;
+      max-width: 600px;
+      margin: 1rem auto;
+      background: linear-gradient(135deg, #f8f9fa 0%, var(--white) 100%);
+      border-radius: 2rem;
+      padding: 3rem 2rem;
+      box-shadow: var(--shadow);
+      text-align: center;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: var(--transition);
+      position: relative;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .flashcard:hover {
+      border-color: var(--primary-yellow);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .flashcard .card-number {
+      font-size: 0.9rem;
+      color: var(--medium-gray);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .flashcard .card-type {
+      font-size: 0.8rem;
+      color: var(--medium-gray);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .flashcard .card-word {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--primary-blue);
+      font-family: 'Montserrat', sans-serif;
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+    }
+
+    .flashcard .card-translation {
+      font-size: 1.8rem;
+      color: var(--dark-gray);
+      border-top: 2px dashed var(--primary-yellow);
+      padding-top: 1.2rem;
+      margin-top: 0.8rem;
+      font-weight: 500;
+      visibility: hidden;
+    }
+
+    .flashcard .card-translation.visible {
+      visibility: visible;
+    }
+
+    .flashcard .card-hint {
+      font-size: 0.85rem;
+      color: var(--medium-gray);
+      margin-top: 1.5rem;
+      opacity: 0.6;
+    }
+
+    .flashcard .card-hint i {
+      margin-right: 6px;
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin: 1rem 0 0.5rem;
+    }
+
+    .nav-btn {
+      background: var(--light-gray);
+      border: none;
+      width: 3.2rem;
+      height: 3.2rem;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      color: var(--primary-blue);
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-btn:hover {
+      background: var(--primary-yellow);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .card-counter {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--medium-gray);
+      margin-top: 0.5rem;
+    }
+
+    .card-counter span {
+      font-weight: 700;
+      color: var(--primary-blue);
+    }
+
+    .sentence-viewport {
+      background: var(--light-gray);
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      border: 1px solid #eee;
+    }
+
+    .sentence-item {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.3rem 0.2rem;
+      margin-bottom: 0.8rem;
+      padding: 0.5rem 0.8rem;
+      border-bottom: 1px dashed #e0e0e0;
+      background: var(--white);
+      border-radius: 0.8rem;
+      transition: var(--transition);
+    }
+
+    .sentence-item:hover {
+      background: #fafafa;
+    }
+
+    .sentence-number {
+      font-weight: 700;
+      color: var(--primary-blue);
+      margin-right: 0.5rem;
+      font-size: 0.9rem;
+      min-width: 2.2rem;
+      text-align: right;
+    }
+
+    .word-chip {
+      background: var(--white);
+      border: 1px solid #d0d0d0;
+      border-radius: 2rem;
+      padding: 0.2rem 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.15rem;
+      font-size: 0.95rem;
+    }
+
+    .word-chip:hover {
+      border-color: var(--primary-blue);
+      background: #f0f4f8;
+    }
+
+    .word-chip.show-translate .chip-translate {
+      display: inline-block;
+      background: var(--primary-yellow);
+      border-radius: 1rem;
+      padding: 0.1rem 0.5rem;
+      font-size: 0.7rem;
+      color: var(--primary-blue);
+      margin-left: 0.3rem;
+      font-weight: 600;
+    }
+
+    .word-chip.unknown {
+      background: #fce4e4;
+      border-color: #c0392b;
+      text-decoration: line-through wavy #c0392b;
+    }
+
+    .chip-translate {
+      display: none;
+    }
+
+    .sentence-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0.5rem 0;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .sentence-controls .hint {
+      font-size: 0.85rem;
+      color: var(--medium-gray);
+    }
+
+    .sentence-controls .hint i {
+      margin-right: 4px;
+    }
+
+    .unknown-panel {
+      background: #fff5f0;
+      border-radius: 1rem;
+      padding: 1rem 1.2rem;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+      border-left: 4px solid #e67e22;
+    }
+
+    .unknown-panel strong {
+      color: var(--primary-blue);
+    }
+
+    .action-small {
+      background: var(--light-gray);
+      border: none;
+      border-radius: 2rem;
+      padding: 0.5rem 1.2rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--dark-gray);
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .action-small:hover {
+      background: var(--primary-yellow);
+      color: var(--primary-blue);
+      transform: translateY(-2px);
+    }
+
+    .action-small.danger:hover {
+      background: #e74c3c;
+      color: var(--white);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .main-footer {
+      background-color: var(--primary-blue);
+      color: var(--white);
+      padding: 40px 30px 25px;
+      border-radius: var(--border-radius);
+      margin-top: 2rem;
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .footer-column h4 {
+      color: var(--primary-yellow);
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 8px;
+    }
+
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      transition: var(--transition);
+      font-size: 0.9rem;
+    }
+
+    .footer-links a:hover {
+      color: var(--primary-yellow);
+      padding-left: 5px;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+
+    .footer-bottom a {
+      color: var(--primary-yellow);
+      text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 1rem 0.5rem; }
+      .main-header { padding: 20px; flex-direction: column; align-items: flex-start; }
+      .main-header .logo-area h1 { font-size: 1.3rem; }
+      .main-nav { padding: 12px 20px; flex-direction: column; align-items: flex-start; }
+      .nav-links { gap: 15px; flex-wrap: wrap; }
+      .breadcrumb { padding: 12px 20px; }
+      .app-card { padding: 1.2rem 1rem 1.8rem; border-radius: 0 0 var(--border-radius) var(--border-radius); }
+      .flashcard { padding: 2rem 1.2rem; min-height: 220px; }
+      .flashcard .card-word { font-size: 1.8rem; }
+      .flashcard .card-translation { font-size: 1.4rem; }
+      .mode-btn { padding: 0.4rem 1rem; font-size: 0.8rem; }
+      .nav-buttons { gap: 1rem; }
+      .nav-btn { width: 2.8rem; height: 2.8rem; font-size: 1.2rem; }
+      .sentence-item { padding: 0.3rem 0.5rem; }
+      .word-chip { font-size: 0.85rem; padding: 0.15rem 0.6rem; }
+      .app-card .unit-banner { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 480px) {
+      .main-header .logo-area h1 { font-size: 1.1rem; }
+      .header-btn { padding: 6px 12px; font-size: 0.75rem; }
+      .flashcard .card-word { font-size: 1.4rem; }
+      .flashcard .card-translation { font-size: 1.1rem; }
+      .mode-switch { width: 100%; justify-content: center; }
+      .mode-btn { font-size: 0.7rem; padding: 0.3rem 0.8rem; flex: 1; text-align: center; }
+      .sentence-controls { flex-direction: column; align-items: stretch; }
+      .btn-group { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header class="main-header">
+    <div class="logo-area">
+      <i class="fas fa-balance-scale"></i>
+      <h1>法语闪卡 <span class="badge">模块三</span></h1>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" class="header-btn"><i class="fas fa-home"></i> Accueil</a>
+      <a href="flashcards-unit2.html" class="header-btn"><i class="fas fa-arrow-left"></i> Module 2</a>
+    </div>
+  </header>
+
+  <nav class="main-nav">
+    <a href="index.html" class="logo">
+      <i class="fas fa-sailboat"></i>
+      <span>Mille Voiles</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Accueil</a>
+      <a href="#flashcards">Flashcards</a>
+      <a href="thematique-droits.html">Droits</a>
+      <a href="index.html#test">Test</a>
+    </div>
+  </nav>
+
+  <div class="breadcrumb">
+    <div class="breadcrumb-links">
+      <a href="index.html">Accueil</a>
+      <i class="fas fa-chevron-right"></i>
+      <a href="thematique-droits.html">Droits et devoirs</a>
+      <i class="fas fa-chevron-right"></i>
+      <span class="current">模块三 · 权利与公民</span>
+    </div>
+  </div>
+
+  <div class="app-card" id="flashcards">
+
+    <div class="unit-banner">
+      <h2><i class="fas fa-hand-fist"></i> 模块三 · Droits et citoyenneté</h2>
+      <div class="unit-stats">
+        <i class="fas fa-words"></i> <span id="totalWords">0</span> mots · 
+        <i class="fas fa-sentence"></i> <span id="totalSentences">0</span> phrases
+      </div>
+    </div>
+
+    <div class="mode-switch">
+      <button id="btnFlashcard" class="mode-btn active"><i class="fas fa-layer-group"></i> 单词闪卡</button>
+      <button id="btnSentence" class="mode-btn"><i class="fas fa-paragraph"></i> 句子练习</button>
+    </div>
+
+    <div id="flashcardView">
+      <div class="flashcard" id="flashcardElement">
+        <div class="card-number" id="cardNumber">1 / 0</div>
+        <div class="card-type" id="cardType">NOM</div>
+        <div class="card-word" id="cardWord">—</div>
+        <div class="card-translation" id="cardTranslation">—</div>
+        <div class="card-hint"><i class="fas fa-mouse-pointer"></i> Cliquez pour révéler la traduction</div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" id="prevCard"><i class="fas fa-chevron-left"></i></button>
+        <button class="nav-btn" id="nextCard"><i class="fas fa-chevron-right"></i></button>
+      </div>
+
+      <div class="card-counter">
+        <span id="totalCards">0</span> mots · <i class="far fa-hand-pointer"></i> cliquer pour voir la traduction
+      </div>
+    </div>
+
+    <div id="sentenceView" style="display:none;">
+      <div class="sentence-viewport" id="sentenceContainer"></div>
+
+      <div class="sentence-controls">
+        <span class="hint"><i class="fas fa-info-circle"></i> Cliquez un mot → voir traduction · Re-cliquez → marquer « inconnu »</span>
+        <div class="btn-group">
+          <button id="prevPageBtn" class="action-small"><i class="fas fa-chevron-left"></i> Précédent</button>
+          <button id="nextPageBtn" class="action-small">Suivant <i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+
+      <div class="unknown-panel">
+        <strong><i class="fas fa-exclamation-triangle"></i> Mots inconnus :</strong>
+        <span id="unknownDisplay">Aucun marqué</span>
+        <button id="resetUnknownBtn" class="action-small danger" style="float:right;background:#e74c3c;color:white;">Effacer</button>
+      </div>
+    </div>
+
+    <hr style="border: 0.5px solid #eee; margin: 1.5rem 0 0.5rem;">
+    <div style="text-align:right;font-size:0.8rem;color:var(--medium-gray);">
+      <i class="fas fa-sailboat"></i> mille voiles · 千帆
+    </div>
+  </div>
+
+  <footer class="main-footer">
+    <div class="footer-content">
+      <div class="footer-column">
+        <h4>À propos</h4>
+        <p style="font-size:0.9rem;opacity:0.8;">L'association Mille Voiles accompagne les communautés chinoises en France dans leurs démarches d'intégration, d'apprentissage du français et de préparation aux examens officiels.</p>
+      </div>
+      <div class="footer-column">
+        <h4>Thématiques</h4>
+        <ul class="footer-links">
+          <li><a href="thematique-valeurs.html"><i class="fas fa-chevron-right"></i> Valeurs de la République</a></li>
+          <li><a href="thematique-institutions.html"><i class="fas fa-chevron-right"></i> Institutions françaises</a></li>
+          <li><a href="thematique-droits.html"><i class="fas fa-chevron-right"></i> Droits et devoirs</a></li>
+          <li><a href="thematique-culture.html"><i class="fas fa-chevron-right"></i> Histoire, Géographie et Culture</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h4>Contact</h4>
+        <p style="font-size:0.9rem;opacity:0.8;">
+          <i class="fas fa-envelope" style="color:var(--primary-yellow);"></i> 2025qianfan@gmail.com<br>
+          <i class="fas fa-map-marker-alt" style="color:var(--primary-yellow);"></i> 94800 Villejuif
+        </p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Association Mille Voiles / 千帆协会 - Tous droits réservés.</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+(function() {
+  // ===== 模块三 词汇：权利与公民 =====
+  const words = [
+    { type:"Nom", french:"accès", chinese:"进入 / 获取" },
+    { type:"Nom", french:"acte", chinese:"行为 / 文件" },
+    { type:"Nom", french:"agression", chinese:"侵犯 / 攻击" },
+    { type:"Nom", french:"aide", chinese:"帮助" },
+    { type:"Nom", french:"assistance", chinese:"援助" },
+    { type:"Nom", french:"atteinte", chinese:"损害" },
+    { type:"Nom", french:"autorité", chinese:"权威 / 机关" },
+    { type:"Nom", french:"capacité", chinese:"能力" },
+    { type:"Nom", french:"caractéristique", chinese:"特点" },
+    { type:"Nom", french:"cadre", chinese:"范围 / 框架" },
+    { type:"Nom", french:"charte", chinese:"宪章" },
+    { type:"Nom", french:"citoyen", chinese:"公民" },
+    { type:"Nom", french:"choix", chinese:"选择" },
+    { type:"Nom", french:"collectivité", chinese:"集体 / 行政区" },
+    { type:"Nom", french:"contraception", chinese:"避孕" },
+    { type:"Nom", french:"constitution", chinese:"宪法" },
+    { type:"Nom", french:"crime", chinese:"重罪" },
+    { type:"Nom", french:"danger", chinese:"危险" },
+    { type:"Nom", french:"déchet", chinese:"垃圾" },
+    { type:"Nom", french:"déclaration", chinese:"声明 / 宣言" },
+    { type:"Nom", french:"défense", chinese:"防卫 / 辩护" },
+    { type:"Nom", french:"développement", chinese:"发展" },
+    { type:"Nom", french:"décision", chinese:"决定" },
+    { type:"Nom", french:"devoir", chinese:"义务" },
+    { type:"Nom", french:"difficulté", chinese:"困难" },
+    { type:"Nom", french:"discrimination", chinese:"歧视" },
+    { type:"Nom", french:"disposition", chinese:"条款 / 安排" },
+    { type:"Nom", french:"droit", chinese:"权利 / 法律" },
+    { type:"Nom", french:"école", chinese:"学校" },
+    { type:"Nom", french:"économie", chinese:"经济" },
+    { type:"Nom", french:"emploi", chinese:"就业" },
+    { type:"Nom", french:"enfant", chinese:"儿童" },
+    { type:"Nom", french:"ensemble", chinese:"整体" },
+    { type:"Nom", french:"environnement", chinese:"环境" },
+    { type:"Nom", french:"égalité", chinese:"平等" },
+    { type:"Nom", french:"état", chinese:"状态 / 国家" },
+    { type:"Nom", french:"exercice", chinese:"行使" },
+    { type:"Nom", french:"expression", chinese:"表达" },
+    { type:"Nom", french:"fait", chinese:"事实" },
+    { type:"Nom", french:"forme", chinese:"形式" },
+    { type:"Nom", french:"fonctionnement", chinese:"运作" },
+    { type:"Nom", french:"gendarmerie", chinese:"宪兵队" },
+    { type:"Nom", french:"génération", chinese:"代 / 产生" },
+    { type:"Nom", french:"grossesse", chinese:"怀孕" },
+    { type:"Nom", french:"gravité", chinese:"严重性" },
+    { type:"Nom", french:"harcèlement", chinese:"骚扰" },
+    { type:"Nom", french:"hôpital", chinese:"医院" },
+    { type:"Nom", french:"humain", chinese:"人类" },
+    { type:"Nom", french:"impôt", chinese:"税" },
+    { type:"Nom", french:"individu", chinese:"个人" },
+    { type:"Nom", french:"infraction", chinese:"违法" },
+    { type:"Nom", french:"intérêt", chinese:"利益" },
+    { type:"Nom", french:"intervention", chinese:"干预" },
+    { type:"Nom", french:"juré", chinese:"陪审员" },
+    { type:"Nom", french:"liberté", chinese:"自由" },
+    { type:"Nom", french:"loi", chinese:"法律" },
+    { type:"Nom", french:"moyen", chinese:"方法 / 手段" },
+    { type:"Nom", french:"meurtre", chinese:"谋杀" },
+    { type:"Nom", french:"nationalité", chinese:"国籍" },
+    { type:"Nom", french:"nature", chinese:"自然" },
+    { type:"Nom", french:"obligation", chinese:"义务" },
+    { type:"Nom", french:"organisation", chinese:"组织" },
+    { type:"Nom", french:"pays", chinese:"国家" },
+    { type:"Nom", french:"personne", chinese:"人" },
+    { type:"Nom", french:"plainte", chinese:"投诉 / 控告" },
+    { type:"Nom", french:"police", chinese:"警察" },
+    { type:"Nom", french:"pollution", chinese:"污染" },
+    { type:"Nom", french:"possibilité", chinese:"可能性" },
+    { type:"Nom", french:"pratique", chinese:"实践" },
+    { type:"Nom", french:"préambule", chinese:"序言" },
+    { type:"Nom", french:"procréation", chinese:"生育" },
+    { type:"Nom", french:"propriété", chinese:"财产" },
+    { type:"Nom", french:"protection", chinese:"保护" },
+    { type:"Nom", french:"prostitution", chinese:"卖淫" },
+    { type:"Nom", french:"république", chinese:"共和国" },
+    { type:"Nom", french:"respect", chinese:"尊重" },
+    { type:"Nom", french:"résident", chinese:"居民" },
+    { type:"Nom", french:"règle", chinese:"规则" },
+    { type:"Nom", french:"régime", chinese:"制度" },
+    { type:"Nom", french:"religion", chinese:"宗教" },
+    { type:"Nom", french:"route", chinese:"道路" },
+    { type:"Nom", french:"santé", chinese:"健康" },
+    { type:"Nom", french:"sécurité", chinese:"安全" },
+    { type:"Nom", french:"service", chinese:"服务" },
+    { type:"Nom", french:"société", chinese:"社会" },
+    { type:"Nom", french:"solidarité", chinese:"团结" },
+    { type:"Nom", french:"sûreté", chinese:"安全 / 安保" },
+    { type:"Nom", french:"témoin", chinese:"证人" },
+    { type:"Nom", french:"terrorisme", chinese:"恐怖主义" },
+    { type:"Nom", french:"titre", chinese:"标题 / 证件" },
+    { type:"Nom", french:"transport", chinese:"交通" },
+    { type:"Nom", french:"tribunal", chinese:"法院" },
+    { type:"Nom", french:"valeur", chinese:"价值" },
+    { type:"Nom", french:"victime", chinese:"受害者" },
+    { type:"Nom", french:"vie", chinese:"生命" },
+    { type:"Nom", french:"viol", chinese:"强奸" },
+    { type:"Nom", french:"violence", chinese:"暴力" },
+    { type:"Nom", french:"vitesse", chinese:"速度" },
+    { type:"Verbe", french:"aider", chinese:"帮助" },
+    { type:"Verbe", french:"appeler", chinese:"呼叫" },
+    { type:"Verbe", french:"assurer", chinese:"确保" },
+    { type:"Verbe", french:"avoir", chinese:"有" },
+    { type:"Verbe", french:"classer", chinese:"分类" },
+    { type:"Verbe", french:"comprendre", chinese:"理解" },
+    { type:"Verbe", french:"concerner", chinese:"涉及" },
+    { type:"Verbe", french:"constituer", chinese:"构成" },
+    { type:"Verbe", french:"correspondre", chinese:"对应" },
+    { type:"Verbe", french:"définir", chinese:"定义" },
+    { type:"Verbe", french:"demander", chinese:"请求" },
+    { type:"Verbe", french:"devenir", chinese:"成为" },
+    { type:"Verbe", french:"devoir", chinese:"必须" },
+    { type:"Verbe", french:"disposer", chinese:"拥有 / 安排" },
+    { type:"Verbe", french:"donner", chinese:"给予" },
+    { type:"Verbe", french:"exercer", chinese:"行使" },
+    { type:"Verbe", french:"financer", chinese:"资助" },
+    { type:"Verbe", french:"garantir", chinese:"保障" },
+    { type:"Verbe", french:"imposer", chinese:"强加" },
+    { type:"Verbe", french:"inclure", chinese:"包括" },
+    { type:"Verbe", french:"permettre", chinese:"允许" },
+    { type:"Verbe", french:"parler", chinese:"说话" },
+    { type:"Verbe", french:"participer", chinese:"参加" },
+    { type:"Verbe", french:"porter", chinese:"穿戴 / 携带" },
+    { type:"Verbe", french:"posséder", chinese:"拥有" },
+    { type:"Verbe", french:"protéger", chinese:"保护" },
+    { type:"Verbe", french:"punir", chinese:"惩罚" },
+    { type:"Verbe", french:"relever", chinese:"提高 / 指出" },
+    { type:"Verbe", french:"respecter", chinese:"尊重" },
+    { type:"Verbe", french:"résider", chinese:"居住" },
+    { type:"Verbe", french:"signaler", chinese:"报告" },
+    { type:"Verbe", french:"témoigner", chinese:"作证" },
+    { type:"Verbe", french:"utiliser", chinese:"使用" },
+    { type:"Verbe", french:"viser", chinese:"针对" },
+    { type:"Adjectif", french:"collectif", chinese:"集体的" },
+    { type:"Adjectif", french:"commun", chinese:"共同的" },
+    { type:"Adjectif", french:"conjugal", chinese:"夫妻的" },
+    { type:"Adjectif", french:"démocratique", chinese:"民主的" },
+    { type:"Adjectif", french:"difficile", chinese:"困难的" },
+    { type:"Adjectif", french:"digne", chinese:"有尊严的" },
+    { type:"Adjectif", french:"durable", chinese:"可持续的" },
+    { type:"Adjectif", french:"économique", chinese:"经济的" },
+    { type:"Adjectif", french:"égal", chinese:"平等的" },
+    { type:"Adjectif", french:"essentiel", chinese:"基本的" },
+    { type:"Adjectif", french:"fondamental", chinese:"根本的" },
+    { type:"Adjectif", french:"français", chinese:"法国的" },
+    { type:"Adjectif", french:"général", chinese:"一般的 / 总的" },
+    { type:"Adjectif", french:"grave", chinese:"严重的" },
+    { type:"Adjectif", french:"humain", chinese:"人类的" },
+    { type:"Adjectif", french:"illégal", chinese:"非法的" },
+    { type:"Adjectif", french:"indispensable", chinese:"必不可少的" },
+    { type:"Adjectif", french:"juridique", chinese:"法律的" },
+    { type:"Adjectif", french:"léger", chinese:"轻的" },
+    { type:"Adjectif", french:"légal", chinese:"合法的" },
+    { type:"Adjectif", french:"médical", chinese:"医学的" },
+    { type:"Adjectif", french:"politique", chinese:"政治的" },
+    { type:"Adjectif", french:"principal", chinese:"主要的" },
+    { type:"Adjectif", french:"public", chinese:"公共的" },
+    { type:"Adjectif", french:"réel", chinese:"真实的" },
+    { type:"Adjectif", french:"résidant", chinese:"居住的" },
+    { type:"Adjectif", french:"scolaire", chinese:"学校的" },
+    { type:"Adjectif", french:"social", chinese:"社会的" },
+    { type:"Adjectif", french:"supplémentaire", chinese:"额外的" },
+    { type:"Adjectif", french:"toute", chinese:"任何" },
+    { type:"Adjectif", french:"troisième", chinese:"第三" },
+    { type:"Adverbe", french:"ainsi", chinese:"因此" },
+    { type:"Adverbe", french:"aussi", chinese:"也" },
+    { type:"Adverbe", french:"d'abord", chinese:"首先" },
+    { type:"Adverbe", french:"également", chinese:"同样地" },
+    { type:"Adverbe", french:"enfin", chinese:"最后" },
+    { type:"Adverbe", french:"notamment", chinese:"特别是" },
+    { type:"Adverbe", french:"particulièrement", chinese:"尤其" },
+    { type:"Adverbe", french:"toutefois", chinese:"然而" }
+  ];
+
+  // ===== 模块三 句子 =====
+  const sentences = [
+    "Comment s'appelle la Constitution actuelle de la France ?",
+    "Comment s'appelle le texte qui énonce les droits et devoirs des personnes résidant en France ?",
+    "Concernant les droits individuels, quelle proposition est correcte ?",
+    "De quelle année date la Déclaration des droits de l'homme et du citoyen ?",
+    "Lequel de ces droits est un droit fondamental ?",
+    "Parmi ces textes, lequel garantit les droits et libertés en France ?",
+    "Qu'est-ce que la liberté d'expression ?",
+    "Quel droit permet à une personne de se défendre devant la justice ?",
+    "Quel est le texte fondateur établissant en France les droits et les devoirs de chaque citoyen ?",
+    "Quel texte a été adopté pendant la Révolution française ?",
+    "Quelle liberté permet à une personne de ne pas avoir de religion ?",
+    "Une femme peut avorter :",
+    "Est-il toujours possible de divorcer ?",
+    "La peine de mort est :",
+    "Concernant les limites aux libertés individuelles, quelle proposition est correcte ?",
+    "En France, est-ce légal d'être marié à plusieurs personnes en même temps ?",
+    "Faut-il réduire ses déchets ?",
+    "Jeter une bouteille dans la rue est :",
+    "Pourquoi les libertés individuelles peuvent-elles être limitées ?",
+    "Que doit faire une personne en cas d'accident ?",
+    "Que permet la citoyenneté française ?",
+    "Que risque une personne qui ne respecte pas la loi ?",
+    "Quel est le rôle de la gendarmerie ?",
+    "Quel est le rôle de la police ?",
+    "Qu'est-ce qu'une infraction ?",
+    "Comment peut-on réduire ses déchets ?",
+    "Déposer une machine à laver cassée sur le trottoir est :",
+    "En quoi consiste la traite des êtres humains ?",
+    "Que doit faire une victime de violences ?",
+    "Quelle est l'infraction la plus grave ?",
+    "À quelle liberté la PMA fait-elle référence ?",
+    "Au nom de quoi l'État justifie-t-il la restriction des droits ?",
+    "Concernant le droit de se marier, quelle proposition est correcte ?",
+    "Est-il toujours possible de divorcer ?",
+    "La peine de mort est :",
+    "Laquelle de ces citations est inscrite dans la Déclaration de 1789 ?",
+    "Le recours à l'avortement est-il autorisé ?",
+    "Que contient la Constitution ?",
+    "Que garantit la liberté de la presse ?",
+    "Que prévoit la Charte de l'environnement ?",
+    "Que signifie la dignité humaine ?",
+    "Que signifie le droit de manifester ?",
+    "Que signifie PMA ?",
+    "Quel texte est le plus difficile à modifier ?",
+    "Quelle liberté permet à une personne de croire en la religion de son choix ?",
+    "Qu'est-ce que le droit de grève ?",
+    "Qu'est-ce que la Constitution ?",
+    "Qui peut demander à avorter ?",
+    "Une femme majeure de nationalité française a-t-elle le droit de voter aux élections ?",
+    "Concernant l'utilisation des réseaux sociaux, quelle proposition est correcte ?",
+    "Jeter un mégot par terre est :",
+    "L'État peut-il limiter les droits et libertés ?",
+    "Parmi ces actions, laquelle permet d'adopter une attitude respectueuse de l'environnement ?",
+    "Quelle proposition constitue une obligation ?",
+    "Pour quel motif peut-on limiter la liberté d'expression ?",
+    "Pourquoi doit-on trier ses déchets ?",
+    "Que doit faire une victime de violences ?",
+    "Que doit-on faire face aux ordres des policiers ou gendarmes ?",
+    "Quel est le rôle de la police ?",
+    "Quel est un exemple d'assistance à personne en danger ?",
+    "Quel exemple illustre une limitation de liberté pour protéger l'intérêt général ?",
+    "Quelle est l'attitude à avoir lorsqu'on est témoin de violences ?",
+    "Quelle est l'infraction la plus grave ?",
+    "Quelle obligation concerne toutes les personnes résidant en France ?",
+    "Quelle proposition représente un exemple de crime ?",
+    "Quelle proposition représente un exemple de délit ?",
+    "Qui veille au maintien de l'ordre public ?",
+    "S'agissant des déchets, quelle proposition est correcte ?"
+  ];
+
+  // ===== TRANSLATIONS =====
+  const translationMap = new Map();
+  words.forEach(w => translationMap.set(w.french.toLowerCase().trim(), w.chinese));
+
+  const extra = {
+    "comment":"怎样","s'appelle":"叫做","constitution":"宪法","actuelle":"当前的","france":"法国","texte":"文本","énonce":"阐述","droits":"权利","devoirs":"义务","personnes":"人们","résidant":"居住","concernant":"关于","individuels":"个人的","proposition":"命题","correcte":"正确的","quelle":"哪个","année":"年份","date":"日期","déclaration":"宣言","homme":"人","citoyen":"公民","lequel":"哪一个","ces":"这些","fondamental":"基本的","parmi":"在…之中","textes":"文本","garantit":"保障","libertés":"自由","qu'est-ce":"什么是","liberté":"自由","d'expression":"表达","permet":"允许","défendre":"辩护","devant":"在…面前","justice":"司法","fondateur":"奠基的","établissant":"确立","chaque":"每个","adopté":"通过","pendant":"在…期间","révolution":"革命","française":"法国的","croire":"相信","religion":"宗教","femme":"女性","peut":"可以","avorter":"堕胎","toujours":"总是","possible":"可能的","divorcer":"离婚","peine":"刑罚","mort":"死亡","limites":"限制","individuelles":"个人的","légal":"合法的","marié":"结婚","plusieurs":"多个","même":"相同的","faut-il":"必须","réduire":"减少","ses":"其","déchets":"垃圾","jeter":"扔","bouteille":"瓶子","rue":"街道","pourquoi":"为什么","peuvent-elles":"它们能","limitées":"限制","faire":"做","cas":"情况","accident":"事故","citoyenneté":"公民身份","risque":"风险","respecte":"尊重","gendarmerie":"宪兵队","police":"警察","infraction":"违法","comment":"如何","déposer":"放置","machine":"机器","laver":"洗","cassée":"坏的","trottoir":"人行道","consiste":"在于","traite":"贩卖","êtres":"存在","humains":"人类","victime":"受害者","violences":"暴力","plus":"最","grave":"严重","pma":"辅助生育","référence":"参考","nom":"名义","justifie-t-il":"辩护","restriction":"限制","laquelle":"哪个","citations":"引文","inscrite":"题写","recours":"诉诸","avortement":"堕胎","autorisé":"允许","contient":"包含","presse":"新闻","prévoit":"规定","charte":"宪章","environnement":"环境","dignité":"尊严","humaine":"人类","manifester":"示威","modifier":"修改","choix":"选择","grève":"罢工","demander":"请求","majeure":"成年","nationalité":"国籍","utilisation":"使用","réseaux":"网络","sociaux":"社交","mégot":"烟蒂","terre":"地上","limiter":"限制","actions":"行动","adopter":"采用","attitude":"态度","respectueuse":"尊重的","constitue":"构成","obligation":"义务","motif":"理由","trier":"分类","face":"面对","ordres":"命令","policiers":"警察","gendarmes":"宪兵","exemple":"例子","assistance":"援助","danger":"危险","illustre":"说明","limitation":"限制","protéger":"保护","intérêt":"利益","général":"总体","témoin":"证人","concerne":"涉及","résidant":"居住","représente":"代表","crime":"重罪","délit":"轻罪","veille":"确保","maintien":"维持","ordre":"秩序","public":"公共","s'agissant":"关于","est":"是"
+  };
+  Object.entries(extra).forEach(([k,v]) => { if(!translationMap.has(k)) translationMap.set(k,v); });
+
+  function getTranslation(rawWord) {
+    const clean = rawWord.toLowerCase().replace(/[.,;:!?»«""'’…\[\]()]/g, '').trim();
+    if (translationMap.has(clean)) return translationMap.get(clean);
+    const noPrefix = clean.replace(/^(l'|d'|s'|qu'|n'|c'|j'|t'|m')/, '');
+    if (noPrefix !== clean && translationMap.has(noPrefix)) return translationMap.get(noPrefix);
+    return '?';
+  }
+
+  // ===== STATE =====
+  let currentCardIndex = 0;
+  let currentPage = 0;
+  const sentencesPerPage = 10;
+  let unknownWords = new Set();
+
+  const flashcardView = document.getElementById('flashcardView');
+  const sentenceView = document.getElementById('sentenceView');
+  const btnFlash = document.getElementById('btnFlashcard');
+  const btnSent = document.getElementById('btnSentence');
+  const cardWord = document.getElementById('cardWord');
+  const cardType = document.getElementById('cardType');
+  const cardTrans = document.getElementById('cardTranslation');
+  const cardNumber = document.getElementById('cardNumber');
+  const totalCardsSpan = document.getElementById('totalCards');
+  const totalWordsSpan = document.getElementById('totalWords');
+  const totalSentencesSpan = document.getElementById('totalSentences');
+  const sentenceContainer = document.getElementById('sentenceContainer');
+  const unknownDisplay = document.getElementById('unknownDisplay');
+  const flashcardEl = document.getElementById('flashcardElement');
+
+  function updateCard() {
+    if (words.length === 0) return;
+    const w = words[currentCardIndex];
+    cardNumber.textContent = (currentCardIndex + 1) + ' / ' + words.length;
+    cardType.textContent = w.type.toUpperCase();
+    cardWord.textContent = w.french;
+    cardTrans.textContent = w.chinese;
+    cardTrans.classList.remove('visible');
+  }
+
+  function nextCard() {
+    if (words.length === 0) return;
+    currentCardIndex = (currentCardIndex + 1) % words.length;
+    updateCard();
+  }
+
+  function prevCard() {
+    if (words.length === 0) return;
+    currentCardIndex = (currentCardIndex - 1 + words.length) % words.length;
+    updateCard();
+  }
+
+  function renderPage() {
+    const totalPages = Math.ceil(sentences.length / sentencesPerPage);
+    if (currentPage >= totalPages) currentPage = totalPages - 1;
+    if (currentPage < 0) currentPage = 0;
+    const start = currentPage * sentencesPerPage;
+    const pageSentences = sentences.slice(start, start + sentencesPerPage);
+    sentenceContainer.innerHTML = '';
+    pageSentences.forEach((sentence, idx) => {
+      const globalIndex = start + idx + 1;
+      const sentDiv = document.createElement('div');
+      sentDiv.className = 'sentence-item';
+      const numSpan = document.createElement('span');
+      numSpan.className = 'sentence-number';
+      numSpan.textContent = globalIndex + '.';
+      sentDiv.appendChild(numSpan);
+      const tokens = sentence.match(/[^\s]+/g) || [];
+      tokens.forEach(token => {
+        const core = token.replace(/[.,;:!?»«""'’…\[\]()]/g, '');
+        const lowerCore = core.toLowerCase();
+        const chip = document.createElement('span');
+        chip.className = 'word-chip';
+        if (unknownWords.has(lowerCore)) chip.classList.add('unknown');
+        const trans = getTranslation(token);
+        chip.innerHTML = token + '<span class="chip-translate">' + trans + '</span>';
+        chip.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (!chip.classList.contains('show-translate')) {
+            chip.classList.add('show-translate');
+          } else {
+            if (unknownWords.has(lowerCore)) {
+              unknownWords.delete(lowerCore);
+              chip.classList.remove('unknown');
+            } else {
+              unknownWords.add(lowerCore);
+              chip.classList.add('unknown');
+            }
+            updateUnknownList();
+          }
+        });
+        sentDiv.appendChild(chip);
+      });
+      sentenceContainer.appendChild(sentDiv);
+    });
+  }
+
+  function updateUnknownList() {
+    unknownDisplay.textContent = unknownWords.size ? Array.from(unknownWords).join(' · ') : 'Aucun marqué';
+  }
+
+  function resetUnknown() {
+    unknownWords.clear();
+    updateUnknownList();
+    renderPage();
+  }
+
+  function showFlashcard() {
+    flashcardView.style.display = 'block';
+    sentenceView.style.display = 'none';
+    btnFlash.classList.add('active');
+    btnSent.classList.remove('active');
+  }
+
+  function showSentence() {
+    flashcardView.style.display = 'none';
+    sentenceView.style.display = 'block';
+    btnSent.classList.add('active');
+    btnFlash.classList.remove('active');
+    renderPage();
+  }
+
+  document.getElementById('prevCard').addEventListener('click', prevCard);
+  document.getElementById('nextCard').addEventListener('click', nextCard);
+
+  flashcardEl.addEventListener('click', () => {
+    cardTrans.classList.toggle('visible');
+  });
+
+  btnFlash.addEventListener('click', showFlashcard);
+  btnSent.addEventListener('click', showSentence);
+
+  document.getElementById('prevPageBtn').addEventListener('click', () => {
+    if (currentPage > 0) { currentPage--; renderPage(); }
+  });
+
+  document.getElementById('nextPageBtn').addEventListener('click', () => {
+    const totalPages = Math.ceil(sentences.length / sentencesPerPage);
+    if (currentPage < totalPages - 1) { currentPage++; renderPage(); }
+  });
+
+  document.getElementById('resetUnknownBtn').addEventListener('click', resetUnknown);
+
+  document.addEventListener('keydown', function(e) {
+    if (flashcardView.style.display !== 'none') {
+      if (e.key === 'ArrowRight') { e.preventDefault(); nextCard(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); prevCard(); }
+      else if (e.key === ' ' || e.key === 'f') { e.preventDefault(); cardTrans.classList.toggle('visible'); }
+    }
+  });
+
+  totalWordsSpan.textContent = words.length;
+  totalSentencesSpan.textContent = sentences.length;
+  totalCardsSpan.textContent = words.length;
+  updateCard();
+  showFlashcard();
+})();
+</script>
+</body>
+</html>

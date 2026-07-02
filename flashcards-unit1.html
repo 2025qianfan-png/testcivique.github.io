@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>模块一 · 共和国价值观 - Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #004080;
+            --primary-light-blue: #0066cc;
+            --primary-yellow: #ffd633;
+            --primary-light-yellow: #ffe066;
+            --dark-gray: #333333;
+            --medium-gray: #666666;
+            --light-gray: #f5f7fa;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--dark-gray);
+            background: var(--light-gray);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .main-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light-blue) 100%);
+            color: var(--white);
+            padding: 25px 30px;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .main-header .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-header .logo-area i {
+            font-size: 2rem;
+            color: var(--primary-yellow);
+        }
+
+        .main-header .logo-area h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: var(--white);
+        }
+
+        .main-header .logo-area .badge {
+            background: var(--primary-yellow);
+            color: var(--primary-blue);
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2rem 0.8rem;
+            border-radius: 50px;
+            margin-left: 0.5rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .header-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 8px 18px;
+            border-radius: 50px;
+            color: var(--white);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: var(--white);
+        }
+
+        .header-btn i {
+            font-size: 1rem;
+        }
+
+        /* Navigation */
+        .main-nav {
+            background-color: var(--white);
+            padding: 12px 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .main-nav .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary-blue);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .main-nav .logo i {
+            color: var(--primary-yellow);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-blue);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 15px 30px;
+            background-color: var(--white);
+            border-bottom: 1px solid #eee;
+        }
+
+        .breadcrumb-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb-links a {
+            color: var(--medium-gray);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .breadcrumb-links a:hover {
+            color: var(--primary-blue);
+        }
+
+        .breadcrumb-links i {
+            font-size: 0.7rem;
+            color: var(--medium-gray);
+        }
+
+        .breadcrumb-links .current {
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        /* App Card */
+        .app-card {
+            background: var(--white);
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            padding: 2rem 2rem 2.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .app-card .unit-banner {
+            background: linear-gradient(135deg, #e8f0fe 0%, #d4e2f7 100%);
+            border-radius: var(--border-radius);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            border-left: 4px solid var(--primary-yellow);
+        }
+
+        .app-card .unit-banner h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2rem;
+            color: var(--primary-blue);
+        }
+
+        .app-card .unit-banner h2 i {
+            margin-right: 8px;
+            color: var(--primary-yellow);
+        }
+
+        .app-card .unit-banner .unit-stats {
+            font-size: 0.85rem;
+            color: var(--medium-gray);
+        }
+
+        .app-card .unit-banner .unit-stats span {
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        /* Mode Switch */
+        .mode-switch {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--light-gray);
+            border-radius: 50px;
+            padding: 0.3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mode-btn {
+            border: none;
+            background: transparent;
+            padding: 0.6rem 1.6rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            color: var(--medium-gray);
+            transition: var(--transition);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .mode-btn:hover {
+            color: var(--primary-blue);
+        }
+
+        .mode-btn.active {
+            background: var(--primary-yellow);
+            color: var(--primary-blue);
+            box-shadow: var(--shadow);
+        }
+
+        .mode-btn i {
+            margin-right: 6px;
+        }
+
+        /* Flashcard */
+        .flashcard {
+            width: 100%;
+            max-width: 600px;
+            margin: 1rem auto;
+            background: linear-gradient(135deg, #f8f9fa 0%, var(--white) 100%);
+            border-radius: 2rem;
+            padding: 3rem 2rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
+            position: relative;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .flashcard:hover {
+            border-color: var(--primary-yellow);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .flashcard .card-number {
+            font-size: 0.9rem;
+            color: var(--medium-gray);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .flashcard .card-type {
+            font-size: 0.8rem;
+            color: var(--medium-gray);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .flashcard .card-word {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .flashcard .card-translation {
+            font-size: 1.8rem;
+            color: var(--dark-gray);
+            border-top: 2px dashed var(--primary-yellow);
+            padding-top: 1.2rem;
+            margin-top: 0.8rem;
+            font-weight: 500;
+            visibility: hidden;
+        }
+
+        .flashcard .card-translation.visible {
+            visibility: visible;
+        }
+
+        .flashcard .card-hint {
+            font-size: 0.85rem;
+            color: var(--medium-gray);
+            margin-top: 1.5rem;
+            opacity: 0.6;
+        }
+
+        .flashcard .card-hint i {
+            margin-right: 6px;
+        }
+
+        /* Nav Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .nav-btn {
+            background: var(--light-gray);
+            border: none;
+            width: 3.2rem;
+            height: 3.2rem;
+            border-radius: 50%;
+            font-size: 1.4rem;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            color: var(--primary-blue);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-yellow);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-counter {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--medium-gray);
+            margin-top: 0.5rem;
+        }
+
+        .card-counter span {
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        /* Sentence View */
+        .sentence-viewport {
+            background: var(--light-gray);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 1px solid #eee;
+        }
+
+        .sentence-item {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.3rem 0.2rem;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            border-bottom: 1px dashed #e0e0e0;
+            background: var(--white);
+            border-radius: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .sentence-item:hover {
+            background: #fafafa;
+        }
+
+        .sentence-number {
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-right: 0.5rem;
+            font-size: 0.9rem;
+            min-width: 2.2rem;
+            text-align: right;
+        }
+
+        .word-chip {
+            background: var(--white);
+            border: 1px solid #d0d0d0;
+            border-radius: 2rem;
+            padding: 0.2rem 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.15rem;
+            font-size: 0.95rem;
+        }
+
+        .word-chip:hover {
+            border-color: var(--primary-blue);
+            background: #f0f4f8;
+        }
+
+        .word-chip.show-translate .chip-translate {
+            display: inline-block;
+            background: var(--primary-yellow);
+            border-radius: 1rem;
+            padding: 0.1rem 0.5rem;
+            font-size: 0.7rem;
+            color: var(--primary-blue);
+            margin-left: 0.3rem;
+            font-weight: 600;
+        }
+
+        .word-chip.unknown {
+            background: #fce4e4;
+            border-color: #c0392b;
+            text-decoration: line-through wavy #c0392b;
+        }
+
+        .chip-translate {
+            display: none;
+        }
+
+        .sentence-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.5rem 0;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .sentence-controls .hint {
+            font-size: 0.85rem;
+            color: var(--medium-gray);
+        }
+
+        .sentence-controls .hint i {
+            margin-right: 4px;
+        }
+
+        .unknown-panel {
+            background: #fff5f0;
+            border-radius: 1rem;
+            padding: 1rem 1.2rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            border-left: 4px solid #e67e22;
+        }
+
+        .unknown-panel strong {
+            color: var(--primary-blue);
+        }
+
+        .action-small {
+            background: var(--light-gray);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.5rem 1.2rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--dark-gray);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .action-small:hover {
+            background: var(--primary-yellow);
+            color: var(--primary-blue);
+            transform: translateY(-2px);
+        }
+
+        .action-small.danger:hover {
+            background: #e74c3c;
+            color: var(--white);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        /* Footer */
+        .main-footer {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 40px 30px 25px;
+            border-radius: var(--border-radius);
+            margin-top: 2rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .footer-column h4 {
+            color: var(--primary-yellow);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-yellow);
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .footer-bottom a {
+            color: var(--primary-yellow);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .main-header {
+                padding: 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .main-header .logo-area h1 {
+                font-size: 1.3rem;
+            }
+
+            .main-nav {
+                padding: 12px 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav-links {
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+
+            .breadcrumb {
+                padding: 12px 20px;
+            }
+
+            .app-card {
+                padding: 1.2rem 1rem 1.8rem;
+                border-radius: 0 0 var(--border-radius) var(--border-radius);
+            }
+
+            .flashcard {
+                padding: 2rem 1.2rem;
+                min-height: 220px;
+            }
+
+            .flashcard .card-word {
+                font-size: 1.8rem;
+            }
+
+            .flashcard .card-translation {
+                font-size: 1.4rem;
+            }
+
+            .mode-btn {
+                padding: 0.4rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            .nav-buttons {
+                gap: 1rem;
+            }
+
+            .nav-btn {
+                width: 2.8rem;
+                height: 2.8rem;
+                font-size: 1.2rem;
+            }
+
+            .sentence-item {
+                padding: 0.3rem 0.5rem;
+            }
+
+            .word-chip {
+                font-size: 0.85rem;
+                padding: 0.15rem 0.6rem;
+            }
+
+            .app-card .unit-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-header .logo-area h1 {
+                font-size: 1.1rem;
+            }
+
+            .header-btn {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+
+            .flashcard .card-word {
+                font-size: 1.4rem;
+            }
+
+            .flashcard .card-translation {
+                font-size: 1.1rem;
+            }
+
+            .mode-switch {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .mode-btn {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.8rem;
+                flex: 1;
+                text-align: center;
+            }
+
+            .sentence-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-group {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <header class="main-header">
+        <div class="logo-area">
+            <i class="fas fa-flag"></i>
+            <h1>法语闪卡 <span class="badge">模块一</span></h1>
+        </div>
+        <div class="header-actions">
+            <a href="index.html" class="header-btn"><i class="fas fa-home"></i> Accueil</a>
+            <a href="flashcards-unit2.html" class="header-btn"><i class="fas fa-arrow-right"></i> Module 2</a>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <a href="index.html" class="logo">
+            <i class="fas fa-sailboat"></i>
+            <span>Mille Voiles</span>
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Accueil</a>
+            <a href="#flashcards">Flashcards</a>
+            <a href="thematique-valeurs.html">Valeurs</a>
+            <a href="index.html#test">Test</a>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="breadcrumb-links">
+            <a href="index.html">Accueil</a>
+            <i class="fas fa-chevron-right"></i>
+            <a href="thematique-valeurs.html">Valeurs de la République</a>
+            <i class="fas fa-chevron-right"></i>
+            <span class="current">模块一 · 共和国价值观与象征</span>
+        </div>
+    </div>
+
+    <!-- App Card -->
+    <div class="app-card" id="flashcards">
+
+        <!-- Unit Banner -->
+        <div class="unit-banner">
+            <h2><i class="fas fa-star"></i> 模块一 · Valeurs et symboles de la République</h2>
+            <div class="unit-stats">
+                <i class="fas fa-words"></i> <span id="totalWords">0</span> mots ·
+                <i class="fas fa-sentence"></i> <span id="totalSentences">0</span> phrases
+            </div>
+        </div>
+
+        <!-- Mode Switch -->
+        <div class="mode-switch">
+            <button id="btnFlashcard" class="mode-btn active"><i class="fas fa-layer-group"></i> 单词闪卡</button>
+            <button id="btnSentence" class="mode-btn"><i class="fas fa-paragraph"></i> 句子练习</button>
+        </div>
+
+        <!-- Flashcard View -->
+        <div id="flashcardView">
+            <div class="flashcard" id="flashcardElement">
+                <div class="card-number" id="cardNumber">1 / 0</div>
+                <div class="card-type" id="cardType">NOM</div>
+                <div class="card-word" id="cardWord">—</div>
+                <div class="card-translation" id="cardTranslation">—</div>
+                <div class="card-hint"><i class="fas fa-mouse-pointer"></i> Cliquez pour révéler la traduction</div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn" id="prevCard"><i class="fas fa-chevron-left"></i></button>
+                <button class="nav-btn" id="nextCard"><i class="fas fa-chevron-right"></i></button>
+            </div>
+
+            <div class="card-counter">
+                <span id="totalCards">0</span> mots · <i class="far fa-hand-pointer"></i> cliquer pour voir la traduction
+            </div>
+        </div>
+
+        <!-- Sentence View -->
+        <div id="sentenceView" style="display:none;">
+            <div class="sentence-viewport" id="sentenceContainer"></div>
+
+            <div class="sentence-controls">
+                <span class="hint"><i class="fas fa-info-circle"></i> Cliquez un mot → voir traduction · Re-cliquez → marquer « inconnu »</span>
+                <div class="btn-group">
+                    <button id="prevPageBtn" class="action-small"><i class="fas fa-chevron-left"></i> Précédent</button>
+                    <button id="nextPageBtn" class="action-small">Suivant <i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <div class="unknown-panel">
+                <strong><i class="fas fa-exclamation-triangle"></i> Mots inconnus :</strong>
+                <span id="unknownDisplay">Aucun marqué</span>
+                <button id="resetUnknownBtn" class="action-small danger" style="float:right;background:#e74c3c;color:white;">Effacer</button>
+            </div>
+        </div>
+
+        <hr style="border: 0.5px solid #eee; margin: 1.5rem 0 0.5rem;">
+        <div style="text-align:right;font-size:0.8rem;color:var(--medium-gray);">
+            <i class="fas fa-sailboat"></i> mille voiles · 千帆
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-column">
+                <h4>À propos</h4>
+                <p style="font-size:0.9rem;opacity:0.8;">L'association Mille Voiles accompagne les communautés chinoises en France dans leurs démarches d'intégration, d'apprentissage du français et de préparation aux examens officiels.</p>
+            </div>
+            <div class="footer-column">
+                <h4>Thématiques</h4>
+                <ul class="footer-links">
+                    <li><a href="thematique-valeurs.html"><i class="fas fa-chevron-right"></i> Valeurs de la République</a></li>
+                    <li><a href="thematique-institutions.html"><i class="fas fa-chevron-right"></i> Institutions françaises</a></li>
+                    <li><a href="thematique-droits.html"><i class="fas fa-chevron-right"></i> Droits et devoirs</a></li>
+                    <li><a href="thematique-culture.html"><i class="fas fa-chevron-right"></i> Histoire, Géographie et Culture</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Contact</h4>
+                <p style="font-size:0.9rem;opacity:0.8;">
+                    <i class="fas fa-envelope" style="color:var(--primary-yellow);"></i> 2025qianfan@gmail.com<br>
+                    <i class="fas fa-map-marker-alt" style="color:var(--primary-yellow);"></i> 94800 Villejuif
+                </p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Association Mille Voiles / 千帆协会 - Tous droits réservés.</p>
+        </div>
+    </footer>
+</div>
+
+<script>
+(function() {
+    // ===== 模块一 词汇：共和国价值观与象征 =====
+    const words = [
+        { type: "Nom", french: "la République", chinese: "共和国" },
+        { type: "Nom", french: "la devise", chinese: "格言 / 座右铭" },
+        { type: "Nom", french: "la liberté", chinese: "自由" },
+        { type: "Nom", french: "les libertés individuelles", chinese: "个人自由" },
+        { type: "Nom", french: "les libertés collectives", chinese: "集体自由" },
+        { type: "Nom", french: "l'égalité", chinese: "平等" },
+        { type: "Nom", french: "les droits civiques", chinese: "公民权利" },
+        { type: "Nom", french: "la discrimination", chinese: "歧视" },
+        { type: "Nom", french: "la fraternité", chinese: "博爱" },
+        { type: "Nom", french: "la solidarité", chinese: "团结" },
+        { type: "Nom", french: "l'association", chinese: "协会 / 社团" },
+        { type: "Nom", french: "la Constitution", chinese: "宪法" },
+        { type: "Nom", french: "la Révolution française", chinese: "法国大革命" },
+        { type: "Nom", french: "les bâtiments publics", chinese: "公共建筑" },
+        { type: "Nom", french: "la mairie", chinese: "市政府" },
+        { type: "Nom", french: "le drapeau tricolore", chinese: "三色旗" },
+        { type: "Nom", french: "l'hymne national", chinese: "国歌" },
+        { type: "Nom", french: "La Marseillaise", chinese: "马赛曲" },
+        { type: "Nom", french: "Marianne", chinese: "玛丽安娜(共和象征)" },
+        { type: "Nom", french: "le bonnet phrygien", chinese: "弗里吉亚帽" },
+        { type: "Nom", french: "la fête nationale", chinese: "国庆日" },
+        { type: "Nom", french: "le défilé militaire", chinese: "阅兵式" },
+        { type: "Nom", french: "le coq gaulois", chinese: "高卢雄鸡" },
+        { type: "Nom", french: "la laïcité", chinese: "世俗主义/政教分离" },
+        { type: "Nom", french: "la liberté de conscience", chinese: "信仰自由" },
+        { type: "Nom", french: "la neutralité", chinese: "中立" },
+        { type: "Nom", french: "la séparation des Églises et de l'État", chinese: "政教分离" },
+        { type: "Nom", french: "la loi", chinese: "法律" },
+        { type: "Nom", french: "l'espace public", chinese: "公共空间" },
+        { type: "Nom", french: "les services publics", chinese: "公共服务" },
+        { type: "Nom", french: "les usagers", chinese: "使用者/用户" },
+        { type: "Nom", french: "les agents publics", chinese: "公务人员" },
+        { type: "Nom", french: "les signes religieux", chinese: "宗教标志" },
+        { type: "Nom", french: "la dissimulation du visage", chinese: "遮盖面部" },
+        { type: "Nom", french: "les fonctionnaires", chinese: "公务员" },
+        { type: "Nom", french: "les entreprises privées", chinese: "私营企业" },
+        { type: "Nom", french: "la Charte de la laïcité", chinese: "世俗主义章程" },
+        { type: "Nom", french: "le prosélytisme", chinese: "劝诱改宗" },
+        { type: "Nom", french: "le blasphème", chinese: "亵渎" },
+        { type: "Verbe", french: "comprendre", chinese: "理解" },
+        { type: "Verbe", french: "respecter", chinese: "尊重" },
+        { type: "Verbe", french: "porter atteinte", chinese: "损害" },
+        { type: "Verbe", french: "signifier", chinese: "意味着" },
+        { type: "Verbe", french: "lutter", chinese: "斗争" },
+        { type: "Verbe", french: "punir", chinese: "惩罚" },
+        { type: "Verbe", french: "reposer", chinese: "基于" },
+        { type: "Verbe", french: "exprimer", chinese: "表达" },
+        { type: "Verbe", french: "créer", chinese: "创造" },
+        { type: "Verbe", french: "trouver", chinese: "找到" },
+        { type: "Verbe", french: "être", chinese: "是" },
+        { type: "Verbe", french: "interdire", chinese: "禁止" },
+        { type: "Verbe", french: "représenter", chinese: "代表" },
+        { type: "Verbe", french: "porter", chinese: "穿戴/携带" },
+        { type: "Verbe", french: "avoir lieu", chinese: "发生/举行" },
+        { type: "Verbe", french: "marquer", chinese: "标志着" },
+        { type: "Verbe", french: "croire", chinese: "相信" },
+        { type: "Verbe", french: "ne pas croire", chinese: "不相信" },
+        { type: "Verbe", french: "changer", chinese: "改变" },
+        { type: "Verbe", french: "impliquer", chinese: "包含/涉及" },
+        { type: "Verbe", french: "soutenir", chinese: "支持" },
+        { type: "Verbe", french: "financer", chinese: "资助" },
+        { type: "Verbe", french: "affirmer", chinese: "确认" },
+        { type: "Verbe", french: "autoriser", chinese: "允许" },
+        { type: "Verbe", french: "troubler", chinese: "扰乱" },
+        { type: "Verbe", french: "encadrer", chinese: "规范/监督" },
+        { type: "Verbe", french: "exiger", chinese: "要求" },
+        { type: "Verbe", french: "imposer", chinese: "强加" },
+        { type: "Verbe", french: "garantir", chinese: "保障" },
+        { type: "Adjectif", french: "individuelle", chinese: "个人的" },
+        { type: "Adjectif", french: "collective", chinese: "集体的" },
+        { type: "Adjectif", french: "civique", chinese: "公民的" },
+        { type: "Adjectif", french: "social", chinese: "社会的" },
+        { type: "Adjectif", french: "discriminatoire", chinese: "歧视性的" },
+        { type: "Adjectif", french: "public", chinese: "公共的" },
+        { type: "Adjectif", french: "officiel", chinese: "官方的" },
+        { type: "Adjectif", french: "national", chinese: "国家的" },
+        { type: "Adjectif", french: "français", chinese: "法国的" },
+        { type: "Adjectif", french: "tricolore", chinese: "三色的" },
+        { type: "Adjectif", french: "phrygien", chinese: "弗里吉亚的" },
+        { type: "Adjectif", french: "fondamental", chinese: "基本的" },
+        { type: "Adjectif", french: "constitutionnel", chinese: "宪法的" },
+        { type: "Adjectif", french: "laïque", chinese: "世俗的" },
+        { type: "Adjectif", french: "démocratique", chinese: "民主的" },
+        { type: "Adjectif", french: "indivisible", chinese: "不可分割的" },
+        { type: "Adjectif", french: "autorisé", chinese: "允许的" },
+        { type: "Adjectif", french: "interdit", chinese: "禁止的" },
+        { type: "Adjectif", french: "religieux", chinese: "宗教的" },
+        { type: "Adjectif", french: "ostensible", chinese: "明显的/炫耀的" },
+        { type: "Adjectif", french: "privé", chinese: "私人的" },
+        { type: "Adjectif", french: "strict", chinese: "严格的" }
+    ];
+
+    // ===== 模块一 句子 =====
+    const sentences = [
+        "À quoi correspond la date du 14 juillet ?",
+        "Quel est l'un des symboles de la République française ?",
+        "Le principe d'égalité signifie que :",
+        "\"Liberté, égalité, fraternité\", c'est :",
+        "A-t-on le droit d'insulter publiquement quelqu'un parce qu'il est différent (handicap, apparence physique, sexe...) ?",
+        "Certains métiers peuvent-ils être réservés aux hommes ?",
+        "De quand date la Constitution de la Ve République ?",
+        "Le régime de la France est :",
+        "Lequel de ces symboles représente officiellement la République française ?",
+        "Où peut-on voir la devise de la République ?",
+        "Quels sont des symboles officiels de la République française ?",
+        "Qu'est-ce que l'égalité ?",
+        "Que signifie la liberté ?",
+        "Que signifie le mot \"fraternité\" dans la devise française ?",
+        "Quel animal est un symbole de la France ?",
+        "Quel est l'un des rôles des associations ?",
+        "Quel est le nom de l'hymne national ?",
+        "Quel symbole de la République française est tricolore ?",
+        "Quelle est la date de la fête nationale française ?",
+        "Quelle est la devise de la République française ?",
+        "Quelle est la langue officielle de la République française ?",
+        "Quelle est la place de la langue française dans la République ?",
+        "Quelle liberté permet à chacun d'exprimer ses idées ?",
+        "Quelle proposition est correcte ? La liberté d'expression :",
+        "Quelles sont les couleurs du drapeau français ?",
+        "Qu'est-ce que la Marseillaise ?",
+        "Qu'est ce qui est traditionnellement organisé sur les Champs Élysées le 14 juillet pour célébrer la fête nationale ?",
+        "Qui est Marianne ?",
+        "Une personne peut-elle changer librement de religion ?",
+        "\"La France est une République indivisible, ..., démocratique et sociale\". Complétez cette phrase extraite de l'article 1er de la Constitution :",
+        "En quelle année la loi de séparation des Églises et de l'État a-t-elle été votée ?",
+        "Que permet le principe de laïcité ?",
+        "Quel droit est garanti par la laïcité ?",
+        "Pourquoi le principe de laïcité doit-il être respecté à l'école ?",
+        "Qu'est-ce que la laïcité ?",
+        "Un enfant peut-il refuser d'aller à l'école pour une raison religieuse ?",
+        "Une personne a-t-elle le droit de ne pas croire en une religion ?",
+        "Parmi les propositions suivantes, laquelle constitue une participation citoyenne ?",
+        "Que garantit la liberté d'expression ?",
+        "À quoi sert un titre de séjour ?",
+        "La liberté de circulation permet à toute personne de :",
+        "Sur quel site internet peut-on retrouver le symbole de la République française ?",
+        "Complétez ces paroles de la Marseillaise : \"Aux armes [...] ! Formez vos bataillons\"",
+        "Complétez les paroles de la Marseillaise : \"Allons enfants de la patrie [...]\"",
+        "En application de la liberté individuelle, quelle proposition est correcte ? Une personne peut :",
+        "Concernant la pratique de la religion, quelle proposition est correcte ?",
+        "En tant que parent, peut-on refuser que son enfant participe aux cours de sport à l'école car ils sont mixtes ?",
+        "Quelle est la devise de la France ?",
+        "La répudiation de sa femme est :",
+        "Les impôts permettent de financer les dépenses publiques. Quelle proposition est correcte ?",
+        "Peut-on brûler publiquement un drapeau français ?",
+        "Que fait l'État pour lutter contre les discriminations ?",
+        "Que représente Marianne ?",
+        "Qu'est-ce que la liberté d'association ?",
+        "Qu'est-ce que la liberté ?",
+        "Qu'est-ce que la Marseillaise ?",
+        "Sur quel document peut-on voir Marianne ?",
+        "Un employeur refuse d'embaucher des femmes dans son entreprise. Que dit la loi ?",
+        "Une des valeurs de la devise républicaine est l'égalité. Qu'est-ce que cela signifie ?",
+        "Quelle est la place de la langue française dans la République ?",
+        "Quels sont des symboles officiels de la République française ?",
+        "A-t-on le droit d'insulter publiquement quelqu'un parce qu'il est différent (handicap, apparence physique, sexe...) ?",
+        "Le régime de la France est :",
+        "Pourquoi le principe de laïcité doit-il être respecté à l'école ?",
+        "En quelle année la loi de séparation des Églises et de l'Etat a-t-elle été votée ?",
+        "Une personne a-t-elle le droit de ne pas croire en une religion ?",
+        "Quel droit est garanti par la laïcité ?",
+        "À l'école publique, qui peut porter des signes religieux très visibles ?",
+        "Selon le principe de laïcité, que signifie la neutralité de l'État ?",
+        "Que peut faire un usager du service public dans une mairie ?",
+        "Qui doit respecter le principe de neutralité religieuse dans une préfecture ?",
+        "La laïcité impose-t-elle aux agents publics d'être neutres vis-à-vis des usagers ?",
+        "Que garantit le principe de laïcité ?",
+        "A-t-on le droit de changer de religion ?",
+        "Que représente la laïcité ?",
+        "Qu'est ce qui est interdit par la Charte de la laïcité à l'école ?",
+        "Que dit l'article 1er de la Constitution française ?"
+    ];
+
+    // ===== TRANSLATIONS =====
+    const translationMap = new Map();
+    words.forEach(w => translationMap.set(w.french.toLowerCase().trim(), w.chinese));
+
+    const extra = {
+        "à":"在/向","quoi":"什么","correspond":"对应","date":"日期","du":"的","14":"14",
+        "juillet":"七月","quel":"哪个","est":"是","l'un":"之一","des":"的/一些",
+        "symboles":"象征","de":"的","république":"共和国","française":"法国的",
+        "le":"这个","principe":"原则","d'égalité":"平等","signifie":"意味着",
+        "que":"…的是","tous":"所有","les":"这些","citoyens":"公民","sont":"是",
+        "égaux":"平等的","devant":"在…面前","loi":"法律","liberté":"自由",
+        "égalité":"平等","fraternité":"博爱","c'est":"这是","a-t-on":"我们有",
+        "droit":"权利","d'insulter":"侮辱","publiquement":"公开地","quelqu'un":"某人",
+        "parce":"因为","qu'il":"他","différent":"不同的","handicap":"残疾",
+        "apparence":"外貌","physique":"身体的","sexe":"性别","certains":"某些",
+        "métiers":"职业","peuvent-ils":"它们能","être":"被","réservés":"保留",
+        "aux":"给","hommes":"男人","quand":"什么时候","constitution":"宪法",
+        "ve":"第五","1958":"1958年","régime":"政体","france":"法国","une":"一个",
+        "démocratique":"民主的","lequel":"哪一个","ces":"这些","représente":"代表",
+        "officiellement":"官方地","où":"哪里","peut-on":"我们能够","voir":"看见",
+        "devise":"格言","sur":"在…上","bâtiments":"建筑","publics":"公共的",
+        "mairies":"市政府","quels":"哪些","officiels":"官方的","qu'est-ce":"什么是",
+        "l'égalité":"平等","mot":"词","dans":"在…中","animal":"动物","symbole":"象征",
+        "rôles":"作用","associations":"协会","nom":"名字","hymne":"国歌",
+        "national":"国家的","tricolore":"三色的","quelle":"什么","fête":"节日",
+        "nationale":"国家的","langue":"语言","officielle":"官方的","place":"地位",
+        "française":"法语","permet":"允许","chacun":"每个人","exprimer":"表达",
+        "ses":"他/她的","idées":"想法","proposition":"命题","correcte":"正确的",
+        "expression":"表达","couleurs":"颜色","drapeau":"旗","français":"法国的",
+        "bleu":"蓝色","blanc":"白色","rouge":"红色","marseillaise":"马赛曲",
+        "traditionnellement":"传统上","organisé":"组织","champs":"田园",
+        "élysées":"爱丽舍","célébrer":"庆祝","marianne":"玛丽安娜","personne":"人",
+        "changer":"改变","librement":"自由地","religion":"宗教","indivisible":"不可分割的",
+        "laïque":"世俗的","sociale":"社会的","complétez":"完成","phrase":"句子",
+        "extraite":"摘自","article":"条款","1er":"第一条","en":"在","année":"年份",
+        "séparation":"分离","églises":"教会","état":"国家","votée":"投票通过",
+        "1905":"1905年","laïcité":"世俗主义","garanti":"保障","par":"通过",
+        "pourquoi":"为什么","doit-il":"它必须","respecté":"尊重","école":"学校",
+        "enfant":"孩子","refuser":"拒绝","aller":"去","pour":"为了","raison":"理由",
+        "religieuse":"宗教的","a-t-elle":"她有","ne":"不","pas":"没有","croire":"相信",
+        "parmi":"在…之中","propositions":"提议","suivantes":"以下的","laquelle":"哪一个",
+        "constitue":"构成","participation":"参与","citoyenne":"公民的","garantit":"保障",
+        "sert":"用于","titre":"证件","séjour":"居留","circulation":"通行","toute":"任何",
+        "site":"网站","internet":"互联网","retrouver":"找到","paroles":"歌词",
+        "aux":"向","armes":"武器","formez":"组成","bataillons":"营","allons":"前进",
+        "enfants":"孩子们","patrie":"祖国","application":"应用","individuelle":"个人的",
+        "concernant":"关于","pratique":"实践","tant":"作为","parent":"家长",
+        "participe":"参加","cours":"课程","sport":"体育","car":"因为","mixtes":"混合的",
+        "répudiation":"休妻","femme":"妻子","impôts":"税收","permettent":"允许",
+        "financer":"资助","dépenses":"开支","publiques":"公共的","brûler":"焚烧",
+        "fait":"做","l'état":"国家","lutter":"斗争","contre":"反对","discriminations":"歧视",
+        "d'association":"结社","document":"文件","employeur":"雇主","embaucher":"雇佣",
+        "femmes":"女性","entreprise":"企业","dit":"说","valeurs":"价值观",
+        "républicaine":"共和的","cela":"这","république":"共和国","qu'est":"什么是",
+        "ce":"这","interdit":"禁止","charte":"章程","l'article":"条款"
+    };
+    Object.entries(extra).forEach(([k,v]) => { if(!translationMap.has(k)) translationMap.set(k,v); });
+
+    function getTranslation(rawWord) {
+        const clean = rawWord.toLowerCase().replace(/[.,;:!?»«""'’…\[\]()]/g, '').trim();
+        if (translationMap.has(clean)) return translationMap.get(clean);
+        const noPrefix = clean.replace(/^(l'|d'|s'|qu'|n'|c'|j'|t'|m')/, '');
+        if (noPrefix !== clean && translationMap.has(noPrefix)) return translationMap.get(noPrefix);
+        return '?';
+    }
+
+    // ===== STATE =====
+    let currentCardIndex = 0;
+    let currentPage = 0;
+    const sentencesPerPage = 10;
+    let unknownWords = new Set();
+
+    const flashcardView = document.getElementById('flashcardView');
+    const sentenceView = document.getElementById('sentenceView');
+    const btnFlash = document.getElementById('btnFlashcard');
+    const btnSent = document.getElementById('btnSentence');
+    const cardWord = document.getElementById('cardWord');
+    const cardType = document.getElementById('cardType');
+    const cardTrans = document.getElementById('cardTranslation');
+    const cardNumber = document.getElementById('cardNumber');
+    const totalCardsSpan = document.getElementById('totalCards');
+    const totalWordsSpan = document.getElementById('totalWords');
+    const totalSentencesSpan = document.getElementById('totalSentences');
+    const sentenceContainer = document.getElementById('sentenceContainer');
+    const unknownDisplay = document.getElementById('unknownDisplay');
+    const flashcardEl = document.getElementById('flashcardElement');
+
+    function updateCard() {
+        if (words.length === 0) return;
+        const w = words[currentCardIndex];
+        cardNumber.textContent = (currentCardIndex + 1) + ' / ' + words.length;
+        cardType.textContent = w.type.toUpperCase();
+        cardWord.textContent = w.french;
+        cardTrans.textContent = w.chinese;
+        cardTrans.classList.remove('visible');
+    }
+
+    function nextCard() {
+        if (words.length === 0) return;
+        currentCardIndex = (currentCardIndex + 1) % words.length;
+        updateCard();
+    }
+
+    function prevCard() {
+        if (words.length === 0) return;
+        currentCardIndex = (currentCardIndex - 1 + words.length) % words.length;
+        updateCard();
+    }
+
+    function renderPage() {
+        const totalPages = Math.ceil(sentences.length / sentencesPerPage);
+        if (currentPage >= totalPages) currentPage = totalPages - 1;
+        if (currentPage < 0) currentPage = 0;
+        const start = currentPage * sentencesPerPage;
+        const pageSentences = sentences.slice(start, start + sentencesPerPage);
+        sentenceContainer.innerHTML = '';
+        pageSentences.forEach((sentence, idx) => {
+            const globalIndex = start + idx + 1;
+            const sentDiv = document.createElement('div');
+            sentDiv.className = 'sentence-item';
+            const numSpan = document.createElement('span');
+            numSpan.className = 'sentence-number';
+            numSpan.textContent = globalIndex + '.';
+            sentDiv.appendChild(numSpan);
+            const tokens = sentence.match(/[^\s]+/g) || [];
+            tokens.forEach(token => {
+                const core = token.replace(/[.,;:!?»«""'’…\[\]()]/g, '');
+                const lowerCore = core.toLowerCase();
+                const chip = document.createElement('span');
+                chip.className = 'word-chip';
+                if (unknownWords.has(lowerCore)) chip.classList.add('unknown');
+                const trans = getTranslation(token);
+                chip.innerHTML = token + '<span class="chip-translate">' + trans + '</span>';
+                chip.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (!chip.classList.contains('show-translate')) {
+                        chip.classList.add('show-translate');
+                    } else {
+                        if (unknownWords.has(lowerCore)) {
+                            unknownWords.delete(lowerCore);
+                            chip.classList.remove('unknown');
+                        } else {
+                            unknownWords.add(lowerCore);
+                            chip.classList.add('unknown');
+                        }
+                        updateUnknownList();
+                    }
+                });
+                sentDiv.appendChild(chip);
+            });
+            sentenceContainer.appendChild(sentDiv);
+        });
+    }
+
+    function updateUnknownList() {
+        unknownDisplay.textContent = unknownWords.size ? Array.from(unknownWords).join(' · ') : 'Aucun marqué';
+    }
+
+    function resetUnknown() {
+        unknownWords.clear();
+        updateUnknownList();
+        renderPage();
+    }
+
+    function showFlashcard() {
+        flashcardView.style.display = 'block';
+        sentenceView.style.display = 'none';
+        btnFlash.classList.add('active');
+        btnSent.classList.remove('active');
+    }
+
+    function showSentence() {
+        flashcardView.style.display = 'none';
+        sentenceView.style.display = 'block';
+        btnSent.classList.add('active');
+        btnFlash.classList.remove('active');
+        renderPage();
+    }
+
+    // ===== EVENT LISTENERS =====
+    document.getElementById('prevCard').addEventListener('click', prevCard);
+    document.getElementById('nextCard').addEventListener('click', nextCard);
+
+    flashcardEl.addEventListener('click', () => {
+        cardTrans.classList.toggle('visible');
+    });
+
+    btnFlash.addEventListener('click', showFlashcard);
+    btnSent.addEventListener('click', showSentence);
+
+    document.getElementById('prevPageBtn').addEventListener('click', () => {
+        if (currentPage > 0) { currentPage--; renderPage(); }
+    });
+
+    document.getElementById('nextPageBtn').addEventListener('click', () => {
+        const totalPages = Math.ceil(sentences.length / sentencesPerPage);
+        if (currentPage < totalPages - 1) { currentPage++; renderPage(); }
+    });
+
+    document.getElementById('resetUnknownBtn').addEventListener('click', resetUnknown);
+
+    // ===== KEYBOARD SHORTCUTS =====
+    document.addEventListener('keydown', function(e) {
+        if (flashcardView.style.display !== 'none') {
+            if (e.key === 'ArrowRight') { e.preventDefault(); nextCard(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevCard(); }
+            else if (e.key === ' ' || e.key === 'f') { e.preventDefault(); cardTrans.classList.toggle('visible'); }
+        }
+    });
+
+    // ===== INIT =====
+    totalWordsSpan.textContent = words.length;
+    totalSentencesSpan.textContent = sentences.length;
+    totalCardsSpan.textContent = words.length;
+    updateCard();
+    showFlashcard();
+})();
+</script>
+</body>
+</html>
