@@ -1,0 +1,2171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Administration Français - Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --primary: #e67e22;
+            --primary-dark: #d35400;
+            --primary-light: #f39c12;
+            --primary-gradient: linear-gradient(135deg, #e67e22 0%, #f39c12 100%);
+            --green: #27ae60;
+            --red: #e74c3c;
+            --blue: #3498db;
+            --purple: #8e44ad;
+            --light-gray: #f5f7fa;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.12);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        html {
+            overflow-x: hidden;
+            width: 100%;
+        }
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: var(--light-gray);
+            color: #333;
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+        }
+
+        .main-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 20px 0;
+        }
+        .main-header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .main-header h1 {
+            color: white;
+            font-size: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            .main-header h1 {
+                font-size: 1.2rem;
+            }
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 18px;
+            border-radius: 30px;
+        }
+        .logout-btn {
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .main-nav {
+            background: white;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0;
+            min-height: 56px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .nav-brand {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1rem;
+            text-decoration: none;
+        }
+        .nav-brand i {
+            margin-right: 8px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 4px 0;
+            border-bottom: 2.5px solid transparent;
+            transition: var(--transition);
+        }
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        .nav-links a i {
+            margin-right: 6px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        @media (max-width: 992px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+        }
+        .stat-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        .stat-card .stat-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        .stat-card .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .stat-card .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .admin-content {
+            padding: 30px 0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+        }
+        .section-header h2 {
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+        .section-header .subtitle {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+        tr:hover td {
+            background: rgba(230, 126, 34, 0.04);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-scheduled {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+        .badge-in_progress {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        .badge-completed {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        .badge-cancelled {
+            background: rgba(149, 165, 166, 0.2);
+            color: #7f8c8d;
+        }
+        .badge-locked {
+            background: rgba(230, 126, 34, 0.1);
+            color: var(--primary);
+        }
+        .badge-free {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--green);
+        }
+        .badge-pending {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--primary);
+        }
+        .badge-confirmed {
+            background: rgba(46, 204, 113, 0.1);
+            color: var(--green);
+        }
+        .badge-admin {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--red);
+        }
+        .badge-teacher {
+            background: rgba(155, 89, 182, 0.1);
+            color: var(--purple);
+        }
+        .badge-stu {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+
+        .type-tag {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .type-n {
+            background: rgba(46, 204, 113, 0.15);
+            color: #27ae60;
+        }
+        .type-r {
+            background: rgba(155, 89, 182, 0.15);
+            color: #8e44ad;
+        }
+        .type-m {
+            background: rgba(52, 152, 219, 0.15);
+            color: #2980b9;
+        }
+        .type-t {
+            background: rgba(241, 196, 15, 0.15);
+            color: #f39c12;
+        }
+
+        .credit-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .credit-high {
+            background: rgba(46, 204, 113, 0.15);
+            color: #27ae60;
+        }
+        .credit-medium {
+            background: rgba(241, 196, 15, 0.15);
+            color: #f39c12;
+        }
+        .credit-low {
+            background: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+        }
+        .credit-none {
+            background: rgba(149, 165, 166, 0.15);
+            color: #95a5a6;
+        }
+
+        .password-cell {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            background: #f5f5f5;
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin: 2px;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-edit {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+        .btn-edit:hover {
+            background: rgba(52, 152, 219, 0.2);
+        }
+        .btn-delete {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--red);
+        }
+        .btn-delete:hover {
+            background: rgba(231, 76, 60, 0.2);
+        }
+        .btn-cancel {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+        }
+        .btn-cancel:hover {
+            background: rgba(243, 156, 18, 0.2);
+        }
+        .btn-status {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+        .btn-status:hover {
+            background: rgba(52, 152, 219, 0.2);
+        }
+        .btn-add {
+            background: var(--primary);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .btn-add:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .btn-add i {
+            margin-right: 8px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            width: 100%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlide 0.3s ease;
+        }
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 {
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            transition: var(--transition);
+        }
+        .close-modal:hover {
+            color: var(--red);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .cancel-btn {
+            padding: 10px 20px;
+            background: #eee;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .cancel-btn:hover {
+            background: #ddd;
+        }
+        .save-btn {
+            padding: 10px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .save-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            color: white;
+            font-weight: 600;
+            z-index: 1100;
+            animation: slideInRight 0.3s ease;
+            max-width: 90%;
+        }
+        @media (max-width: 480px) {
+            .toast {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                padding: 10px 16px;
+                font-size: 0.85rem;
+            }
+        }
+        .toast-success {
+            background: var(--green);
+        }
+        .toast-error {
+            background: var(--red);
+        }
+        .toast-warning {
+            background: var(--primary);
+        }
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .confirm-dialog {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .confirm-content {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+        }
+        .confirm-content h3 {
+            color: var(--red);
+            margin-bottom: 15px;
+        }
+        .confirm-content p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .confirm-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .confirm-cancel {
+            padding: 10px 24px;
+            background: #eee;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .confirm-delete {
+            padding: 10px 24px;
+            background: var(--red);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .footer {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            padding: 10px 24px;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .tab-btn:hover:not(.active) {
+            background: rgba(230, 126, 34, 0.05);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .tab-btn {
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+            .section-header h2 {
+                font-size: 1.1rem;
+            }
+            .table-container {
+                padding: 12px;
+            }
+            th,
+            td {
+                padding: 8px 10px;
+                font-size: 0.8rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .tab-btn {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .modal-content {
+                padding: 20px 16px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .btn-add {
+                width: 100%;
+                text-align: center;
+            }
+            .user-info {
+                padding: 4px 12px;
+                font-size: 0.8rem;
+            }
+            .logout-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container">
+            <h1><i class="fas fa-language"></i> Administration Français</h1>
+            <div class="header-actions">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="adminName">Administrateur</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="main-nav">
+        <div class="container nav-container">
+            <a href="index.html" class="nav-brand"><i class="fas fa-sailboat"></i> Mille Voiles</a>
+            <div class="nav-links">
+                <a href="french-admin.html" class="active"><i class="fas fa-language"></i> Français</a>
+                <a href="admin.html"><i class="fas fa-graduation-cap"></i> Civique</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="admin-content">
+        <div class="container">
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label">Utilisateurs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-certificate"></i></div>
+                    <div class="stat-number" id="totalExams">0</div>
+                    <div class="stat-label">Examens</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                    <div class="stat-number" id="totalCourses">0</div>
+                    <div class="stat-label">Cours</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-book-open"></i></div>
+                    <div class="stat-number" id="totalResources">0</div>
+                    <div class="stat-label">Ressources</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-file-signature"></i></div>
+                    <div class="stat-number" id="totalRegistrations">0</div>
+                    <div class="stat-label">Inscriptions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="stat-number" id="totalProgress">0</div>
+                    <div class="stat-label">Progrès</div>
+                </div>
+            </div>
+
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="users"><i class="fas fa-users"></i> Utilisateurs</button>
+                <button class="tab-btn" data-tab="exams"><i class="fas fa-certificate"></i> Examens</button>
+                <button class="tab-btn" data-tab="courses"><i class="fas fa-calendar-check"></i> Cours</button>
+                <button class="tab-btn" data-tab="resources"><i class="fas fa-book-open"></i> Ressources</button>
+                <button class="tab-btn" data-tab="registrations"><i class="fas fa-file-signature"></i> Inscriptions</button>
+            </div>
+
+            <!-- TAB: USERS -->
+            <div class="tab-content active" id="tab-users">
+                <div class="section-header">
+                    <div>
+                        <h2>Gestion des utilisateurs</h2>
+                        <span class="subtitle">Administrateurs · Intervenants · Élèves</span>
+                    </div>
+                    <button class="btn-add" onclick="openAddUserModal()"><i class="fas fa-plus"></i> Ajouter</button>
+                </div>
+                <div class="table-container">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th>Nom</th><th>Rôle</th><th>Type</th><th>Niveau</th><th>📚 Crédits</th><th>🔑 Mot de passe</th><th>Expiration</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <tr><td colspan="8" class="loading"><i class="fas fa-spinner fa-spin"></i> Chargement...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: EXAMS -->
+            <div class="tab-content" id="tab-exams">
+                <div class="section-header">
+                    <div>
+                        <h2>Gestion des examens</h2>
+                        <span class="subtitle">DELF · DALF · TCF · TCF IRN</span>
+                    </div>
+                    <button class="btn-add" onclick="openAddExamModal()"><i class="fas fa-plus"></i> Ajouter</button>
+                </div>
+                <div class="table-container">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th>Nom</th><th>Niveau</th><th>Durée</th><th>Prix</th><th>Validité</th><th>Accès</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody id="examsTableBody">
+                                <tr><td colspan="7" class="loading"><i class="fas fa-spinner fa-spin"></i> Chargement...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: COURSES -->
+            <div class="tab-content" id="tab-courses">
+                <div class="section-header">
+                    <div>
+                        <h2>Gestion des cours</h2>
+                        <span class="subtitle">Cours de français pour tous niveaux</span>
+                    </div>
+                    <button class="btn-add" onclick="openAddCourseModal()"><i class="fas fa-plus"></i> Ajouter</button>
+                </div>
+                <div class="table-container">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th>Type</th><th>Élève</th><th>Intervenant</th><th>Date</th><th>Durée</th><th>Statut</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody id="coursesTableBody">
+                                <tr><td colspan="7" class="loading"><i class="fas fa-spinner fa-spin"></i> Chargement...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: RESOURCES -->
+            <div class="tab-content" id="tab-resources">
+                <div class="section-header">
+                    <div>
+                        <h2>Gestion des ressources</h2>
+                        <span class="subtitle">Supports pédagogiques</span>
+                    </div>
+                    <button class="btn-add" onclick="openAddResourceModal()"><i class="fas fa-plus"></i> Ajouter</button>
+                </div>
+                <div class="table-container">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th>Titre</th><th>Catégorie</th><th>Niveau</th><th>Type</th><th>Gratuit</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody id="resourcesTableBody">
+                                <tr><td colspan="6" class="loading"><i class="fas fa-spinner fa-spin"></i> Chargement...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: REGISTRATIONS -->
+            <div class="tab-content" id="tab-registrations">
+                <div class="section-header">
+                    <div>
+                        <h2>Inscriptions aux examens</h2>
+                        <span class="subtitle">Suivi des inscriptions</span>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th>Élève</th><th>Examen</th><th>Date inscription</th><th>Statut</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody id="registrationsTableBody">
+                                <tr><td colspan="5" class="loading"><i class="fas fa-spinner fa-spin"></i> Chargement...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025-2026 Association Mille Voiles / 千帆协会 - Administration Français</p>
+        </div>
+    </footer>
+
+    <!-- ===== MODALS ===== -->
+
+    <!-- USER MODAL -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="userModalTitle">Ajouter un utilisateur</h3>
+                <button class="close-modal" onclick="closeModal('userModal')">&times;</button>
+            </div>
+            <form id="userForm">
+                <input type="hidden" id="userId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nom *</label>
+                        <input type="text" id="userName" required placeholder="Nom d'utilisateur">
+                    </div>
+                    <div class="form-group">
+                        <label>Mot de passe *</label>
+                        <input type="password" id="userPassword" placeholder="Laisser vide pour ne pas changer">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Rôle *</label>
+                        <select id="userRole" required>
+                            <option value="admin">Administrateur</option>
+                            <option value="teacher">Intervenant</option>
+                            <option value="stu" selected>Élève</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Type (examen)</label>
+                        <select id="userType">
+                            <option value="n">🇫🇷 DELF</option>
+                            <option value="r">📘 DALF</option>
+                            <option value="m">📗 TCF</option>
+                            <option value="t">📙 TCF IRN</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Niveau</label>
+                        <select id="userLevel">
+                            <option value="A1">A1</option>
+                            <option value="A2">A2</option>
+                            <option value="B1">B1</option>
+                            <option value="B2">B2</option>
+                            <option value="C1">C1</option>
+                            <option value="C2">C2</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>📚 Crédits (heures)</label>
+                        <input type="number" id="userCredit" min="0" step="1" value="0" placeholder="Ex: 10, 20">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Expiration</label>
+                    <input type="datetime-local" id="userTimer">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="closeModal('userModal')">Annuler</button>
+                    <button type="submit" class="save-btn"><i class="fas fa-save"></i> Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- EXAM MODAL -->
+    <div class="modal" id="examModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="examModalTitle">Ajouter un examen</h3>
+                <button class="close-modal" onclick="closeModal('examModal')">&times;</button>
+            </div>
+            <form id="examForm">
+                <input type="hidden" id="examId">
+                <div class="form-row">
+                    <div class="form-group"><label>Nom *</label><input type="text" id="examName" required placeholder="DELF, DALF, TCF..."></div>
+                    <div class="form-group"><label>Nom complet</label><input type="text" id="examFullName" placeholder="Diplôme d'Études..."></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Niveau *</label><input type="text" id="examLevel" required placeholder="A1 · A2 · B1 · B2"></div>
+                    <div class="form-group"><label>Durée</label><input type="text" id="examDuration" placeholder="2h30"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Prix</label><input type="text" id="examPrice" placeholder="~100-200€"></div>
+                    <div class="form-group"><label>Validité</label><input type="text" id="examValidity" placeholder="Valable à vie"></div>
+                </div>
+                <div class="form-group"><label>Description</label><textarea id="examDescription" rows="3" placeholder="Description de l'examen..."></textarea></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Icône</label><input type="text" id="examIcon" placeholder="fa-certificate" value="fa-certificate"></div>
+                    <div class="form-group"><label>Couleur</label><input type="text" id="examColor" placeholder="#3498db" value="#3498db"></div>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="examLocked">
+                    <label for="examLocked">Accès réservé (nécessite connexion)</label>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="closeModal('examModal')">Annuler</button>
+                    <button type="submit" class="save-btn"><i class="fas fa-save"></i> Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- COURSE MODAL -->
+    <div class="modal" id="courseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="courseModalTitle">Ajouter un cours</h3>
+                <button class="close-modal" onclick="closeModal('courseModal')">&times;</button>
+            </div>
+            <form id="courseForm">
+                <input type="hidden" id="courseId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Type *</label>
+                        <select id="courseType" required>
+                            <option value="beginner">🌱 Débutant A1-A2</option>
+                            <option value="intermediate">📈 Intermédiaire B1-B2</option>
+                            <option value="advanced">🎯 Avancé C1-C2</option>
+                            <option value="business">💼 Français des affaires</option>
+                            <option value="delf">📝 Préparation DELF</option>
+                            <option value="dalf">📝 Préparation DALF</option>
+                            <option value="tcf">📝 Préparation TCF</option>
+                            <option value="tcf_irn">📝 Préparation TCF IRN</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Titre</label>
+                        <input type="text" id="courseTitle" placeholder="Titre du cours">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Élève *</label>
+                        <select id="courseStudent" required><option value="">Sélectionner un élève</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Intervenant *</label>
+                        <select id="courseTeacher" required><option value="">Sélectionner un intervenant</option></select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date et heure *</label>
+                        <input type="datetime-local" id="courseStartTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Durée (heures) *</label>
+                        <input type="number" id="courseDuration" value="2" min="1" max="8" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Lieu</label>
+                        <input type="text" id="courseLocation" placeholder="Salle, adresse...">
+                    </div>
+                    <div class="form-group">
+                        <label>Lien Meet</label>
+                        <input type="url" id="courseMeetingLink" placeholder="https://meet.google.com/...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="courseDescription" rows="2" placeholder="Description du cours..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="closeModal('courseModal')">Annuler</button>
+                    <button type="submit" class="save-btn"><i class="fas fa-save"></i> Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- STATUS CHANGE MODAL -->
+    <div class="modal" id="statusModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exchange-alt"></i> Changer le statut</h3>
+                <button class="close-modal" onclick="closeModal('statusModal')">&times;</button>
+            </div>
+            <form id="statusForm">
+                <input type="hidden" id="statusCourseId">
+                <div class="form-group">
+                    <label>Nouveau statut</label>
+                    <select id="statusSelect" required>
+                        <option value="scheduled">📅 Planifié</option>
+                        <option value="in_progress">🔄 En cours</option>
+                        <option value="completed">✅ Terminé</option>
+                        <option value="cancelled">❌ Annulé</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="closeModal('statusModal')">Annuler</button>
+                    <button type="submit" class="save-btn"><i class="fas fa-save"></i> Mettre à jour</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- RESOURCE MODAL -->
+    <div class="modal" id="resourceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="resourceModalTitle">Ajouter une ressource</h3>
+                <button class="close-modal" onclick="closeModal('resourceModal')">&times;</button>
+            </div>
+            <form id="resourceForm">
+                <input type="hidden" id="resourceId">
+                <div class="form-group"><label>Titre *</label><input type="text" id="resourceTitle" required placeholder="Titre de la ressource"></div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Catégorie</label>
+                        <select id="resourceCategory">
+                            <option value="vocabulary">📖 Vocabulaire</option>
+                            <option value="grammar">📘 Grammaire</option>
+                            <option value="listening">🎧 Compréhension orale</option>
+                            <option value="reading">📕 Compréhension écrite</option>
+                            <option value="speaking">🗣️ Expression orale</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Niveau</label>
+                        <select id="resourceLevel">
+                            <option value="">Tous niveaux</option>
+                            <option value="A1">A1</option>
+                            <option value="A2">A2</option>
+                            <option value="B1">B1</option>
+                            <option value="B2">B2</option>
+                            <option value="C1">C1</option>
+                            <option value="C2">C2</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="resourceType">
+                            <option value="pdf">📄 PDF</option>
+                            <option value="video">🎬 Vidéo</option>
+                            <option value="audio">🎧 Audio</option>
+                            <option value="link">🔗 Lien</option>
+                            <option value="exercise">📝 Exercice interactif</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Lien</label>
+                        <input type="url" id="resourceLink" placeholder="https://...">
+                    </div>
+                </div>
+                <div class="form-group"><label>Contenu</label><textarea id="resourceContent" rows="3" placeholder="Description ou contenu..."></textarea></div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="resourceIsFree" checked>
+                    <label for="resourceIsFree">Ressource gratuite</label>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="closeModal('resourceModal')">Annuler</button>
+                    <button type="submit" class="save-btn"><i class="fas fa-save"></i> Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- REGISTRATION MODAL -->
+    <div class="modal" id="registrationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Modifier l'inscription</h3>
+                <button class="close-modal" onclick="closeModal('registrationModal')">&times;</button>
+            </div>
+            <form id="registrationForm">
+                <input type="hidden" id="registrationId">
+                <div class="form-group">
+                    <label>Statut</label>
+                    <select id="registrationStatus">
+                        <option value="pending">⏳ En attente</option>
+                        <option value="confirmed">✅ Confirmée</option>
+                        <option value="completed">🎉 Terminée</option>
+                        <option value="cancelled">❌ Annulée</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="registrationNotes" rows="3" placeholder="Notes supplémentaires..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="closeModal('registrationModal')">Annuler</button>
+                    <button type="submit" class="save-btn"><i class="fas fa-save"></i> Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CONFIRM DIALOG -->
+    <div class="confirm-dialog" id="confirmDialog">
+        <div class="confirm-content">
+            <h3><i class="fas fa-exclamation-triangle"></i> Confirmer</h3>
+            <p id="confirmMessage">Êtes-vous sûr de vouloir effectuer cette action ?</p>
+            <div class="confirm-actions">
+                <button class="confirm-cancel" onclick="closeConfirmDialog()">Annuler</button>
+                <button class="confirm-delete" id="confirmDeleteBtn"><i class="fas fa-trash"></i> Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 全局变量
+        // ============================================================
+        let currentAdmin = null;
+        let allUsers = [];
+        let allExams = [];
+        let allCourses = [];
+        let allResources = [];
+        let allRegistrations = [];
+        let deleteTarget = { type: '', id: '' };
+
+        // ============================================================
+        // 类型映射
+        // ============================================================
+        function getTypeLabel(type) {
+            var map = { 'n': '🇫🇷 DELF', 'r': '📘 DALF', 'm': '📗 TCF', 't': '📙 TCF IRN' };
+            return map[type] || type || '-';
+        }
+
+        function getTypeClass(type) {
+            var map = { 'n': 'type-n', 'r': 'type-r', 'm': 'type-m', 't': 'type-t' };
+            return map[type] || '';
+        }
+
+        function getCreditBadge(credit, role) {
+            if (role !== 'stu') return '<span class="credit-none">—</span>';
+            var num = Number(credit) || 0;
+            var cls = 'credit-none';
+            if (num >= 20) cls = 'credit-high';
+            else if (num >= 10) cls = 'credit-medium';
+            else if (num > 0) cls = 'credit-low';
+            return '<span class="credit-badge ' + cls + '">📚 ' + num + 'h</span>';
+        }
+
+        function getRoleBadge(role) {
+            var map = { 'admin': '<span class="badge badge-admin">👑 Admin</span>', 'teacher': '<span class="badge badge-teacher">👨‍🏫 Intervenant</span>',
+                'stu': '<span class="badge badge-stu">🎓 Élève</span>' };
+            return map[role] || role;
+        }
+
+        function getStatusBadge(status) {
+            var map = { 'scheduled': '<span class="badge badge-scheduled">📅 Planifié</span>', 'in_progress': '<span class="badge badge-in_progress">🔄 En cours</span>',
+                'completed': '<span class="badge badge-completed">✅ Terminé</span>', 'cancelled': '<span class="badge badge-cancelled">❌ Annulé</span>' };
+            return map[status] || status;
+        }
+
+        function escapeHtml(s) {
+            if (!s) return '';
+            return s.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m ===
+                    '>') return '&gt;'; return m; });
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            var d = new Date(dateStr);
+            return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function showToast(msg, type) {
+            type = type || 'success';
+            var existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            var toast = document.createElement('div');
+            toast.className = 'toast toast-' + type;
+            var icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' :
+            'fa-info-circle';
+            toast.innerHTML = '<i class="fas ' + icon + '"></i> ' + msg;
+            document.body.appendChild(toast);
+            setTimeout(function() { if (toast.parentNode) toast.remove(); }, 3500);
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+
+        function closeConfirmDialog() {
+            document.getElementById('confirmDialog').style.display = 'none';
+            deleteTarget = { type: '', id: '' };
+        }
+
+        // ============================================================
+        // 初始化
+        // ============================================================
+        async function init() {
+            var token = new URLSearchParams(window.location.search).get('token');
+            if (!token) { window.location.href = 'francais.html'; return; }
+            try {
+                var jsonStr = decodeURIComponent(atob(token));
+                var data = JSON.parse(jsonStr);
+                if (data.role !== 'admin') { window.location.href = 'francais.html'; return; }
+                currentAdmin = data;
+                document.getElementById('adminName').textContent = data.name;
+            } catch (e) { window.location.href = 'francais.html'; return; }
+
+            // Tabs
+            document.querySelectorAll('.tab-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+                    this.classList.add('active');
+                    document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove(
+                    'active'); });
+                    document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+                });
+            });
+
+            await loadAllData();
+        }
+
+        // ============================================================
+        // 加载所有数据
+        // ============================================================
+        async function loadAllData() {
+            await Promise.all([
+                loadUsers(),
+                loadExams(),
+                loadCourses(),
+                loadResources(),
+                loadRegistrations(),
+                updateStats()
+            ]);
+        }
+
+        // ============================================================
+        // 加载用户（显示密码）
+        // ============================================================
+        async function loadUsers() {
+            try {
+                var supabase = window.supabaseAuth.getSupabaseClient();
+                var { data, error } = await supabase.from('french_users').select('*').order('name');
+                if (error) throw error;
+                allUsers = data || [];
+
+                var tbody = document.getElementById('usersTableBody');
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Aucun utilisateur</td></tr>';
+                    return;
+                }
+
+                var html = '';
+                for (var i = 0; i < data.length; i++) {
+                    var u = data[i];
+                    html += '<tr>';
+                    html += '<td><strong>' + escapeHtml(u.name) + '</strong></td>';
+                    html += '<td>' + getRoleBadge(u.role) + '</td>';
+                    html += '<td><span class="type-tag ' + getTypeClass(u.type) + '">' + getTypeLabel(u.type) + '</span></td>';
+                    html += '<td>' + (u.level || '-') + '</td>';
+                    html += '<td>' + getCreditBadge(u.credit, u.role) + '</td>';
+                    html += '<td><span class="password-cell">' + escapeHtml(u.password || '—') + '</span></td>';
+                    html += '<td>' + (u.timer ? formatDate(u.timer) : 'Illimité') + '</td>';
+                    html += '<td>';
+                    html += '<button class="action-btn btn-edit" data-id="' + u.id +
+                    '" data-action="edit-user"><i class="fas fa-edit"></i></button>';
+                    html += '<button class="action-btn btn-delete" data-id="' + u.id + '" data-name="' + escapeHtml(u
+                        .name) + '" data-action="delete-user"><i class="fas fa-trash"></i></button>';
+                    html += '</td>';
+                    html += '</tr>';
+                }
+                tbody.innerHTML = html;
+
+                // 绑定事件
+                document.querySelectorAll('[data-action="edit-user"]').forEach(function(btn) {
+                    btn.addEventListener('click', function() { editUser(this.getAttribute('data-id')); });
+                });
+                document.querySelectorAll('[data-action="delete-user"]').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        showConfirmDialog('Supprimer l\'utilisateur ' + this.getAttribute('data-name') + ' ?',
+                            'user', this.getAttribute('data-id'));
+                    });
+                });
+
+                updateSelects();
+            } catch (e) {
+                console.error('加载用户失败:', e);
+                document.getElementById('usersTableBody').innerHTML =
+                    '<tr><td colspan="8" class="empty-state">Erreur de chargement</td></tr>';
+            }
+        }
+
+        // ============================================================
+        // 加载考试
+        // ============================================================
+        async function loadExams() {
+            try {
+                var data = await window.supabaseAuth.getFrenchExams();
+                allExams = data;
+                var tbody = document.getElementById('examsTableBody');
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Aucun examen</td></tr>';
+                    return;
+                }
+                var html = '';
+                for (var i = 0; i < data.length; i++) {
+                    var e = data[i];
+                    html += '<tr>';
+                    html += '<td><strong>' + escapeHtml(e.name) + '</strong></td>';
+                    html += '<td>' + escapeHtml(e.level || '-') + '</td>';
+                    html += '<td>' + escapeHtml(e.duration || '-') + '</td>';
+                    html += '<td>' + escapeHtml(e.price || '-') + '</td>';
+                    html += '<td>' + escapeHtml(e.validity || '-') + '</td>';
+                    html += '<td>' + (e.is_locked ? '<span class="badge badge-locked">🔒 Réservé</span>' :
+                        '<span class="badge badge-free">✅ Libre</span>') + '</td>';
+                    html += '<td>';
+                    html += '<button class="action-btn btn-edit" data-id="' + e.id +
+                        '" data-action="edit-exam"><i class="fas fa-edit"></i></button>';
+                    html += '<button class="action-btn btn-delete" data-id="' + e.id + '" data-name="' + escapeHtml(e
+                        .name) + '" data-action="delete-exam"><i class="fas fa-trash"></i></button>';
+                    html += '</td>';
+                    html += '</tr>';
+                }
+                tbody.innerHTML = html;
+
+                document.querySelectorAll('[data-action="edit-exam"]').forEach(function(btn) {
+                    btn.addEventListener('click', function() { editExam(this.getAttribute('data-id')); });
+                });
+                document.querySelectorAll('[data-action="delete-exam"]').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        showConfirmDialog('Supprimer l\'examen ' + this.getAttribute('data-name') + ' ?', 'exam',
+                            this.getAttribute('data-id'));
+                    });
+                });
+            } catch (e) {
+                console.error('加载考试失败:', e);
+                document.getElementById('examsTableBody').innerHTML =
+                    '<tr><td colspan="7" class="empty-state">Erreur de chargement</td></tr>';
+            }
+        }
+
+        // ============================================================
+        // 加载课程
+        // ============================================================
+        async function loadCourses() {
+            try {
+                var data = await window.supabaseAuth.getFrenchCourses(null, 'admin');
+                allCourses = data;
+                var tbody = document.getElementById('coursesTableBody');
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Aucun cours</td></tr>';
+                    return;
+                }
+                var typeMap = { 'beginner': '🌱 Débutant', 'intermediate': '📈 Intermédiaire', 'advanced': '🎯 Avancé',
+                    'business': '💼 Affaires', 'delf': '📝 DELF', 'dalf': '📝 DALF', 'tcf': '📝 TCF',
+                    'tcf_irn': '📝 TCF IRN' };
+                var html = '';
+                for (var i = 0; i < data.length; i++) {
+                    var c = data[i];
+                    html += '<tr>';
+                    html += '<td>' + (typeMap[c.course_type] || c.course_type) + '</td>';
+                    html += '<td>' + escapeHtml(c.student ? c.student.name : 'N/A') + '</td>';
+                    html += '<td>' + escapeHtml(c.teacher ? c.teacher.name : 'N/A') + '</td>';
+                    html += '<td>' + (c.start_time ? formatDate(c.start_time) : '-') + '</td>';
+                    html += '<td>' + (c.duration || 2) + 'h</td>';
+                    html += '<td>' + getStatusBadge(c.status) + '</td>';
+                    html += '<td>';
+                    html += '<button class="action-btn btn-status" data-id="' + c.id +
+                        '" data-action="status-course"><i class="fas fa-exchange-alt"></i></button>';
+                    html += '<button class="action-btn btn-edit" data-id="' + c.id +
+                        '" data-action="edit-course"><i class="fas fa-edit"></i></button>';
+                    html += '<button class="action-btn btn-cancel" data-id="' + c.id + '" data-name="' + escapeHtml(c
+                        .course_type) + '" data-action="cancel-course"><i class="fas fa-pause"></i></button>';
+                    html += '<button class="action-btn btn-delete" data-id="' + c.id + '" data-name="' + escapeHtml(c
+                        .course_type) + '" data-action="delete-course"><i class="fas fa-trash"></i></button>';
+                    html += '</td>';
+                    html += '</tr>';
+                }
+                tbody.innerHTML = html;
+
+                document.querySelectorAll('[data-action="status-course"]').forEach(function(btn) {
+                    btn.addEventListener('click', function() { openStatusModal(this.getAttribute('data-id')); });
+                });
+                document.querySelectorAll('[data-action="edit-course"]').forEach(function(btn) {
+                    btn.addEventListener('click', function() { editCourse(this.getAttribute('data-id')); });
+                });
+                document.querySelectorAll('[data-action="cancel-course"]').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        showConfirmDialog('Annuler ce cours (statut: cancelled, crédits remboursés) ?',
+                            'cancel-course', this.getAttribute('data-id'));
+                    });
+                });
+                document.querySelectorAll('[data-action="delete-course"]').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        showConfirmDialog('Supprimer définitivement ce cours ? (ACTION IRRÉVERSIBLE)',
+                            'delete-course', this.getAttribute('data-id'));
+                    });
+                });
+            } catch (e) {
+                console.error('加载课程失败:', e);
+                document.getElementById('coursesTableBody').innerHTML =
+                    '<tr><td colspan="7" class="empty-state">Erreur de chargement</td></tr>';
+            }
+        }
+
+        // ============================================================
+        // 加载资源
+        // ============================================================
+        async function loadResources() {
+            try {
+                var data = await window.supabaseAuth.getFrenchResources();
+                allResources = data;
+                var tbody = document.getElementById('resourcesTableBody');
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Aucune ressource</td></tr>';
+                    return;
+                }
+                var catMap = { 'vocabulary': '📖 Vocabulaire', 'grammar': '📘 Grammaire', 'listening': '🎧 Écoute',
+                    'reading': '📕 Lecture', 'speaking': '🗣️ Expression' };
+                var html = '';
+                for (var i = 0; i < data.length; i++) {
+                    var r = data[i];
+                    html += '<tr>';
+                    html += '<td><strong>' + escapeHtml(r.title) + '</strong></td>';
+                    html += '<td>' + (catMap[r.category] || r.category || '-') + '</td>';
+                    html += '<td>' + escapeHtml(r.level || '-') + '</td>';
+                    html += '<td>' + escapeHtml(r.type || '-') + '</td>';
+                    html += '<td>' + (r.is_free ? '✅ Oui' : '❌ Non') + '</td>';
+                    html += '<td>';
+                    html += '<button class="action-btn btn-edit" data-id="' + r.id +
+                        '" data-action="edit-resource"><i class="fas fa-edit"></i></button>';
+                    html += '<button class="action-btn btn-delete" data-id="' + r.id + '" data-name="' + escapeHtml(r
+                        .title) + '" data-action="delete-resource"><i class="fas fa-trash"></i></button>';
+                    html += '</td>';
+                    html += '</tr>';
+                }
+                tbody.innerHTML = html;
+
+                document.querySelectorAll('[data-action="edit-resource"]').forEach(function(btn) {
+                    btn.addEventListener('click', function() { editResource(this.getAttribute('data-id')); });
+                });
+                document.querySelectorAll('[data-action="delete-resource"]').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        showConfirmDialog('Supprimer la ressource ' + this.getAttribute('data-name') + ' ?',
+                            'resource', this.getAttribute('data-id'));
+                    });
+                });
+            } catch (e) {
+                console.error('加载资源失败:', e);
+                document.getElementById('resourcesTableBody').innerHTML =
+                    '<tr><td colspan="6" class="empty-state">Erreur de chargement</td></tr>';
+            }
+        }
+
+        // ============================================================
+        // 加载报名
+        // ============================================================
+        async function loadRegistrations() {
+            try {
+                var supabase = window.supabaseAuth.getSupabaseClient();
+                var { data, error } = await supabase
+                    .from('french_registrations')
+                    .select('*, student:student_id(id, name), exam:french_exams(id, name)')
+                    .order('registration_date', { ascending: false });
+                if (error) throw error;
+                allRegistrations = data || [];
+                var tbody = document.getElementById('registrationsTableBody');
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Aucune inscription</td></tr>';
+                    return;
+                }
+                var statusMap = { 'pending': '<span class="badge badge-pending">⏳ En attente</span>',
+                    'confirmed': '<span class="badge badge-confirmed">✅ Confirmée</span>',
+                    'completed': '<span class="badge badge-completed">🎉 Terminée</span>',
+                    'cancelled': '<span class="badge badge-cancelled">❌ Annulée</span>' };
+                var html = '';
+                for (var i = 0; i < data.length; i++) {
+                    var r = data[i];
+                    html += '<tr>';
+                    html += '<td>' + escapeHtml(r.student ? r.student.name : 'N/A') + '</td>';
+                    html += '<td>' + escapeHtml(r.exam ? r.exam.name : 'N/A') + '</td>';
+                    html += '<td>' + formatDate(r.registration_date) + '</td>';
+                    html += '<td>' + (statusMap[r.status] || r.status) + '</td>';
+                    html += '<td>';
+                    html += '<button class="action-btn btn-edit" data-id="' + r.id +
+                        '" data-action="edit-registration"><i class="fas fa-edit"></i></button>';
+                    html += '<button class="action-btn btn-delete" data-id="' + r.id + '" data-action="delete-registration"><i class="fas fa-trash"></i></button>';
+                    html += '</td>';
+                    html += '</tr>';
+                }
+                tbody.innerHTML = html;
+
+                document.querySelectorAll('[data-action="edit-registration"]').forEach(function(btn) {
+                    btn.addEventListener('click', function() { editRegistration(this.getAttribute('data-id')); });
+                });
+                document.querySelectorAll('[data-action="delete-registration"]').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        showConfirmDialog('Supprimer cette inscription ?', 'registration', this.getAttribute(
+                            'data-id'));
+                    });
+                });
+            } catch (e) {
+                console.error('加载报名失败:', e);
+                document.getElementById('registrationsTableBody').innerHTML =
+                    '<tr><td colspan="5" class="empty-state">Erreur de chargement</td></tr>';
+            }
+        }
+
+        // ============================================================
+        // 更新统计
+        // ============================================================
+        async function updateStats() {
+            try {
+                var supabase = window.supabaseAuth.getSupabaseClient();
+                var [users, exams, courses, resources, registrations, progress] = await Promise.all([
+                    supabase.from('french_users').select('*', { count: 'exact', head: true }),
+                    supabase.from('french_exams').select('*', { count: 'exact', head: true }),
+                    supabase.from('french_courses').select('*', { count: 'exact', head: true }),
+                    supabase.from('french_resources').select('*', { count: 'exact', head: true }),
+                    supabase.from('french_registrations').select('*', { count: 'exact', head: true }),
+                    supabase.from('french_progress').select('*', { count: 'exact', head: true })
+                ]);
+                document.getElementById('totalUsers').textContent = users.count || 0;
+                document.getElementById('totalExams').textContent = exams.count || 0;
+                document.getElementById('totalCourses').textContent = courses.count || 0;
+                document.getElementById('totalResources').textContent = resources.count || 0;
+                document.getElementById('totalRegistrations').textContent = registrations.count || 0;
+                document.getElementById('totalProgress').textContent = progress.count || 0;
+            } catch (e) { console.error('更新统计失败:', e); }
+        }
+
+        // ============================================================
+        // 更新下拉列表
+        // ============================================================
+        function updateSelects() {
+            var students = allUsers.filter(function(u) { return u.role === 'stu'; });
+            var studentSelect = document.getElementById('courseStudent');
+            if (studentSelect) {
+                var val = studentSelect.value;
+                studentSelect.innerHTML = '<option value="">Sélectionner un élève</option>';
+                for (var i = 0; i < students.length; i++) {
+                    var s = students[i];
+                    studentSelect.innerHTML += '<option value="' + s.id + '">' + escapeHtml(s.name) + ' (' + (s.credit ||
+                        0) + 'h)</option>';
+                }
+                if (val) studentSelect.value = val;
+            }
+
+            var teachers = allUsers.filter(function(u) { return u.role === 'teacher'; });
+            var teacherSelect = document.getElementById('courseTeacher');
+            if (teacherSelect) {
+                var val = teacherSelect.value;
+                teacherSelect.innerHTML = '<option value="">Sélectionner un intervenant</option>';
+                for (var i = 0; i < teachers.length; i++) {
+                    var t = teachers[i];
+                    teacherSelect.innerHTML += '<option value="' + t.id + '">' + escapeHtml(t.name) + '</option>';
+                }
+                if (val) teacherSelect.value = val;
+            }
+        }
+
+        // ============================================================
+        // CRUD: USERS
+        // ============================================================
+        function openAddUserModal() {
+            document.getElementById('userId').value = '';
+            document.getElementById('userForm').reset();
+            document.getElementById('userPassword').required = true;
+            document.getElementById('userPassword').placeholder = 'Nouveau mot de passe';
+            document.getElementById('userModalTitle').textContent = 'Ajouter un utilisateur';
+            openModal('userModal');
+        }
+
+        async function editUser(id) {
+            var user = allUsers.find(function(u) { return u.id === id; });
+            if (!user) return;
+            document.getElementById('userId').value = user.id;
+            document.getElementById('userName').value = user.name;
+            document.getElementById('userRole').value = user.role || 'stu';
+            document.getElementById('userType').value = user.type || 'n';
+            document.getElementById('userLevel').value = user.level || 'A1';
+            document.getElementById('userCredit').value = user.credit || 0;
+            if (user.timer) {
+                var d = new Date(user.timer);
+                document.getElementById('userTimer').value = d.toISOString().slice(0, 16);
+            } else {
+                document.getElementById('userTimer').value = '';
+            }
+            document.getElementById('userPassword').required = false;
+            document.getElementById('userPassword').placeholder = 'Laisser vide pour ne pas changer';
+            document.getElementById('userPassword').value = '';
+            document.getElementById('userModalTitle').textContent = 'Modifier l\'utilisateur';
+            openModal('userModal');
+        }
+
+        document.getElementById('userForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var id = document.getElementById('userId').value;
+            var data = {
+                name: document.getElementById('userName').value.trim(),
+                role: document.getElementById('userRole').value,
+                type: document.getElementById('userType').value,
+                level: document.getElementById('userLevel').value,
+                credit: parseInt(document.getElementById('userCredit').value) || 0,
+                timer: document.getElementById('userTimer').value || null
+            };
+            var password = document.getElementById('userPassword').value;
+            if (password) data.password = password;
+
+            var supabase = window.supabaseAuth.getSupabaseClient();
+            var result;
+            if (id) {
+                var { data: res, error } = await supabase.from('french_users').update(data).eq('id', id).select().single();
+                result = res;
+                if (error) result = null;
+            } else {
+                if (!data.password) { showToast('Le mot de passe est requis', 'error'); return; }
+                var { data: res, error } = await supabase.from('french_users').insert([data]).select().single();
+                result = res;
+                if (error) result = null;
+            }
+            if (result) {
+                closeModal('userModal');
+                showToast(id ? 'Utilisateur modifié ✓' : 'Utilisateur créé ✓');
+                await loadUsers();
+                await updateStats();
+            } else {
+                showToast('Erreur: nom peut-être déjà utilisé', 'error');
+            }
+        });
+
+        // ============================================================
+        // CRUD: EXAMS
+        // ============================================================
+        function openAddExamModal() {
+            document.getElementById('examId').value = '';
+            document.getElementById('examForm').reset();
+            document.getElementById('examModalTitle').textContent = 'Ajouter un examen';
+            openModal('examModal');
+        }
+
+        async function editExam(id) {
+            var exam = allExams.find(function(e) { return e.id === id; });
+            if (!exam) return;
+            document.getElementById('examId').value = exam.id;
+            document.getElementById('examName').value = exam.name || '';
+            document.getElementById('examFullName').value = exam.full_name || '';
+            document.getElementById('examLevel').value = exam.level || '';
+            document.getElementById('examDuration').value = exam.duration || '';
+            document.getElementById('examPrice').value = exam.price || '';
+            document.getElementById('examValidity').value = exam.validity || '';
+            document.getElementById('examDescription').value = exam.description || '';
+            document.getElementById('examIcon').value = exam.icon || 'fa-certificate';
+            document.getElementById('examColor').value = exam.color || '#3498db';
+            document.getElementById('examLocked').checked = exam.is_locked || false;
+            document.getElementById('examModalTitle').textContent = 'Modifier l\'examen';
+            openModal('examModal');
+        }
+
+        document.getElementById('examForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var id = document.getElementById('examId').value;
+            var data = {
+                name: document.getElementById('examName').value.trim(),
+                full_name: document.getElementById('examFullName').value.trim(),
+                level: document.getElementById('examLevel').value.trim(),
+                duration: document.getElementById('examDuration').value.trim(),
+                price: document.getElementById('examPrice').value.trim(),
+                validity: document.getElementById('examValidity').value.trim(),
+                description: document.getElementById('examDescription').value.trim(),
+                icon: document.getElementById('examIcon').value.trim() || 'fa-certificate',
+                color: document.getElementById('examColor').value.trim() || '#3498db',
+                is_locked: document.getElementById('examLocked').checked
+            };
+            var result;
+            if (id) {
+                result = await window.supabaseAuth.updateFrenchExam(id, data);
+            } else {
+                result = await window.supabaseAuth.createFrenchExam(data);
+            }
+            if (result) {
+                closeModal('examModal');
+                showToast(id ? 'Examen modifié ✓' : 'Examen créé ✓');
+                await loadExams();
+                await updateStats();
+            } else {
+                showToast('Erreur lors de l\'opération', 'error');
+            }
+        });
+
+        // ============================================================
+        // CRUD: COURSES
+        // ============================================================
+        function openAddCourseModal() {
+            document.getElementById('courseId').value = '';
+            document.getElementById('courseForm').reset();
+            document.getElementById('courseModalTitle').textContent = 'Ajouter un cours';
+            setTimeout(function() { updateSelects(); }, 100);
+            openModal('courseModal');
+        }
+
+        async function editCourse(id) {
+            var course = allCourses.find(function(c) { return c.id === id; });
+            if (!course) return;
+            updateSelects();
+            document.getElementById('courseId').value = course.id;
+            document.getElementById('courseType').value = course.course_type || 'beginner';
+            document.getElementById('courseTitle').value = course.title || '';
+            document.getElementById('courseStudent').value = course.student_id || '';
+            document.getElementById('courseTeacher').value = course.teacher_id || '';
+            if (course.start_time) {
+                var d = new Date(course.start_time);
+                document.getElementById('courseStartTime').value = d.toISOString().slice(0, 16);
+            }
+            document.getElementById('courseDuration').value = course.duration || 2;
+            document.getElementById('courseLocation').value = course.location || '';
+            document.getElementById('courseMeetingLink').value = course.meeting_link || '';
+            document.getElementById('courseDescription').value = course.description || '';
+            document.getElementById('courseModalTitle').textContent = 'Modifier le cours';
+            openModal('courseModal');
+        }
+
+        document.getElementById('courseForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var id = document.getElementById('courseId').value;
+            var studentId = document.getElementById('courseStudent').value;
+            var duration = parseInt(document.getElementById('courseDuration').value) || 2;
+
+            if (!id && studentId) {
+                var student = allUsers.find(function(u) { return u.id === studentId; });
+                if (student && student.role === 'stu') {
+                    var currentCredit = student.credit || 0;
+                    if (currentCredit < duration) {
+                        showToast('课时不足！' + student.name + ' 仅有 ' + currentCredit + 'h，需要 ' + duration + 'h', 'error');
+                        return;
+                    }
+                }
+            }
+
+            var data = {
+                course_type: document.getElementById('courseType').value,
+                title: document.getElementById('courseTitle').value.trim(),
+                student_id: studentId,
+                teacher_id: document.getElementById('courseTeacher').value,
+                start_time: document.getElementById('courseStartTime').value,
+                duration: duration,
+                location: document.getElementById('courseLocation').value.trim(),
+                meeting_link: document.getElementById('courseMeetingLink').value.trim(),
+                description: document.getElementById('courseDescription').value.trim(),
+                status: 'scheduled'
+            };
+
+            var result;
+            if (id) {
+                result = await window.supabaseAuth.updateFrenchCourse(id, data);
+            } else {
+                result = await window.supabaseAuth.createFrenchCourse(data);
+            }
+
+            if (result) {
+                closeModal('courseModal');
+                showToast(id ? 'Cours modifié ✓' : 'Cours créé ✓ (课时已扣减)');
+                await loadCourses();
+                await loadUsers();
+                await updateStats();
+            } else {
+                showToast('Erreur lors de l\'opération', 'error');
+            }
+        });
+
+        // ============================================================
+        // 更改课程状态
+        // ============================================================
+        function openStatusModal(courseId) {
+            var course = allCourses.find(function(c) { return c.id === courseId; });
+            if (!course) return;
+            document.getElementById('statusCourseId').value = courseId;
+            document.getElementById('statusSelect').value = course.status || 'scheduled';
+            openModal('statusModal');
+        }
+
+        document.getElementById('statusForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var id = document.getElementById('statusCourseId').value;
+            var newStatus = document.getElementById('statusSelect').value;
+
+            try {
+                var result = await window.supabaseAuth.updateFrenchCourse(id, { status: newStatus });
+                if (result) {
+                    closeModal('statusModal');
+                    showToast('Statut mis à jour ✓');
+                    await loadCourses();
+                    await updateStats();
+                }
+            } catch (err) {
+                showToast('Erreur', 'error');
+                console.error(err);
+            }
+        });
+
+        // ============================================================
+        // CRUD: RESOURCES
+        // ============================================================
+        function openAddResourceModal() {
+            document.getElementById('resourceId').value = '';
+            document.getElementById('resourceForm').reset();
+            document.getElementById('resourceModalTitle').textContent = 'Ajouter une ressource';
+            openModal('resourceModal');
+        }
+
+        async function editResource(id) {
+            var resource = allResources.find(function(r) { return r.id === id; });
+            if (!resource) return;
+            document.getElementById('resourceId').value = resource.id;
+            document.getElementById('resourceTitle').value = resource.title || '';
+            document.getElementById('resourceCategory').value = resource.category || '';
+            document.getElementById('resourceLevel').value = resource.level || '';
+            document.getElementById('resourceType').value = resource.type || '';
+            document.getElementById('resourceLink').value = resource.link || '';
+            document.getElementById('resourceContent').value = resource.content || '';
+            document.getElementById('resourceIsFree').checked = resource.is_free !== false;
+            document.getElementById('resourceModalTitle').textContent = 'Modifier la ressource';
+            openModal('resourceModal');
+        }
+
+        document.getElementById('resourceForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var id = document.getElementById('resourceId').value;
+            var data = {
+                title: document.getElementById('resourceTitle').value.trim(),
+                category: document.getElementById('resourceCategory').value,
+                level: document.getElementById('resourceLevel').value,
+                type: document.getElementById('resourceType').value,
+                link: document.getElementById('resourceLink').value.trim(),
+                content: document.getElementById('resourceContent').value.trim(),
+                is_free: document.getElementById('resourceIsFree').checked
+            };
+
+            var supabase = window.supabaseAuth.getSupabaseClient();
+            var result;
+            if (id) {
+                var { data: res, error } = await supabase.from('french_resources').update(data).eq('id', id).select()
+                    .single();
+                result = res;
+                if (error) result = null;
+            } else {
+                var { data: res, error } = await supabase.from('french_resources').insert([data]).select().single();
+                result = res;
+                if (error) result = null;
+            }
+            if (result) {
+                closeModal('resourceModal');
+                showToast(id ? 'Ressource modifiée ✓' : 'Ressource créée ✓');
+                await loadResources();
+                await updateStats();
+            } else {
+                showToast('Erreur lors de l\'opération', 'error');
+            }
+        });
+
+        // ============================================================
+        // CRUD: REGISTRATIONS
+        // ============================================================
+        function editRegistration(id) {
+            var reg = allRegistrations.find(function(r) { return r.id === id; });
+            if (!reg) return;
+            document.getElementById('registrationId').value = reg.id;
+            document.getElementById('registrationStatus').value = reg.status || 'pending';
+            document.getElementById('registrationNotes').value = reg.notes || '';
+            openModal('registrationModal');
+        }
+
+        document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var id = document.getElementById('registrationId').value;
+            var data = {
+                status: document.getElementById('registrationStatus').value,
+                notes: document.getElementById('registrationNotes').value.trim()
+            };
+
+            var supabase = window.supabaseAuth.getSupabaseClient();
+            var { error } = await supabase.from('french_registrations').update(data).eq('id', id);
+            if (error) {
+                showToast('Erreur', 'error');
+            } else {
+                closeModal('registrationModal');
+                showToast('Inscription mise à jour ✓');
+                await loadRegistrations();
+                await updateStats();
+            }
+        });
+
+        // ============================================================
+        // CONFIRM DELETE - 处理所有删除操作
+        // ============================================================
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+            var { type, id } = deleteTarget;
+            var success = false;
+            var supabase = window.supabaseAuth.getSupabaseClient();
+
+            try {
+                switch (type) {
+                    case 'user': {
+                        var { error } = await supabase.from('french_users').delete().eq('id', id);
+                        success = !error;
+                        if (success) { await loadUsers();
+                            await updateStats();
+                            showToast('Utilisateur supprimé ✓', 'success'); }
+                        break;
+                    }
+                    case 'exam': {
+                        success = await window.supabaseAuth.deleteFrenchExam(id);
+                        if (success) { await loadExams();
+                            await updateStats();
+                            showToast('Examen supprimé ✓', 'success'); }
+                        break;
+                    }
+                    case 'cancel-course': {
+                        // 取消课程 = 状态改为 cancelled + 退还课时
+                        success = await window.supabaseAuth.deleteFrenchCourse(id); // 这个方法会退还课时
+                        if (success) {
+                            showToast('Cours annulé ✓ (课时已退还)', 'success');
+                            await loadCourses();
+                            await loadUsers();
+                            await updateStats();
+                        }
+                        break;
+                    }
+                    case 'delete-course': {
+                        // 删除课程 = 物理删除 + 退还课时
+                        success = await window.supabaseAuth.forceDeleteFrenchCourse(id);
+                        if (success) {
+                            showToast('Cours supprimé définitivement ✓', 'success');
+                            await loadCourses();
+                            await loadUsers();
+                            await updateStats();
+                        }
+                        break;
+                    }
+                    case 'resource': {
+                        var { error } = await supabase.from('french_resources').delete().eq('id', id);
+                        success = !error;
+                        if (success) { await loadResources();
+                            await updateStats();
+                            showToast('Ressource supprimée ✓', 'success'); }
+                        break;
+                    }
+                    case 'registration': {
+                        var { error } = await supabase.from('french_registrations').delete().eq('id', id);
+                        success = !error;
+                        if (success) { await loadRegistrations();
+                            await updateStats();
+                            showToast('Inscription supprimée ✓', 'success'); }
+                        break;
+                    }
+                    default: {
+                        showToast('Type non reconnu', 'error');
+                        closeConfirmDialog();
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.error('删除失败:', err);
+                showToast('Erreur lors de la suppression', 'error');
+                success = false;
+            }
+
+            closeConfirmDialog();
+            if (!success && type !== '') {
+                showToast('Erreur lors de la suppression', 'error');
+            }
+        });
+
+        // ============================================================
+        // 显示确认对话框
+        // ============================================================
+        function showConfirmDialog(message, type, id) {
+            deleteTarget = { type: type, id: id };
+            document.getElementById('confirmMessage').textContent = message;
+            document.getElementById('confirmDialog').style.display = 'flex';
+        }
+
+        // ============================================================
+        // LOGOUT
+        // ============================================================
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            sessionStorage.clear();
+            localStorage.removeItem('french_user');
+            window.location.href = 'francais.html';
+        });
+
+        // ============================================================
+        // START
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', init);
+
+        // 暴露全局函数
+        window.openAddUserModal = openAddUserModal;
+        window.openAddExamModal = openAddExamModal;
+        window.openAddCourseModal = openAddCourseModal;
+        window.openAddResourceModal = openAddResourceModal;
+        window.openStatusModal = openStatusModal;
+        window.editUser = editUser;
+        window.editExam = editExam;
+        window.editCourse = editCourse;
+        window.editResource = editResource;
+        window.editRegistration = editRegistration;
+        window.closeModal = closeModal;
+        window.showConfirmDialog = showConfirmDialog;
+        window.closeConfirmDialog = closeConfirmDialog;
+    </script>
+</body>
+</html>

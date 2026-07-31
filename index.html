@@ -1,484 +1,219 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Examen Civique Français - Association Mille Voiles</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="index.css">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#004080">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Examen Civique">
-    <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
-    <meta name="msapplication-TileColor" content="#004080">
-    <meta name="msapplication-TileImage" content="/icons/icon-144x144.png">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Examen Civique">
-    <script>
-        if (window.matchMedia('(display-mode: standalone)').matches) {
-            document.documentElement.classList.add('pwa-mode');
-        }
-    </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Mille Voiles · 千帆协会</title>
+  <link rel="stylesheet" href="index_style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="language-toggle">
-        <button class="lang-btn active" id="langFr" onclick="switchLanguage('fr')">
-            <i class="fas fa-language"></i> FR
-        </button>
-        <button class="lang-btn" id="langZh" onclick="switchLanguage('zh')">
-            <i class="fas fa-language"></i> 中文
-        </button>
+
+<!-- LANGUAGE TOGGLE -->
+<div class="lang-toggle">
+  <button class="lang-btn active" id="langFr" onclick="switchLanguage('fr')"><i class="fas fa-globe"></i> FR</button>
+  <button class="lang-btn" id="langZh" onclick="switchLanguage('zh')"><i class="fas fa-globe"></i> 中文</button>
+</div>
+
+<!-- HEADER -->
+<header class="main-header">
+  <div class="container">
+    <div class="header-inner">
+      <div class="header-logo">
+        <img src="icons/logo.png" alt="Mille Voiles" class="header-logo-img">
+      </div>
+      <div class="header-title">
+        <h1><span id="titleMain">Association Mille Voiles</span></h1>
+        <p class="subhead" id="slogan">Intégration · Formation · Innovation</p>
+        <p class="subhead-zh" id="sloganZh">融入 · 培训 · 创新</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- NAVIGATION -->
+<nav class="main-nav">
+  <div class="container">
+    <div class="nav-inner">
+      <div class="nav-brand"><i class="fas fa-sailboat"></i> Mille Voiles</div>
+      <div class="nav-links">
+        <a href="#accueil" class="active"><i class="fas fa-home"></i> <span id="navHome">Accueil</span></a>
+        <a href="#presentation"><i class="fas fa-info-circle"></i> <span id="navAbout">Association</span></a>
+        <a href="#piliers"><i class="fas fa-th-large"></i> <span id="navServices">Nos pôles</span></a>
+        <a href="#contact"><i class="fas fa-envelope"></i> <span id="navContact">Contact</span></a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="accueil">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="hero-text">
+        <span class="hero-tag" id="heroTag">🇫🇷 Association Franco-Chinoise</span>
+        <h2 id="heroTitle">Bienvenue chez <br><span class="highlight">Mille Voiles</span></h2>
+        <p id="heroDesc">Association franco-chinoise dédiée à l'intégration, la formation linguistique et l'innovation numérique. Nous accompagnons les communautés vers la réussite en France.</p>
+        <div class="hero-buttons">
+          <a href="#piliers" class="btn-primary"><i class="fas fa-rocket"></i> <span id="heroBtn1">Découvrir nos pôles</span></a>
+          <a href="#contact" class="btn-secondary"><i class="fas fa-envelope"></i> <span id="heroBtn2">Nous contacter</span></a>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="hero-image-wrapper">
+          <img src="icons/logo.png" alt="Mille Voiles" class="hero-logo-img">
+          <div class="floating-badge">
+            <i class="fas fa-award"></i>
+            <span id="heroBadge">Depuis 2025</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="presentation">
+  <div class="container">
+    <div class="section-label">
+      <span class="label-tag" id="aboutTag">À PROPOS</span>
+      <h2 id="aboutTitle">Qui sommes-nous ?</h2>
+      <p id="aboutSub">Découvrez notre histoire, notre mission et nos valeurs</p>
     </div>
 
-    <header class="main-header">
-        <div class="container">
-            <h1 id="mainTitle">Examen Civique Français</h1>
-            <p id="mainSubtitle">Association Mille Voiles / 千帆协会 - Préparation à l'examen civique obligatoire 2026</p>
+    <div class="about-card">
+      <div class="about-text">
+        <p id="aboutP1"><strong>Mille Voiles / 千帆协会</strong> est une association loi 1901 créée à Paris en 2025. Notre mission : faciliter l'intégration des communautés chinoises en France à travers la formation civique, l'apprentissage du français et l'accès aux nouvelles technologies.</p>
+        <p id="aboutP2">Nous proposons des cursus adaptés : préparation à l'examen civique obligatoire, cours de français intensifs, et ateliers en intelligence artificielle & programmation. Notre équipe pluridisciplinaire allie expertise pédagogique et connaissance des enjeux interculturels.</p>
+        <p id="aboutP3">L'association s'engage à offrir un accompagnement personnalisé à chaque membre, en proposant des formations de qualité qui répondent aux exigences des institutions françaises et aux besoins spécifiques de la communauté chinoise.</p>
+      </div>
+      <div class="about-values">
+        <span class="value-tag"><i class="fas fa-handshake"></i> <span id="value1">Solidarité</span></span>
+        <span class="value-tag"><i class="fas fa-graduation-cap"></i> <span id="value2">Excellence</span></span>
+        <span class="value-tag"><i class="fas fa-users"></i> <span id="value3">Inclusion</span></span>
+        <span class="value-tag"><i class="fas fa-lightbulb"></i> <span id="value4">Innovation</span></span>
+        <span class="value-tag"><i class="fas fa-globe-asia"></i> <span id="value5">Franco-Chinois</span></span>
+      </div>
+      <div class="about-stats">
+        <div class="stat-item">
+          <span class="stat-number">2025</span>
+          <span class="stat-label" id="stat1Label">Année de création</span>
         </div>
-    </header>
-
-    <nav class="main-nav">
-        <div class="container nav-container">
-            <button class="hamburger" id="hamburgerBtn">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <a href="#" class="logo">
-                <img src="/icons/icon-192x192.png" alt="Mille Voiles" style="height: 50px; width: auto; margin-right: 5px;">
-                <span id="logoText">Mille Voiles</span>
-            </a>
-            <div class="nav-links" id="navLinks">
-                <a href="#accueil" id="navHome">Accueil</a>
-                <a href="#tests" id="navTests">Tests en ligne</a>
-                <a href="#thematiques" id="navThemes">Thématiques</a>
-                <a href="#politique" id="navPolicy">Nouvelle politique</a>
-                <a href="#faq" id="navFAQ">FAQ</a>
-                <a href="#contact" id="navContact">Contact</a>
-                <a href="#" id="navLogin" onclick="openLoginModal()">
-                    <span id="navLoginText">Connexion</span>
-                </a>
-                <div class="user-info" id="userInfo" style="display: none;">
-                    <i class="fas fa-user-circle"></i>
-                    <span id="welcomeMessage"></span>
-                    <button class="user-menu-btn" onclick="toggleUserMenu()">
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="user-dropdown" id="userDropdown">
-                        <a href="#" onclick="showProfileModal()"><i class="fas fa-user-cog"></i> <span id="profileMenuItem">Mon profil</span></a>
-                        <div id="roleBasedMenu"></div>
-                        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span id="logoutMenuItem">Déconnexion</span></a>
-                    </div>
-                </div>
-            </div>
+        <div class="stat-item">
+          <span class="stat-number">4</span>
+          <span class="stat-label" id="stat2Label">Pôles d'activité</span>
         </div>
-    </nav>
-
-    <section class="hero" id="accueil">
-        <div class="container">
-            <h2 id="heroTitle">Préparez-vous à l'examen civique 2026</h2>
-            <p id="heroText">À partir du 1er janvier 2026, tous les étrangers souhaitant obtenir une carte de séjour pluriannuelle, une carte de résident ou la naturalisation française devront réussir un examen civique. Préparez-vous dès maintenant avec nos tests en ligne.</p>
-            <a href="#tests" class="btn btn-primary" id="heroBtn">Commencer maintenant</a>
+        <div class="stat-item">
+          <span class="stat-number">98%</span>
+          <span class="stat-label" id="stat3Label">Taux de réussite</span>
         </div>
-    </section>
-
-    <section class="test-cards" id="tests">
-        <div class="container">
-            <div class="section-title">
-                <h2 id="testsTitle">Choisissez votre test</h2>
-                <p id="testsSubtitle">Trois options adaptées à vos besoins : test gratuit, test officiel ou test complet pour nos étudiants</p>
-            </div>
-            <div class="cards-container">
-                <div class="test-card">
-                    <div class="card-header">
-                        <h3 id="freeTestTitle">Test Gratuit</h3>
-                        <div class="card-price" id="freeTestPrice">GRATUIT</div>
-                        <p id="freeTestDesc">Évaluation de niveau</p>
-                    </div>
-                    <div class="card-body">
-                        <ul class="features-list">
-                            <li><i class="fas fa-check"></i> <span id="feature1">20 questions adaptatives</span></li>
-                            <li><i class="fas fa-check"></i> <span id="feature2">Durée : 20 minutes</span></li>
-                            <li><i class="fas fa-check"></i> <span id="feature3">Correction immédiate</span></li>
-                            <li><i class="fas fa-check"></i> <span id="feature4">Recommandation de cours</span></li>
-                            <li><i class="fas fa-check"></i> <span id="feature5">Sans engagement</span></li>
-                        </ul>
-                        <div class="password-info">
-                            <p id="passwordInfoFree"><i class="fas fa-key"></i> <strong>Accès protégé :</strong> Pour obtenir le mot de passe, contactez-nous à <a href="mailto:2025qianfan@gmail.com" id="contactEmailFree">2025qianfan@gmail.com</a></p>
-                        </div>
-                        <a href="test-gratuit.html" class="btn btn-primary" id="freeTestBtn"><i class="fas fa-play-circle"></i> Commencer le test</a>
-                    </div>
-                </div>
-                <div class="test-card">
-                    <div class="card-header" style="background-color: var(--orange);">
-                        <h3 id="annalesTestTitle">Test officiel</h3>
-                        <div class="card-price" id="annalesTestPrice">ACCÈS LIMITÉ</div>
-                        <p id="annalesTestDesc">Sujets d'examen réels</p>
-                    </div>
-                    <div class="card-body">
-                        <ul class="features-list">
-                            <li><i class="fas fa-check"></i> <span id="annalesFeature1">20 questions officielles</span></li>
-                            <li><i class="fas fa-check"></i> <span id="annalesFeature2">Correction immédiate</span></li>
-                            <li><i class="fas fa-check"></i> <span id="annalesFeature3">Explications détaillées</span></li>
-                            <li><i class="fas fa-check"></i> <span id="annalesFeature4">Statistiques de réussite</span></li>
-                            <li><i class="fas fa-check"></i> <span id="annalesFeature5">Renouvelé mensuellement</span></li>
-                        </ul>
-                        <div class="password-info">
-                            <p id="passwordInfoAnnales"><i class="fas fa-key"></i> <strong>Accès protégé :</strong> Mot de passe disponible après inscription (contactez-nous)</p>
-                        </div>
-                        <a href="#" class="btn btn-orange protected-link" id="annalesTestBtn" data-page="test-officiel" data-href="test-annales.html" data-needs-auth="true" data-needs-userinfo="true"><i class="fas fa-play-circle"></i> Commencer le test</a>
-                    </div>
-                </div>
-                <div class="test-card">
-                    <div class="card-header" style="background-color: var(--green);">
-                        <h3 id="studentTestTitle">Test Étudiant</h3>
-                        <div class="card-price" id="studentTestPrice">ACCÈS LIMITÉ</div>
-                        <p id="studentTestDesc">Pour nos étudiants inscrits</p>
-                    </div>
-                    <div class="card-body">
-                        <ul class="features-list">
-                            <li><i class="fas fa-check"></i> <span id="feature6">40 questions conformes</span></li>
-                            <li><i class="fas fa-check"></i> <span id="feature7">Durée : 45 minutes</span></li>
-                            <li><i class="fas fa-check"></i> <span id="feature8">Simulation réelle</span></li>
-                            <li><i class="fas fa-check"></i> <span id="feature9">2000 questions de type examen</span></li>
-                            <li><i class="fas fa-check"></i> <span id="feature10">Révision des erreurs</span></li>
-                        </ul>
-                        <div class="password-info">
-                            <p id="passwordInfoStudent"><i class="fas fa-lock"></i> <strong>Accès réservé :</strong> Mot de passe fourni après inscription aux cours de l'association</p>
-                        </div>
-                        <a href="#" class="btn btn-success protected-link" id="studentTestBtn" data-page="test-etudiant" data-href="test-etudiant.html" data-needs-auth="true" data-needs-userinfo="true"><i class="fas fa-play-circle"></i> Commencer le test</a>
-                    </div>
-                </div>
-            </div>
+        <div class="stat-item">
+          <span class="stat-number">50+</span>
+          <span class="stat-label" id="stat4Label">Membres actifs</span>
         </div>
-    </section>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <section class="policy-content" id="thematiques">
-        <div class="container">
-            <div class="section-title">
-                <h2 id="themesTitle">Thématiques de l'examen</h2>
-                <p id="themesSubtitle">Les 5 thématiques principales que vous devrez maîtriser pour réussir l'examen civique</p>
-            </div>
-            <div class="themes-grid">
-                <a href="#" class="theme-card protected-link" data-page="thematique" data-href="thematique-valeurs.html" data-needs-auth="true" data-needs-userinfo="true">
-                    <div class="theme-icon"><i class="fas fa-flag"></i></div>
-                    <h3 id="theme1">Principes et valeurs</h3>
-                    <p id="theme1Desc">La devise et les symboles de la République, la laïcité, les valeurs fondamentales de la France.</p>
-                    <div class="theme-link"><span id="link1Text">En savoir plus</span><i class="fas fa-arrow-right"></i></div>
-                </a>
-                <a href="#" class="theme-card protected-link" data-page="thematique" data-href="thematique-institutions.html" data-needs-auth="true" data-needs-userinfo="true">
-                    <div class="theme-icon"><i class="fas fa-landmark"></i></div>
-                    <h3 id="theme2">Institutions</h3>
-                    <p id="theme2Desc">Organisation de la République française, l'Union européenne et ses institutions politiques.</p>
-                    <div class="theme-link"><span id="link2Text">En savoir plus</span><i class="fas fa-arrow-right"></i></div>
-                </a>
-                <a href="#" class="theme-card protected-link" data-page="thematique" data-href="thematique-droits.html" data-needs-auth="true" data-needs-userinfo="true">
-                    <div class="theme-icon"><i class="fas fa-balance-scale"></i></div>
-                    <h3 id="theme3">Droits et devoirs</h3>
-                    <p id="theme3Desc">Les droits fondamentaux, les obligations et devoirs des personnes résidant en France.</p>
-                    <div class="theme-link"><span id="link3Text">En savoir plus</span><i class="fas fa-arrow-right"></i></div>
-                </a>
-                <a href="#" class="theme-card protected-link" data-page="thematique" data-href="thematique-culture.html" data-needs-auth="true" data-needs-userinfo="true">
-                    <div class="theme-icon"><i class="fas fa-theater-masks"></i></div>
-                    <h3 id="theme4">Culture française</h3>
-                    <p id="theme4Desc">L'Histoire, la géographie et la culture françaises, patrimoine culturel national.</p>
-                    <div class="theme-link"><span id="link4Text">En savoir plus</span><i class="fas fa-arrow-right"></i></div>
-                </a>
-                <a href="#" class="theme-card protected-link" data-page="thematique" data-href="thematique-societe.html" data-needs-auth="true" data-needs-userinfo="true">
-                    <div class="theme-icon"><i class="fas fa-users"></i></div>
-                    <h3 id="theme5">Vie sociale</h3>
-                    <p id="theme5Desc">L'autorité parentale, système éducatif, travail en France et services publics.</p>
-                    <div class="theme-link"><span id="link5Text">En savoir plus</span><i class="fas fa-arrow-right"></i></div>
-                </a>
-            </div>
-        </div>
-    </section>
+<!-- PILIERS -->
+<section id="piliers">
+  <div class="container">
+    <div class="section-label">
+      <span class="label-tag" id="pilierTag">NOS PÔLES</span>
+      <h2 id="pilierTitle">Quatre pôles d'excellence</h2>
+      <p id="pilierSub">Des formations conçues pour répondre aux besoins de la communauté francophone et sinophone</p>
+    </div>
 
-    <section class="policy-content" id="politique">
-        <div class="container">
-            <div class="article-content">
-                <div class="article-header">
-                    <h2 id="articleTitle">Un nouvel examen civique pour les étrangers souhaitant s'installer en France</h2>
-                    <div class="article-meta">
-                        <span><i class="far fa-calendar"></i> <span id="articleDate">Publié le 18 décembre 2025</span></span>
-                        <span><i class="fas fa-building"></i> <span id="articleSource">Service Public / Direction de l'information légale et administrative (Premier ministre)</span></span>
-                    </div>
-                </div>
-                <div class="article-image">
-                    <img src="https://www.leparisien.fr/resizer/ZnvsKA9JRhRoUFUhp0qZyQ7cqVY=/932x582/cloudfront-eu-central-1.images.arcpublishing.com/leparisien/KH3X37UNKRGUPI5PA6NZ3DX7UQ.jpg" alt="Examen civique en France" id="articleImage">
-                    <div class="image-caption">
-                        <span id="imageCaption">Examen civique - Nouvelle exigence pour les étrangers souhaitant s'installer en France</span>
-                        <br>
-                        <span class="image-citation" id="imageCitation">Crédit: LP/ Jean-Baptiste Quentin</span>
-                    </div>
-                </div>
-                <div class="content-section">
-                    <p id="introPara">Pour obtenir une carte de séjour pluriannuelle, une carte de résident ou la naturalisation française, les étrangers devront avoir réussi un examen civique à compter du 1er janvier 2026. Ce test vise notamment à évaluer leur connaissance des principes et valeurs de la République, ainsi que des droits et devoirs des personnes résidant en France.</p>
-                </div>
-                <div class="content-section">
-                    <h3 id="section1Title">Contexte légal</h3>
-                    <p id="section1Text1">La loi du 26 janvier 2024 pour contrôler l'immigration, améliorer l'intégration a notamment créé un examen civique.</p>
-                    <p id="section1Text2">Cette épreuve, d'une durée de 45 minutes maximum et réalisée sur support numérique, se présente sous la forme d'un questionnaire à choix multiples (QCM) comprenant 40 questions (28 questions de connaissances générales et 12 questions de mises en situation) ; à chaque fois, une seule réponse est correcte parmi les 4 options proposées. Pour valider l'examen, il faut avoir obtenu au moins 32 bonnes réponses (soit 80 % de réussite).</p>
-                </div>
-                <div class="content-section">
-                    <h3 id="section2Title">Qui est concerné ?</h3>
-                    <p id="section2Text1">À partir du 1er janvier 2026, la réussite à cet examen sera obligatoire pour :</p>
-                    <div class="highlight-box">
-                        <h4 id="highlight1Title">Obligations à partir du 1er janvier 2026 :</h4>
-                        <ul style="list-style: none; padding-left: 0;">
-                            <li id="obligation1">• Obtenir la naturalisation française</li>
-                            <li id="obligation2">• Acquérir un titre de séjour pluriannuel (carte de séjour pluriannuelle ou carte de résident), si vous êtes un ressortissant d'un pays non-membre de l'Union européenne</li>
-                        </ul>
-                    </div>
-                    <div class="highlight-box" style="background-color: rgba(39, 174, 96, 0.05); border-left-color: var(--green);">
-                        <h4 id="highlight2Title">Exceptions :</h4>
-                        <ul style="list-style: none; padding-left: 0;">
-                            <li id="exception1">• Vous n'aurez pas à passer l'examen civique si vous demandez le renouvellement de votre carte de séjour pluriannuelle ou de votre carte de résident</li>
-                            <li id="exception2">• Vous n'êtes pas concerné par cet examen si vous êtes bénéficiaire d'une protection internationale, notamment</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="content-section">
-                    <h3 id="section3Title">Quand passer l'examen civique ?</h3>
-                    <p id="section3Text1">L'examen civique devra être passé avant le dépôt de la demande de titre de séjour ou de naturalisation.</p>
-                    <p id="section3Text2">Pour les personnes souhaitant obtenir un titre de séjour pluriannuel, l'examen interviendra obligatoirement en conclusion d'une formation civique (d'une durée de 24 heures, réparties sur 4 jours). Actuellement, cette formation est suivie par les étrangers après l'obtention de leur titre de séjour, dans le cadre de leur contrat d'intégration républicaine. À compter du 1er janvier 2026, ils devront donc suivre cette formation avant l'obtention de leur titre de séjour.</p>
-                    <div class="highlight-box">
-                        <h4 id="highlight3Title">Important :</h4>
-                        <p id="highlight3Text">L'attestation de réussite à l'examen civique n'aura pas une durée de validité limitée.</p>
-                    </div>
-                </div>
-                <div class="content-section">
-                    <h3 id="section4Title">Thématiques de l'examen</h3>
-                    <p id="section4Text">Chaque QCM composant l'examen civique comprendra des questions sur les 5 thématiques étudiées lors de la formation civique :</p>
-                    <p id="resourceText" style="margin-top: 30px; font-style: italic;">Vous pouvez trouver des fiches pour préparer l'examen civique, et prendre connaissance des centres agréés au sein desquels il est possible de passer l'examen sur le site formation-civique.interieur.gouv.fr.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    <div class="cards-grid cards-grid-4">
+      <!-- Carte 1 : Examen civique - Bleu -->
+      <div class="card-pilier blue-card">
+        <div class="card-icon blue"><i class="fas fa-landmark"></i></div>
+        <h3 id="card1Title">Examen civique</h3>
+        <p id="card1Desc">Préparation complète au nouvel examen obligatoire (2026) : QCM, mises en situation, cours thématiques.</p>
+        <a href="#" class="card-btn blue-btn" data-page="examen-civique">
+          <span id="card1Btn">Accéder au test</span> <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
 
-    <section class="faq-section" id="faq">
-        <div class="container">
-            <div class="section-title">
-                <h2 id="faqTitle">Questions fréquentes</h2>
-                <p id="faqSubtitle">Trouvez rapidement des réponses à vos questions sur le nouvel examen civique</p>
-            </div>
-            <div class="faq-container">
-                <div class="faq-item" data-id="1">
-                    <div class="faq-question"><span id="faq1Q">Qui doit passer l'examen civique ?</span><i class="fas fa-chevron-down"></i></div>
-                    <div class="faq-answer">
-                        <div id="faq1AFr"><p>À partir du 1er janvier 2026, tous les étrangers non-ressortissants de l'UE souhaitant obtenir une carte de séjour pluriannuelle, une carte de résident ou la naturalisation française devront passer et réussir l'examen civique.</p></div>
-                        <div id="faq1AZh" style="display: none;"><p>从2026年1月1日起，所有希望获得多年居留卡、长期居留卡或法国国籍的非欧盟外国人都必须参加并通过公民考试。</p></div>
-                    </div>
-                </div>
-                <div class="faq-item" data-id="2">
-                    <div class="faq-question"><span id="faq2Q">Combien de questions dans l'examen officiel ?</span><i class="fas fa-chevron-down"></i></div>
-                    <div class="faq-answer">
-                        <div id="faq2AFr"><p>L'examen officiel comprend 40 questions : 28 questions de connaissances générales et 12 questions de mises en situation. Pour réussir, il faut obtenir au moins 32 bonnes réponses (80%).</p></div>
-                        <div id="faq2AZh" style="display: none;"><p>官方考试包括40道题：28道一般知识题和12道情境题。要通过考试，必须获得至少32个正确答案（80%）。</p></div>
-                    </div>
-                </div>
-                <div class="faq-item" data-id="3">
-                    <div class="faq-question"><span id="faq3Q">L'examen civique remplace-t-il le test de langue ?</span><i class="fas fa-chevron-down"></i></div>
-                    <div class="faq-answer">
-                        <div id="faq3AFr"><p>Non, l'examen civique est un nouvel examen supplémentaire. Pour la naturalisation ou certains titres de séjour, vous devez toujours prouver votre maîtrise du français.</p></div>
-                        <div id="faq3AZh" style="display: none;"><p>不，公民考试是一项新增的考试。对于入籍或某些居留许可，您仍然需要证明您的法语水平。</p></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+      <!-- Carte 2 : Français - Orange -->
+      <div class="card-pilier orange-card">
+        <div class="card-icon orange"><i class="fas fa-language"></i></div>
+        <h3 id="card2Title">Français · FLE</h3>
+        <p id="card2Desc">Cours de français intensifs, ateliers de conversation, préparation DELF/DALF et français sur objectifs spécifiques.</p>
+        <a href="#" class="card-btn orange-btn" data-page="francais">
+          <span id="card2Btn">Voir les cours</span> <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
 
+      <!-- Carte 3 : IA - Vert -->
+      <div class="card-pilier green-card">
+        <div class="card-icon green"><i class="fas fa-robot"></i></div>
+        <h3 id="card3Title">IA & Computer Science</h3>
+        <p id="card3Desc">Ateliers programmation, initiation à l'intelligence artificielle, data science et outils numériques pour tous.</p>
+        <a href="#" class="card-btn green-btn" data-page="ia">
+          <span id="card3Btn">Découvrir</span> <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+
+      <!-- Carte 4 : 中文培训 - Rouge -->
+      <div class="card-pilier red-card">
+        <div class="card-icon red"><i class="fas fa-globe-asia"></i></div>
+        <h3 id="card4Title">中文培训 · Chinois</h3>
+        <p id="card4Desc">Cours de chinois mandarin pour tous niveaux : initiation, conversation, préparation aux examens HSK et chinois des affaires.</p>
+        <a href="#" class="card-btn red-btn" data-page="chinois">
+          <span id="card4Btn">Découvrir</span> <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
 <footer class="main-footer" id="contact">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-column">
-                <h4 id="footerAbout">À propos</h4>
-                <p id="footerAboutText">L'association Mille Voiles accompagne les communautés chinoises en France dans leurs démarches d'intégration, d'apprentissage du français et de préparation aux examens officiels.</p>
-            </div>
-            <div class="footer-column">
-                <h4 id="footerLinks">Liens rapides</h4>
-                <ul class="footer-links">
-                    <li><a href="#accueil"><i class="fas fa-chevron-right"></i> <span id="footerLink1">Accueil</span></a></li>
-                    <li><a href="#tests"><i class="fas fa-chevron-right"></i> <span id="footerLink2">Tests en ligne</span></a></li>
-                    <li><a href="#thematiques"><i class="fas fa-chevron-right"></i> <span id="footerLink3">Thématiques</span></a></li>
-                    <li><a href="#politique"><i class="fas fa-chevron-right"></i> <span id="footerLink4">Nouvelle politique</span></a></li>
-                    <li><a href="#faq"><i class="fas fa-chevron-right"></i> <span id="footerLink5">FAQ</span></a></li>
-                    
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h4 id="footerContact">Contact</h4>
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <span id="footerEmail">2025qianfan@gmail.com</span>
-                    </div>
-                    <div class="contact-item" onclick="copyWechat()" style="cursor: pointer;">
-                        <i class="fab fa-weixin"></i>
-                        <span id="footerWechat">WeChat: qfparis</span>
-                        <i class="fas fa-copy" style="font-size: 0.8rem; margin-left: 8px; opacity: 0.7;"></i>
-                    </div>
-                    <div class="contact-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span id="footerAddress">Association enregistrée à Paris</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p id="footerCopyright">&copy; 2025 Association Mille Voiles / 千帆协会 - Tous droits réservés.</p>
-        </div>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4><i class="fas fa-sailboat"></i> Mille Voiles</h4>
+        <p id="footerAbout">Association d'intégration et de formation</p>
+        <p><i class="fas fa-map-pin"></i> <span id="footerAddr">Paris, France</span></p>
+        <p><i class="fas fa-calendar-alt"></i> <span id="footerYear">Fondée en 2025</span></p>
+      </div>
+      <div class="footer-col">
+        <h4 id="footerContactTitle">Contact</h4>
+        <div class="contact-item"><i class="fas fa-envelope"></i> <a href="mailto:qf2025qianfan@gmail.com">qf2025qianfan@gmail.com</a></div>
+        <div class="contact-item"><i class="fab fa-weixin"></i> <span>WeChat: qfparis</span></div>
+        <div class="contact-item"><i class="fab fa-linkedin"></i> <a href="https://www.linkedin.com/company/association-mille-voiles/" target="_blank">LinkedIn</a></div>
+      </div>
+      <div class="footer-col">
+        <h4 id="footerNavTitle">Navigation</h4>
+        <a href="#accueil"><i class="fas fa-chevron-right"></i> <span id="fNav1">Accueil</span></a>
+        <a href="#presentation"><i class="fas fa-chevron-right"></i> <span id="fNav2">Association</span></a>
+        <a href="#piliers"><i class="fas fa-chevron-right"></i> <span id="fNav3">Nos pôles</span></a>
+        <a href="#contact"><i class="fas fa-chevron-right"></i> <span id="fNav4">Contact</span></a>
+      </div>
     </div>
+    <div class="footer-bottom">
+      <span id="footerCopy">© 2025-2026 Mille Voiles · Tous droits réservés</span>
+      <span class="sep">|</span>
+      <span id="footerCopyZh">千帆协会 版权所有</span>
+    </div>
+  </div>
 </footer>
 
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="loginModalTitle">Connexion Élève</h3>
-                <button class="close-modal" onclick="closeLoginModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="loginForm" class="login-form" onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label><i class="fas fa-user"></i><span id="nameLabel">Nom d'utilisateur</span></label>
-                        <input type="text" id="loginName" required placeholder="Entrez votre nom" autocomplete="off">
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-lock"></i><span id="passwordLabel">Mot de passe</span></label>
-                        <input type="password" id="loginPassword" required placeholder="Entrez votre mot de passe">
-                    </div>
-                    <div id="loginError" class="login-error" style="display: none;"><i class="fas fa-exclamation-circle"></i><span id="errorMessage">Nom d'utilisateur ou mot de passe incorrect</span></div>
-                    <button type="submit" class="btn btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i><span id="loginBtnText">Se connecter</span></button>
-                </form>
-                <div class="login-footer"><p id="loginHelp">Contactez l'association si vous n'avez pas de compte</p></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="profileModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="profileModalTitle">Mon Profil</h3>
-                <button class="close-modal" onclick="closeProfileModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="profileForm" class="login-form" onsubmit="updateProfile(event)">
-                    <div class="profile-info-section">
-                        <h4 id="infoSectionTitle">Informations du compte</h4>
-                        <div class="form-group"><label><i class="fas fa-user-tag"></i><span id="typeLabel">Type</span></label><input type="text" id="profileType" readonly class="readonly-field"></div>
-                        <div class="form-group"><label><i class="fas fa-clock"></i><span id="expiryLabel">Accès jusqu'au</span></label><input type="text" id="profileExpiry" readonly class="readonly-field"></div>
-                        <div class="form-group"><label><i class="fas fa-user"></i><span id="usernameLabel">Nom d'utilisateur</span></label><input type="text" id="profileUsername" readonly class="readonly-field"></div>
-                    </div>
-                    <div class="profile-edit-section">
-                        <h4 id="editSectionTitle">Modifier mon mot de passe</h4>
-                        <div class="form-group"><label><i class="fas fa-lock"></i><span id="currentPasswordLabel">Mot de passe actuel</span></label><input type="password" id="currentPassword" required placeholder="Entrez votre mot de passe actuel"></div>
-                        <div class="form-group"><label><i class="fas fa-lock"></i><span id="newPasswordLabel">Nouveau mot de passe</span></label><input type="password" id="newPassword" required placeholder="Entrez votre nouveau mot de passe" minlength="6"></div>
-                        <div class="form-group"><label><i class="fas fa-lock"></i><span id="confirmPasswordLabel">Confirmer le mot de passe</span></label><input type="password" id="confirmPassword" required placeholder="Confirmez votre nouveau mot de passe"></div>
-                    </div>
-                    <div id="profileError" class="login-error" style="display: none;"><i class="fas fa-exclamation-circle"></i><span id="profileErrorMessage"></span></div>
-                    <div id="profileSuccess" class="login-success" style="display: none;"><i class="fas fa-check-circle"></i><span id="profileSuccessMessage">Mot de passe mis à jour avec succès</span></div>
-                    <div class="profile-actions">
-                        <button type="submit" class="btn btn-primary" id="updateProfileBtn"><i class="fas fa-save"></i><span id="updateBtnText">Mettre à jour</span></button>
-                        <button type="button" class="btn btn-secondary" onclick="closeProfileModal()" id="cancelBtn"><i class="fas fa-times"></i><span id="cancelBtnText">Annuler</span></button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="toast-container" id="toastContainer"></div>
-    <div id="pwa-install-button" class="pwa-install-btn" style="display: none;"><button onclick="showInstallGuide()" class="install-btn"><i class="fas fa-download"></i><span id="installBtnText">Installer l'app</span></button></div>
-   <div id="pwa-install-guide" class="pwa-install-guide" style="display: none;">
-    <div class="install-guide-content">
-        <div class="install-header">
-            <h3 id="installGuideTitle">Installer l'application</h3>
-            <button class="close-guide" onclick="closeInstallGuide()">&times;</button>
-        </div>
-        <div class="install-body">
-            <div class="device-selector">
-                <button class="device-btn active" id="iosBtn" onclick="showInstructions('ios')">
-                    <i class="fab fa-apple"></i> iOS
-                </button>
-                <button class="device-btn" id="androidBtn" onclick="showInstructions('android')">
-                    <i class="fab fa-android"></i> Android
-                </button>
-            </div>
-            
-            <div id="ios-instructions" class="instructions active">
-                <div class="install-step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h4 id="iosStep1">Ouvrez Safari</h4>
-                        <p id="iosStep1Desc">Accédez à cette page via Safari sur votre iPhone</p>
-                    </div>
-                </div>
-                <div class="install-step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h4 id="iosStep2">Cliquez sur "Partager"</h4>
-                        <p id="iosStep2Desc">Appuyez sur l'icône <i class="fas fa-share"></i> en bas de l'écran</p>
-                    </div>
-                </div>
-                <div class="install-step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h4 id="iosStep3">Ajouter à l'écran d'accueil</h4>
-                        <p id="iosStep3Desc">Faites défiler et sélectionnez "Sur l'écran d'accueil"</p>
-                    </div>
-                </div>
-                <div class="install-step">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <h4 id="iosStep4">Confirmer l'installation</h4>
-                        <p id="iosStep4Desc">Appuyez sur "Ajouter" en haut à droite</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="android-instructions" class="instructions">
-                <div class="install-step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h4 id="androidStep1">Ouvrez Chrome</h4>
-                        <p id="androidStep1Desc">Accédez à cette page via Chrome sur votre Android</p>
-                    </div>
-                </div>
-                <div class="install-step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h4 id="androidStep2">Menu des options</h4>
-                        <p id="androidStep2Desc">Appuyez sur les trois points <i class="fas fa-ellipsis-v"></i> en haut à droite</p>
-                    </div>
-                </div>
-                <div class="install-step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h4 id="androidStep3">Installer l'app</h4>
-                        <p id="androidStep3Desc">Sélectionnez "Ajouter à l'écran d'accueil" ou "Installer l'application"</p>
-                    </div>
-                </div>
-                <div class="install-step">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <h4 id="androidStep4">Confirmer</h4>
-                        <p id="androidStep4Desc">Appuyez sur "Installer" pour confirmer</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="install-footer">
-            <button class="btn btn-primary" onclick="installPWA()" id="installPwaBtn">Installer maintenant</button>
-            <button class="btn" onclick="closeInstallGuide()" id="closeGuideBtn">Fermer</button>
-        </div>
-    </div>
+<!-- MODAL -->
+<div class="modal-overlay" id="developingModal" style="display: none;">
+  <div class="modal-container">
+    <div class="modal-icon"><i class="fas fa-code"></i></div>
+    <h3 id="devTitle">En développement</h3>
+    <p id="devMsg">Cette section est en cours de développement. Revenez bientôt !</p>
+    <button class="modal-btn" onclick="closeDevelopingModal()">
+      <i class="fas fa-check"></i> <span id="devBtn">Fermer</span>
+    </button>
+  </div>
 </div>
-    <div id="offline-notice" class="offline-notice" style="display: none;"><div class="offline-content"><i class="fas fa-wifi-slash"></i><span id="offlineText">Mode hors ligne - Vous pouvez continuer à utiliser l'application</span></div></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
-    <script src="index.js"></script>
+<script src="index_script.js"></script>
 </body>
 </html>

@@ -521,12 +521,12 @@ body {
         function getTeacherFromToken() {
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
-            if (!token) { window.location.href = 'index.html'; return null; }
+            if (!token) { window.location.href = 'examen-civique.html'; return null; }
             try {
                 const data = JSON.parse(decodeURIComponent(atob(token)));
-                if (data.role !== 'teacher') { window.location.href = 'index.html'; return null; }
+                if (data.role !== 'teacher') { window.location.href = 'examen-civique.html'; return null; }
                 return data;
-            } catch(e) { window.location.href = 'index.html'; return null; }
+            } catch(e) { window.location.href = 'examen-civique.html'; return null; }
         }
         
         // ========== 获取过滤后的课程 ==========
@@ -933,7 +933,7 @@ body {
             currentTeacher = getTeacherFromToken();
             if (!currentTeacher) return;
             document.getElementById('teacherName').textContent = currentTeacher.name;
-            document.getElementById('logoutBtn').onclick = () => window.location.href = 'index.html';
+            document.getElementById('logoutBtn').onclick = () => window.location.href = 'examen-civique.html';
             initModals();
             initFilters();
             await loadCourses();

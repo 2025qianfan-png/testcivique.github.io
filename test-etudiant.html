@@ -2330,7 +2330,7 @@
   <div class="container">
     <p>© 2026 Association Mille Voiles</p>
     <p id="footerTestInfo">Test civique - Simulation officielle</p>
-    <p><a href="index.html">Retour au site principal</a></p>
+    <p><a href="examen-civique.html">Retour au site principal</a></p>
   </div>
 </footer>
 
@@ -4072,7 +4072,7 @@ function goBackToHome() {
             document.querySelector('.test-footer').style.display = 'none';
             
             // 显示选择模态框（主页）
-             window.location.href = 'index.html';
+             window.location.href = 'examen-civique.html';
         }
     );
 }
@@ -4758,12 +4758,12 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (e) {
             console.error("Token解析失败:", e);
             alert("登录信息错误，请重新登录");
-            window.location.href = 'index.html';
+            window.location.href = 'examen-civique.html';
         }
     } else {
         // 如果没有token，返回主页
         alert("请先登录");
-        window.location.href = 'index.html';
+        window.location.href = 'examen-civique.html';
     }
     
     // 检查题库是否加载

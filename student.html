@@ -1003,12 +1003,12 @@
         async function getStudentFromToken() {
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
-            if (!token) { window.location.href = 'index.html'; return null; }
+            if (!token) { window.location.href = 'examen-civique.html'; return null; }
             try {
                 const data = JSON.parse(decodeURIComponent(atob(token)));
-                if (data.role !== 'stu') { window.location.href = 'index.html'; return null; }
+                if (data.role !== 'stu') { window.location.href = 'examen-civique.html'; return null; }
                 return data;
-            } catch(e) { window.location.href = 'index.html'; return null; }
+            } catch(e) { window.location.href = 'examen-civique.html'; return null; }
         }
         
         async function loadMyCourses() {
@@ -1158,7 +1158,7 @@
             currentStudent = await getStudentFromToken();
             if (!currentStudent) return;
             document.getElementById('studentName').textContent = currentStudent.name;
-            document.getElementById('logoutBtn').onclick = () => { sessionStorage.clear(); window.location.href = 'index.html'; };
+            document.getElementById('logoutBtn').onclick = () => { sessionStorage.clear(); window.location.href = 'examen-civique.html'; };
             updateUIText();
             initModals();
             initFilters();

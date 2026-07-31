@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Espace Intervenant - Français · FLE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --primary: #e67e22;
+            --primary-dark: #d35400;
+            --primary-light: #f39c12;
+            --primary-gradient: linear-gradient(135deg, #e67e22 0%, #f39c12 100%);
+            --green: #27ae60;
+            --red: #e74c3c;
+            --blue: #3498db;
+            --purple: #8e44ad;
+            --light-gray: #f5f7fa;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.12);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        html {
+            overflow-x: hidden;
+            width: 100%;
+        }
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: var(--light-gray);
+            color: #333;
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+        }
+
+        /* HEADER */
+        .main-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 20px 0;
+        }
+        .main-header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .main-header h1 {
+            color: white;
+            font-size: 1.5rem;
+        }
+        .main-header h1 i {
+            margin-right: 10px;
+        }
+        @media (max-width: 768px) {
+            .main-header h1 {
+                font-size: 1.2rem;
+            }
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 18px;
+            border-radius: 30px;
+        }
+        .user-info i {
+            font-size: 1.2rem;
+        }
+        .user-info .user-name {
+            font-weight: 600;
+        }
+        .logout-btn {
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+        .back-home {
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        .back-home:hover {
+            opacity: 0.8;
+        }
+        .back-home i {
+            margin-right: 6px;
+        }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        @media (max-width: 992px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+        }
+        .stat-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        .stat-card .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .stat-card .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .stat-card .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        .stat-card.orange .stat-icon,
+        .stat-card.orange .stat-number {
+            color: var(--primary);
+        }
+        .stat-card.green .stat-icon,
+        .stat-card.green .stat-number {
+            color: var(--green);
+        }
+        .stat-card.blue .stat-icon,
+        .stat-card.blue .stat-number {
+            color: var(--blue);
+        }
+        .stat-card.purple .stat-icon,
+        .stat-card.purple .stat-number {
+            color: var(--purple);
+        }
+        .stat-card.red .stat-icon,
+        .stat-card.red .stat-number {
+            color: var(--red);
+        }
+
+        /* SECTION */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .section-header h2 {
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+        .section-header .filter-group {
+            display: flex;
+            gap: 8px;
+        }
+        .filter-btn {
+            padding: 6px 16px;
+            border: 2px solid var(--primary);
+            border-radius: 30px;
+            background: transparent;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .filter-btn:hover:not(.active) {
+            background: rgba(230, 126, 34, 0.05);
+        }
+
+        /* COURSE CARD */
+        .courses-container {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .course-card {
+            border: 1px solid #eee;
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            transition: var(--transition);
+        }
+        .course-card:last-child {
+            margin-bottom: 0;
+        }
+        .course-card:hover {
+            box-shadow: var(--shadow);
+            transform: translateX(4px);
+        }
+        .course-card.cancelled {
+            opacity: 0.6;
+            background: #f9f9f9;
+        }
+        .course-card .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .course-card .course-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--primary-dark);
+        }
+        .course-card .course-status {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 3px 12px;
+            border-radius: 20px;
+        }
+        .course-status.scheduled {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+        .course-status.in_progress {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        .course-status.completed {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        .course-status.cancelled {
+            background: rgba(149, 165, 166, 0.2);
+            color: #7f8c8d;
+        }
+        .course-card .course-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #555;
+            margin: 6px 0 10px 0;
+        }
+        .course-card .course-details span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .course-card .course-details i {
+            width: 18px;
+            color: var(--primary);
+        }
+        .course-card .course-details a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+        .course-card .course-details a:hover {
+            text-decoration: underline;
+        }
+        .course-card .course-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        .action-btn {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+        .action-btn.start {
+            background: var(--green);
+            color: white;
+        }
+        .action-btn.start:hover {
+            background: #219653;
+        }
+        .action-btn.end {
+            background: var(--red);
+            color: white;
+        }
+        .action-btn.end:hover {
+            background: #c0392b;
+        }
+        .action-btn.edit {
+            background: var(--blue);
+            color: white;
+        }
+        .action-btn.edit:hover {
+            background: #2980b9;
+        }
+        .action-btn.cancel {
+            background: var(--red);
+            color: white;
+        }
+        .action-btn.cancel:hover {
+            background: #c0392b;
+        }
+        .action-btn.material {
+            background: var(--purple);
+            color: white;
+        }
+        .action-btn.material:hover {
+            background: #7d3c98;
+        }
+        .action-btn.disabled {
+            background: #ddd;
+            color: #999;
+            cursor: not-allowed;
+        }
+        .action-btn.disabled:hover {
+            transform: none;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlide 0.3s ease;
+        }
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            transition: var(--transition);
+        }
+        .close-modal:hover {
+            color: var(--red);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .cancel-btn {
+            padding: 10px 20px;
+            background: #eee;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .cancel-btn:hover {
+            background: #ddd;
+        }
+        .save-btn {
+            padding: 10px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .save-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Cancel reasons */
+        .cancel-reason-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 8px;
+        }
+        .cancel-reason-option:hover {
+            border-color: var(--primary);
+        }
+        .cancel-reason-option.selected {
+            border-color: var(--primary);
+            background: rgba(230, 126, 34, 0.05);
+        }
+        .cancel-reason-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .cancel-reason-option label {
+            cursor: pointer;
+            flex: 1;
+            font-weight: 500;
+        }
+        .custom-reason-input {
+            margin-top: 10px;
+            display: none;
+        }
+        .custom-reason-input.show {
+            display: block;
+        }
+        .custom-reason-input input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            color: white;
+            font-weight: 600;
+            z-index: 1100;
+            animation: slideInRight 0.3s ease;
+            max-width: 90%;
+        }
+        @media (max-width: 480px) {
+            .toast {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                padding: 10px 16px;
+                font-size: 0.85rem;
+            }
+        }
+        .toast-success {
+            background: var(--green);
+        }
+        .toast-error {
+            background: var(--red);
+        }
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        .empty-state i {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .course-card .course-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .course-card .course-details {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .stat-card {
+                padding: 15px;
+            }
+            .stat-card .stat-number {
+                font-size: 1.5rem;
+            }
+            .modal-content {
+                padding: 20px 16px;
+            }
+            .user-info {
+                padding: 4px 12px;
+                font-size: 0.8rem;
+            }
+            .logout-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+            .filter-btn {
+                padding: 4px 12px;
+                font-size: 0.7rem;
+            }
+            .action-btn {
+                padding: 4px 12px;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container">
+            <h1><i class="fas fa-chalkboard-user"></i> Espace Intervenant</h1>
+            <div class="header-actions">
+                <a href="francais.html" class="back-home"><i class="fas fa-arrow-left"></i> Retour</a>
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="user-name" id="teacherName">Chargement...</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 20px 0;">
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card blue">
+                <div class="stat-icon"><i class="fas fa-calendar-day"></i></div>
+                <div class="stat-number" id="statUpcoming">0</div>
+                <div class="stat-label">📅 À venir</div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-icon"><i class="fas fa-play-circle"></i></div>
+                <div class="stat-number" id="statInProgress">0</div>
+                <div class="stat-label">🔄 En cours</div>
+            </div>
+            <div class="stat-card purple">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-number" id="statCompleted">0</div>
+                <div class="stat-label">✅ Terminés</div>
+            </div>
+            <div class="stat-card orange">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-number" id="statTotalHours">0</div>
+                <div class="stat-label">📚 Heures dispensées</div>
+            </div>
+            <div class="stat-card red">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-number" id="statTotalStudents">0</div>
+                <div class="stat-label">👨‍🎓 Élèves</div>
+            </div>
+            <div class="stat-card purple">
+                <div class="stat-icon"><i class="fas fa-star"></i></div>
+                <div class="stat-number" id="statAvgRating">0</div>
+                <div class="stat-label">⭐ Note moyenne</div>
+            </div>
+        </div>
+
+        <!-- COURSES -->
+        <div class="section-header">
+            <h2><i class="fas fa-calendar-alt"></i> Mes cours</h2>
+            <div class="filter-group">
+                <button class="filter-btn active" data-filter="all">📋 Tous</button>
+                <button class="filter-btn" data-filter="upcoming">📅 À venir</button>
+                <button class="filter-btn" data-filter="past">📜 Terminés</button>
+            </div>
+        </div>
+
+        <div class="courses-container" id="coursesContainer">
+            <div style="text-align:center; padding:40px; color:#999;">
+                <i class="fas fa-spinner fa-spin" style="font-size:2rem; color:var(--primary);"></i>
+                <p>Chargement...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ===== MODALS ===== -->
+
+    <!-- EDIT MODAL -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Modifier le cours</h3>
+                <button class="close-modal" onclick="closeModal('editModal')">&times;</button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editCourseId">
+                <div class="form-group">
+                    <label><i class="fas fa-map-marker-alt"></i> Lieu</label>
+                    <input type="text" id="editLocation" placeholder="Salle, adresse...">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-video"></i> Lien Google Meet</label>
+                    <input type="url" id="editMeetingLink" placeholder="https://meet.google.com/...">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="closeModal('editModal')">Annuler</button>
+                    <button type="submit" class="save-btn"><i class="fas fa-save"></i> Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MATERIAL MODAL -->
+    <div class="modal" id="materialModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-paperclip"></i> Partager un support</h3>
+                <button class="close-modal" onclick="closeModal('materialModal')">&times;</button>
+            </div>
+            <form id="materialForm">
+                <input type="hidden" id="materialCourseId">
+                <div class="form-group">
+                    <label><i class="fas fa-link"></i> Lien du support</label>
+                    <input type="url" id="materialLink" placeholder="https://...">
+                    <small style="color:#999; font-size:0.8rem;">Les étudiants pourront consulter ce lien</small>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-comment"></i> Commentaire sur le cours</label>
+                    <textarea id="materialComment" rows="4" placeholder="Appréciation, points à améliorer, résumé du cours..."></textarea>
+                    <small style="color:#999; font-size:0.8rem;">Visible par l'étudiant</small>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="closeModal('materialModal')">Annuler</button>
+                    <button type="submit" class="save-btn"><i class="fas fa-save"></i> Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CANCEL MODAL -->
+    <div class="modal" id="cancelModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-ban"></i> Annuler le cours</h3>
+                <button class="close-modal" onclick="closeModal('cancelModal')">&times;</button>
+            </div>
+            <form id="cancelForm">
+                <input type="hidden" id="cancelCourseId">
+                <div id="cancelCourseInfo" style="margin-bottom:15px; padding:12px; background:#f5f5f5; border-radius:8px; font-size:0.9rem;">
+                    <p><strong>📚 Cours:</strong> <span id="cancelCourseType">-</span></p>
+                    <p><strong>👨‍🎓 Élève:</strong> <span id="cancelStudentName">-</span></p>
+                    <p><strong>📅 Date:</strong> <span id="cancelCourseDate">-</span></p>
+                </div>
+                <div class="form-group">
+                    <label>Motif d'annulation</label>
+                    <div class="cancel-reason-option" data-reason="student_leave">
+                        <input type="radio" name="cancelReason" value="学生请假">
+                        <label>📖 学生请假</label>
+                    </div>
+                    <div class="cancel-reason-option" data-reason="teacher_busy">
+                        <input type="radio" name="cancelReason" value="老师有事">
+                        <label>👨‍🏫 老师有事</label>
+                    </div>
+                    <div class="cancel-reason-option" data-reason="student_absent">
+                        <input type="radio" name="cancelReason" value="学生缺席">
+                        <label>❌ 学生缺席</label>
+                    </div>
+                    <div class="cancel-reason-option" data-reason="other">
+                        <input type="radio" name="cancelReason" value="其他">
+                        <label>📝 其他</label>
+                    </div>
+                    <div class="custom-reason-input" id="customReasonContainer">
+                        <input type="text" id="customReason" placeholder="Précisez le motif...">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" onclick="closeModal('cancelModal')">Annuler</button>
+                    <button type="submit" class="save-btn" style="background:var(--red);"><i class="fas fa-trash"></i> Confirmer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toastContainer"></div>
+
+    <script>
+        // ============================================================
+        // 全局变量
+        // ============================================================
+        var currentUser = null;
+        var allCourses = [];
+        var currentFilter = 'all';
+
+        // ============================================================
+        // 工具函数
+        // ============================================================
+        function escapeHtml(s) {
+            if (!s) return '';
+            return s.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function showToast(msg, type) {
+            type = type || 'success';
+            var container = document.getElementById('toastContainer');
+            var toast = document.createElement('div');
+            toast.className = 'toast toast-' + type;
+            var icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            toast.innerHTML = '<i class="fas ' + icon + '"></i> ' + msg;
+            container.appendChild(toast);
+            setTimeout(function() {
+                if (toast.parentNode) toast.remove();
+            }, 3500);
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            var d = new Date(dateStr);
+            return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function getCourseTypeLabel(type) {
+            var map = {
+                'beginner': '🌱 Débutant',
+                'intermediate': '📈 Intermédiaire',
+                'advanced': '🎯 Avancé',
+                'business': '💼 Affaires',
+                'delf': '📝 DELF',
+                'dalf': '📝 DALF',
+                'tcf': '📝 TCF',
+                'tcf_irn': '📝 TCF IRN'
+            };
+            return map[type] || type;
+        }
+
+        function getStatusLabel(status) {
+            var map = {
+                'scheduled': '📅 Planifié',
+                'in_progress': '🔄 En cours',
+                'completed': '✅ Terminé',
+                'cancelled': '❌ Annulé'
+            };
+            return map[status] || status;
+        }
+
+        function getStatusClass(status) {
+            var map = {
+                'scheduled': 'scheduled',
+                'in_progress': 'in_progress',
+                'completed': 'completed',
+                'cancelled': 'cancelled'
+            };
+            return map[status] || '';
+        }
+
+        function isMoreThan24HoursAhead(dateStr) {
+            var courseDate = new Date(dateStr);
+            var now = new Date();
+            var diffHours = (courseDate - now) / (1000 * 60 * 60);
+            return diffHours >= 24;
+        }
+
+        // ============================================================
+        // 获取用户信息
+        // ============================================================
+        function getUserFromToken() {
+            var token = new URLSearchParams(window.location.search).get('token');
+            if (!token) return null;
+            try {
+                var data = JSON.parse(decodeURIComponent(atob(token)));
+                return data;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // ============================================================
+        // 加载数据
+        // ============================================================
+        async function loadData() {
+            try {
+                console.log('📚 加载老师课程...');
+                var courses = await window.supabaseAuth.getFrenchCourses(currentUser.userId, 'teacher');
+                console.log('✅ 课程数据:', courses);
+                allCourses = courses || [];
+                renderCourses();
+                updateStats();
+            } catch (e) {
+                console.error('❌ 加载课程失败:', e);
+                document.getElementById('coursesContainer').innerHTML =
+                    '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Erreur de chargement</p><small style="color:#999;">' +
+                    e.message + '</small></div>';
+            }
+        }
+
+        // ============================================================
+        // 渲染课程
+        // ============================================================
+        function renderCourses() {
+            var container = document.getElementById('coursesContainer');
+            var now = new Date();
+            var filtered = allCourses;
+            if (currentFilter === 'upcoming') {
+                filtered = allCourses.filter(function(c) {
+                    return c.status !== 'cancelled' && c.status !== 'completed' && new Date(c.start_time) > now;
+                });
+            } else if (currentFilter === 'past') {
+                filtered = allCourses.filter(function(c) {
+                    return c.status === 'completed' || c.status === 'cancelled';
+                });
+            }
+            if (filtered.length === 0) {
+                container.innerHTML =
+                    '<div class="empty-state"><i class="fas fa-calendar-empty"></i><p>Aucun cours à afficher</p></div>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < filtered.length; i++) {
+                var c = filtered[i];
+                var isCancelled = c.status === 'cancelled';
+                var isCompleted = c.status === 'completed';
+                var isInProgress = c.status === 'in_progress';
+                var isScheduled = c.status === 'scheduled';
+                var canStart = isScheduled && !c.teacher_started;
+                var canEnd = isInProgress || (isScheduled && c.teacher_started);
+                var canEdit = isScheduled || isInProgress;
+                var canCancel = isScheduled && !c.teacher_started && isMoreThan24HoursAhead(c.start_time);
+                var canMaterial = isCompleted || isInProgress;
+
+                html += '<div class="course-card' + (isCancelled ? ' cancelled' : '') + '">';
+                html += '<div class="course-header">';
+                html += '<span class="course-title">' + getCourseTypeLabel(c.course_type) + '</span>';
+                html += '<span class="course-status ' + getStatusClass(c.status) + '">' + getStatusLabel(c.status) +
+                '</span>';
+                html += '</div>';
+
+                html += '<div class="course-details">';
+                html += '<span><i class="fas fa-user"></i> ' + escapeHtml(c.student ? c.student.name : 'N/A') + '</span>';
+                html += '<span><i class="fas fa-calendar"></i> ' + formatDate(c.start_time) + '</span>';
+                html += '<span><i class="fas fa-clock"></i> ' + (c.duration || 2) + 'h</span>';
+                if (c.location) html += '<span><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(c.location) + '</span>';
+                if (c.meeting_link) html +=
+                    '<span><i class="fas fa-video"></i> <a href="' + c.meeting_link +
+                    '" target="_blank">Rejoindre</a></span>';
+                if (c.material_link) html +=
+                    '<span><i class="fas fa-paperclip"></i> <a href="' + c.material_link +
+                    '" target="_blank">Support</a></span>';
+                if (isCancelled && c.cancel_reason) html +=
+                    '<span><i class="fas fa-info-circle"></i> Motif: ' + escapeHtml(c.cancel_reason) + '</span>';
+                if (c.student_rating) html +=
+                    '<span><i class="fas fa-star" style="color:#f1c40f;"></i> ' + c.student_rating + '/5</span>';
+                if (c.student_comment) html +=
+                    '<span><i class="fas fa-comment-dots"></i> "' + escapeHtml(c.student_comment) + '"</span>';
+                html += '</div>';
+
+                html += '<div class="course-actions">';
+                if (canStart) html +=
+                    '<button class="action-btn start" onclick="startCourse(\'' + c.id +
+                    '\')"><i class="fas fa-play"></i> Démarrer</button>';
+                if (canEnd) html +=
+                    '<button class="action-btn end" onclick="endCourse(\'' + c.id +
+                    '\')"><i class="fas fa-stop"></i> Terminer</button>';
+                if (canEdit) html +=
+                    '<button class="action-btn edit" onclick="openEditModal(\'' + c.id +
+                    '\')"><i class="fas fa-edit"></i> Modifier</button>';
+                if (canCancel) html +=
+                    '<button class="action-btn cancel" onclick="openCancelModal(\'' + c.id +
+                    '\')"><i class="fas fa-ban"></i> Annuler</button>';
+                if (canMaterial) html +=
+                    '<button class="action-btn material" onclick="openMaterialModal(\'' + c.id +
+                    '\')"><i class="fas fa-paperclip"></i> Support</button>';
+                if (isCancelled) html +=
+                    '<button class="action-btn disabled"><i class="fas fa-ban"></i> Annulé</button>';
+                if (isCompleted && !canMaterial) html +=
+                    '<button class="action-btn disabled"><i class="fas fa-check"></i> Terminé</button>';
+                html += '</div></div>';
+            }
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // 更新统计
+        // ============================================================
+        function updateStats() {
+            var now = new Date();
+            var upcoming = allCourses.filter(function(c) {
+                return c.status !== 'cancelled' && c.status !== 'completed' && new Date(c.start_time) > now;
+            }).length;
+            var inProgress = allCourses.filter(function(c) { return c.status === 'in_progress'; }).length;
+            var completed = allCourses.filter(function(c) { return c.status === 'completed'; }).length;
+            var totalHours = allCourses.filter(function(c) {
+                return c.status === 'completed' || c.status === 'in_progress';
+            }).reduce(function(s, c) { return s + (c.duration || 2); }, 0);
+            var students = new Set();
+            allCourses.forEach(function(c) { if (c.student_id) students.add(c.student_id); });
+            var rated = allCourses.filter(function(c) { return c.student_rating; });
+            var avg = rated.length ? (rated.reduce(function(s, c) { return s + c.student_rating; }, 0) / rated.length)
+                .toFixed(1) : 0;
+            document.getElementById('statUpcoming').textContent = upcoming;
+            document.getElementById('statInProgress').textContent = inProgress;
+            document.getElementById('statCompleted').textContent = completed;
+            document.getElementById('statTotalHours').textContent = totalHours;
+            document.getElementById('statTotalStudents').textContent = students.size;
+            document.getElementById('statAvgRating').textContent = avg;
+        }
+
+        // ============================================================
+        // 开始课程
+        // ============================================================
+        async function startCourse(courseId) {
+            try {
+                var supabase = window.supabaseAuth.getSupabaseClient();
+                var now = new Date();
+                var localTimeStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now
+                    .getDate()).padStart(2, '0') + ' ' + String(now.getHours()).padStart(2, '0') + ':' + String(now
+                    .getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
+                var { error } = await supabase
+                    .from('french_courses')
+                    .update({ teacher_started: true, actual_start: localTimeStr, status: 'in_progress' })
+                    .eq('id', courseId);
+                if (error) throw error;
+                showToast('Cours démarré ✓', 'success');
+                await loadData();
+            } catch (e) {
+                showToast('Erreur', 'error');
+                console.error(e);
+            }
+        }
+
+        // ============================================================
+        // 结束课程
+        // ============================================================
+        async function endCourse(courseId) {
+            try {
+                var supabase = window.supabaseAuth.getSupabaseClient();
+                var now = new Date();
+                var localTimeStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now
+                    .getDate()).padStart(2, '0') + ' ' + String(now.getHours()).padStart(2, '0') + ':' + String(now
+                    .getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
+                var { error } = await supabase
+                    .from('french_courses')
+                    .update({ actual_end: localTimeStr, status: 'completed' })
+                    .eq('id', courseId);
+                if (error) throw error;
+                showToast('Cours terminé ✓', 'success');
+                await loadData();
+            } catch (e) {
+                showToast('Erreur', 'error');
+                console.error(e);
+            }
+        }
+
+        // ============================================================
+        // 编辑课程
+        // ============================================================
+        function openEditModal(courseId) {
+            var course = allCourses.find(function(c) { return c.id === courseId; });
+            if (!course) return;
+            document.getElementById('editCourseId').value = courseId;
+            document.getElementById('editLocation').value = course.location || '';
+            document.getElementById('editMeetingLink').value = course.meeting_link || '';
+            openModal('editModal');
+        }
+
+        document.getElementById('editForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var id = document.getElementById('editCourseId').value;
+            var data = {
+                location: document.getElementById('editLocation').value.trim() || null,
+                meeting_link: document.getElementById('editMeetingLink').value.trim() || null
+            };
+            try {
+                var result = await window.supabaseAuth.updateFrenchCourse(id, data);
+                if (result) {
+                    closeModal('editModal');
+                    showToast('Cours modifié ✓', 'success');
+                    await loadData();
+                }
+            } catch (e) {
+                showToast('Erreur', 'error');
+                console.error(e);
+            }
+        });
+
+        // ============================================================
+        // 资料/评语
+        // ============================================================
+        function openMaterialModal(courseId) {
+            var course = allCourses.find(function(c) { return c.id === courseId; });
+            if (!course) return;
+            document.getElementById('materialCourseId').value = courseId;
+            document.getElementById('materialLink').value = course.material_link || '';
+            document.getElementById('materialComment').value = course.teacher_comment || '';
+            openModal('materialModal');
+        }
+
+        document.getElementById('materialForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var id = document.getElementById('materialCourseId').value;
+            var data = {
+                material_link: document.getElementById('materialLink').value.trim() || null,
+                teacher_comment: document.getElementById('materialComment').value.trim() || null
+            };
+            try {
+                var result = await window.supabaseAuth.updateFrenchCourse(id, data);
+                if (result) {
+                    closeModal('materialModal');
+                    showToast('Support enregistré ✓', 'success');
+                    await loadData();
+                }
+            } catch (e) {
+                showToast('Erreur', 'error');
+                console.error(e);
+            }
+        });
+
+        // ============================================================
+        // 取消课程（老师）
+        // ============================================================
+        function openCancelModal(courseId) {
+            var course = allCourses.find(function(c) { return c.id === courseId; });
+            if (!course) return;
+            document.getElementById('cancelCourseId').value = courseId;
+            document.getElementById('cancelCourseType').textContent = getCourseTypeLabel(course.course_type);
+            document.getElementById('cancelStudentName').textContent = course.student ? course.student.name : 'N/A';
+            document.getElementById('cancelCourseDate').textContent = formatDate(course.start_time);
+            document.querySelectorAll('#cancelForm input[name="cancelReason"]').forEach(function(r) { r.checked = false; });
+            document.getElementById('customReason').value = '';
+            document.getElementById('customReasonContainer').classList.remove('show');
+            document.querySelectorAll('.cancel-reason-option').forEach(function(o) { o.classList.remove('selected'); });
+            openModal('cancelModal');
+        }
+
+        document.querySelectorAll('.cancel-reason-option').forEach(function(option) {
+            option.addEventListener('click', function() {
+                var radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+                document.querySelectorAll('.cancel-reason-option').forEach(function(o) { o.classList.remove(
+                    'selected'); });
+                this.classList.add('selected');
+                if (this.dataset.reason === 'other') {
+                    document.getElementById('customReasonContainer').classList.add('show');
+                } else {
+                    document.getElementById('customReasonContainer').classList.remove('show');
+                }
+            });
+        });
+
+        document.getElementById('cancelForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var courseId = document.getElementById('cancelCourseId').value;
+            var reason = null;
+            document.querySelectorAll('#cancelForm input[name="cancelReason"]').forEach(function(r) {
+                if (r.checked) reason = r.value;
+            });
+            if (reason === '其他') {
+                var custom = document.getElementById('customReason').value.trim();
+                if (custom) reason = custom;
+            }
+            if (!reason) {
+                showToast('Veuillez sélectionner un motif', 'error');
+                return;
+            }
+            try {
+                var supabase = window.supabaseAuth.getSupabaseClient();
+                var { data: course } = await supabase
+                    .from('french_courses')
+                    .select('student_id, duration')
+                    .eq('id', courseId)
+                    .single();
+                if (course && course.student_id && course.duration) {
+                    var { data: student } = await supabase
+                        .from('french_users')
+                        .select('credit')
+                        .eq('id', course.student_id)
+                        .single();
+                    if (student) {
+                        var newCredit = (student.credit || 0) + course.duration;
+                        await supabase
+                            .from('french_users')
+                            .update({ credit: newCredit })
+                            .eq('id', course.student_id);
+                    }
+                }
+                var { error } = await supabase
+                    .from('french_courses')
+                    .update({ status: 'cancelled', cancel_reason: reason })
+                    .eq('id', courseId);
+                if (error) throw error;
+                closeModal('cancelModal');
+                showToast('Cours annulé ✓ (课时已退还)', 'success');
+                await loadData();
+            } catch (e) {
+                showToast('Erreur', 'error');
+                console.error(e);
+            }
+        });
+
+        // ============================================================
+        // FILTER
+        // ============================================================
+        document.querySelectorAll('.filter-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                renderCourses();
+            });
+        });
+
+        // ============================================================
+        // LOGOUT
+        // ============================================================
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            sessionStorage.clear();
+            localStorage.removeItem('french_user');
+            window.location.href = 'francais.html';
+        });
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            var user = getUserFromToken();
+            if (!user || user.role !== 'teacher') {
+                window.location.href = 'francais.html';
+                return;
+            }
+            currentUser = user;
+            document.getElementById('teacherName').textContent = user.name;
+            await loadData();
+        });
+
+        // 暴露给全局
+        window.startCourse = startCourse;
+        window.endCourse = endCourse;
+        window.openEditModal = openEditModal;
+        window.openMaterialModal = openMaterialModal;
+        window.openCancelModal = openCancelModal;
+        window.closeModal = closeModal;
+    </script>
+</body>
+</html>

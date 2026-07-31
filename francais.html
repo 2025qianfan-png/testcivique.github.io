@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Français · FLE - Association Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="francais.css">
+    <meta name="theme-color" content="#e67e22">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Français FLE">
+</head>
+<body>
+
+<!-- LANGUAGE TOGGLE -->
+<div class="language-toggle">
+    <button class="lang-btn active" id="langFr" onclick="switchLanguage('fr')">
+        <i class="fas fa-globe"></i> FR
+    </button>
+    <button class="lang-btn" id="langZh" onclick="switchLanguage('zh')">
+        <i class="fas fa-globe"></i> 中文
+    </button>
+</div>
+
+<!-- HEADER -->
+<header class="main-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="header-logo">
+                <img src="images/logo.png" alt="Mille Voiles" onerror="this.style.display='none'">
+            </div>
+            <div class="header-text">
+                <h1><span id="mainTitle">Français · FLE</span></h1>
+                <p id="mainSubtitle">Association Mille Voiles / 千帆协会 - Formation en français langue étrangère</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- NAVIGATION -->
+<nav class="main-nav">
+    <div class="container nav-container">
+        <a href="index.html" class="nav-brand">
+            <i class="fas fa-sailboat"></i> <span id="navBrand">Mille Voiles</span>
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html#accueil" id="navHome">Accueil</a>
+            <a href="#examens" id="navExams">Examens</a>
+            <a href="#cours" id="navCourses">Cours</a>
+            <a href="#ressources" id="navResources">Ressources</a>
+            <a href="#contact" id="navContact">Contact</a>
+            <a href="#" id="navLogin" onclick="openLoginModal()">
+                <span id="navLoginText">Connexion</span>
+            </a>
+            <div class="user-info" id="userInfo" style="display: none;">
+                <i class="fas fa-user-circle"></i>
+                <span id="welcomeMessage"></span>
+                <button class="user-menu-btn" onclick="toggleUserMenu()">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="#" onclick="showProfileModal()"><i class="fas fa-user-cog"></i> <span id="profileMenuItem">Mon profil</span></a>
+                    <div id="roleBasedMenu"></div>
+                    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span id="logoutMenuItem">Déconnexion</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="accueil">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <span class="hero-tag" id="heroTag">🇫🇷 Français Langue Étrangère</span>
+                <h2 id="heroTitle">Maîtrisez le français <br><span class="highlight">pour réussir en France</span></h2>
+                <p id="heroDesc">Des cours adaptés à tous les niveaux, une préparation aux examens officiels et un accompagnement personnalisé pour votre intégration en France.</p>
+                <div class="hero-buttons">
+                    <a href="#examens" class="btn-primary"><i class="fas fa-graduation-cap"></i> <span id="heroBtn1">Découvrir les examens</span></a>
+                    <a href="#cours" class="btn-secondary"><i class="fas fa-book"></i> <span id="heroBtn2">Nos cours</span></a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="hero-image-wrapper">
+                    <div class="hero-placeholder">
+                        <i class="fas fa-language"></i>
+                        <span>FLE</span>
+                    </div>
+                    <div class="floating-badge">
+                        <i class="fas fa-award"></i>
+                        <span id="heroBadge">DELF · DALF · TCF · TCF IRN</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== EXAMENS ==================== -->
+<section id="examens">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag" id="examsTag">EXAMENS OFFICIELS</span>
+            <h2 id="examsTitle">Les certifications en français</h2>
+            <p id="examsSubtitle">Choisissez l'examen qui correspond à vos objectifs et à votre niveau</p>
+        </div>
+        <div class="exams-grid" id="examsContainer">
+            <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Chargement...</div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== COURS ==================== -->
+<section id="cours">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag" id="coursesTag">NOS FORMATIONS</span>
+            <h2 id="coursesTitle">Des cours adaptés à tous</h2>
+            <p id="coursesSubtitle">Du débutant à l'expert, trouvez la formation qui vous convient</p>
+        </div>
+        <div class="courses-grid" id="coursesContainer"></div>
+    </div>
+</section>
+
+<!-- ==================== RESSOURCES ==================== -->
+<section id="ressources">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag" id="resourcesTag">RESSOURCES</span>
+            <h2 id="resourcesTitle">Outils pour apprendre</h2>
+            <p id="resourcesSubtitle">Des ressources gratuites et payantes pour progresser en français</p>
+        </div>
+        <div class="resources-grid" id="resourcesContainer"></div>
+    </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="main-footer" id="contact">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4><i class="fas fa-sailboat"></i> Mille Voiles</h4>
+                <p id="footerAbout">Association d'intégration et de formation</p>
+                <p><i class="fas fa-map-pin"></i> <span id="footerAddr">Paris, France</span></p>
+                <p><i class="fas fa-calendar-alt"></i> <span id="footerYear">Fondée en 2025</span></p>
+            </div>
+            <div class="footer-col">
+                <h4 id="footerContactTitle">Contact</h4>
+                <div class="contact-item"><i class="fas fa-envelope"></i> <a href="mailto:qf2025qianfan@gmail.com">qf2025qianfan@gmail.com</a></div>
+                <div class="contact-item"><i class="fab fa-weixin"></i> <span>WeChat: qfparis</span></div>
+                <div class="contact-item"><i class="fab fa-linkedin"></i> <a href="https://www.linkedin.com/company/association-mille-voiles/" target="_blank">LinkedIn</a></div>
+            </div>
+            <div class="footer-col">
+                <h4 id="footerNavTitle">Navigation</h4>
+                <a href="index.html"><i class="fas fa-chevron-right"></i> <span id="fNav1">Accueil</span></a>
+                <a href="#examens"><i class="fas fa-chevron-right"></i> <span id="fNav2">Examens</span></a>
+                <a href="#cours"><i class="fas fa-chevron-right"></i> <span id="fNav3">Cours</span></a>
+                <a href="#ressources"><i class="fas fa-chevron-right"></i> <span id="fNav4">Ressources</span></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span id="footerCopy">© 2025-2026 Mille Voiles · Tous droits réservés</span>
+            <span class="separator">|</span>
+            <span id="footerCopyZh">千帆协会 版权所有</span>
+        </div>
+    </div>
+</footer>
+
+<!-- ==================== LOGIN MODAL ==================== -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="loginModalTitle">Connexion Élève</h3>
+            <button class="close-modal" onclick="closeLoginModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i><span id="nameLabel">Nom d'utilisateur</span></label>
+                    <input type="text" id="loginName" required placeholder="Entrez votre nom">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i><span id="passwordLabel">Mot de passe</span></label>
+                    <input type="password" id="loginPassword" required placeholder="Entrez votre mot de passe">
+                </div>
+                <div id="loginError" class="login-error" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorMessage">Nom ou mot de passe incorrect</span>
+                </div>
+                <button type="submit" class="btn-primary" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span id="loginBtnText">Se connecter</span>
+                </button>
+            </form>
+            <div class="login-footer"><p id="loginHelp">Contactez l'association si vous n'avez pas de compte</p></div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== PROFILE MODAL ==================== -->
+<div id="profileModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="profileModalTitle">Mon Profil</h3>
+            <button class="close-modal" onclick="closeProfileModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="profileForm" onsubmit="updateProfile(event)">
+                <div class="profile-info-section">
+                    <h4 id="infoSectionTitle">Informations du compte</h4>
+                    <div class="form-group">
+                        <label><i class="fas fa-user-tag"></i><span id="typeLabel">Type</span></label>
+                        <input type="text" id="profileType" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-clock"></i><span id="expiryLabel">Accès jusqu'au</span></label>
+                        <input type="text" id="profileExpiry" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i><span id="usernameLabel">Nom</span></label>
+                        <input type="text" id="profileUsername" readonly>
+                    </div>
+                </div>
+                <div class="profile-edit-section">
+                    <h4 id="editSectionTitle">Modifier le mot de passe</h4>
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i><span id="currentPasswordLabel">Mot de passe actuel</span></label>
+                        <input type="password" id="currentPassword" required placeholder="Mot de passe actuel">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i><span id="newPasswordLabel">Nouveau mot de passe</span></label>
+                        <input type="password" id="newPassword" required placeholder="Nouveau mot de passe" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i><span id="confirmPasswordLabel">Confirmer</span></label>
+                        <input type="password" id="confirmPassword" required placeholder="Confirmer">
+                    </div>
+                </div>
+                <div id="profileError" class="login-error" style="display: none;"></div>
+                <div id="profileSuccess" class="login-success" style="display: none;"></div>
+                <div class="profile-actions">
+                    <button type="submit" class="btn-primary" id="updateProfileBtn">
+                        <i class="fas fa-save"></i><span id="updateBtnText">Mettre à jour</span>
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="closeProfileModal()" id="cancelBtn">
+                        <i class="fas fa-times"></i><span id="cancelBtnText">Annuler</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== DEVELOPING MODAL ==================== -->
+<div id="developingModal" class="modal">
+    <div class="modal-content developing-content">
+        <div class="developing-icon">
+            <i class="fas fa-code"></i>
+        </div>
+        <h3 id="devTitle">En développement</h3>
+        <p id="devMsg">Cette section est en cours de développement. Revenez bientôt !</p>
+        <div class="dev-progress">
+            <div class="progress-bar"><span style="width: 40%;"></span></div>
+            <span class="progress-label">40%</span>
+        </div>
+        <button class="btn-primary" onclick="closeDevelopingModal()" style="margin-top: 20px;">
+            <i class="fas fa-check"></i> <span id="devBtn">Fermer</span>
+        </button>
+    </div>
+</div>
+
+<!-- ==================== TOAST ==================== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="francais.js"></script>
+</body>
+</html>
