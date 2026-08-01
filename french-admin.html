@@ -1853,31 +1853,32 @@
             document.getElementById('courseId').value = '';
             document.getElementById('courseForm').reset();
             document.getElementById('courseModalTitle').textContent = 'Ajouter un cours';
+            document.getElementById('courseMeetingLink').value = 'https://meet.google.com/gkv-cirp-iqo';
+            document.getElementById('courseDuration').value = 2;
             setTimeout(function() { updateSelects(); }, 100);
             openModal('courseModal');
         }
 
-        async function editCourse(id) {
-            var course = allCourses.find(function(c) { return c.id === id; });
-            if (!course) return;
-            updateSelects();
-            document.getElementById('courseId').value = course.id;
-            document.getElementById('courseType').value = course.course_type || 'beginner';
-            document.getElementById('courseTitle').value = course.title || '';
-            document.getElementById('courseStudent').value = course.student_id || '';
-            document.getElementById('courseTeacher').value = course.teacher_id || '';
-            if (course.start_time) {
-                var d = new Date(course.start_time);
-                document.getElementById('courseStartTime').value = d.toISOString().slice(0, 16);
-            }
-            document.getElementById('courseDuration').value = course.duration || 2;
-            document.getElementById('courseLocation').value = course.location || '';
-            document.getElementById('courseMeetingLink').value = course.meeting_link || '';
-            document.getElementById('courseDescription').value = course.description || '';
-            document.getElementById('courseModalTitle').textContent = 'Modifier le cours';
-            openModal('courseModal');
-        }
-
+      async function editCourse(id) {
+    var course = allCourses.find(function(c) { return c.id === id; });
+    if (!course) return;
+    updateSelects();
+    document.getElementById('courseId').value = course.id;
+    document.getElementById('courseType').value = course.course_type || 'beginner';
+    document.getElementById('courseTitle').value = course.title || '';
+    document.getElementById('courseStudent').value = course.student_id || '';
+    document.getElementById('courseTeacher').value = course.teacher_id || '';
+    if (course.start_time) {
+        var d = new Date(course.start_time);
+        document.getElementById('courseStartTime').value = d.toISOString().slice(0, 16);
+    }
+    document.getElementById('courseDuration').value = course.duration || 2;
+    document.getElementById('courseLocation').value = course.location || '';
+    document.getElementById('courseMeetingLink').value = course.meeting_link || 'https://meet.google.com/gkv-cirp-iqo';
+    document.getElementById('courseDescription').value = course.description || '';
+    document.getElementById('courseModalTitle').textContent = 'Modifier le cours';
+    openModal('courseModal');
+}
         document.getElementById('courseForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             var id = document.getElementById('courseId').value;
