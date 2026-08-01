@@ -19,9 +19,11 @@ const dict = {
     aboutTag: "À PROPOS",
     aboutTitle: "Qui sommes-nous ?",
     aboutSub: "Découvrez notre histoire, notre mission et nos valeurs",
-    aboutP1: "<strong>Mille Voiles / 千帆协会</strong> est une association loi 1901 créée à Paris en 2025. Notre mission : faciliter l'intégration des communautés chinoises en France à travers la formation civique, l'apprentissage du français et l'accès aux nouvelles technologies.",
-    aboutP2: "Nous proposons des cursus adaptés : préparation à l'examen civique obligatoire, cours de français intensifs, et ateliers en intelligence artificielle & programmation. Notre équipe pluridisciplinaire allie expertise pédagogique et connaissance des enjeux interculturels.",
-    aboutP3: "L'association s'engage à offrir un accompagnement personnalisé à chaque membre, en proposant des formations de qualité qui répondent aux exigences des institutions françaises et aux besoins spécifiques de la communauté chinoise.",
+    aboutP1: "<strong>Mille Voiles (千帆协会)</strong> est une association loi 1901 à but non lucratif, créée à Paris en 2025.",
+    aboutP2: "L'association a pour mission de favoriser l'intégration sociale, la formation tout au long de la vie et le développement personnel des membres de la communauté chinoise en France, ainsi que de toutes les personnes intéressées par les échanges culturels franco-chinois.",
+    aboutP3: "Nous proposons des programmes de formation variés et structurés : préparation à l'examen civique français, cours de français (préparation DELF/DALF), ateliers d'intelligence artificielle et compétences numériques, ainsi que des cours de chinois pour tous les âges et tous les niveaux.",
+    aboutP4: "Notre équipe réunit des compétences pédagogiques, scientifiques et interculturelles. Nous comprenons les défis réels auxquels sont confrontés les Chinois en France dans leurs études, leur travail et leur vie quotidienne, et nous nous engageons à offrir un accompagnement de qualité, personnalisé et professionnel.",
+    aboutP5: "Que vous soyez nouvel arrivant en France, en préparation d'une demande de nationalité française, en recherche d'amélioration linguistique ou professionnelle, ou simplement désireux de découvrir la culture chinoise, nous vous invitons à nous rejoindre dans cette aventure humaine et formatrice.",
     value1: "Solidarité",
     value2: "Excellence",
     value3: "Inclusion",
@@ -78,9 +80,11 @@ const dict = {
     aboutTag: "关于我们",
     aboutTitle: "我们是谁？",
     aboutSub: "了解我们的历史、使命和价值观",
-    aboutP1: "<strong>千帆协会 / Mille Voiles</strong> 是根据1901年法律于2025年在巴黎成立的非营利组织。我们的使命：通过公民教育、法语学习和新技术培训，促进在法华人社区融入。",
-    aboutP2: "我们提供定制课程：强制公民考试准备、强化法语课程，以及人工智能与编程工作坊。我们的跨学科团队融合了教学专长与跨文化知识。",
-    aboutP3: "协会致力于为每位成员提供个性化支持，提供符合法国机构要求和华人社区特定需求的高质量培训。",
+    aboutP1: "<strong>千帆协会（Mille Voiles）</strong> 是一家依据法国《1901年协会法》于2025年在巴黎成立的非营利组织（Association loi 1901）。",
+    aboutP2: "协会致力于促进在法华人及所有关注中法文化交流人士的社会融入、终身学习与个人发展。我们希望通过优质的教育培训、文化交流和数字技能普及，为每一位成员提供成长与发展的机会，帮助他们更好地适应法国社会，拓展未来的发展空间。",
+    aboutP3: "我们围绕实际需求，提供多元化、系统化的培训项目，包括：法国公民考试辅导、法语培训课程（涵盖DELF/DALF备考）、人工智能与数字技能培训，以及面向不同年龄和水平的中文教育课程。",
+    aboutP4: "协会汇聚了一支兼具教学经验、科研背景和跨文化实践经验的团队。我们深刻理解华人在法国学习、工作、生活和融入过程中所面临的实际需求，坚持以专业、务实、开放的理念，为每位学员提供高质量、个性化的支持。",
+    aboutP5: "无论您是初到法国的新移民、准备申请法国国籍、希望提升语言与职业技能，还是希望深入了解中华文化，我们都期待与您同行，共同开启新的成长旅程。",
     value1: "团结互助",
     value2: "追求卓越",
     value3: "包容共进",
@@ -122,23 +126,23 @@ const dict = {
   }
 };
 
-var currentLang = 'fr';
+let currentLang = 'fr';
 
 // ============================================
 // SWITCH LANGUAGE
 // ============================================
 function switchLanguage(lang) {
   currentLang = lang;
-  var data = dict[lang];
+  const data = dict[lang];
 
-  document.querySelectorAll('[id]').forEach(function(el) {
-    var key = el.id;
+  document.querySelectorAll('[id]').forEach(el => {
+    const key = el.id;
     if (data[key] !== undefined) {
       el.innerHTML = data[key];
     }
   });
 
-  document.querySelectorAll('.lang-btn').forEach(function(btn) { btn.classList.remove('active'); });
+  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
   if (lang === 'fr') {
     document.getElementById('langFr').classList.add('active');
   } else {
@@ -150,7 +154,7 @@ function switchLanguage(lang) {
 // DEVELOPING MODAL
 // ============================================
 function showDevelopingModal() {
-  var modal = document.getElementById('developingModal');
+  const modal = document.getElementById('developingModal');
   modal.classList.add('show');
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
@@ -162,7 +166,7 @@ function showDevelopingModal() {
 }
 
 function closeDevelopingModal() {
-  var modal = document.getElementById('developingModal');
+  const modal = document.getElementById('developingModal');
   modal.classList.remove('show');
   modal.style.display = 'none';
   document.body.style.overflow = '';
@@ -176,17 +180,17 @@ function handleEscClose(e) {
 // ============================================
 // SMOOTH SCROLL
 // ============================================
-document.querySelectorAll('a[href^="#"]').forEach(function(link) {
+document.querySelectorAll('a[href^="#"]').forEach(link => {
   link.addEventListener('click', function(e) {
-    var targetId = this.getAttribute('href');
+    const targetId = this.getAttribute('href');
     if (targetId && targetId !== '#') {
       e.preventDefault();
-      var target = document.querySelector(targetId);
+      const target = document.querySelector(targetId);
       if (target) {
-        var navHeight = document.querySelector('.main-nav').offsetHeight;
-        var langHeight = document.querySelector('.lang-toggle').offsetHeight;
-        var offset = navHeight + langHeight + 20;
-        var targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
+        const navHeight = document.querySelector('.main-nav').offsetHeight;
+        const langHeight = document.querySelector('.lang-toggle').offsetHeight;
+        const offset = navHeight + langHeight + 20;
+        const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
         window.scrollTo({ top: targetPosition, behavior: 'smooth' });
       }
     }
@@ -196,25 +200,25 @@ document.querySelectorAll('a[href^="#"]').forEach(function(link) {
 // ============================================
 // NAV ACTIVE LINK
 // ============================================
-var sections = document.querySelectorAll('section[id]');
-var navLinks = document.querySelectorAll('.nav-links a');
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
 
-window.addEventListener('scroll', function() {
-  var current = '';
-  var navHeight = document.querySelector('.main-nav').offsetHeight;
-  var langHeight = document.querySelector('.lang-toggle').offsetHeight;
-  var offset = navHeight + langHeight + 50;
+window.addEventListener('scroll', () => {
+  let current = '';
+  const navHeight = document.querySelector('.main-nav').offsetHeight;
+  const langHeight = document.querySelector('.lang-toggle').offsetHeight;
+  const offset = navHeight + langHeight + 50;
 
-  sections.forEach(function(section) {
-    var sectionTop = section.offsetTop - offset;
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop - offset;
     if (window.scrollY >= sectionTop) {
       current = section.getAttribute('id');
     }
   });
 
-  navLinks.forEach(function(link) {
+  navLinks.forEach(link => {
     link.classList.remove('active');
-    if (link.getAttribute('href') === '#' + current) {
+    if (link.getAttribute('href') === `#${current}`) {
       link.classList.add('active');
     }
   });

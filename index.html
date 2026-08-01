@@ -21,7 +21,7 @@
   <div class="container">
     <div class="header-inner">
       <div class="header-logo">
-        <img src="icons/logo.png" alt="Mille Voiles" class="header-logo-img">
+        <img src="icons/logo.png" alt="Mille Voiles" class="header-logo-img" onerror="this.style.display='none'">
       </div>
       <div class="header-title">
         <h1><span id="titleMain">Association Mille Voiles</span></h1>
@@ -62,7 +62,7 @@
       </div>
       <div class="hero-image">
         <div class="hero-image-wrapper">
-          <img src="icons/logo.png" alt="Mille Voiles" class="hero-logo-img">
+          <img src="icons/logo.png" alt="Mille Voiles" class="hero-logo-img" onerror="this.style.display='none'">
           <div class="floating-badge">
             <i class="fas fa-award"></i>
             <span id="heroBadge">Depuis 2025</span>
@@ -83,41 +83,46 @@
     </div>
 
     <div class="about-card">
-      <div class="about-text">
-        <p id="aboutP1"><strong>Mille Voiles / 千帆协会</strong> est une association loi 1901 créée à Paris en 2025. Notre mission : faciliter l'intégration des communautés chinoises en France à travers la formation civique, l'apprentissage du français et l'accès aux nouvelles technologies.</p>
-        <p id="aboutP2">Nous proposons des cursus adaptés : préparation à l'examen civique obligatoire, cours de français intensifs, et ateliers en intelligence artificielle & programmation. Notre équipe pluridisciplinaire allie expertise pédagogique et connaissance des enjeux interculturels.</p>
-        <p id="aboutP3">L'association s'engage à offrir un accompagnement personnalisé à chaque membre, en proposant des formations de qualité qui répondent aux exigences des institutions françaises et aux besoins spécifiques de la communauté chinoise.</p>
-      </div>
-      <div class="about-values">
-        <span class="value-tag"><i class="fas fa-handshake"></i> <span id="value1">Solidarité</span></span>
-        <span class="value-tag"><i class="fas fa-graduation-cap"></i> <span id="value2">Excellence</span></span>
-        <span class="value-tag"><i class="fas fa-users"></i> <span id="value3">Inclusion</span></span>
-        <span class="value-tag"><i class="fas fa-lightbulb"></i> <span id="value4">Innovation</span></span>
-        <span class="value-tag"><i class="fas fa-globe-asia"></i> <span id="value5">Franco-Chinois</span></span>
-      </div>
-      <div class="about-stats">
-        <div class="stat-item">
-          <span class="stat-number">2025</span>
-          <span class="stat-label" id="stat1Label">Année de création</span>
+      <div class="about-grid">
+        <div class="about-text">
+          <p id="aboutP1"><strong>千帆协会（Mille Voiles）</strong> 是一家依据法国《1901年协会法》于2025年在巴黎成立的非营利组织（Association loi 1901）。</p>
+          <p id="aboutP2">协会致力于促进在法华人及所有关注中法文化交流人士的社会融入、终身学习与个人发展。我们希望通过优质的教育培训、文化交流和数字技能普及，为每一位成员提供成长与发展的机会，帮助他们更好地适应法国社会，拓展未来的发展空间。</p>
+          <p id="aboutP3">我们围绕实际需求，提供多元化、系统化的培训项目，包括：法国公民考试辅导、法语培训课程（涵盖DELF/DALF备考）、人工智能与数字技能培训，以及面向不同年龄和水平的中文教育课程。</p>
+          <p id="aboutP4">协会汇聚了一支兼具教学经验、科研背景和跨文化实践经验的团队。我们深刻理解华人在法国学习、工作、生活和融入过程中所面临的实际需求，坚持以专业、务实、开放的理念，为每位学员提供高质量、个性化的支持。</p>
+          <p id="aboutP5">无论您是初到法国的新移民、准备申请法国国籍、希望提升语言与职业技能，还是希望深入了解中华文化，我们都期待与您同行，共同开启新的成长旅程。</p>
         </div>
-        <div class="stat-item">
-          <span class="stat-number">4</span>
-          <span class="stat-label" id="stat2Label">Pôles d'activité</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-number">98%</span>
-          <span class="stat-label" id="stat3Label">Taux de réussite</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-number">50+</span>
-          <span class="stat-label" id="stat4Label">Membres actifs</span>
+        <div class="about-values-stats">
+          <div class="about-values">
+            <span class="value-tag"><i class="fas fa-handshake"></i> <span id="value1">团结互助</span></span>
+            <span class="value-tag"><i class="fas fa-graduation-cap"></i> <span id="value2">追求卓越</span></span>
+            <span class="value-tag"><i class="fas fa-users"></i> <span id="value3">包容共进</span></span>
+            <span class="value-tag"><i class="fas fa-lightbulb"></i> <span id="value4">创新驱动</span></span>
+            <span class="value-tag"><i class="fas fa-globe-asia"></i> <span id="value5">法中交流</span></span>
+          </div>
+          <div class="about-stats">
+            <div class="stat-item">
+              <span class="stat-number">2025</span>
+              <span class="stat-label" id="stat1Label">Année de création</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">4</span>
+              <span class="stat-label" id="stat2Label">Pôles d'activité</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">98%</span>
+              <span class="stat-label" id="stat3Label">Taux de réussite</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">50+</span>
+              <span class="stat-label" id="stat4Label">Membres actifs</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- PILIERS -->
 <!-- PILIERS -->
 <section id="piliers">
   <div class="container">
