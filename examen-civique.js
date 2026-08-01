@@ -1,5 +1,4 @@
-
-    // ==================== 自动登出功能变量 ====================
+// ==================== 自动登出功能变量 ====================
     let inactivityTimer;
     const INACTIVITY_LIMIT = 10 * 60 * 1000; // 10分钟无操作自动登出
     const CHECK_INTERVAL = 60 * 1000; // 每分钟检查一次页面是否关闭
@@ -381,6 +380,46 @@ function checkAccess(student) {
                 footerAddress: "Association enregistrée à Paris",
                 footerCopyright: "© 2025 Association Mille Voiles / 千帆协会 - Tous droits réservés.",
                 
+                // ===== 课程翻译 =====
+courseTitle: "📚 Nos formations civiques",
+courseSubtitle: "Des cursus adaptés à votre niveau et vos besoins",
+course1Title: "📘 Initiation",
+course1Duration: "8 séances · 16 heures",
+course1Group: "Groupe 4-8 pers.",
+course1Desc: "Cours complet couvrant toutes les bases de l'examen civique. Idéal pour les débutants ou ceux qui découvrent l'examen pour la première fois.",
+course1Feature1: "Système français et valeurs",
+course1Feature2: "Constitution et institutions",
+course1Feature3: "Droits et devoirs des citoyens",
+course1Feature4: "Culture et histoire de France",
+course1Feature5: "Vie sociale et services publics",
+course1Btn: "En savoir plus",
+course2Title: "📘 Perfectionnement",
+course2Duration: "4 séances · 8 heures",
+course2Group: "Groupe 4-8 pers.",
+course2Desc: "Renforcez vos connaissances, approfondissez les points clés et surmontez les difficultés spécifiques de l'examen.",
+course2Feature1: "Analyse approfondie des sujets clés",
+course2Feature2: "Entraînement avec des sujets réels",
+course2Feature3: "Techniques de réponse",
+course2Feature4: "Renforcement des points faibles",
+course2Feature5: "Simulations d'examen",
+course2Btn: "En savoir plus",
+course3Title: "📘 Expertise",
+course3Duration: "2 séances · 4 heures",
+course3Group: "Groupe 2-6 pers.",
+course3Desc: "Synthèse des connaissances, sessions intensives et préparation finale avant l'examen.",
+course3Feature1: "Synthèse des sujets et pronostics",
+course3Feature2: "Analyse des erreurs fréquentes",
+course3Feature3: "Tests en temps limité",
+course3Feature4: "Accompagnement personnalisé",
+course3Feature5: "Conseils de préparation mentale",
+course3Btn: "En savoir plus",
+                
+                // ===== 新增统计翻译 =====
+                statStudentLabel: "👨‍🎓 Élèves formés",
+                statSuccessLabel: "✅ Taux de réussite",
+                statTeacherLabel: "👨‍🏫 Intervenants",
+                statMemberLabel: "👥 Membres actifs",
+                
                 // PWA
                 installBtnText: "Installer l'app",
                 installGuideTitle: "Installer l'application",
@@ -562,6 +601,47 @@ function checkAccess(student) {
                 footerEmail: "2025qianfan@gmail.com",
                 footerAddress: "注册于巴黎的协会",
                 footerCopyright: "© 2025 千帆协会 - 版权所有。",
+                
+                // ===== 新增课程翻译 =====
+                // ===== 课程翻译 =====
+                courseTitle: "📚 我们的公民课程",
+                courseSubtitle: "适合您水平和需求的课程",
+                course1Title: "📘 初级课程 · 启蒙",
+                course1Duration: "8节课 · 16小时",
+                course1Group: "小组 4-8人",
+                course1Desc: "全面讲解公民考试基础知识，系统梳理考试要点。适合零基础或初次接触公民考试的学员。",
+                course1Feature1: "法国制度与价值观",
+                course1Feature2: "宪法与政体结构",
+                course1Feature3: "公民权利与义务",
+                course1Feature4: "法国文化与历史",
+                course1Feature5: "社会生活与公共服务",
+                course1Btn: "了解更多",
+                course2Title: "📘 中级课程 · 提升",
+                course2Duration: "4节课 · 8小时",
+                course2Group: "小组 4-8人",
+                course2Desc: "巩固核心知识，强化重点考点，针对性突破难点。适合已有基础、希望系统提升的学员。",
+                course2Feature1: "核心考点深度解析",
+                course2Feature2: "真题实战训练",
+                course2Feature3: "答题技巧精讲",
+                course2Feature4: "薄弱环节强化",
+                course2Feature5: "模拟考试演练",
+                course2Btn: "了解更多",
+                course3Title: "📘 高级课程 · 精通",
+                course3Duration: "2节课 · 4小时",
+                course3Group: "小组 2-6人",
+                course3Desc: "考点速通，专项突破，考前冲刺强化。适合已完成系统学习、准备冲刺考试的学员。",
+                course3Feature1: "考点梳理与押题",
+                course3Feature2: "高频易错题精讲",
+                course3Feature3: "限时模拟测试",
+                course3Feature4: "一对一答疑指导",
+                course3Feature5: "考前心理辅导",
+                course3Btn: "了解更多",
+                
+                // ===== 新增统计翻译 =====
+                statStudentLabel: "👨‍🎓 培训学员",
+                statSuccessLabel: "✅ 通过率",
+                statTeacherLabel: "👨‍🏫 教师团队",
+                statMemberLabel: "👥 活跃会员",
                 
                 // PWA
                 installBtnText: "安装应用",
@@ -1244,6 +1324,51 @@ function copyWechat() {
                 offlineNotice.style.display = navigator.onLine ? 'none' : 'block';
             }
         }
+
+// ==================== 加载统计数据 ====================
+async function loadStats() {
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        
+        // 获取学生总数 (role = 'stu')
+        const { count: studentCount, error: studentError } = await supabase
+            .from('students')
+            .select('*', { count: 'exact', head: true })
+            .eq('role', 'stu');
+        
+        if (studentError) throw studentError;
+        
+        // 获取老师总数 (role = 'teacher')
+        const { count: teacherCount, error: teacherError } = await supabase
+            .from('students')
+            .select('*', { count: 'exact', head: true })
+            .eq('role', 'teacher');
+        
+        if (teacherError) throw teacherError;
+        
+        // 更新显示
+        const studentNumberEl = document.getElementById('statStudentNumber');
+        const teacherNumberEl = document.getElementById('statTeacherNumber');
+        
+        if (studentNumberEl) {
+            studentNumberEl.textContent = (studentCount || 0) + '+';
+        }
+        if (teacherNumberEl) {
+            teacherNumberEl.textContent = (teacherCount || 0) + '+';
+        }
+        
+        console.log('📊 统计加载成功:', { students: studentCount, teachers: teacherCount });
+        
+    } catch (error) {
+        console.error('加载统计数据失败:', error);
+        // 显示默认值
+        const studentNumberEl = document.getElementById('statStudentNumber');
+        const teacherNumberEl = document.getElementById('statTeacherNumber');
+        if (studentNumberEl) studentNumberEl.textContent = '50+';
+        if (teacherNumberEl) teacherNumberEl.textContent = '10+';
+    }
+}
+
         document.addEventListener('DOMContentLoaded', function() {
     switchLanguage('fr');
     
@@ -1288,6 +1413,9 @@ function copyWechat() {
             dropdown.classList.remove('show');
         }
     });
+    
+    // ===== 加载统计数据 =====
+    loadStats();
 });
 
 // 暴露全局函数
@@ -1305,4 +1433,3 @@ function copyWechat() {
         window.showInstructions = showInstructions;
         window.installPWA = installPWA;
         window.copyWechat = copyWechat;
-   

@@ -40,51 +40,153 @@
         </div>
     </header>
 
-   <nav class="main-nav">
-    <div class="container nav-container">
-        <button class="hamburger" id="hamburgerBtn">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <a href="#" class="logo">
-            <img src="/icons/icon-192x192.png" alt="Mille Voiles" style="height: 50px; width: auto; margin-right: 5px;">
-            <span id="logoText">Mille Voiles</span>
-        </a>
-        <div class="nav-links" id="navLinks">
-            <!-- 返回主页 -->
-            <a href="../index.html" id="navHomePage" style="color: var(--primary-blue); font-weight: 700;">
-                <i class="fas fa-home"></i> <span id="homePageText">Accueil</span>
+    <nav class="main-nav">
+        <div class="container nav-container">
+            <button class="hamburger" id="hamburgerBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <a href="#" class="logo">
+                <img src="/icons/icon-192x192.png" alt="Mille Voiles" style="height: 50px; width: auto; margin-right: 5px;">
+                <span id="logoText">Mille Voiles</span>
             </a>
-            <a href="#tests" id="navTests">Tests en ligne</a>
-            <a href="#thematiques" id="navThemes">Thématiques</a>
-            <a href="#politique" id="navPolicy">Nouvelle politique</a>
-            <a href="#faq" id="navFAQ">FAQ</a>
-            <a href="#contact" id="navContact">Contact</a>
-            <a href="#" id="navLogin" onclick="openLoginModal()">
-                <span id="navLoginText">Connexion</span>
-            </a>
-            <div class="user-info" id="userInfo" style="display: none;">
-                <i class="fas fa-user-circle"></i>
-                <span id="welcomeMessage"></span>
-                <button class="user-menu-btn" onclick="toggleUserMenu()">
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="user-dropdown" id="userDropdown">
-                    <a href="#" onclick="showProfileModal()"><i class="fas fa-user-cog"></i> <span id="profileMenuItem">Mon profil</span></a>
-                    <div id="roleBasedMenu"></div>
-                    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span id="logoutMenuItem">Déconnexion</span></a>
+            <div class="nav-links" id="navLinks">
+                <a href="../index.html" id="navHomePage" style="color: var(--primary-blue); font-weight: 700;">
+                    <i class="fas fa-home"></i> <span id="homePageText">Accueil</span>
+                </a>
+                <a href="#tests" id="navTests">Tests en ligne</a>
+                <a href="#thematiques" id="navThemes">Thématiques</a>
+                <a href="#politique" id="navPolicy">Nouvelle politique</a>
+                <a href="#faq" id="navFAQ">FAQ</a>
+                <a href="#contact" id="navContact">Contact</a>
+                <a href="#" id="navLogin" onclick="openLoginModal()">
+                    <span id="navLoginText">Connexion</span>
+                </a>
+                <div class="user-info" id="userInfo" style="display: none;">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="welcomeMessage"></span>
+                    <button class="user-menu-btn" onclick="toggleUserMenu()">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="#" onclick="showProfileModal()"><i class="fas fa-user-cog"></i> <span id="profileMenuItem">Mon profil</span></a>
+                        <div id="roleBasedMenu"></div>
+                        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span id="logoutMenuItem">Déconnexion</span></a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
     <section class="hero" id="accueil">
         <div class="container">
             <h2 id="heroTitle">Préparez-vous à l'examen civique 2026</h2>
             <p id="heroText">À partir du 1er janvier 2026, tous les étrangers souhaitant obtenir une carte de séjour pluriannuelle, une carte de résident ou la naturalisation française devront réussir un examen civique. Préparez-vous dès maintenant avec nos tests en ligne.</p>
             <a href="#tests" class="btn btn-primary" id="heroBtn">Commencer maintenant</a>
+        </div>
+    </section>
+
+    <!-- ==================== 课程介绍 ==================== -->
+        <!-- ==================== 课程介绍 ==================== -->
+    <section class="course-intro">
+        <div class="container">
+            <div class="section-title">
+                <h2 id="courseTitle">📚 Nos formations civiques</h2>
+                <p id="courseSubtitle">Des cursus adaptés à votre niveau et vos besoins</p>
+            </div>
+            <div class="course-grid">
+                <!-- 初级课程 - 最受欢迎 -->
+                <div class="course-card featured">
+                    <div class="course-level beginner">Débutant</div>
+                    <div class="course-icon"><i class="fas fa-seedling"></i></div>
+                    <div class="featured-badge">⭐ Populaire</div>
+                    <h3 id="course1Title">📘 初级课程 · Initiation</h3>
+                    <div class="course-detail">
+                        <span><i class="fas fa-clock"></i> <span id="course1Duration">8 séances · 16 heures</span></span>
+                        <span><i class="fas fa-users"></i> <span id="course1Group">Groupe 4-8 pers.</span></span>
+                    </div>
+                    <p id="course1Desc">Cours complet couvrant toutes les bases de l'examen civique. Idéal pour les débutants ou ceux qui découvrent l'examen pour la première fois.</p>
+                    <ul class="course-features">
+                        <li><i class="fas fa-check-circle"></i> <span id="course1Feature1">Système français et valeurs</span></li>
+                        <li><i class="fas fa-check-circle"></i> <span id="course1Feature2">Constitution et institutions</span></li>
+                        <li><i class="fas fa-check-circle"></i> <span id="course1Feature3">Droits et devoirs des citoyens</span></li>
+                        <li><i class="fas fa-check-circle"></i> <span id="course1Feature4">Culture et histoire de France</span></li>
+                        <li><i class="fas fa-check-circle"></i> <span id="course1Feature5">Vie sociale et services publics</span></li>
+                    </ul>
+                    <a href="cours-civique.html" class="btn btn-primary">
+                        <span id="course1Btn">En savoir plus</span> <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- 中级课程 -->
+                <div class="course-card">
+                    <div class="course-level intermediate">Intermédiaire</div>
+                    <div class="course-icon"><i class="fas fa-rocket"></i></div>
+                    <h3 id="course2Title">📘 中级课程 · Perfectionnement</h3>
+                    <div class="course-detail">
+                        <span><i class="fas fa-clock"></i> <span id="course2Duration">4 séances · 8 heures</span></span>
+                        <span><i class="fas fa-users"></i> <span id="course2Group">Groupe 4-8 pers.</span></span>
+                    </div>
+                    <p id="course2Desc">Renforcez vos connaissances, approfondissez les points clés et surmontez les difficultés spécifiques de l'examen.</p>
+                    <ul class="course-features">
+                        <li><i class="fas fa-check-circle"></i> <span id="course2Feature1">Analyse approfondie des sujets clés</span></li>
+                        <li><i class="fas fa-check-circle"></i> <span id="course2Feature2">Entraînement avec des sujets réels</span></li>
+                        <li><i class="fas fa-check-circle"></i> <span id="course2Feature3">Techniques de réponse</span></li>
+                        <li><i class="fas fa-check-circle"></i> <span id="course2Feature4">Renforcement des points faibles</span></li>
+                        <li><i class="fas fa-check-circle"></i> <span id="course2Feature5">Simulations d'examen</span></li>
+                    </ul>
+                    <a href="cours-civique.html" class="btn btn-outline">
+                        <span id="course2Btn">En savoir plus</span> <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- 高级课程 -->
+                <div class="course-card">
+                    <div class="course-level advanced">Avancé</div>
+                    <div class="course-icon"><i class="fas fa-crown"></i></div>
+                    <h3 id="course3Title">📘 高级课程 · Expertise</h3>
+                    <div class="course-detail">
+                        <span><i class="fas fa-clock"></i> <span id="course3Duration">2 séances · 4 heures</span></span>
+                        <span><i class="fas fa-users"></i> <span id="course3Group">Groupe 2-6 pers.</span></span>
+                    </div>
+                    <p id="course3Desc">Synthèse des connaissances, sessions intensives et préparation finale avant l'examen.</p>
+                    <ul class="course-features">
+                        <li><i class="fas fa-check-circle"></i> <span id="course3Feature1">Synthèse des sujets et pronostics</span></li>
+                        <li><i class="fas fa-check-circle"></i> <span id="course3Feature2">Analyse des erreurs fréquentes</span></li>
+                        <li><i class="fas fa-check-circle"></i> <span id="course3Feature3">Tests en temps limité</span></li>
+                        <li><i class="fas fa-check-circle"></i> <span id="course3Feature4">Accompagnement personnalisé</span></li>
+                        <li><i class="fas fa-check-circle"></i> <span id="course3Feature5">Conseils de préparation mentale</span></li>
+                    </ul>
+                    <a href="cours-civique.html" class="btn btn-outline">
+                        <span id="course3Btn">En savoir plus</span> <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== 学员数据统计 ==================== -->
+    <section class="stats-highlight" id="statsSection">
+        <div class="container">
+            <div class="stats-highlight-grid">
+                <div class="stat-highlight-item">
+                    <div class="stat-highlight-number" id="statStudentNumber">0</div>
+                    <div class="stat-highlight-label" id="statStudentLabel">👨‍🎓 Élèves formés</div>
+                </div>
+                <div class="stat-highlight-item">
+                    <div class="stat-highlight-number">99%</div>
+                    <div class="stat-highlight-label" id="statSuccessLabel">✅ Taux de réussite</div>
+                </div>
+                <div class="stat-highlight-item">
+                    <div class="stat-highlight-number" id="statTeacherNumber">0</div>
+                    <div class="stat-highlight-label" id="statTeacherLabel">👨‍🏫 Intervenants</div>
+                </div>
+                <div class="stat-highlight-item">
+                    <div class="stat-highlight-number">50+</div>
+                    <div class="stat-highlight-label" id="statMemberLabel">👥 Membres actifs</div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -294,48 +396,47 @@
         </div>
     </section>
 
-<footer class="main-footer" id="contact">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-column">
-                <h4 id="footerAbout">À propos</h4>
-                <p id="footerAboutText">L'association Mille Voiles accompagne les communautés chinoises en France dans leurs démarches d'intégration, d'apprentissage du français et de préparation aux examens officiels.</p>
-            </div>
-            <div class="footer-column">
-                <h4 id="footerLinks">Liens rapides</h4>
-                <ul class="footer-links">
-                    <li><a href="#accueil"><i class="fas fa-chevron-right"></i> <span id="footerLink1">Accueil</span></a></li>
-                    <li><a href="#tests"><i class="fas fa-chevron-right"></i> <span id="footerLink2">Tests en ligne</span></a></li>
-                    <li><a href="#thematiques"><i class="fas fa-chevron-right"></i> <span id="footerLink3">Thématiques</span></a></li>
-                    <li><a href="#politique"><i class="fas fa-chevron-right"></i> <span id="footerLink4">Nouvelle politique</span></a></li>
-                    <li><a href="#faq"><i class="fas fa-chevron-right"></i> <span id="footerLink5">FAQ</span></a></li>
-                    
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h4 id="footerContact">Contact</h4>
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <span id="footerEmail">2025qianfan@gmail.com</span>
-                    </div>
-                    <div class="contact-item" onclick="copyWechat()" style="cursor: pointer;">
-                        <i class="fab fa-weixin"></i>
-                        <span id="footerWechat">WeChat: qfparis</span>
-                        <i class="fas fa-copy" style="font-size: 0.8rem; margin-left: 8px; opacity: 0.7;"></i>
-                    </div>
-                    <div class="contact-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span id="footerAddress">Association enregistrée à Paris</span>
+    <footer class="main-footer" id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h4 id="footerAbout">À propos</h4>
+                    <p id="footerAboutText">L'association Mille Voiles accompagne les communautés chinoises en France dans leurs démarches d'intégration, d'apprentissage du français et de préparation aux examens officiels.</p>
+                </div>
+                <div class="footer-column">
+                    <h4 id="footerLinks">Liens rapides</h4>
+                    <ul class="footer-links">
+                        <li><a href="#accueil"><i class="fas fa-chevron-right"></i> <span id="footerLink1">Accueil</span></a></li>
+                        <li><a href="#tests"><i class="fas fa-chevron-right"></i> <span id="footerLink2">Tests en ligne</span></a></li>
+                        <li><a href="#thematiques"><i class="fas fa-chevron-right"></i> <span id="footerLink3">Thématiques</span></a></li>
+                        <li><a href="#politique"><i class="fas fa-chevron-right"></i> <span id="footerLink4">Nouvelle politique</span></a></li>
+                        <li><a href="#faq"><i class="fas fa-chevron-right"></i> <span id="footerLink5">FAQ</span></a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4 id="footerContact">Contact</h4>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span id="footerEmail">2025qianfan@gmail.com</span>
+                        </div>
+                        <div class="contact-item" onclick="copyWechat()" style="cursor: pointer;">
+                            <i class="fab fa-weixin"></i>
+                            <span id="footerWechat">WeChat: qfparis</span>
+                            <i class="fas fa-copy" style="font-size: 0.8rem; margin-left: 8px; opacity: 0.7;"></i>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="footerAddress">Association enregistrée à Paris</span>
+                        </div>
                     </div>
                 </div>
             </div>
+            <div class="footer-bottom">
+                <p id="footerCopyright">&copy; 2025 Association Mille Voiles / 千帆协会 - Tous droits réservés.</p>
+            </div>
         </div>
-        <div class="footer-bottom">
-            <p id="footerCopyright">&copy; 2025 Association Mille Voiles / 千帆协会 - Tous droits réservés.</p>
-        </div>
-    </div>
-</footer>
+    </footer>
 
     <div id="loginModal" class="modal">
         <div class="modal-content">
@@ -394,90 +495,90 @@
 
     <div class="toast-container" id="toastContainer"></div>
     <div id="pwa-install-button" class="pwa-install-btn" style="display: none;"><button onclick="showInstallGuide()" class="install-btn"><i class="fas fa-download"></i><span id="installBtnText">Installer l'app</span></button></div>
-   <div id="pwa-install-guide" class="pwa-install-guide" style="display: none;">
-    <div class="install-guide-content">
-        <div class="install-header">
-            <h3 id="installGuideTitle">Installer l'application</h3>
-            <button class="close-guide" onclick="closeInstallGuide()">&times;</button>
-        </div>
-        <div class="install-body">
-            <div class="device-selector">
-                <button class="device-btn active" id="iosBtn" onclick="showInstructions('ios')">
-                    <i class="fab fa-apple"></i> iOS
-                </button>
-                <button class="device-btn" id="androidBtn" onclick="showInstructions('android')">
-                    <i class="fab fa-android"></i> Android
-                </button>
+    <div id="pwa-install-guide" class="pwa-install-guide" style="display: none;">
+        <div class="install-guide-content">
+            <div class="install-header">
+                <h3 id="installGuideTitle">Installer l'application</h3>
+                <button class="close-guide" onclick="closeInstallGuide()">&times;</button>
             </div>
-            
-            <div id="ios-instructions" class="instructions active">
-                <div class="install-step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h4 id="iosStep1">Ouvrez Safari</h4>
-                        <p id="iosStep1Desc">Accédez à cette page via Safari sur votre iPhone</p>
+            <div class="install-body">
+                <div class="device-selector">
+                    <button class="device-btn active" id="iosBtn" onclick="showInstructions('ios')">
+                        <i class="fab fa-apple"></i> iOS
+                    </button>
+                    <button class="device-btn" id="androidBtn" onclick="showInstructions('android')">
+                        <i class="fab fa-android"></i> Android
+                    </button>
+                </div>
+                
+                <div id="ios-instructions" class="instructions active">
+                    <div class="install-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4 id="iosStep1">Ouvrez Safari</h4>
+                            <p id="iosStep1Desc">Accédez à cette page via Safari sur votre iPhone</p>
+                        </div>
+                    </div>
+                    <div class="install-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4 id="iosStep2">Cliquez sur "Partager"</h4>
+                            <p id="iosStep2Desc">Appuyez sur l'icône <i class="fas fa-share"></i> en bas de l'écran</p>
+                        </div>
+                    </div>
+                    <div class="install-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4 id="iosStep3">Ajouter à l'écran d'accueil</h4>
+                            <p id="iosStep3Desc">Faites défiler et sélectionnez "Sur l'écran d'accueil"</p>
+                        </div>
+                    </div>
+                    <div class="install-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4 id="iosStep4">Confirmer l'installation</h4>
+                            <p id="iosStep4Desc">Appuyez sur "Ajouter" en haut à droite</p>
+                        </div>
                     </div>
                 </div>
-                <div class="install-step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h4 id="iosStep2">Cliquez sur "Partager"</h4>
-                        <p id="iosStep2Desc">Appuyez sur l'icône <i class="fas fa-share"></i> en bas de l'écran</p>
+                
+                <div id="android-instructions" class="instructions">
+                    <div class="install-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4 id="androidStep1">Ouvrez Chrome</h4>
+                            <p id="androidStep1Desc">Accédez à cette page via Chrome sur votre Android</p>
+                        </div>
                     </div>
-                </div>
-                <div class="install-step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h4 id="iosStep3">Ajouter à l'écran d'accueil</h4>
-                        <p id="iosStep3Desc">Faites défiler et sélectionnez "Sur l'écran d'accueil"</p>
+                    <div class="install-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4 id="androidStep2">Menu des options</h4>
+                            <p id="androidStep2Desc">Appuyez sur les trois points <i class="fas fa-ellipsis-v"></i> en haut à droite</p>
+                        </div>
                     </div>
-                </div>
-                <div class="install-step">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <h4 id="iosStep4">Confirmer l'installation</h4>
-                        <p id="iosStep4Desc">Appuyez sur "Ajouter" en haut à droite</p>
+                    <div class="install-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4 id="androidStep3">Installer l'app</h4>
+                            <p id="androidStep3Desc">Sélectionnez "Ajouter à l'écran d'accueil" ou "Installer l'application"</p>
+                        </div>
+                    </div>
+                    <div class="install-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4 id="androidStep4">Confirmer</h4>
+                            <p id="androidStep4Desc">Appuyez sur "Installer" pour confirmer</p>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div id="android-instructions" class="instructions">
-                <div class="install-step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h4 id="androidStep1">Ouvrez Chrome</h4>
-                        <p id="androidStep1Desc">Accédez à cette page via Chrome sur votre Android</p>
-                    </div>
-                </div>
-                <div class="install-step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h4 id="androidStep2">Menu des options</h4>
-                        <p id="androidStep2Desc">Appuyez sur les trois points <i class="fas fa-ellipsis-v"></i> en haut à droite</p>
-                    </div>
-                </div>
-                <div class="install-step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h4 id="androidStep3">Installer l'app</h4>
-                        <p id="androidStep3Desc">Sélectionnez "Ajouter à l'écran d'accueil" ou "Installer l'application"</p>
-                    </div>
-                </div>
-                <div class="install-step">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <h4 id="androidStep4">Confirmer</h4>
-                        <p id="androidStep4Desc">Appuyez sur "Installer" pour confirmer</p>
-                    </div>
-                </div>
+            <div class="install-footer">
+                <button class="btn btn-primary" onclick="installPWA()" id="installPwaBtn">Installer maintenant</button>
+                <button class="btn" onclick="closeInstallGuide()" id="closeGuideBtn">Fermer</button>
             </div>
-        </div>
-        <div class="install-footer">
-            <button class="btn btn-primary" onclick="installPWA()" id="installPwaBtn">Installer maintenant</button>
-            <button class="btn" onclick="closeInstallGuide()" id="closeGuideBtn">Fermer</button>
         </div>
     </div>
-</div>
     <div id="offline-notice" class="offline-notice" style="display: none;"><div class="offline-content"><i class="fas fa-wifi-slash"></i><span id="offlineText">Mode hors ligne - Vous pouvez continuer à utiliser l'application</span></div></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

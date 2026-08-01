@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Nos formations civiques - Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="cours-civique.css">
+</head>
+<body>
+
+<!-- LANGUAGE TOGGLE -->
+<div class="lang-toggle">
+    <button class="lang-btn active" id="langFr" onclick="switchLanguage('fr')">
+        <i class="fas fa-globe"></i> FR
+    </button>
+    <button class="lang-btn" id="langZh" onclick="switchLanguage('zh')">
+        <i class="fas fa-globe"></i> 中文
+    </button>
+</div>
+
+<!-- HEADER -->
+<header class="main-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="header-logo">
+                <i class="fas fa-landmark"></i>
+            </div>
+            <div class="header-text">
+                <h1><span id="mainTitle">Nos formations civiques</span></h1>
+                <p id="mainSubtitle">Association Mille Voiles / 千帆协会 - Préparez-vous à l'examen civique 2026</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- NAVIGATION -->
+<nav class="main-nav">
+    <div class="container nav-container">
+        <a href="index.html" class="nav-brand">
+            <i class="fas fa-sailboat"></i> <span id="navBrand">Mille Voiles</span>
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="examen-civique.html" id="navBack"><i class="fas fa-arrow-left"></i> <span id="navBackText">Retour</span></a>
+            <a href="#debutant" id="navDebutant">Débutant</a>
+            <a href="#intermediaire" id="navIntermediaire">Intermédiaire</a>
+            <a href="#avance" id="navAvance">Avancé</a>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="container">
+        <h2 id="heroTitle">Choisissez la formation <span class="highlight">adaptée à votre niveau</span></h2>
+        <p id="heroDesc">Trois parcours conçus pour vous accompagner pas à pas vers la réussite de l'examen civique.</p>
+    </div>
+</section>
+
+<!-- ===== 亮点特色 ===== -->
+<section class="features-section">
+    <div class="container">
+        <div class="features-header">
+            <span class="features-tag">🇫🇷 Pourquoi choisir Mille Voiles ?</span>
+            <h2 id="featuresTitle">法国公民考试 · 培训</h2>
+            <p id="featuresSub">从2026年1月1日起，申请法国国籍、十年居留卡或四年居留卡，都必须通过公民考试。考试内容涵盖法国历史、文化、价值观、公民义务及语言交流能力。只要准备充分，即使法语基础一般，也能顺利通过！</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-user-graduate"></i></div>
+                <h3 id="feature1Title">🎓 一对一专业辅导</h3>
+                <p id="feature1Desc">根据每位学员的法语水平和考试进度，量身定制学习方案。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-bullseye"></i></div>
+                <h3 id="feature2Title">🎯 考试重点精准讲解</h3>
+                <p id="feature2Desc">深入解析考试内容，梳理高频考点，帮助学员高效备考。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-comments"></i></div>
+                <h3 id="feature3Title">💡 实用考试技巧培训</h3>
+                <p id="feature3Desc">模拟真实考试场景，教授答题技巧、表达方法及应试策略，提高通过率。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-laptop"></i></div>
+                <h3 id="feature4Title">📚 专业练习平台</h3>
+                <p id="feature4Desc">配套专业在线练习系统，随时随地刷题巩固，让学习更高效。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                <h3 id="feature5Title">📋 全程协助报名</h3>
+                <p id="feature5Desc">全程指导考试报名流程，省时省心，无需担心手续问题。</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                <h3 id="feature6Title">🌱 法语基础薄弱也能学</h3>
+                <p id="feature6Desc">课程循序渐进，从基础到实战，帮助法语较弱的学员建立信心，顺利通过考试。</p>
+            </div>
+        </div>
+        
+        <div class="features-cta">
+            <div class="features-audience">
+                <h4 id="audienceTitle">🎯 适合人群：</h4>
+                <ul>
+                    <li id="audience1">✅ 准备申请法国国籍</li>
+                    <li id="audience2">✅ 准备申请十年居留卡</li>
+                    <li id="audience3">✅ 准备申请四年居留卡</li>
+                    <li id="audience4">✅ 已收到公民考试通知</li>
+                    <li id="audience5">✅ 希望提前备考，提高通过率</li>
+                    <li id="audience6">✅ 法语基础较弱，希望获得专业辅导</li>
+                </ul>
+            </div>
+            <div class="features-cta-text">
+                <p id="ctaText"><strong>专业培训 + 一对一辅导 + 全程陪伴</strong>，助您顺利通过法国公民考试，开启在法国的全新篇章！</p>
+                <a href="#debutant" class="btn btn-features"><span id="ctaBtn">📩 预约免费学习评估</span> <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== COURS 1 : DÉBUTANT ===== -->
+<section class="cours-section" id="debutant">
+    <div class="container">
+        <div class="cours-header">
+            <span class="cours-badge debutant">Débutant</span>
+            <span class="cours-badge populaire">⭐ Populaire</span>
+            <h2 id="cours1Title">📘 初级课程 · Initiation</h2>
+            <div class="cours-price" id="cours1Price">180€</div>
+        </div>
+        
+        <div class="cours-grid">
+            <div class="cours-info">
+                <h3 id="cours1Subtitle">👤 À qui s'adresse ce cours ?</h3>
+                <p id="cours1Audience">Ce cours est conçu pour les personnes qui débutent totalement leur apprentissage :</p>
+                <ul class="audience-list">
+                    <li><i class="fas fa-check-circle"></i> <span id="cours1Audience1">Vous n'avez aucune connaissance du français</span></li>
+                    <li><i class="fas fa-check-circle"></i> <span id="cours1Audience2">Vous découvrez la France et ses institutions</span></li>
+                    <li><i class="fas fa-check-circle"></i> <span id="cours1Audience3">Vous partez de zéro et souhaitez tout apprendre</span></li>
+                    <li><i class="fas fa-check-circle"></i> <span id="cours1Audience4">Vous avez besoin d'un accompagnement pas à pas</span></li>
+                </ul>
+                <div class="cours-details">
+                    <span><i class="fas fa-clock"></i> <span id="cours1Duration">8 séances · 16 heures</span></span>
+                    <span><i class="fas fa-users"></i> <span id="cours1Group">Groupe 4-8 pers.</span></span>
+                    <span><i class="fas fa-euro-sign"></i> <span id="cours1PriceLabel">180€</span></span>
+                </div>
+            </div>
+            
+            <div class="cours-programme">
+                <h3 id="cours1ProgrammeTitle">📖 Programme</h3>
+                <ul class="programme-list">
+                    <li><span class="module-number">01</span> <span id="cours1Module1">🇫🇷 La France et ses symboles</span></li>
+                    <li><span class="module-number">02</span> <span id="cours1Module2">🏛️ Les institutions de la République</span></li>
+                    <li><span class="module-number">03</span> <span id="cours1Module3">📜 La Constitution et les lois</span></li>
+                    <li><span class="module-number">04</span> <span id="cours1Module4">🤝 Les droits et devoirs du citoyen</span></li>
+                    <li><span class="module-number">05</span> <span id="cours1Module5">🎭 La culture et l'histoire de France</span></li>
+                    <li><span class="module-number">06</span> <span id="cours1Module6">🏙️ La vie sociale et les services publics</span></li>
+                    <li><span class="module-number">07</span> <span id="cours1Module7">🗳️ La démocratie et la participation citoyenne</span></li>
+                    <li><span class="module-number">08</span> <span id="cours1Module8">✅ Révision générale et simulation</span></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="cours-actions">
+            <a href="#" class="btn btn-primary" onclick="openInscriptionModal(); return false;"><span id="cours1Btn">S'inscrire</span> <i class="fas fa-arrow-right"></i></a>
+            <a href="#intermediaire" class="btn btn-outline"><span id="cours1Next">Voir le niveau suivant →</span></a>
+        </div>
+    </div>
+</section>
+
+<!-- ===== COURS 2 : INTERMÉDIAIRE ===== -->
+<section class="cours-section alt" id="intermediaire">
+    <div class="container">
+        <div class="cours-header">
+            <span class="cours-badge intermediaire">Intermédiaire</span>
+            <h2 id="cours2Title">📘 中级课程 · Perfectionnement</h2>
+            <div class="cours-price" id="cours2Price">100€</div>
+        </div>
+        
+        <div class="cours-grid">
+            <div class="cours-info">
+                <h3 id="cours2Subtitle">👤 À qui s'adresse ce cours ?</h3>
+                <p id="cours2Audience">Ce cours est conçu pour les personnes qui ont déjà une base et souhaitent approfondir :</p>
+                <ul class="audience-list">
+                    <li><i class="fas fa-check-circle"></i> <span id="cours2Audience1">Vous avez un niveau A2 en français</span></li>
+                    <li><i class="fas fa-check-circle"></i> <span id="cours2Audience2">Vous vivez en France depuis quelques années</span></li>
+                    <li><i class="fas fa-check-circle"></i> <span id="cours2Audience3">Vous connaissez déjà les bases de la société française</span></li>
+                    <li><i class="fas fa-check-circle"></i> <span id="cours2Audience4">Vous souhaitez consolider vos connaissances</span></li>
+                </ul>
+                <div class="cours-details">
+                    <span><i class="fas fa-clock"></i> <span id="cours2Duration">4 séances · 8 heures</span></span>
+                    <span><i class="fas fa-users"></i> <span id="cours2Group">Groupe 4-8 pers.</span></span>
+                    <span><i class="fas fa-euro-sign"></i> <span id="cours2PriceLabel">100€</span></span>
+                </div>
+            </div>
+            
+            <div class="cours-programme">
+                <h3 id="cours2ProgrammeTitle">📖 Programme</h3>
+                <ul class="programme-list">
+                    <li><span class="module-number">01</span> <span id="cours2Module1">🏛️ Approfondissement des institutions</span></li>
+                    <li><span class="module-number">02</span> <span id="cours2Module2">📜 Analyse de la Constitution</span></li>
+                    <li><span class="module-number">03</span> <span id="cours2Module3">⚖️ Droits et devoirs en pratique</span></li>
+                    <li><span class="module-number">04</span> <span id="cours2Module4">🎯 Entraînement sur sujets réels</span></li>
+                    <li><span class="module-number">05</span> <span id="cours2Module5">📝 Techniques de réponse efficace</span></li>
+                    <li><span class="module-number">06</span> <span id="cours2Module6">🔄 Renforcement des points faibles</span></li>
+                    <li><span class="module-number">07</span> <span id="cours2Module7">🎭 Culture et actualité françaises</span></li>
+                    <li><span class="module-number">08</span> <span id="cours2Module8">✅ Simulation d'examen complète</span></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="cours-actions">
+            <a href="#" class="btn btn-primary" onclick="openInscriptionModal(); return false;"><span id="cours2Btn">S'inscrire</span> <i class="fas fa-arrow-right"></i></a>
+            <a href="#avance" class="btn btn-outline"><span id="cours2Next">Voir le niveau suivant →</span></a>
+        </div>
+    </div>
+</section>
+
+<!-- ===== COURS 3 : AVANCÉ ===== -->
+<section class="cours-section" id="avance">
+    <div class="container">
+        <div class="cours-header">
+            <span class="cours-badge avance">Avancé</span>
+            <h2 id="cours3Title">📘 高级课程 · Expertise</h2>
+            <div class="cours-price" id="cours3Price">60€</div>
+        </div>
+        
+        <div class="cours-grid">
+            <div class="cours-info">
+                <h3 id="cours3Subtitle">👤 À qui s'adresse ce cours ?</h3>
+                <p id="cours3Audience">Ce cours est conçu pour les personnes qui ont déjà une bonne maîtrise et veulent optimiser leurs chances :</p>
+                <ul class="audience-list">
+                    <li><i class="fas fa-check-circle"></i> <span id="cours3Audience1">Vous avez un niveau B1 en français</span></li>
+                    <li><i class="fas fa-check-circle"></i> <span id="cours3Audience2">Vous maîtrisez déjà les bases de l'examen</span></li>
+                    <li><i class="fas fa-check-circle"></i> <span id="cours3Audience3">Vous souhaitez une préparation intensive</span></li>
+                    <li><i class="fas fa-check-circle"></i> <span id="cours3Audience4">Vous voulez maximiser vos chances de réussite</span></li>
+                </ul>
+                <div class="cours-details">
+                    <span><i class="fas fa-clock"></i> <span id="cours3Duration">2 séances · 4 heures</span></span>
+                    <span><i class="fas fa-users"></i> <span id="cours3Group">Groupe 2-6 pers.</span></span>
+                    <span><i class="fas fa-euro-sign"></i> <span id="cours3PriceLabel">60€</span></span>
+                </div>
+            </div>
+            
+            <div class="cours-programme">
+                <h3 id="cours3ProgrammeTitle">📖 Programme</h3>
+                <ul class="programme-list">
+                    <li><span class="module-number">01</span> <span id="cours3Module1">🎯 Synthèse des sujets clés</span></li>
+                    <li><span class="module-number">02</span> <span id="cours3Module2">📝 Analyse des erreurs fréquentes</span></li>
+                    <li><span class="module-number">03</span> <span id="cours3Module3">⏱️ Tests en temps limité</span></li>
+                    <li><span class="module-number">04</span> <span id="cours3Module4">💡 Pronostics et sujets probables</span></li>
+                    <li><span class="module-number">05</span> <span id="cours3Module5">🎤 Accompagnement personnalisé</span></li>
+                    <li><span class="module-number">06</span> <span id="cours3Module6">🧠 Stratégies de préparation mentale</span></li>
+                    <li><span class="module-number">07</span> <span id="cours3Module7">📋 Simulation d'examen complète</span></li>
+                    <li><span class="module-number">08</span> <span id="cours3Module8">✅ Feedback et plan de révision</span></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="cours-actions">
+            <a href="#" class="btn btn-primary" onclick="openInscriptionModal(); return false;"><span id="cours3Btn">S'inscrire</span> <i class="fas fa-arrow-right"></i></a>
+            <a href="examen-civique.html#tests" class="btn btn-outline"><span id="cours3Next">← Retour aux tests</span></a>
+        </div>
+    </div>
+</section>
+
+<!-- COMPARAISON -->
+<section class="comparaison-section">
+    <div class="container">
+        <h2 id="comparaisonTitle">📊 Comparaison des formations</h2>
+        <div class="comparaison-grid">
+            <div class="comparaison-card">
+                <h3 id="comp1Title">Débutant</h3>
+                <div class="comp-price">180€</div>
+                <ul>
+                    <li><span id="comp1Dur">8 séances · 16h</span></li>
+                    <li><span id="comp1Group">4-8 pers.</span></li>
+                    <li><span id="comp1Level">Aucun prérequis</span></li>
+                    <li><span id="comp1Support">Supports inclus</span></li>
+                </ul>
+                <a href="#debutant" class="btn btn-small">Voir le cours</a>
+            </div>
+            <div class="comparaison-card featured">
+                <h3 id="comp2Title">Intermédiaire</h3>
+                <div class="comp-price">100€</div>
+                <ul>
+                    <li><span id="comp2Dur">4 séances · 8h</span></li>
+                    <li><span id="comp2Group">4-8 pers.</span></li>
+                    <li><span id="comp2Level">Niveau A2</span></li>
+                    <li><span id="comp2Support">Supports inclus</span></li>
+                </ul>
+                <a href="#intermediaire" class="btn btn-small">Voir le cours</a>
+            </div>
+            <div class="comparaison-card">
+                <h3 id="comp3Title">Avancé</h3>
+                <div class="comp-price">60€</div>
+                <ul>
+                    <li><span id="comp3Dur">2 séances · 4h</span></li>
+                    <li><span id="comp3Group">2-6 pers.</span></li>
+                    <li><span id="comp3Level">Niveau B1</span></li>
+                    <li><span id="comp3Support">Supports inclus</span></li>
+                </ul>
+                <a href="#avance" class="btn btn-small">Voir le cours</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="main-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4><i class="fas fa-sailboat"></i> Mille Voiles</h4>
+                <p id="footerAbout">Association d'intégration et de formation</p>
+                <p><i class="fas fa-map-pin"></i> <span id="footerAddr">Paris, France</span></p>
+                <p><i class="fas fa-calendar-alt"></i> <span id="footerYear">Fondée en 2025</span></p>
+            </div>
+            <div class="footer-col">
+                <h4 id="footerContactTitle">Contact</h4>
+                <div class="contact-item"><i class="fas fa-envelope"></i> <a href="mailto:2025qianfan@gmail.com">2025qianfan@gmail.com</a></div>
+                <div class="contact-item"><i class="fab fa-weixin"></i> <span>WeChat: qfparis</span></div>
+                <div class="contact-item"><i class="fab fa-linkedin"></i> <a href="https://www.linkedin.com/company/association-mille-voiles/" target="_blank">LinkedIn</a></div>
+            </div>
+            <div class="footer-col">
+                <h4 id="footerNavTitle">Navigation</h4>
+                <a href="examen-civique.html"><i class="fas fa-chevron-right"></i> <span id="fNav1">Examen civique</span></a>
+                <a href="#debutant"><i class="fas fa-chevron-right"></i> <span id="fNav2">Débutant</span></a>
+                <a href="#intermediaire"><i class="fas fa-chevron-right"></i> <span id="fNav3">Intermédiaire</span></a>
+                <a href="#avance"><i class="fas fa-chevron-right"></i> <span id="fNav4">Avancé</span></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span id="footerCopy">© 2025-2026 Mille Voiles · Tous droits réservés</span>
+            <span class="sep">|</span>
+            <span id="footerCopyZh">千帆协会 版权所有</span>
+        </div>
+    </div>
+</footer>
+
+<!-- INSCRIPTION MODAL -->
+<div class="modal" id="inscriptionModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">📩 Demande d'inscription</h3>
+            <button class="close-modal" onclick="closeInscriptionModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p id="modalText">Veuillez nous contacter par email ou WeChat pour vous inscrire à une formation.</p>
+            <div class="modal-contact">
+                <div class="modal-contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <a href="mailto:2025qianfan@gmail.com">2025qianfan@gmail.com</a>
+                </div>
+                <div class="modal-contact-item">
+                    <i class="fab fa-weixin"></i>
+                    <span>WeChat: qfparis</span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeInscriptionModal()"><span id="modalCloseBtn">Fermer</span></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="cours-civique.js"></script>
+</body>
+</html>
