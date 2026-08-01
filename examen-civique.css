@@ -1,4 +1,6 @@
-/* ==================== 变量定义 ==================== */
+/* ============================================
+   变量定义
+   ============================================ */
 :root {
     --primary-blue: #004080;
     --primary-light-blue: #0066cc;
@@ -18,7 +20,9 @@
     --transition: all 0.3s ease;
 }
 
-/* ==================== 基础重置 ==================== */
+/* ============================================
+   基础重置
+   ============================================ */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -45,10 +49,11 @@ h1, h2, h3, h4, h5 {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
-    box-sizing: border-box;
 }
 
-/* ==================== 按钮样式 ==================== */
+/* ============================================
+   按钮样式
+   ============================================ */
 .btn {
     display: inline-block;
     padding: 16px 36px;
@@ -109,20 +114,16 @@ h1, h2, h3, h4, h5 {
     background-color: #555;
 }
 
-.btn:disabled, .btn.disabled {
+.btn:disabled,
+.btn.disabled {
     opacity: 0.5;
     cursor: not-allowed;
     pointer-events: none;
 }
 
-/* ==================== Logo图片 ==================== */
-.logo img {
-    height: 40px;
-    width: auto;
-    transition: height 0.3s ease;
-}
-
-/* ==================== 头部 ==================== */
+/* ============================================
+   头部
+   ============================================ */
 .main-header {
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light-blue) 100%);
     color: var(--white);
@@ -145,7 +146,9 @@ h1, h2, h3, h4, h5 {
     margin: 0 auto;
 }
 
-/* ==================== 语言切换 ==================== */
+/* ============================================
+   语言切换
+   ============================================ */
 .language-toggle {
     position: absolute;
     top: 20px;
@@ -181,7 +184,9 @@ h1, h2, h3, h4, h5 {
     color: var(--primary-blue);
 }
 
-/* ==================== 导航栏 ==================== */
+/* ============================================
+   导航栏
+   ============================================ */
 .main-nav {
     background-color: var(--white);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -197,7 +202,6 @@ h1, h2, h3, h4, h5 {
     padding: 15px 20px;
     position: relative;
     min-height: 70px;
-    box-sizing: border-box;
 }
 
 .logo {
@@ -414,7 +418,9 @@ h1, h2, h3, h4, h5 {
     font-size: 1rem;
 }
 
-/* ==================== Hero区域 ==================== */
+/* ============================================
+   Hero区域
+   ============================================ */
 .hero {
     background: linear-gradient(rgba(0, 64, 128, 0.9), rgba(0, 102, 204, 0.9)), url('https://images.unsplash.com/photo-1583409899067-19f1d1997d41?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
     background-size: cover;
@@ -437,10 +443,28 @@ h1, h2, h3, h4, h5 {
     opacity: 0.9;
 }
 
-/* ==================== 课程介绍 ==================== */
+/* ============================================
+   课程介绍
+   ============================================ */
 .course-intro {
     padding: 80px 0 60px;
     background: var(--white);
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.section-title h2 {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+}
+
+.section-title p {
+    color: var(--medium-gray);
+    max-width: 700px;
+    margin: 0 auto;
 }
 
 .course-grid {
@@ -601,58 +625,75 @@ h1, h2, h3, h4, h5 {
     background: #e67e22;
 }
 
-/* ==================== 学员数据统计 ==================== */
+/* ============================================
+   统计区域 - 精致卡片设计
+   ============================================ */
 .stats-highlight {
-    padding: 60px 0;
+    padding: 50px 0;
     background: var(--primary-blue);
-    color: var(--white);
 }
 
 .stats-highlight-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 30px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
     text-align: center;
+    max-width: 750px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 12px 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(4px);
 }
 
 .stat-highlight-item {
-    padding: 20px;
+    padding: 16px 10px;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stat-highlight-item:last-child {
+    border-right: none;
 }
 
 .stat-highlight-number {
     font-family: 'Montserrat', sans-serif;
-    font-size: 3rem;
+    font-size: 3.4rem;
     font-weight: 800;
     color: var(--primary-yellow);
-    line-height: 1.2;
+    line-height: 1.1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+.stat-highlight-number .stat-plus {
+    font-size: 2.2rem;
+    color: var(--primary-yellow);
+    opacity: 0.6;
+}
+
+.stat-highlight-number .stat-percent {
+    font-size: 2.2rem;
+    color: var(--primary-yellow);
+    opacity: 0.6;
 }
 
 .stat-highlight-label {
-    font-size: 1rem;
+    font-size: 0.95rem;
     opacity: 0.85;
-    margin-top: 6px;
+    margin-top: 4px;
+    font-weight: 400;
+    color: var(--white);
 }
 
-/* ==================== 测试卡片 ==================== */
+/* ============================================
+   测试卡片
+   ============================================ */
 .test-cards {
     padding: 80px 0;
     background-color: var(--white);
-}
-
-.section-title {
-    text-align: center;
-    margin-bottom: 50px;
-}
-
-.section-title h2 {
-    font-size: 2.2rem;
-    margin-bottom: 15px;
-}
-
-.section-title p {
-    color: var(--medium-gray);
-    max-width: 700px;
-    margin: 0 auto;
 }
 
 .cards-container {
@@ -753,7 +794,9 @@ h1, h2, h3, h4, h5 {
     pointer-events: none;
 }
 
-/* ==================== 主题卡片网格 ==================== */
+/* ============================================
+   主题卡片网格
+   ============================================ */
 .themes-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -813,7 +856,9 @@ h1, h2, h3, h4, h5 {
     flex-shrink: 0;
 }
 
-/* ==================== 文章内容 ==================== */
+/* ============================================
+   文章内容
+   ============================================ */
 .policy-content {
     padding: 80px 0;
     background-color: var(--light-gray);
@@ -903,7 +948,9 @@ h1, h2, h3, h4, h5 {
     margin: 25px 0;
 }
 
-/* ==================== FAQ ==================== */
+/* ============================================
+   FAQ
+   ============================================ */
 .faq-section {
     padding: 80px 0;
     background-color: var(--white);
@@ -957,7 +1004,9 @@ h1, h2, h3, h4, h5 {
     max-height: 1000px;
 }
 
-/* ==================== 模态框 ==================== */
+/* ============================================
+   模态框
+   ============================================ */
 .modal {
     display: none;
     position: fixed;
@@ -1135,7 +1184,9 @@ h1, h2, h3, h4, h5 {
     flex: 1;
 }
 
-/* ==================== Toast通知 ==================== */
+/* ============================================
+   Toast通知
+   ============================================ */
 .toast-container {
     position: fixed;
     top: 20px;
@@ -1211,7 +1262,9 @@ h1, h2, h3, h4, h5 {
     }
 }
 
-/* ==================== 页脚 ==================== */
+/* ============================================
+   页脚
+   ============================================ */
 .main-footer {
     background-color: var(--primary-blue);
     color: var(--white);
@@ -1275,7 +1328,9 @@ h1, h2, h3, h4, h5 {
     opacity: 0.7;
 }
 
-/* ==================== PWA相关 ==================== */
+/* ============================================
+   PWA相关
+   ============================================ */
 .pwa-install-btn {
     position: fixed;
     bottom: 20px;
@@ -1443,7 +1498,9 @@ h1, h2, h3, h4, h5 {
     gap: 10px;
 }
 
-/* ==================== 响应式设计 ==================== */
+/* ============================================
+   响应式设计
+   ============================================ */
 @media (max-width: 1024px) {
     .themes-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -1454,12 +1511,15 @@ h1, h2, h3, h4, h5 {
 }
 
 @media (max-width: 992px) {
-    .stats-highlight-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
+    .stat-highlight-number {
+        font-size: 2.8rem;
     }
-    .stats-highlight-number {
-        font-size: 2.4rem;
+    .stat-highlight-number .stat-plus,
+    .stat-highlight-number .stat-percent {
+        font-size: 1.8rem;
+    }
+    .stats-highlight-grid {
+        padding: 10px 16px;
     }
 }
 
@@ -1467,7 +1527,7 @@ h1, h2, h3, h4, h5 {
     .main-header h1 {
         font-size: 1.6rem;
     }
-    
+
     .hero {
         padding: 50px 0;
     }
@@ -1477,11 +1537,11 @@ h1, h2, h3, h4, h5 {
     .hero p {
         font-size: 0.95rem;
     }
-    
+
     .section-title h2 {
         font-size: 1.5rem;
     }
-    
+
     .cards-container {
         display: flex;
         flex-direction: column;
@@ -1499,9 +1559,8 @@ h1, h2, h3, h4, h5 {
         text-align: center;
         padding: 12px 16px;
         font-size: 0.9rem;
-        box-sizing: border-box;
     }
-    
+
     .themes-grid {
         display: flex;
         flex-direction: column;
@@ -1517,7 +1576,7 @@ h1, h2, h3, h4, h5 {
     .theme-link {
         justify-content: center;
     }
-    
+
     .course-grid {
         grid-template-columns: 1fr;
         max-width: 400px;
@@ -1541,24 +1600,37 @@ h1, h2, h3, h4, h5 {
         margin-bottom: 8px;
         align-self: flex-start;
     }
-    
+
     .stats-highlight {
-        padding: 40px 0;
+        padding: 35px 0;
     }
-    .stats-highlight-number {
+    .stats-highlight-grid {
+        max-width: 100%;
+        padding: 8px 12px;
+        gap: 8px;
+        border-radius: 12px;
+    }
+    .stat-highlight-item {
+        padding: 12px 6px;
+    }
+    .stat-highlight-number {
         font-size: 2rem;
     }
-    .stats-highlight-label {
-        font-size: 0.85rem;
+    .stat-highlight-number .stat-plus,
+    .stat-highlight-number .stat-percent {
+        font-size: 1.4rem;
     }
-    
+    .stat-highlight-label {
+        font-size: 0.75rem;
+    }
+
     .article-image {
         height: 220px;
     }
     .article-content {
         padding: 25px 16px;
     }
-    
+
     .pwa-install-btn {
         bottom: 70px;
         right: 15px;
@@ -1567,7 +1639,7 @@ h1, h2, h3, h4, h5 {
         padding: 10px 18px;
         font-size: 0.85rem;
     }
-    
+
     .toast-container {
         left: 16px;
         right: 16px;
@@ -1594,34 +1666,44 @@ h1, h2, h3, h4, h5 {
     .contact-item {
         justify-content: center;
     }
+    .stats-highlight {
+        padding: 25px 0;
+    }
     .stats-highlight-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
+        padding: 6px 6px;
+        gap: 4px;
+        border-radius: 10px;
     }
     .stat-highlight-item {
-        padding: 12px;
+        padding: 10px 4px;
     }
-    .stats-highlight-number {
-        font-size: 1.6rem;
+    .stat-highlight-number {
+        font-size: 1.5rem;
     }
-    .stats-highlight-label {
-        font-size: 0.75rem;
+    .stat-highlight-number .stat-plus,
+    .stat-highlight-number .stat-percent {
+        font-size: 1rem;
+    }
+    .stat-highlight-label {
+        font-size: 0.6rem;
     }
 }
 
-/* ==================== 响应式设计 - 导航栏 ==================== */
+/* ============================================
+   导航栏响应式
+   ============================================ */
 @media (max-width: 1024px) {
     .nav-container {
         padding: 12px 16px;
         min-height: 60px;
     }
-    
+
     .hamburger {
         display: flex;
         z-index: 1002;
         order: 1;
     }
-    
+
     .logo {
         position: absolute;
         left: 50%;
@@ -1629,7 +1711,7 @@ h1, h2, h3, h4, h5 {
         z-index: 1;
         order: 2;
     }
-    
+
     .language-toggle {
         position: static;
         display: flex;
@@ -1637,13 +1719,13 @@ h1, h2, h3, h4, h5 {
         order: 3;
         z-index: 1002;
     }
-    
+
     .lang-btn {
         padding: 6px 12px;
         font-size: 0.8rem;
         min-width: 55px;
     }
-    
+
     .nav-links {
         position: fixed;
         top: 0;
@@ -1663,11 +1745,11 @@ h1, h2, h3, h4, h5 {
         box-shadow: -5px 0 20px rgba(0, 0, 0, 0.15);
         display: flex !important;
     }
-    
+
     .nav-links.active {
         right: 0;
     }
-    
+
     .nav-links a {
         width: 100%;
         padding: 14px 0;
@@ -1676,11 +1758,11 @@ h1, h2, h3, h4, h5 {
         white-space: normal;
         text-align: left;
     }
-    
+
     .nav-links a::after {
         display: none;
     }
-    
+
     .user-info {
         width: 100%;
         margin-top: 20px;
@@ -1689,7 +1771,7 @@ h1, h2, h3, h4, h5 {
         justify-content: space-between;
         position: relative;
     }
-    
+
     .user-dropdown {
         position: absolute;
         top: 100%;
@@ -1699,13 +1781,13 @@ h1, h2, h3, h4, h5 {
         z-index: 1003;
         margin-top: 5px;
     }
-    
+
     body.menu-open {
         overflow: hidden;
     }
 }
 
-/* 手机端 Logo 文字强制一行显示 */
+/* 手机端 Logo 文字 */
 @media (max-width: 768px) {
     .logo {
         font-size: 1rem;

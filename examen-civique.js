@@ -1326,17 +1326,17 @@ function copyWechat() {
         }
 
 // ==================== 加载统计数据 ====================
+// ==================== 加载统计数据 ====================
 async function loadStats() {
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         
-        // 获取学生总数 (role = 'stu')
-        const { count: studentCount, error: studentError } = await supabase
+        // 获取所有用户总数 (不区分role)
+        const { count: totalCount, error: totalError } = await supabase
             .from('students')
-            .select('*', { count: 'exact', head: true })
-            .eq('role', 'stu');
+            .select('*', { count: 'exact', head: true });
         
-        if (studentError) throw studentError;
+        if (totalError) throw totalError;
         
         // 获取老师总数 (role = 'teacher')
         const { count: teacherCount, error: teacherError } = await supabase
@@ -1351,21 +1351,21 @@ async function loadStats() {
         const teacherNumberEl = document.getElementById('statTeacherNumber');
         
         if (studentNumberEl) {
-            studentNumberEl.textContent = (studentCount || 0) + '+';
+            studentNumberEl.textContent = totalCount || 0;
         }
         if (teacherNumberEl) {
             teacherNumberEl.textContent = (teacherCount || 0) + '+';
         }
         
-        console.log('📊 统计加载成功:', { students: studentCount, teachers: teacherCount });
+        console.log('📊 统计加载成功:', { total: totalCount, teachers: teacherCount });
         
     } catch (error) {
         console.error('加载统计数据失败:', error);
         // 显示默认值
         const studentNumberEl = document.getElementById('statStudentNumber');
         const teacherNumberEl = document.getElementById('statTeacherNumber');
-        if (studentNumberEl) studentNumberEl.textContent = '50+';
-        if (teacherNumberEl) teacherNumberEl.textContent = '10+';
+        if (studentNumberEl) studentNumberEl.textContent = '0';
+        if (teacherNumberEl) teacherNumberEl.textContent = '0+';
     }
 }
 
