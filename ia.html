@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>IA & Computer Science - Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="ia.css">
+    <meta name="theme-color" content="#27ae60">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+<body>
+
+<!-- LANGUAGE TOGGLE -->
+<div class="lang-toggle">
+    <button class="lang-btn active" id="langFr" onclick="switchLanguage('fr')">
+        <i class="fas fa-globe"></i> FR
+    </button>
+    <button class="lang-btn" id="langZh" onclick="switchLanguage('zh')">
+        <i class="fas fa-globe"></i> 中文
+    </button>
+</div>
+
+<!-- HEADER -->
+<header class="main-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="header-logo">
+                <div class="logo-icon"><i class="fas fa-robot"></i></div>
+            </div>
+            <div class="header-text">
+                <h1><span id="mainTitle">IA & Computer Science</span></h1>
+                <p id="mainSubtitle">Association Mille Voiles / 千帆协会 - Former les talents du numérique</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- NAVIGATION -->
+<nav class="main-nav">
+    <div class="container nav-container">
+        <a href="index.html" class="nav-brand">
+            <i class="fas fa-sailboat"></i> <span id="navBrand">Mille Voiles</span>
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html#accueil" id="navHome">Accueil</a>
+            <a href="#accueil" id="navAccueil">Accueil</a>
+            <a href="#programmes" id="navProgrammes">Programmes</a>
+            <a href="#projets" id="navProjets">Projets</a>
+            <a href="#contact" id="navContact">Contact</a>
+            <a href="#" id="navLogin" onclick="openLoginModal()">
+                <span id="navLoginText">Connexion</span>
+            </a>
+            <div class="user-info" id="userInfo" style="display: none;">
+                <i class="fas fa-user-circle"></i>
+                <span id="welcomeMessage"></span>
+                <button class="user-menu-btn" onclick="toggleUserMenu()">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="#" onclick="showProfileModal()"><i class="fas fa-user-cog"></i> <span id="profileMenuItem">Mon profil</span></a>
+                    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span id="logoutMenuItem">Déconnexion</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="accueil">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <span class="hero-tag" id="heroTag">💻 Tech & Innovation</span>
+                <h2 id="heroTitle">L'avenir <span class="highlight">se code</span> aujourd'hui</h2>
+                <p id="heroDesc">Des ateliers de programmation, d'intelligence artificielle et de data science pour tous les niveaux. Devenez acteur de la transformation numérique.</p>
+                <div class="hero-buttons">
+                    <a href="#programmes" class="btn-primary"><i class="fas fa-rocket"></i> <span id="heroBtn1">Découvrir les programmes</span></a>
+                    <a href="#projets" class="btn-secondary"><i class="fas fa-code"></i> <span id="heroBtn2">Voir les projets</span></a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="hero-image-wrapper">
+                    <div class="hero-placeholder">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <div class="floating-badge">
+                        <i class="fas fa-code"></i>
+                        <span id="heroBadge">Python · IA · Data</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">50+</div>
+                <div class="stat-label" id="stat1Label">Étudiants formés</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">12</div>
+                <div class="stat-label" id="stat2Label">Projets réalisés</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">95%</div>
+                <div class="stat-label" id="stat3Label">Satisfaction</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">4</div>
+                <div class="stat-label" id="stat4Label">Ateliers disponibles</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PROGRAMMES -->
+<section id="programmes">
+    <div class="container">
+        <div class="section-label">
+            <span class="label-tag" id="progTag">NOS PROGRAMMES</span>
+            <h2 id="progTitle">Formez-vous aux technologies de demain</h2>
+            <p id="progSub">Des ateliers pratiques pour tous les niveaux</p>
+        </div>
+
+        <div class="programmes-grid">
+            <div class="programme-card">
+                <div class="programme-icon"><i class="fab fa-python"></i></div>
+                <h3 id="prog1Title">Python - Initiation</h3>
+                <p id="prog1Desc">Apprenez les bases de la programmation avec Python. Variables, boucles, fonctions et premiers algorithmes.</p>
+                <div class="programme-meta">
+                    <span><i class="fas fa-clock"></i> 20h</span>
+                    <span><i class="fas fa-users"></i> 8-12 pers.</span>
+                    <span><i class="fas fa-signal"></i> Débutant</span>
+                </div>
+                <a href="#" class="btn-prog" onclick="handleProgramClick(event)"><span id="prog1Btn">S'inscrire</span> <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="programme-card featured">
+                <div class="programme-icon"><i class="fas fa-brain"></i></div>
+                <div class="featured-badge">⭐ Populaire</div>
+                <h3 id="prog2Title">IA & Machine Learning</h3>
+                <p id="prog2Desc">Initiez-vous à l'intelligence artificielle : réseaux de neurones, NLP, vision par ordinateur et modèles génératifs.</p>
+                <div class="programme-meta">
+                    <span><i class="fas fa-clock"></i> 30h</span>
+                    <span><i class="fas fa-users"></i> 6-10 pers.</span>
+                    <span><i class="fas fa-signal"></i> Intermédiaire</span>
+                </div>
+                <a href="#" class="btn-prog" onclick="handleProgramClick(event)"><span id="prog2Btn">S'inscrire</span> <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="programme-card">
+                <div class="programme-icon"><i class="fas fa-chart-line"></i></div>
+                <h3 id="prog3Title">Data Science</h3>
+                <p id="prog3Desc">Analyse de données, visualisation, pandas, numpy et création de modèles prédictifs avec Python.</p>
+                <div class="programme-meta">
+                    <span><i class="fas fa-clock"></i> 25h</span>
+                    <span><i class="fas fa-users"></i> 6-10 pers.</span>
+                    <span><i class="fas fa-signal"></i> Intermédiaire</span>
+                </div>
+                <a href="#" class="btn-prog" onclick="handleProgramClick(event)"><span id="prog3Btn">S'inscrire</span> <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="programme-card">
+                <div class="programme-icon"><i class="fas fa-globe"></i></div>
+                <h3 id="prog4Title">Web Dev & Cloud</h3>
+                <p id="prog4Desc">Développement web full-stack : HTML, CSS, JavaScript, React et déploiement sur le cloud.</p>
+                <div class="programme-meta">
+                    <span><i class="fas fa-clock"></i> 30h</span>
+                    <span><i class="fas fa-users"></i> 6-10 pers.</span>
+                    <span><i class="fas fa-signal"></i> Débutant +</span>
+                </div>
+                <a href="#" class="btn-prog" onclick="handleProgramClick(event)"><span id="prog4Btn">S'inscrire</span> <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PROJETS -->
+<section id="projets">
+    <div class="container">
+        <div class="section-label">
+            <span class="label-tag" id="projetTag">PROJETS RÉALISÉS</span>
+            <h2 id="projetTitle">Des projets concrets</h2>
+            <p id="projetSub">Découvrez ce que nos étudiants ont créé</p>
+        </div>
+
+        <div class="projets-grid">
+            <div class="projet-card">
+                <div class="projet-icon"><i class="fas fa-robot"></i></div>
+                <h3 id="projet1Title">Chatbot IA</h3>
+                <p id="projet1Desc">Assistant conversationnel basé sur GPT pour répondre aux questions des nouveaux arrivants en France.</p>
+                <span class="projet-tech">Python · NLP · Transformers</span>
+            </div>
+            <div class="projet-card">
+                <div class="projet-icon"><i class="fas fa-chart-pie"></i></div>
+                <h3 id="projet2Title">Dashboard Data</h3>
+                <p id="projet2Desc">Tableau de bord interactif visualisant les données de l'association : membres, cours, satisfaction.</p>
+                <span class="projet-tech">Python · Plotly · Pandas</span>
+            </div>
+            <div class="projet-card">
+                <div class="projet-icon"><i class="fas fa-mobile-alt"></i></div>
+                <h3 id="projet3Title">Appli PWA</h3>
+                <p id="projet3Desc">Application web progressive pour l'apprentissage du français, accessible hors ligne sur mobile.</p>
+                <span class="projet-tech">JavaScript · Service Worker · PWA</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TOOLS -->
+<section id="tools">
+    <div class="container">
+        <div class="tools-content">
+            <div class="tools-text">
+                <span class="label-tag" id="toolsTag">OUTILS</span>
+                <h2 id="toolsTitle">Les technologies que nous utilisons</h2>
+                <p id="toolsDesc">Des outils modernes pour une formation pratique et professionnelle.</p>
+            </div>
+            <div class="tools-grid">
+                <span class="tool-tag"><i class="fab fa-python"></i> Python</span>
+                <span class="tool-tag"><i class="fab fa-js"></i> JavaScript</span>
+                <span class="tool-tag"><i class="fas fa-database"></i> SQL</span>
+                <span class="tool-tag"><i class="fas fa-cloud"></i> Cloud</span>
+                <span class="tool-tag"><i class="fas fa-brain"></i> TensorFlow</span>
+                <span class="tool-tag"><i class="fas fa-code"></i> React</span>
+                <span class="tool-tag"><i class="fas fa-chart-line"></i> Pandas</span>
+                <span class="tool-tag"><i class="fas fa-robot"></i> GPT</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CONTACT / FOOTER -->
+<footer class="main-footer" id="contact">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4><i class="fas fa-sailboat"></i> Mille Voiles</h4>
+                <p id="footerAbout">Association d'intégration et de formation</p>
+                <p><i class="fas fa-map-pin"></i> <span id="footerAddr">Paris, France</span></p>
+                <p><i class="fas fa-calendar-alt"></i> <span id="footerYear">Fondée en 2025</span></p>
+            </div>
+            <div class="footer-col">
+                <h4 id="footerContactTitle">Contact</h4>
+                <div class="contact-item"><i class="fas fa-envelope"></i> <a href="mailto:qf2025qianfan@gmail.com">qf2025qianfan@gmail.com</a></div>
+                <div class="contact-item"><i class="fab fa-weixin"></i> <span>WeChat: qfparis</span></div>
+                <div class="contact-item"><i class="fab fa-linkedin"></i> <a href="https://www.linkedin.com/company/association-mille-voiles/" target="_blank">LinkedIn</a></div>
+            </div>
+            <div class="footer-col">
+                <h4 id="footerNavTitle">Navigation</h4>
+                <a href="index.html"><i class="fas fa-chevron-right"></i> <span id="fNav1">Accueil</span></a>
+                <a href="#programmes"><i class="fas fa-chevron-right"></i> <span id="fNav2">Programmes</span></a>
+                <a href="#projets"><i class="fas fa-chevron-right"></i> <span id="fNav3">Projets</span></a>
+                <a href="#contact"><i class="fas fa-chevron-right"></i> <span id="fNav4">Contact</span></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span id="footerCopy">© 2025-2026 Mille Voiles · Tous droits réservés</span>
+            <span class="sep">|</span>
+            <span id="footerCopyZh">千帆协会 版权所有</span>
+        </div>
+    </div>
+</footer>
+
+<!-- ===== MODALS ===== -->
+
+<!-- LOGIN MODAL -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="loginModalTitle">Connexion</h3>
+            <button class="close-modal" onclick="closeLoginModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i><span id="nameLabel">Nom d'utilisateur</span></label>
+                    <input type="text" id="loginName" required placeholder="Entrez votre nom">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i><span id="passwordLabel">Mot de passe</span></label>
+                    <input type="password" id="loginPassword" required placeholder="Entrez votre mot de passe">
+                </div>
+                <div id="loginError" class="login-error" style="display: none;"><i class="fas fa-exclamation-circle"></i><span id="errorMessage">Nom ou mot de passe incorrect</span></div>
+                <button type="submit" class="btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i><span id="loginBtnText">Se connecter</span></button>
+            </form>
+            <div class="login-footer"><p id="loginHelp">Contactez l'association si vous n'avez pas de compte</p></div>
+        </div>
+    </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div id="profileModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="profileModalTitle">Mon Profil</h3>
+            <button class="close-modal" onclick="closeProfileModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="profileForm" onsubmit="updateProfile(event)">
+                <div class="profile-info-section">
+                    <h4 id="infoSectionTitle">Informations du compte</h4>
+                    <div class="form-group"><label><i class="fas fa-user-tag"></i><span id="typeLabel">Type</span></label><input type="text" id="profileType" readonly></div>
+                    <div class="form-group"><label><i class="fas fa-clock"></i><span id="expiryLabel">Accès jusqu'au</span></label><input type="text" id="profileExpiry" readonly></div>
+                    <div class="form-group"><label><i class="fas fa-user"></i><span id="usernameLabel">Nom</span></label><input type="text" id="profileUsername" readonly></div>
+                </div>
+                <div class="profile-edit-section">
+                    <h4 id="editSectionTitle">Modifier le mot de passe</h4>
+                    <div class="form-group"><label><i class="fas fa-lock"></i><span id="currentPasswordLabel">Mot de passe actuel</span></label><input type="password" id="currentPassword" required placeholder="Mot de passe actuel"></div>
+                    <div class="form-group"><label><i class="fas fa-lock"></i><span id="newPasswordLabel">Nouveau mot de passe</span></label><input type="password" id="newPassword" required placeholder="Nouveau mot de passe" minlength="6"></div>
+                    <div class="form-group"><label><i class="fas fa-lock"></i><span id="confirmPasswordLabel">Confirmer</span></label><input type="password" id="confirmPassword" required placeholder="Confirmer"></div>
+                </div>
+                <div id="profileError" class="login-error" style="display: none;"></div>
+                <div id="profileSuccess" class="login-success" style="display: none;"></div>
+                <div class="profile-actions">
+                    <button type="submit" class="btn-primary" id="updateProfileBtn"><i class="fas fa-save"></i><span id="updateBtnText">Mettre à jour</span></button>
+                    <button type="button" class="btn-secondary" onclick="closeProfileModal()" id="cancelBtn"><i class="fas fa-times"></i><span id="cancelBtnText">Annuler</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="ia.js"></script>
+</body>
+</html>

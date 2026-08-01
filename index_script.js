@@ -122,23 +122,23 @@ const dict = {
   }
 };
 
-let currentLang = 'fr';
+var currentLang = 'fr';
 
 // ============================================
 // SWITCH LANGUAGE
 // ============================================
 function switchLanguage(lang) {
   currentLang = lang;
-  const data = dict[lang];
+  var data = dict[lang];
 
-  document.querySelectorAll('[id]').forEach(el => {
-    const key = el.id;
+  document.querySelectorAll('[id]').forEach(function(el) {
+    var key = el.id;
     if (data[key] !== undefined) {
       el.innerHTML = data[key];
     }
   });
 
-  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.lang-btn').forEach(function(btn) { btn.classList.remove('active'); });
   if (lang === 'fr') {
     document.getElementById('langFr').classList.add('active');
   } else {
@@ -147,39 +147,10 @@ function switchLanguage(lang) {
 }
 
 // ============================================
-// CARD BUTTONS
-// ============================================
-function initCardButtons() {
-  document.querySelectorAll('.card-btn').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      const page = this.getAttribute('data-page');
-
-      switch(page) {
-        case 'examen-civique':
-          window.location.href = 'examen-civique.html';
-          break;
-        case 'francais':
-          window.location.href = 'francais.html';
-          break;
-        case 'ia':
-          showDevelopingModal();
-          break;
-        case 'chinois':
-          showDevelopingModal();
-          break;
-        default:
-          showDevelopingModal();
-      }
-    });
-  });
-}
-
-// ============================================
 // DEVELOPING MODAL
 // ============================================
 function showDevelopingModal() {
-  const modal = document.getElementById('developingModal');
+  var modal = document.getElementById('developingModal');
   modal.classList.add('show');
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
@@ -191,7 +162,7 @@ function showDevelopingModal() {
 }
 
 function closeDevelopingModal() {
-  const modal = document.getElementById('developingModal');
+  var modal = document.getElementById('developingModal');
   modal.classList.remove('show');
   modal.style.display = 'none';
   document.body.style.overflow = '';
@@ -205,17 +176,17 @@ function handleEscClose(e) {
 // ============================================
 // SMOOTH SCROLL
 // ============================================
-document.querySelectorAll('a[href^="#"]').forEach(link => {
+document.querySelectorAll('a[href^="#"]').forEach(function(link) {
   link.addEventListener('click', function(e) {
-    const targetId = this.getAttribute('href');
+    var targetId = this.getAttribute('href');
     if (targetId && targetId !== '#') {
       e.preventDefault();
-      const target = document.querySelector(targetId);
+      var target = document.querySelector(targetId);
       if (target) {
-        const navHeight = document.querySelector('.main-nav').offsetHeight;
-        const langHeight = document.querySelector('.lang-toggle').offsetHeight;
-        const offset = navHeight + langHeight + 20;
-        const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
+        var navHeight = document.querySelector('.main-nav').offsetHeight;
+        var langHeight = document.querySelector('.lang-toggle').offsetHeight;
+        var offset = navHeight + langHeight + 20;
+        var targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
         window.scrollTo({ top: targetPosition, behavior: 'smooth' });
       }
     }
@@ -225,25 +196,25 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
 // ============================================
 // NAV ACTIVE LINK
 // ============================================
-const sections = document.querySelectorAll('section[id]');
-const navLinks = document.querySelectorAll('.nav-links a');
+var sections = document.querySelectorAll('section[id]');
+var navLinks = document.querySelectorAll('.nav-links a');
 
-window.addEventListener('scroll', () => {
-  let current = '';
-  const navHeight = document.querySelector('.main-nav').offsetHeight;
-  const langHeight = document.querySelector('.lang-toggle').offsetHeight;
-  const offset = navHeight + langHeight + 50;
+window.addEventListener('scroll', function() {
+  var current = '';
+  var navHeight = document.querySelector('.main-nav').offsetHeight;
+  var langHeight = document.querySelector('.lang-toggle').offsetHeight;
+  var offset = navHeight + langHeight + 50;
 
-  sections.forEach(section => {
-    const sectionTop = section.offsetTop - offset;
+  sections.forEach(function(section) {
+    var sectionTop = section.offsetTop - offset;
     if (window.scrollY >= sectionTop) {
       current = section.getAttribute('id');
     }
   });
 
-  navLinks.forEach(link => {
+  navLinks.forEach(function(link) {
     link.classList.remove('active');
-    if (link.getAttribute('href') === `#${current}`) {
+    if (link.getAttribute('href') === '#' + current) {
       link.classList.add('active');
     }
   });
@@ -254,7 +225,6 @@ window.addEventListener('scroll', () => {
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
   switchLanguage('fr');
-  initCardButtons();
 });
 
 // 暴露给全局

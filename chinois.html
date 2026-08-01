@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>中文培训 · Chinois - Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="chinois.css">
+    <meta name="theme-color" content="#c0392b">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+<body>
+
+<!-- LANGUAGE TOGGLE -->
+<div class="lang-toggle">
+    <button class="lang-btn active" id="langFr" onclick="switchLanguage('fr')">
+        <i class="fas fa-globe"></i> FR
+    </button>
+    <button class="lang-btn" id="langZh" onclick="switchLanguage('zh')">
+        <i class="fas fa-globe"></i> 中文
+    </button>
+</div>
+
+<!-- HEADER -->
+<header class="main-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="header-logo">
+                <div class="logo-icon"><i class="fas fa-globe-asia"></i></div>
+            </div>
+            <div class="header-text">
+                <h1><span id="mainTitle">中文培训 · Chinois</span></h1>
+                <p id="mainSubtitle">Association Mille Voiles / 千帆协会 - 对外汉语培训</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- NAVIGATION -->
+<nav class="main-nav">
+    <div class="container nav-container">
+        <a href="index.html" class="nav-brand">
+            <i class="fas fa-sailboat"></i> <span id="navBrand">Mille Voiles</span>
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html#accueil" id="navHome">Accueil</a>
+            <a href="#accueil" id="navAccueil">Accueil</a>
+            <a href="#cours" id="navCours">Cours</a>
+            <a href="#niveaux" id="navNiveaux">Niveaux</a>
+            <a href="#contact" id="navContact">Contact</a>
+            <a href="#" id="navLogin" onclick="openLoginModal()">
+                <span id="navLoginText">Connexion</span>
+            </a>
+            <div class="user-info" id="userInfo" style="display: none;">
+                <i class="fas fa-user-circle"></i>
+                <span id="welcomeMessage"></span>
+                <button class="user-menu-btn" onclick="toggleUserMenu()">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="#" onclick="showProfileModal()"><i class="fas fa-user-cog"></i> <span id="profileMenuItem">Mon profil</span></a>
+                    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span id="logoutMenuItem">Déconnexion</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="accueil">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <span class="hero-tag" id="heroTag">🇨🇳 Langue & Culture Chinoise</span>
+                <h2 id="heroTitle">Apprenez le chinois <br><span class="highlight">avec des professionnels</span></h2>
+                <p id="heroDesc">Des cours de chinois mandarin pour tous les niveaux, dispensés par des professeurs natifs expérimentés. De la conversation quotidienne au chinois des affaires.</p>
+                <div class="hero-buttons">
+                    <a href="#cours" class="btn-primary"><i class="fas fa-book"></i> <span id="heroBtn1">Découvrir les cours</span></a>
+                    <a href="#niveaux" class="btn-secondary"><i class="fas fa-chart-line"></i> <span id="heroBtn2">Nos niveaux</span></a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="hero-image-wrapper">
+                    <div class="hero-placeholder">
+                        <i class="fas fa-language"></i>
+                        <span>中文</span>
+                    </div>
+                    <div class="floating-badge">
+                        <i class="fas fa-award"></i>
+                        <span id="heroBadge">HSK · 对话 · 商务</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">30+</div>
+                <div class="stat-label" id="stat1Label">Étudiants formés</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">5</div>
+                <div class="stat-label" id="stat2Label">Niveaux disponibles</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">98%</div>
+                <div class="stat-label" id="stat3Label">Satisfaction</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">4</div>
+                <div class="stat-label" id="stat4Label">Professeurs natifs</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- COURS SECTION -->
+<section id="cours">
+    <div class="container">
+        <div class="section-label">
+            <span class="label-tag" id="coursTag">NOS COURS</span>
+            <h2 id="coursTitle">Des cours adaptés à vos besoins</h2>
+            <p id="coursSub">Du débutant à l'expert, trouvez la formation qui vous convient</p>
+        </div>
+
+        <div class="cours-grid">
+            <div class="cours-card">
+                <div class="cours-icon"><i class="fas fa-seedling"></i></div>
+                <h3 id="cours1Title">Initiation</h3>
+                <div class="cours-level">A1</div>
+                <p id="cours1Desc">Apprenez les bases du chinois mandarin : prononciation (pinyin), tons et premiers caractères.</p>
+                <div class="cours-meta">
+                    <span><i class="fas fa-clock"></i> 20h</span>
+                    <span><i class="fas fa-users"></i> 6-10 pers.</span>
+                </div>
+                <a href="#" class="btn-cours" onclick="handleCoursClick(event)"><span id="cours1Btn">S'inscrire</span> <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="cours-card featured">
+                <div class="cours-icon"><i class="fas fa-comments"></i></div>
+                <div class="featured-badge">⭐ Populaire</div>
+                <h3 id="cours2Title">Conversation</h3>
+                <div class="cours-level">A2-B1</div>
+                <p id="cours2Desc">Maîtrisez la communication quotidienne : dialogues, expressions courantes et prononciation.</p>
+                <div class="cours-meta">
+                    <span><i class="fas fa-clock"></i> 25h</span>
+                    <span><i class="fas fa-users"></i> 6-8 pers.</span>
+                </div>
+                <a href="#" class="btn-cours" onclick="handleCoursClick(event)"><span id="cours2Btn">S'inscrire</span> <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="cours-card">
+                <div class="cours-icon"><i class="fas fa-graduation-cap"></i></div>
+                <h3 id="cours3Title">HSK Préparation</h3>
+                <div class="cours-level">B1-C1</div>
+                <p id="cours3Desc">Préparez-vous aux examens HSK avec des exercices pratiques et des simulations d'examen.</p>
+                <div class="cours-meta">
+                    <span><i class="fas fa-clock"></i> 30h</span>
+                    <span><i class="fas fa-users"></i> 6-10 pers.</span>
+                </div>
+                <a href="#" class="btn-cours" onclick="handleCoursClick(event)"><span id="cours3Btn">S'inscrire</span> <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="cours-card">
+                <div class="cours-icon"><i class="fas fa-handshake"></i></div>
+                <h3 id="cours4Title">Chinois des affaires</h3>
+                <div class="cours-level">B2-C1</div>
+                <p id="cours4Desc">Apprenez le vocabulaire professionnel, la rédaction d'emails et les codes culturels des affaires en Chine.</p>
+                <div class="cours-meta">
+                    <span><i class="fas fa-clock"></i> 30h</span>
+                    <span><i class="fas fa-users"></i> 4-6 pers.</span>
+                </div>
+                <a href="#" class="btn-cours" onclick="handleCoursClick(event)"><span id="cours4Btn">S'inscrire</span> <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- NIVEAUX SECTION -->
+<section id="niveaux">
+    <div class="container">
+        <div class="section-label">
+            <span class="label-tag" id="niveauxTag">NOS NIVEAUX</span>
+            <h2 id="niveauxTitle">Du débutant à l'expert</h2>
+            <p id="niveauxSub">Un parcours structuré pour progresser pas à pas</p>
+        </div>
+
+        <div class="niveaux-grid">
+            <div class="niveau-card">
+                <div class="niveau-number">A1</div>
+                <h3 id="niv1Title">Débutant</h3>
+                <p id="niv1Desc">Pinyin, tons, salutations, nombres, présentation personnelle, vocabulaire de base.</p>
+                <span class="niveau-duree"><i class="fas fa-clock"></i> 20h</span>
+            </div>
+            <div class="niveau-card">
+                <div class="niveau-number">A2</div>
+                <h3 id="niv2Title">Élémentaire</h3>
+                <p id="niv2Desc">Phrases simples, vie quotidienne, achats, restaurants, transports, temps.</p>
+                <span class="niveau-duree"><i class="fas fa-clock"></i> 25h</span>
+            </div>
+            <div class="niveau-card featured">
+                <div class="niveau-number">B1</div>
+                <h3 id="niv3Title">Intermédiaire</h3>
+                <p id="niv3Desc">Conversation courante, expression d'opinions, récits, compréhension de textes simples.</p>
+                <span class="niveau-duree"><i class="fas fa-clock"></i> 30h</span>
+            </div>
+            <div class="niveau-card">
+                <div class="niveau-number">B2</div>
+                <h3 id="niv4Title">Indépendant</h3>
+                <p id="niv4Desc">Discussions approfondies, sujets variés, rédaction d'emails, présentations.</p>
+                <span class="niveau-duree"><i class="fas fa-clock"></i> 35h</span>
+            </div>
+            <div class="niveau-card">
+                <div class="niveau-number">C1</div>
+                <h3 id="niv5Title">Avancé</h3>
+                <p id="niv5Desc">Maîtrise de la langue, débats, analyse de textes complexes, écriture professionnelle.</p>
+                <span class="niveau-duree"><i class="fas fa-clock"></i> 40h</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CULTURE SECTION -->
+<section id="culture">
+    <div class="container">
+        <div class="culture-content">
+            <div class="culture-text">
+                <span class="label-tag" id="cultureTag">CULTURE</span>
+                <h2 id="cultureTitle">Apprendre la langue, <br>découvrir la culture</h2>
+                <p id="cultureDesc">La langue chinoise est indissociable de sa culture. Nos cours intègrent des éléments culturels : calligraphie, cuisine, festivals, traditions et codes sociaux.</p>
+                <div class="culture-tags">
+                    <span class="culture-tag">🏮 Calligraphie</span>
+                    <span class="culture-tag">🍜 Cuisine</span>
+                    <span class="culture-tag">🎋 Festivals</span>
+                    <span class="culture-tag">🎭 Traditions</span>
+                    <span class="culture-tag">🤝 Codes sociaux</span>
+                </div>
+            </div>
+            <div class="culture-image">
+                <div class="culture-placeholder">
+                    <i class="fas fa-palette"></i>
+                    <span>中国文化</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CONTACT / FOOTER -->
+<footer class="main-footer" id="contact">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4><i class="fas fa-sailboat"></i> Mille Voiles</h4>
+                <p id="footerAbout">Association d'intégration et de formation</p>
+                <p><i class="fas fa-map-pin"></i> <span id="footerAddr">Paris, France</span></p>
+                <p><i class="fas fa-calendar-alt"></i> <span id="footerYear">Fondée en 2025</span></p>
+            </div>
+            <div class="footer-col">
+                <h4 id="footerContactTitle">Contact</h4>
+                <div class="contact-item"><i class="fas fa-envelope"></i> <a href="mailto:qf2025qianfan@gmail.com">qf2025qianfan@gmail.com</a></div>
+                <div class="contact-item"><i class="fab fa-weixin"></i> <span>WeChat: qfparis</span></div>
+                <div class="contact-item"><i class="fab fa-linkedin"></i> <a href="https://www.linkedin.com/company/association-mille-voiles/" target="_blank">LinkedIn</a></div>
+            </div>
+            <div class="footer-col">
+                <h4 id="footerNavTitle">Navigation</h4>
+                <a href="index.html"><i class="fas fa-chevron-right"></i> <span id="fNav1">Accueil</span></a>
+                <a href="#cours"><i class="fas fa-chevron-right"></i> <span id="fNav2">Cours</span></a>
+                <a href="#niveaux"><i class="fas fa-chevron-right"></i> <span id="fNav3">Niveaux</span></a>
+                <a href="#contact"><i class="fas fa-chevron-right"></i> <span id="fNav4">Contact</span></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span id="footerCopy">© 2025-2026 Mille Voiles · Tous droits réservés</span>
+            <span class="sep">|</span>
+            <span id="footerCopyZh">千帆协会 版权所有</span>
+        </div>
+    </div>
+</footer>
+
+<!-- ===== MODALS ===== -->
+
+<!-- LOGIN MODAL -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="loginModalTitle">Connexion</h3>
+            <button class="close-modal" onclick="closeLoginModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i><span id="nameLabel">Nom d'utilisateur</span></label>
+                    <input type="text" id="loginName" required placeholder="Entrez votre nom">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i><span id="passwordLabel">Mot de passe</span></label>
+                    <input type="password" id="loginPassword" required placeholder="Entrez votre mot de passe">
+                </div>
+                <div id="loginError" class="login-error" style="display: none;"><i class="fas fa-exclamation-circle"></i><span id="errorMessage">Nom ou mot de passe incorrect</span></div>
+                <button type="submit" class="btn-primary" id="loginBtn"><i class="fas fa-sign-in-alt"></i><span id="loginBtnText">Se connecter</span></button>
+            </form>
+            <div class="login-footer"><p id="loginHelp">Contactez l'association si vous n'avez pas de compte</p></div>
+        </div>
+    </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div id="profileModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="profileModalTitle">Mon Profil</h3>
+            <button class="close-modal" onclick="closeProfileModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="profileForm" onsubmit="updateProfile(event)">
+                <div class="profile-info-section">
+                    <h4 id="infoSectionTitle">Informations du compte</h4>
+                    <div class="form-group"><label><i class="fas fa-user-tag"></i><span id="typeLabel">Type</span></label><input type="text" id="profileType" readonly></div>
+                    <div class="form-group"><label><i class="fas fa-clock"></i><span id="expiryLabel">Accès jusqu'au</span></label><input type="text" id="profileExpiry" readonly></div>
+                    <div class="form-group"><label><i class="fas fa-user"></i><span id="usernameLabel">Nom</span></label><input type="text" id="profileUsername" readonly></div>
+                </div>
+                <div class="profile-edit-section">
+                    <h4 id="editSectionTitle">Modifier le mot de passe</h4>
+                    <div class="form-group"><label><i class="fas fa-lock"></i><span id="currentPasswordLabel">Mot de passe actuel</span></label><input type="password" id="currentPassword" required placeholder="Mot de passe actuel"></div>
+                    <div class="form-group"><label><i class="fas fa-lock"></i><span id="newPasswordLabel">Nouveau mot de passe</span></label><input type="password" id="newPassword" required placeholder="Nouveau mot de passe" minlength="6"></div>
+                    <div class="form-group"><label><i class="fas fa-lock"></i><span id="confirmPasswordLabel">Confirmer</span></label><input type="password" id="confirmPassword" required placeholder="Confirmer"></div>
+                </div>
+                <div id="profileError" class="login-error" style="display: none;"></div>
+                <div id="profileSuccess" class="login-success" style="display: none;"></div>
+                <div class="profile-actions">
+                    <button type="submit" class="btn-primary" id="updateProfileBtn"><i class="fas fa-save"></i><span id="updateBtnText">Mettre à jour</span></button>
+                    <button type="button" class="btn-secondary" onclick="closeProfileModal()" id="cancelBtn"><i class="fas fa-times"></i><span id="cancelBtnText">Annuler</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="chinois.js"></script>
+</body>
+</html>
