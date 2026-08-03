@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammaire · FLE - Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="grammaire.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="main-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="header-logo">
+                <img src="images/logo.png" alt="Mille Voiles" onerror="this.style.display='none'">
+            </div>
+            <div class="header-text">
+                <h1>📘 Grammaire française</h1>
+                <p>Maîtrisez la grammaire du A1 au C2 avec des leçons, exercices et quiz</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- NAVIGATION -->
+<nav class="main-nav">
+    <div class="container nav-container">
+        <a href="francais.html" class="nav-brand">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+        <div class="nav-links">
+            <span class="user-badge"><i class="fas fa-user-circle"></i> <span id="userName">Élève</span></span>
+        </div>
+    </div>
+</nav>
+
+<!-- MAIN -->
+<main class="grammaire-main">
+    <div class="container">
+
+        <!-- LEVEL FILTER -->
+        <div class="level-filter">
+            <span class="filter-label">Niveau :</span>
+            <div class="level-buttons" id="levelButtons">
+                <button class="level-btn active" data-level="A1" onclick="switchLevel('A1')">A1</button>
+                <button class="level-btn" data-level="A2" onclick="switchLevel('A2')">A2</button>
+                <button class="level-btn" data-level="B1" onclick="switchLevel('B1')">B1</button>
+                <button class="level-btn" data-level="B2" onclick="switchLevel('B2')">B2</button>
+                <button class="level-btn" data-level="C1" onclick="switchLevel('C1')">C1</button>
+                <button class="level-btn" data-level="C2" onclick="switchLevel('C2')">C2</button>
+            </div>
+            <span class="progress-badge" id="progressBadge">📊 0%</span>
+        </div>
+
+        <!-- MODE TABS -->
+        <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="apprendre" onclick="switchMode('apprendre')">
+                <i class="fas fa-book-open"></i> Apprendre
+            </button>
+            <button class="mode-tab" data-mode="entrainer" onclick="switchMode('entrainer')">
+                <i class="fas fa-pencil-alt"></i> S'entraîner
+            </button>
+            <button class="mode-tab" data-mode="tester" onclick="switchMode('tester')">
+                <i class="fas fa-trophy"></i> Tester
+            </button>
+        </div>
+
+        <!-- MODE CONTENT -->
+        <div class="mode-content">
+
+            <!-- ===== MODE APPRENDRE ===== -->
+            <div id="modeApprendre" class="mode-panel active">
+                <div class="learn-container">
+                    <div class="topic-nav">
+                        <button class="nav-btn" onclick="prevTopic()"><i class="fas fa-chevron-left"></i></button>
+                        <span class="topic-counter" id="topicCounter">1 / 7</span>
+                        <button class="nav-btn" onclick="nextTopic()"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+
+                    <div class="topic-card" id="topicCard">
+                        <div class="topic-level-badge" id="topicLevelBadge">A1</div>
+                        <h2 id="topicTitle">Le Présent de l'indicatif</h2>
+                        <div class="topic-category" id="topicCategory">verbe · present</div>
+                        <p class="topic-description" id="topicDescription">Le présent est le temps le plus utilisé en français...</p>
+
+                        <div class="topic-section">
+                            <h4><i class="fas fa-gavel"></i> Règle</h4>
+                            <div class="topic-rule" id="topicRule">🔹 1er groupe (-er) : radical + e, es, e, ons, ez, ent</div>
+                        </div>
+
+                        <div class="topic-section">
+                            <h4><i class="fas fa-lightbulb"></i> Astuce</h4>
+                            <div class="topic-tips" id="topicTips">💡 Les verbes du 1er groupe sont les plus réguliers.</div>
+                        </div>
+
+                        <div class="topic-section">
+                            <h4><i class="fas fa-examples"></i> Exemples</h4>
+                            <div class="topic-examples" id="topicExamples">
+                                <div class="example-item">
+                                    <span class="ex-fr">"Je parle français."</span>
+                                    <span class="ex-zh">我说法语。</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="topic-section" id="commonMistakesSection">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Erreurs fréquentes</h4>
+                            <div class="topic-mistakes" id="topicMistakes"></div>
+                        </div>
+
+                        <button class="btn-mark-learned" onclick="markTopicLearned()">
+                            <i class="fas fa-check"></i> Marquer comme appris
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== MODE S'ENTRAÎNER ===== -->
+            <div id="modeEntrainer" class="mode-panel">
+                <div class="exercise-container">
+                    <div class="exercise-header">
+                        <span class="exercise-counter" id="exerciseCounter">Exercice 1 / 10</span>
+                        <span class="exercise-level" id="exerciseLevel">A1</span>
+                    </div>
+
+                    <div class="exercise-card" id="exerciseCard">
+                        <div class="question-number" id="questionNumber">Q1</div>
+                        <p class="question-text" id="questionText">Conjuguez le verbe au présent : Je (parler) _______ français.</p>
+
+                        <div class="answer-area" id="answerArea">
+                            <!-- Rempli par JS selon le type -->
+                        </div>
+
+                        <div class="feedback-area" id="feedbackArea" style="display:none;">
+                            <div class="feedback-result" id="feedbackResult"></div>
+                            <div class="feedback-explanation" id="feedbackExplanation"></div>
+                        </div>
+
+                        <div class="exercise-actions">
+                            <button class="btn-check" onclick="checkExercise()"><i class="fas fa-check"></i> Vérifier</button>
+                            <button class="btn-next" onclick="nextExercise()"><i class="fas fa-arrow-right"></i> Suivant</button>
+                        </div>
+                    </div>
+
+                    <div class="exercise-progress" id="exerciseProgress">
+                        <div class="progress-bar"><span style="width: 0%;"></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== MODE TESTER ===== -->
+            <div id="modeTester" class="mode-panel">
+                <div class="quiz-container">
+                    <!-- Quiz Selection -->
+                    <div class="quiz-select" id="quizSelect">
+                        <h3><i class="fas fa-list"></i> Choisissez un quiz</h3>
+                        <div class="quiz-list" id="quizList"></div>
+                    </div>
+
+                    <!-- Quiz Active -->
+                    <div class="quiz-active" id="quizActive" style="display:none;">
+                        <div class="quiz-header">
+                            <span class="quiz-title" id="quizTitle">Quiz A1 - Le Présent</span>
+                            <span class="quiz-timer" id="quizTimer">⏱️ 15:00</span>
+                            <span class="quiz-progress-text" id="quizProgressText">1 / 10</span>
+                        </div>
+
+                        <div class="quiz-progress-bar">
+                            <div class="progress-bar"><span id="quizProgressFill" style="width: 10%;"></span></div>
+                        </div>
+
+                        <div class="quiz-question" id="quizQuestion">
+                            <div class="question-number" id="quizQNumber">Q1</div>
+                            <p class="question-text" id="quizQText">Conjuguez le verbe au présent : Je (parler) _______ français.</p>
+                            <div class="answer-area" id="quizAnswerArea"></div>
+                        </div>
+
+                        <div class="quiz-actions">
+                            <button class="btn-prev" onclick="prevQuizQuestion()"><i class="fas fa-chevron-left"></i> Précédent</button>
+                            <button class="btn-next" onclick="nextQuizQuestion()">Suivant <i class="fas fa-chevron-right"></i></button>
+                            <button class="btn-submit-quiz" onclick="submitQuiz()"><i class="fas fa-check"></i> Terminer</button>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Results -->
+                    <div class="quiz-results" id="quizResults" style="display:none;">
+                        <div class="result-icon" id="resultIcon">🎉</div>
+                        <h3 id="resultTitle">Félicitations !</h3>
+                        <div class="result-score" id="resultScore">8 / 10</div>
+                        <div class="result-percentage" id="resultPercentage">80%</div>
+                        <div class="result-level" id="resultLevel">Niveau estimé : A2</div>
+                        <div class="result-details" id="resultDetails">
+                            <span>✅ Bonnes réponses : <strong id="resultCorrect">8</strong></span>
+                            <span>❌ Erreurs : <strong id="resultWrong">2</strong></span>
+                        </div>
+                        <div class="result-actions">
+                            <button class="btn-primary" onclick="showQuizDetails()"><i class="fas fa-list"></i> Voir les détails</button>
+                            <button class="btn-secondary" onclick="resetQuiz()"><i class="fas fa-redo"></i> Recommencer</button>
+                            <button class="btn-secondary" onclick="backToQuizList()"><i class="fas fa-arrow-left"></i> Retour aux quiz</button>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Details -->
+                    <div class="quiz-details" id="quizDetails" style="display:none;">
+                        <h4><i class="fas fa-list"></i> Détail des réponses</h4>
+                        <div id="quizDetailsList"></div>
+                        <button class="btn-secondary" onclick="closeQuizDetails()"><i class="fas fa-arrow-left"></i> Retour</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- ==================== TOAST ==================== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="grammaire.js"></script>
+</body>
+</html>

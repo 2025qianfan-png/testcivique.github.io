@@ -525,22 +525,27 @@ function handleCourseClick(event) {
 // ============================================================
 // RENDER RESSOURCES - 5大技能
 // ============================================================
+// ============================================================
+// RENDER RESSOURCES - 5大技能
+// ============================================================
 function renderRessources() {
     const container = document.getElementById('resourcesContainer');
 
     const resourceItems = [
-        { icon: 'fa-headphones', title: dict[currentLang].res1Title, desc: dict[currentLang].res1Desc, type: 'listening' },
-        { icon: 'fa-book', title: dict[currentLang].res2Title, desc: dict[currentLang].res2Desc, type: 'grammar' },
-        { icon: 'fa-eye', title: dict[currentLang].res3Title, desc: dict[currentLang].res3Desc, type: 'reading' },
-        { icon: 'fa-pen-fancy', title: dict[currentLang].res4Title, desc: dict[currentLang].res4Desc, type: 'writing' },
-        { icon: 'fa-comments', title: dict[currentLang].res5Title, desc: dict[currentLang].res5Desc, type: 'speaking' }
+        { icon: 'fa-headphones', title: 'Compréhension orale', desc: dict[currentLang].res1Desc, type: 'listening' },
+        { icon: 'fa-book', title: 'Grammaire', desc: dict[currentLang].res2Desc, type: 'grammar' },
+        { icon: 'fa-eye', title: 'Compréhension écrite', desc: dict[currentLang].res3Desc, type: 'reading' },
+        { icon: 'fa-pen-fancy', title: 'Expression écrite', desc: dict[currentLang].res4Desc, type: 'writing' },
+        { icon: 'fa-comments', title: 'Expression orale', desc: dict[currentLang].res5Desc, type: 'speaking' }
     ];
 
     container.innerHTML = resourceItems.map(item => `
         <div class="resource-card" onclick="handleResourceClick(event, '${item.type}')">
-            <i class="fas ${item.icon}"></i>
+            <div class="icon-wrapper">
+                <i class="fas ${item.icon}"></i>
+            </div>
             <h3>${item.title}</h3>
-            <p>${item.desc}</p>
+            <div class="card-desc">${item.desc}</div>
             <span class="click-hint">
                 <i class="fas fa-arrow-right"></i> ${dict[currentLang].clickToDiscover}
             </span>
@@ -548,6 +553,9 @@ function renderRessources() {
     `).join('');
 }
 
+// ============================================================
+// 资源点击处理 - 带 token 跳转
+// ============================================================
 // ============================================================
 // 资源点击处理 - 带 token 跳转
 // ============================================================
@@ -575,8 +583,11 @@ function handleResourceClick(event, type) {
     if (type === 'writing') {
         // 写作 → 跳转到写作页面
         window.location.href = `ecriture.html?token=${token}`;
+    } else if (type === 'grammar') {
+        // ✅ 语法 → 跳转到语法页面
+        window.location.href = `grammaire.html?token=${token}`;
     } else {
-        // 其他（listening, grammar, reading, speaking）→ 跳转到开发中页面
+        // 其他（listening, reading, speaking）→ 跳转到开发中页面
         window.location.href = `developpement.html?token=${token}&type=${type}`;
     }
 }
