@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>En développement · Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="francais.css">
+    <style>
+        /* ============================================
+           开发中页面专用样式
+           ============================================ */
+        .dev-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #fdf6ed 0%, var(--grey-light) 100%);
+            padding: 30px;
+        }
+
+        .dev-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 50px 40px;
+            max-width: 520px;
+            width: 100%;
+            text-align: center;
+            box-shadow: var(--shadow-hover);
+            animation: fadeSlideUp 0.5s ease;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dev-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(230, 126, 34, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            color: var(--orange);
+            margin: 0 auto 20px;
+        }
+
+        .dev-card h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .dev-card .subtitle {
+            color: var(--text-light);
+            font-size: 1.05rem;
+            margin-bottom: 6px;
+        }
+
+        .dev-card .user-info-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: var(--grey);
+            border-radius: 30px;
+            margin: 16px auto;
+            max-width: 280px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .dev-card .user-info-display i {
+            color: var(--orange);
+            font-size: 1.2rem;
+        }
+
+        .dev-progress-wrapper {
+            margin: 24px 0 16px;
+        }
+
+        .dev-progress-wrapper .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 6px;
+        }
+
+        .dev-progress-wrapper .progress-track {
+            width: 100%;
+            height: 8px;
+            background: #e8edf5;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .dev-progress-wrapper .progress-track .progress-fill {
+            height: 100%;
+            background: var(--orange-gradient);
+            border-radius: 10px;
+            transition: width 1s ease;
+            width: 0%;
+        }
+
+        .dev-card .feature-list {
+            text-align: left;
+            margin: 20px 0 24px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .dev-card .feature-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-light);
+            font-size: 0.92rem;
+            border-bottom: 1px solid #f0f4f8;
+        }
+
+        .dev-card .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .dev-card .feature-list li i {
+            color: var(--orange);
+            width: 22px;
+            text-align: center;
+        }
+
+        .dev-card .btn-retour {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: var(--transition);
+            background: var(--orange-gradient);
+            color: var(--white);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 18px rgba(230, 126, 34, 0.3);
+            margin-top: 8px;
+        }
+
+        .dev-card .btn-retour:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(230, 126, 34, 0.35);
+        }
+
+        .dev-card .btn-retour i {
+            font-size: 0.9rem;
+        }
+
+        .dev-card .back-link {
+            display: block;
+            margin-top: 16px;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .dev-card .back-link:hover {
+            color: var(--orange);
+        }
+
+        .dev-tag {
+            display: inline-block;
+            background: rgba(230, 126, 34, 0.1);
+            color: var(--orange);
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        /* 功能名称映射 */
+        .feature-name {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .dev-card {
+                padding: 30px 20px;
+            }
+            .dev-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 2.4rem;
+            }
+            .dev-card h1 {
+                font-size: 1.4rem;
+            }
+            .dev-card .user-info-display {
+                font-size: 0.85rem;
+                padding: 10px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- LANGUAGE TOGGLE (保持和主站一致) -->
+<div class="language-toggle" style="justify-content: flex-end; padding: 8px 30px; background: var(--white); border-bottom: 1px solid rgba(0,0,0,0.04);">
+    <button class="lang-btn active" id="langFr" onclick="switchLanguage('fr')">
+        <i class="fas fa-globe"></i> FR
+    </button>
+    <button class="lang-btn" id="langZh" onclick="switchLanguage('zh')">
+        <i class="fas fa-globe"></i> 中文
+    </button>
+</div>
+
+<!-- 开发中页面 -->
+<div class="dev-page">
+    <div class="dev-card">
+        <div class="dev-icon">
+            <i class="fas fa-code"></i>
+        </div>
+
+        <span class="dev-tag" id="devTag">🚧 EN DÉVELOPPEMENT</span>
+
+        <h1 id="devTitle">Cette fonctionnalité arrive bientôt !</h1>
+
+        <p class="subtitle" id="devSubtitle">Nous travaillons dur pour vous offrir cette expérience.</p>
+
+        <!-- 用户信息 -->
+        <div class="user-info-display" id="userDisplay">
+            <i class="fas fa-user-circle"></i>
+            <span id="userNameDisplay">Chargement...</span>
+        </div>
+
+        <!-- 进度条 -->
+        <div class="dev-progress-wrapper">
+            <div class="progress-label">
+                <span id="progressText">Progression</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- 功能列表 -->
+        <ul class="feature-list" id="featureList">
+            <li><i class="fas fa-check-circle"></i> <span id="feature1">Interface utilisateur</span></li>
+            <li><i class="fas fa-spinner fa-spin" style="color: var(--orange);"></i> <span id="feature2">Contenu pédagogique</span></li>
+            <li><i class="fas fa-clock"></i> <span id="feature3">Exercices interactifs</span></li>
+            <li><i class="fas fa-clock"></i> <span id="feature4">Suivi de progression</span></li>
+        </ul>
+
+        <!-- 按钮 -->
+        <a href="francais.html" class="btn-retour">
+            <i class="fas fa-arrow-left"></i> <span id="btnText">Retour à l'accueil</span>
+        </a>
+
+        <a href="#" class="back-link" onclick="window.history.back(); return false;" id="backLink">
+            ← <span id="backLinkText">Revenir à la page précédente</span>
+        </a>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // 字典翻译
+    // ============================================================
+    const dict = {
+        fr: {
+            devTag: "🚧 EN DÉVELOPPEMENT",
+            devTitle: "Cette fonctionnalité arrive bientôt !",
+            devSubtitle: "Nous travaillons dur pour vous offrir cette expérience.",
+            progressText: "Progression",
+            feature1: "Interface utilisateur",
+            feature2: "Contenu pédagogique",
+            feature3: "Exercices interactifs",
+            feature4: "Suivi de progression",
+            btnText: "Retour à l'accueil",
+            backLinkText: "Revenir à la page précédente",
+            featureName: "Fonctionnalité"
+        },
+        zh: {
+            devTag: "🚧 开发中",
+            devTitle: "该功能即将上线！",
+            devSubtitle: "我们正在努力为您打造更好的体验。",
+            progressText: "开发进度",
+            feature1: "用户界面",
+            feature2: "教学内容",
+            feature3: "互动练习",
+            feature4: "进度追踪",
+            btnText: "返回首页",
+            backLinkText: "返回上一页",
+            featureName: "功能"
+        }
+    };
+
+    let currentLang = 'fr';
+
+    // ============================================================
+    // 语言切换
+    // ============================================================
+    function switchLanguage(lang) {
+        currentLang = lang;
+        const data = dict[lang];
+
+        document.querySelectorAll('[id]').forEach(el => {
+            const key = el.id;
+            if (data[key] !== undefined) {
+                el.textContent = data[key];
+            }
+        });
+
+        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+        if (lang === 'fr') {
+            document.getElementById('langFr').classList.add('active');
+        } else {
+            document.getElementById('langZh').classList.add('active');
+        }
+    }
+
+    // ============================================================
+    // 获取 Token 并验证用户
+    // ============================================================
+    function getTokenFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('token');
+    }
+
+    function parseToken(token) {
+        try {
+            const decoded = decodeURIComponent(atob(token));
+            return JSON.parse(decoded);
+        } catch (e) {
+            console.error('Token 解析失败:', e);
+            return null;
+        }
+    }
+
+    function getFeatureName(type) {
+        const names = {
+            'listening': '🎧 Compréhension orale',
+            'grammar': '📘 Grammaire',
+            'reading': '📖 Compréhension écrite',
+            'speaking': '💬 Expression orale'
+        };
+        return names[type] || 'Fonctionnalité';
+    }
+
+    // ============================================================
+    // 初始化
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        // 默认法语
+        switchLanguage('fr');
+
+        // 获取 token
+        const token = getTokenFromURL();
+        const userDisplay = document.getElementById('userNameDisplay');
+
+        if (token) {
+            const userData = parseToken(token);
+            if (userData && userData.name) {
+                userDisplay.textContent = userData.name + ' 👋';
+                // 显示功能名称
+                const type = new URLSearchParams(window.location.search).get('type') || '';
+                const featureName = getFeatureName(type);
+                document.getElementById('feature1').innerHTML = `<i class="fas fa-check-circle"></i> ${featureName}`;
+            } else {
+                userDisplay.textContent = 'Invité';
+            }
+        } else {
+            userDisplay.textContent = 'Invité';
+        }
+
+        // 进度条动画
+        setTimeout(() => {
+            const fill = document.getElementById('progressFill');
+            const percent = document.getElementById('progressPercent');
+            let current = 0;
+            const target = 40;
+            const interval = setInterval(() => {
+                current += 2;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(interval);
+                }
+                fill.style.width = current + '%';
+                percent.textContent = current + '%';
+            }, 60);
+        }, 300);
+    });
+
+    // 暴露函数
+    window.switchLanguage = switchLanguage;
+</script>
+
+</body>
+</html>
