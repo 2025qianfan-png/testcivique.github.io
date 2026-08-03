@@ -264,29 +264,35 @@ function updateUIForUser() {
                 user.role === 'teacher' ? 'Intervenant' : 'Élève';
         }
 
-        const roleMenu = document.getElementById('roleBasedMenu');
+        // 生成 token
         const tokenData = {
-            userId: user.userId,
+            userId: user.userId || user.id,
             name: user.name,
             role: user.role,
             type: user.type || 'n',
-            expiry: user.expiry
+            expiry: user.expiry || user.timer
         };
         const token = btoa(encodeURIComponent(JSON.stringify(tokenData)));
 
+        const roleMenu = document.getElementById('roleBasedMenu');
+        
         if (user.role === 'admin') {
+            // 管理员 → 法语管理后台
             roleMenu.innerHTML = `<a href="french-admin.html?token=${token}"><i class="fas fa-cog"></i> Administration</a>`;
         } else if (user.role === 'teacher') {
-            roleMenu.innerHTML = `<a href="#" onclick="openDevelopingModal(); return false;"><i class="fas fa-chalkboard-user"></i> Espace intervenant</a>`;
+            // 老师 → 老师界面（直接跳转）
+            roleMenu.innerHTML = `<a href="french-teacher.html?token=${token}"><i class="fas fa-chalkboard-user"></i> Espace intervenant</a>`;
         } else if (user.role === 'stu') {
-            roleMenu.innerHTML = `<a href="#" onclick="openDevelopingModal(); return false;"><i class="fas fa-user-graduate"></i> Espace étudiant</a>`;
+            // 学生 → 学生界面（直接跳转）
+            roleMenu.innerHTML = `<a href="french-student.html?token=${token}"><i class="fas fa-user-graduate"></i> Espace étudiant</a>`;
+        } else {
+            roleMenu.innerHTML = `<a href="#" onclick="showToast('Accès réservé aux membres', 'warning')"><i class="fas fa-info-circle"></i> Devenir membre</a>`;
         }
     } else {
         userInfo.style.display = 'none';
         navLogin.style.display = 'inline';
     }
 }
-
 function openLoginModal() {
     document.getElementById('loginModal').classList.add('show');
     document.getElementById('loginError').style.display = 'none';
