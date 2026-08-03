@@ -1402,7 +1402,163 @@ TEXTE DE L'ÉLÈVE :`;
     const specific = taskSpecific[taskType] || taskSpecific['tache1'];
     return basePrompt + '\n' + specific;
 }
+// ============================================================
+// 语法模块 - 数据获取
+// ============================================================
 
+async function getGrammarTopics(level) {
+    try {
+        const supabase = getSupabaseClient();
+        let query = supabase
+            .from('grammar_topics')
+            .select('*')
+            .eq('level', level)
+            .order('sort_order', { ascending: true });
+
+        const { data, error } = await query;
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('获取语法知识点失败:', error);
+        return [];
+    }
+}
+
+async function getGrammarExercises(level, topicId) {
+    try {
+        const supabase = getSupabaseClient();
+        let query = supabase
+            .from('grammar_exercises')
+            .select('*')
+            .eq('level', level)
+            .order('sort_order', { ascending: true });
+
+        if (topicId) {
+            query = query.eq('topic_id', topicId);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('获取语法习题失败:', error);
+        return [];
+    }
+}
+
+async function getGrammarQuizzes(level) {
+    try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+            .from('grammar_quizzes')
+            .select('*')
+            .eq('level', level)
+            .order('sort_order', { ascending: true });
+
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('获取语法测验失败:', error);
+        return [];
+    }
+}
+
+async function getQuizQuestions(quizId) {
+    try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+            .from('grammar_quiz_questions')
+            .select(`
+                exercise_id,
+                sort_order,
+                grammar_exercises (*)
+            `)
+            .eq('quiz_id', quizId)
+            .order('sort_order', { ascending: true });
+
+        if (error) throw error;
+        return data?.map(item => ({
+            ...item.grammar_exercises,
+            quiz_id: quizId
+        })) || [];
+    } catch (error) {
+        console.error('获取测验题目失败:', error);
+        return [];
+    }
+}
+
+async function saveGrammarProgress(progressData) {
+    try {
+        const supabase = getSupabaseClient();
+        // Vérifier si un enregistrement existe déjà
+        const { data: existing, error: checkError } = await supabase
+            .from('grammar_progress')
+            .select('id')
+            .eq('user_id', progressData.user_id)
+            .eq(progressData.topic_id ? 'topic_id' : 'exercise_id', 
+                progressData.topic_id || progressData.exercise_id || progressData.quiz_id)
+            .maybeSingle();
+
+        if (checkError && checkError.code !== 'PGRST116') {
+            throw checkError;
+        }
+
+        if (existing) {
+            // Mettre à jour
+            const { error: updateError } = await supabase
+                .from('grammar_progress')
+                .update({
+                    status: progressData.status,
+                    score: progressData.score || 0,
+                    attempts: 1,
+                    last_attempt_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', existing.id);
+
+            if (updateError) throw updateError;
+        } else {
+            // Insérer
+            const { error: insertError } = await supabase
+                .from('grammar_progress')
+                .insert([{
+                    user_id: progressData.user_id,
+                    topic_id: progressData.topic_id || null,
+                    exercise_id: progressData.exercise_id || null,
+                    quiz_id: progressData.quiz_id || null,
+                    status: progressData.status,
+                    score: progressData.score || 0,
+                    attempts: 1,
+                    last_attempt_at: new Date().toISOString(),
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                }]);
+
+            if (insertError) throw insertError;
+        }
+
+        return true;
+    } catch (error) {
+        console.error('保存语法进度失败:', error);
+        return false;
+    }
+}
+
+async function getGrammarProgress(userId) {
+    try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+            .from('grammar_progress')
+            .select('*')
+            .eq('user_id', userId);
+
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('获取语法进度失败:', error);
+        return [];
+    }
+}
 // ============================================================
 // 导出所有功能
 // ============================================================
@@ -1470,9 +1626,19 @@ window.supabaseAuth = {
     getWritingHistory: getWritingHistory,
     deleteWritingHistory: deleteWritingHistory,
     callGeminiAI: callMistralAI,  // 优先使用 Mistral
-    getWritingPrompt: getWritingPrompt
+    getWritingPrompt: getWritingPrompt,
+
+    // ============================================================
+    // 语法模块 (新增)
+    // ============================================================
+    getGrammarTopics: getGrammarTopics,
+    getGrammarExercises: getGrammarExercises,
+    getGrammarQuizzes: getGrammarQuizzes,
+    getQuizQuestions: getQuizQuestions,
+    saveGrammarProgress: saveGrammarProgress,
+    getGrammarProgress: getGrammarProgress
 };
 
-console.log('✅ Supabase 配置已加载 (公民考试 + 法语 + 写作模块)');
+console.log('✅ Supabase 配置已加载 (公民考试 + 法语 + 写作 + 语法模块)');
 console.log('📚 可用方法:', Object.keys(window.supabaseAuth));
 console.log('🤖 AI 服务: 优先 Mistral，备用 Gemini');
