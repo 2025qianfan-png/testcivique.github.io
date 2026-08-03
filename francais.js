@@ -43,16 +43,18 @@ const dict = {
         course4Duration: "35 heures",
         course4Group: "4-8 pers.",
         resourcesTag: "RESSOURCES",
-        resourcesTitle: "Outils pour apprendre",
-        resourcesSubtitle: "Des ressources gratuites et payantes pour progresser en français",
-        res1Title: "Podcasts & Audio",
-        res1Desc: "Des exercices d'écoute pour améliorer votre compréhension orale.",
-        res2Title: "Exercices interactifs",
-        res2Desc: "Des quiz et exercices pour renforcer votre grammaire et votre vocabulaire.",
-        res3Title: "Vidéos pédagogiques",
-        res3Desc: "Des leçons animées pour apprendre le français de manière visuelle.",
-        res4Title: "Conversation",
-        res4Desc: "Ateliers de conversation en ligne avec des locuteurs natifs.",
+        resourcesTitle: "Compétences linguistiques",
+        resourcesSubtitle: "Entraînez-vous sur les 5 compétences clés du français",
+        res1Title: "🎧 Compréhension orale",
+        res1Desc: "Podcasts, dialogues et exercices d'écoute pour améliorer votre compréhension du français parlé.",
+        res2Title: "📘 Grammaire",
+        res2Desc: "Quiz, exercices et fiches pour maîtriser la grammaire française du A1 au C2.",
+        res3Title: "📖 Compréhension écrite",
+        res3Desc: "Textes, articles et exercices de lecture pour développer votre compréhension des écrits.",
+        res4Title: "✍️ Expression écrite",
+        res4Desc: "Exercices de rédaction, modèles de lettres et conseils pour améliorer votre écrit.",
+        res5Title: "💬 Expression orale",
+        res5Desc: "Ateliers de conversation, simulations et exercices de prononciation.",
         footerAbout: "Association d'intégration et de formation",
         footerAddr: "Paris, France",
         footerYear: "Fondée en 2025",
@@ -128,16 +130,18 @@ const dict = {
         course4Duration: "35小时",
         course4Group: "4-8人",
         resourcesTag: "学习资源",
-        resourcesTitle: "学习工具",
-        resourcesSubtitle: "免费和付费资源助您提升法语",
-        res1Title: "播客与音频",
-        res1Desc: "听力练习提升您的法语理解能力。",
-        res2Title: "互动练习",
-        res2Desc: "测验和练习巩固您的语法和词汇。",
-        res3Title: "教学视频",
-        res3Desc: "动画课程让您通过视觉学习法语。",
-        res4Title: "口语会话",
-        res4Desc: "与母语者在线会话工作坊。",
+        resourcesTitle: "语言技能",
+        resourcesSubtitle: "训练法语的5大核心技能",
+        res1Title: "🎧 听力理解",
+        res1Desc: "播客、对话和听力练习，提升您的法语听力水平。",
+        res2Title: "📘 语法",
+        res2Desc: "测验、练习和语法卡片，从A1到C2全面掌握法语语法。",
+        res3Title: "📖 阅读理解",
+        res3Desc: "文章、文本和阅读练习，提升您的阅读理解能力。",
+        res4Title: "✍️ 写作表达",
+        res4Desc: "写作练习、信件模板和写作技巧，提升您的法语写作水平。",
+        res5Title: "💬 口语表达",
+        res5Desc: "会话工作坊、情景模拟和发音练习，提升您的法语口语。",
         footerAbout: "融入与培训协会",
         footerAddr: "法国巴黎",
         footerYear: "成立于2025年",
@@ -277,13 +281,10 @@ function updateUIForUser() {
         const roleMenu = document.getElementById('roleBasedMenu');
         
         if (user.role === 'admin') {
-            // 管理员 → 法语管理后台
             roleMenu.innerHTML = `<a href="french-admin.html?token=${token}"><i class="fas fa-cog"></i> Administration</a>`;
         } else if (user.role === 'teacher') {
-            // 老师 → 老师界面（直接跳转）
             roleMenu.innerHTML = `<a href="french-teacher.html?token=${token}"><i class="fas fa-chalkboard-user"></i> Espace intervenant</a>`;
         } else if (user.role === 'stu') {
-            // 学生 → 学生界面（直接跳转）
             roleMenu.innerHTML = `<a href="french-student.html?token=${token}"><i class="fas fa-user-graduate"></i> Espace étudiant</a>`;
         } else {
             roleMenu.innerHTML = `<a href="#" onclick="showToast('Accès réservé aux membres', 'warning')"><i class="fas fa-info-circle"></i> Devenir membre</a>`;
@@ -293,6 +294,7 @@ function updateUIForUser() {
         navLogin.style.display = 'inline';
     }
 }
+
 function openLoginModal() {
     document.getElementById('loginModal').classList.add('show');
     document.getElementById('loginError').style.display = 'none';
@@ -400,15 +402,19 @@ function updateProfile(event) {
 // Developing Modal
 // ============================================================
 function openDevelopingModal() {
-    document.getElementById('developingModal').style.display = 'flex';
+    const modal = document.getElementById('developingModal');
+    modal.style.display = 'flex';
+    modal.classList.add('show');
 }
 
 function closeDevelopingModal() {
-    document.getElementById('developingModal').style.display = 'none';
+    const modal = document.getElementById('developingModal');
+    modal.style.display = 'none';
+    modal.classList.remove('show');
 }
 
 // ============================================================
-// RENDER EXAMS - 从数据库读取，点击根据登录状态
+// RENDER EXAMS - 从数据库读取
 // ============================================================
 async function renderExams() {
     const container = document.getElementById('examsContainer');
@@ -456,7 +462,7 @@ async function renderExams() {
 }
 
 // ============================================================
-// 考试点击处理 - 根据登录状态
+// 考试点击处理
 // ============================================================
 function handleExamClick(event, examId) {
     event.preventDefault();
@@ -472,7 +478,7 @@ function handleExamClick(event, examId) {
 }
 
 // ============================================================
-// RENDER COURS - 卡片始终显示，点击根据登录状态
+// RENDER COURS
 // ============================================================
 function renderCourses() {
     const container = document.getElementById('coursesContainer');
@@ -502,7 +508,7 @@ function renderCourses() {
 }
 
 // ============================================================
-// 课程点击处理 - 根据登录状态
+// 课程点击处理
 // ============================================================
 function handleCourseClick(event) {
     const user = getCurrentUser();
@@ -517,20 +523,21 @@ function handleCourseClick(event) {
 }
 
 // ============================================================
-// RENDER RESSOURCES - 卡片始终显示，点击根据登录状态
+// RENDER RESSOURCES - 5大技能
 // ============================================================
 function renderRessources() {
     const container = document.getElementById('resourcesContainer');
 
     const resourceItems = [
-        { icon: 'fa-headphones', title: dict[currentLang].res1Title, desc: dict[currentLang].res1Desc },
-        { icon: 'fa-book-open', title: dict[currentLang].res2Title, desc: dict[currentLang].res2Desc },
-        { icon: 'fa-video', title: dict[currentLang].res3Title, desc: dict[currentLang].res3Desc },
-        { icon: 'fa-users', title: dict[currentLang].res4Title, desc: dict[currentLang].res4Desc }
+        { icon: 'fa-headphones', title: dict[currentLang].res1Title, desc: dict[currentLang].res1Desc, type: 'listening' },
+        { icon: 'fa-book', title: dict[currentLang].res2Title, desc: dict[currentLang].res2Desc, type: 'grammar' },
+        { icon: 'fa-eye', title: dict[currentLang].res3Title, desc: dict[currentLang].res3Desc, type: 'reading' },
+        { icon: 'fa-pen-fancy', title: dict[currentLang].res4Title, desc: dict[currentLang].res4Desc, type: 'writing' },
+        { icon: 'fa-comments', title: dict[currentLang].res5Title, desc: dict[currentLang].res5Desc, type: 'speaking' }
     ];
 
     container.innerHTML = resourceItems.map(item => `
-        <div class="resource-card" onclick="handleResourceClick(event)">
+        <div class="resource-card" onclick="handleResourceClick(event, '${item.type}')">
             <i class="fas ${item.icon}"></i>
             <h3>${item.title}</h3>
             <p>${item.desc}</p>
@@ -542,18 +549,36 @@ function renderRessources() {
 }
 
 // ============================================================
-// 资源点击处理 - 根据登录状态
+// 资源点击处理 - 带 token 跳转
 // ============================================================
-function handleResourceClick(event) {
+function handleResourceClick(event, type) {
     const user = getCurrentUser();
 
+    // 未登录 → 提示登录
     if (!user) {
         showToast(dict[currentLang].loginRequired, 'warning');
         openLoginModal();
         return;
     }
 
-    openDevelopingModal();
+    // 生成 token
+    const tokenData = {
+        userId: user.userId || user.id,
+        name: user.name,
+        role: user.role,
+        type: user.type || 'n',
+        expiry: user.expiry || user.timer
+    };
+    const token = btoa(encodeURIComponent(JSON.stringify(tokenData)));
+
+    // 根据类型跳转
+    if (type === 'writing') {
+        // 写作 → 跳转到写作页面
+        window.location.href = `ecriture.html?token=${token}`;
+    } else {
+        // 其他（listening, grammar, reading, speaking）→ 跳转到开发中页面
+        window.location.href = `developpement.html?token=${token}&type=${type}`;
+    }
 }
 
 // ============================================================
@@ -626,7 +651,9 @@ document.addEventListener('DOMContentLoaded', function() {
     renderAllSections();
 });
 
+// ============================================================
 // 暴露函数给 HTML
+// ============================================================
 window.switchLanguage = switchLanguage;
 window.openLoginModal = openLoginModal;
 window.closeLoginModal = closeLoginModal;

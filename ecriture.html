@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expression écrite · FLE - Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="ecriture.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="main-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="header-logo">
+                <img src="images/logo.png" alt="Mille Voiles" onerror="this.style.display='none'">
+            </div>
+            <div class="header-text">
+                <h1>✍️ Expression écrite</h1>
+                <p>Entraînez-vous aux 3 tâches du DELF avec correction IA</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- NAVIGATION -->
+<nav class="main-nav">
+    <div class="container nav-container">
+        <a href="francais.html" class="nav-brand">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+        <div class="nav-links">
+            <span class="user-badge"><i class="fas fa-user-circle"></i> <span id="userName">Élève</span></span>
+        </div>
+    </div>
+</nav>
+
+<!-- MAIN -->
+<main class="ecriture-main">
+    <div class="container">
+
+        <!-- TASK TABS -->
+        <div class="task-tabs">
+            <button class="task-tab active" data-task="tache1" onclick="switchTask('tache1')">
+                <span class="tab-icon">📝</span> Tâche 1
+                <span class="tab-badge">4 pts</span>
+            </button>
+            <button class="task-tab" data-task="tache2" onclick="switchTask('tache2')">
+                <span class="tab-icon">📖</span> Tâche 2
+                <span class="tab-badge">6 pts</span>
+            </button>
+            <button class="task-tab" data-task="tache3" onclick="switchTask('tache3')">
+                <span class="tab-icon">💬</span> Tâche 3
+                <span class="tab-badge">10 pts</span>
+            </button>
+        </div>
+
+        <!-- MAIN GRID -->
+        <div class="ecriture-grid">
+
+            <!-- LEFT: TOPIC LIST -->
+            <div class="ecriture-left">
+                <div class="topic-panel">
+                    <!-- 搜索 + 随机 -->
+                    <div class="topic-toolbar">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="Rechercher un sujet..." oninput="filterTopicsBySearch()">
+                        </div>
+                        <button class="btn-random" onclick="selectRandomTopic()" title="Sujet aléatoire">
+                            <i class="fas fa-dice"></i>
+                        </button>
+                    </div>
+
+                    <!-- 题目列表 -->
+                    <div class="topic-list" id="topicList">
+                        <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Chargement...</div>
+                    </div>
+
+                    <!-- 当前题目详情 -->
+                    <div class="topic-detail" id="topicDetail">
+                        <div class="detail-content">
+                            <div class="detail-empty">
+                                <i class="fas fa-hand-pointer"></i>
+                                <p>Sélectionnez un sujet dans la liste</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: WRITING + FEEDBACK -->
+            <div class="ecriture-right">
+
+                <!-- WRITING PANEL -->
+                <div class="writing-panel">
+                    <div class="writing-header">
+                        <h3><i class="fas fa-pen-fancy"></i> Votre production</h3>
+                        <div class="writing-stats">
+                            <span class="word-counter" id="wordCounter">0 mots</span>
+                            <span class="word-target" id="wordTarget">📏 30-60 mots</span>
+                        </div>
+                    </div>
+
+                    <textarea id="writingArea" placeholder="Sélectionnez un sujet et commencez à écrire..." disabled></textarea>
+
+                    <div class="writing-actions">
+                        <button class="btn-primary" onclick="submitWriting()">
+                            <i class="fas fa-paper-plane"></i> Soumettre
+                        </button>
+                        <button class="btn-secondary" onclick="clearWriting()">
+                            <i class="fas fa-eraser"></i> Effacer
+                        </button>
+                        <button class="btn-secondary" onclick="openHistory()">
+                            <i class="fas fa-history"></i> Historique
+                        </button>
+                    </div>
+
+                    <div class="writing-tips" id="writingTips">
+                        <i class="fas fa-lightbulb"></i>
+                        <span id="tipText">Choisissez un sujet pour commencer</span>
+                    </div>
+                </div>
+
+                <!-- FEEDBACK PANEL -->
+                <div class="feedback-panel" id="feedbackPanel" style="display:none;">
+                    <div class="feedback-header" onclick="toggleFeedback()">
+                        <div class="feedback-header-left">
+                            <i class="fas fa-robot"></i>
+                            <h3>Correction IA</h3>
+                        </div>
+                        <div class="feedback-header-right">
+                            <span class="feedback-level" id="feedbackLevel">-</span>
+                            <span class="feedback-score" id="feedbackScore">- / -</span>
+                            <button class="btn-toggle" id="feedbackToggleBtn"><i class="fas fa-chevron-up"></i></button>
+                        </div>
+                    </div>
+                    <div class="feedback-body" id="feedbackBody">
+                        <!-- 由 JS 渲染 -->
+                    </div>
+                    <div class="feedback-actions">
+                        <button class="btn-secondary" onclick="copyFeedback()"><i class="fas fa-copy"></i> Copier</button>
+                        <button class="btn-secondary" onclick="closeFeedback()"><i class="fas fa-times"></i> Fermer</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- ==================== EXAMPLE MODAL ==================== -->
+<div id="exampleModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-book-open"></i> Exemple</h3>
+            <button class="close-modal" onclick="closeExampleModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="exampleContent"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== HISTORY MODAL ==================== -->
+<div id="historyModal" class="modal">
+    <div class="modal-content history-modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-history"></i> Historique</h3>
+            <button class="close-modal" onclick="closeHistory()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="historyList">
+                <div class="empty-state"><i class="fas fa-inbox"></i><p>Aucune production</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== VIEW HISTORY MODAL ==================== -->
+<div id="viewHistoryModal" class="modal">
+    <div class="modal-content history-modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-file-alt"></i> Détail</h3>
+            <button class="close-modal" onclick="closeViewHistory()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="viewHistoryContent"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== LOADING OVERLAY ==================== -->
+<div class="loading-overlay" id="loadingOverlay" style="display:none;">
+    <div class="loading-box">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Analyse en cours... Gemini réfléchit...</p>
+        <span class="loading-sub">Cela peut prendre quelques secondes</span>
+    </div>
+</div>
+
+<!-- ==================== TOAST ==================== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="ecriture.js"></script>
+</body>
+</html>

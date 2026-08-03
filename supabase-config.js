@@ -394,10 +394,8 @@ async function markMistakeAsMastered(mistakeId, mastered = true) {
 }
 
 // ============================================================
-// 法语模块 - 完全独立
+// 法语模块 - 用户管理
 // ============================================================
-
-// ========== 法语用户管理 ==========
 
 async function validateFrenchUser(name, password) {
     try {
@@ -686,12 +684,10 @@ async function getFrenchCoursesStats(userId, userRole) {
     }
 }
 
-// 创建课程 - 扣减学生课时
 async function createFrenchCourse(courseData) {
     try {
         const supabase = getSupabaseClient();
         
-        // 1. 先检查学生课时是否足够
         if (courseData.student_id) {
             const { data: student, error: studentError } = await supabase
                 .from('french_users')
@@ -712,7 +708,6 @@ async function createFrenchCourse(courseData) {
                 throw new Error('课时不足，无法创建课程');
             }
             
-            // 2. 扣减课时
             const { error: updateError } = await supabase
                 .from('french_users')
                 .update({ credit: currentCredit - duration })
@@ -724,7 +719,6 @@ async function createFrenchCourse(courseData) {
             }
         }
         
-        // 3. 创建课程
         const { data, error } = await supabase
             .from('french_courses')
             .insert([courseData])
@@ -741,7 +735,6 @@ async function createFrenchCourse(courseData) {
     }
 }
 
-// 更新课程
 async function updateFrenchCourse(id, courseData) {
     try {
         const supabase = getSupabaseClient();
@@ -759,12 +752,10 @@ async function updateFrenchCourse(id, courseData) {
     }
 }
 
-// 删除/取消课程 - 退还课时
 async function deleteFrenchCourse(id) {
     try {
         const supabase = getSupabaseClient();
         
-        // 1. 获取课程信息
         const { data: course, error: courseError } = await supabase
             .from('french_courses')
             .select('student_id, duration, status')
@@ -776,13 +767,11 @@ async function deleteFrenchCourse(id) {
             return false;
         }
         
-        // 2. 如果课程是消耗课时的状态，退还课时
         const isConsumingStatus = course.status === 'scheduled' || 
                                    course.status === 'in_progress' || 
                                    course.status === 'completed';
         
         if (isConsumingStatus && course.student_id && course.duration) {
-            // 获取学生当前课时
             const { data: student, error: studentError } = await supabase
                 .from('french_users')
                 .select('credit')
@@ -795,11 +784,10 @@ async function deleteFrenchCourse(id) {
                     .from('french_users')
                     .update({ credit: newCredit })
                     .eq('id', course.student_id);
-                console.log(`✅ 课时已退还: +${course.duration}h，学生新课时: ${newCredit}h`);
+                console.log(`✅ 课时已退还: +${course.duration}h`);
             }
         }
         
-        // 3. 软删除 - 标记为 cancelled 而不是真正删除
         const { error: updateError } = await supabase
             .from('french_courses')
             .update({ status: 'cancelled' })
@@ -814,12 +802,10 @@ async function deleteFrenchCourse(id) {
     }
 }
 
-// 硬删除课程（管理员强制删除，退还课时）
 async function forceDeleteFrenchCourse(id) {
     try {
         const supabase = getSupabaseClient();
         
-        // 获取课程信息
         const { data: course, error: courseError } = await supabase
             .from('french_courses')
             .select('student_id, duration, status')
@@ -831,7 +817,6 @@ async function forceDeleteFrenchCourse(id) {
             return false;
         }
         
-        // 退还课时
         const isConsumingStatus = course.status === 'scheduled' || 
                                    course.status === 'in_progress' || 
                                    course.status === 'completed';
@@ -853,7 +838,6 @@ async function forceDeleteFrenchCourse(id) {
             }
         }
         
-        // 物理删除
         const { error } = await supabase
             .from('french_courses')
             .delete()
@@ -984,14 +968,454 @@ async function getFrenchResources(level, category) {
 }
 
 // ============================================================
+// 写作模块 - 题目管理
+// ============================================================
+
+async function getWritingTopics(taskType, level) {
+    try {
+        const supabase = getSupabaseClient();
+        let query = supabase
+            .from('writing_topics')
+            .select('*')
+            .order('sort_order', { ascending: true });
+
+        if (taskType) {
+            query = query.eq('task_type', taskType);
+        }
+        if (level && level !== 'all') {
+            query = query.eq('level', level);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('获取写作题目失败:', error);
+        return [];
+    }
+}
+
+async function getWritingTopicById(id) {
+    try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+            .from('writing_topics')
+            .select('*')
+            .eq('id', id)
+            .single();
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('获取写作题目失败:', error);
+        return null;
+    }
+}
+
+async function createWritingTopic(topicData) {
+    try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+            .from('writing_topics')
+            .insert([topicData])
+            .select()
+            .single();
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('创建写作题目失败:', error);
+        return null;
+    }
+}
+
+async function updateWritingTopic(id, topicData) {
+    try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+            .from('writing_topics')
+            .update(topicData)
+            .eq('id', id)
+            .select()
+            .single();
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('更新写作题目失败:', error);
+        return null;
+    }
+}
+
+async function deleteWritingTopic(id) {
+    try {
+        const supabase = getSupabaseClient();
+        const { error } = await supabase
+            .from('writing_topics')
+            .delete()
+            .eq('id', id);
+        if (error) throw error;
+        return true;
+    } catch (error) {
+        console.error('删除写作题目失败:', error);
+        return false;
+    }
+}
+
+// ============================================================
+// 写作模块 - 历史管理
+// ============================================================
+
+async function saveWritingHistory(historyData) {
+    try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+            .from('writing_history')
+            .insert([{
+                ...historyData,
+                created_at: new Date().toISOString()
+            }])
+            .select()
+            .single();
+        if (error) throw error;
+        console.log('✅ 写作历史保存成功:', data.id);
+        return data;
+    } catch (error) {
+        console.error('保存写作历史失败:', error);
+        return saveWritingHistoryLocal(historyData);
+    }
+}
+
+function saveWritingHistoryLocal(historyData) {
+    try {
+        const user = JSON.parse(localStorage.getItem('french_user') || '{}');
+        const key = `writing_history_${user.name || 'guest'}`;
+        const existing = JSON.parse(localStorage.getItem(key) || '[]');
+        const newEntry = {
+            ...historyData,
+            id: `local_${Date.now()}`,
+            created_at: new Date().toISOString(),
+            local_only: true
+        };
+        existing.push(newEntry);
+        localStorage.setItem(key, JSON.stringify(existing));
+        console.log('✅ 写作历史保存到本地:', newEntry.id);
+        return newEntry;
+    } catch (e) {
+        console.error('本地保存失败:', e);
+        return null;
+    }
+}
+
+async function getWritingHistory(userId, userName) {
+    try {
+        const results = { supabase: [], local: [] };
+
+        try {
+            const supabase = getSupabaseClient();
+            const { data, error } = await supabase
+                .from('writing_history')
+                .select('*')
+                .eq('user_id', userId)
+                .order('created_at', { ascending: false });
+
+            if (!error && data) {
+                results.supabase = data;
+                console.log('从 Supabase 获取历史:', data.length);
+            }
+        } catch (e) {
+            console.warn('Supabase 获取失败:', e.message);
+        }
+
+        try {
+            const key = `writing_history_${userName || 'guest'}`;
+            const localData = JSON.parse(localStorage.getItem(key) || '[]');
+            results.local = localData;
+            console.log('从本地获取历史:', localData.length);
+        } catch (e) {
+            console.warn('本地获取失败:', e);
+        }
+
+        const all = [...results.local, ...results.supabase];
+        const seen = new Set();
+        const unique = [];
+        for (const item of all) {
+            const id = item.id || item._id || item.created_at;
+            if (!seen.has(id)) {
+                seen.add(id);
+                unique.push(item);
+            }
+        }
+
+        return unique;
+    } catch (error) {
+        console.error('获取写作历史失败:', error);
+        return [];
+    }
+}
+
+async function deleteWritingHistory(id) {
+    try {
+        const isLocal = id && id.toString().includes('local_');
+
+        if (isLocal) {
+            const user = JSON.parse(localStorage.getItem('french_user') || '{}');
+            const key = `writing_history_${user.name || 'guest'}`;
+            const existing = JSON.parse(localStorage.getItem(key) || '[]');
+            const filtered = existing.filter(item => item.id !== id);
+            localStorage.setItem(key, JSON.stringify(filtered));
+            return true;
+        }
+
+        const supabase = getSupabaseClient();
+        const { error } = await supabase
+            .from('writing_history')
+            .delete()
+            .eq('id', id);
+        if (error) throw error;
+        return true;
+    } catch (error) {
+        console.error('删除写作历史失败:', error);
+        return false;
+    }
+}
+
+// ============================================================
+// 写作模块 - AI 批改（优先 Mistral，备用 Gemini）
+// ============================================================
+
+/**
+ * 调用 Mistral AI API
+ * 免费额度：每天 500 次请求
+ */
+async function callMistralAI(prompt, userText) {
+    try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+            .from('app_config')
+            .select('value')
+            .eq('key', 'mistral_api_key')
+            .single();
+
+        if (error || !data) {
+            console.warn('⚠️ Mistral API Key 未配置，尝试使用 Gemini...');
+            return callGeminiAI(prompt, userText);
+        }
+
+        const apiKey = data.value;
+        const url = 'https://api.mistral.ai/v1/chat/completions';
+
+        console.log('📤 调用 Mistral API...');
+        console.log('🤖 模型: mistral-small-latest');
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: 'mistral-small-latest',
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'Tu es un professeur de français expert DELF, spécialiste en évaluation des niveaux A1 à C2 du CECRL. Réponds toujours en français.'
+                    },
+                    {
+                        role: 'user',
+                        content: prompt + '\n\n' + userText
+                    }
+                ],
+                temperature: 0.7,
+                max_tokens: 2048
+            })
+        });
+
+        console.log('📥 API 响应状态:', response.status);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ Mistral API 错误:', response.status, errorText);
+            
+            if (response.status === 429) {
+                console.warn('⚠️ Mistral 配额已用完，尝试使用 Gemini...');
+                return callGeminiAI(prompt, userText);
+            }
+            
+            throw new Error(`Mistral API 错误: ${response.status}`);
+        }
+
+        const dataResponse = await response.json();
+        const result = dataResponse.choices?.[0]?.message?.content || '';
+
+        if (!result) {
+            throw new Error('Mistral 未返回有效结果');
+        }
+
+        console.log('✅ Mistral 返回成功，长度:', result.length);
+        return result;
+
+    } catch (error) {
+        console.error('❌ Mistral 调用失败:', error.message);
+        console.log('🔄 尝试使用 Gemini...');
+        return callGeminiAI(prompt, userText);
+    }
+}
+
+/**
+ * 调用 Gemini API（备用）
+ * 免费额度：每天 1500 次请求
+ */
+async function callGeminiAI(prompt, userText) {
+    try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+            .from('app_config')
+            .select('value')
+            .eq('key', 'gemini_api_key')
+            .single();
+
+        if (error || !data) {
+            console.error('❌ Gemini API Key 未配置');
+            throw new Error('没有可用的 AI API Key，请联系管理员');
+        }
+
+        const apiKey = data.value;
+        const MODEL = 'gemini-2.0-flash-lite-001';
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
+
+        console.log('📤 调用 Gemini API (备用)...');
+        console.log('🤖 模型:', MODEL);
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: prompt + '\n\n' + userText }]
+                }],
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 2048
+                }
+            })
+        });
+
+        console.log('📥 API 响应状态:', response.status);
+
+        if (!response.ok) {
+            let errorMessage = `HTTP ${response.status}`;
+            try {
+                const errorJson = await response.json();
+                console.error('❌ Gemini API 错误详情:', errorJson);
+                errorMessage = errorJson.error?.message || errorMessage;
+            } catch (e) {
+                const errorText = await response.text();
+                console.error('❌ Gemini API 错误:', response.status, errorText);
+                errorMessage = errorText.substring(0, 200);
+            }
+            
+            throw new Error(`Gemini API 错误: ${errorMessage}`);
+        }
+
+        const dataResponse = await response.json();
+        const result = dataResponse.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+        if (!result) {
+            throw new Error('Gemini 未返回有效结果');
+        }
+
+        console.log('✅ Gemini 返回成功，长度:', result.length);
+        return result;
+
+    } catch (error) {
+        console.error('❌ Gemini 调用失败:', error);
+        throw error;
+    }
+}
+
+// ============================================================
+// 写作模块 - 批改 Prompt
+// ============================================================
+
+function getWritingPrompt(taskType, topicTitle, wordMin, wordMax) {
+    const basePrompt = `Tu es un professeur de français expert DELF, spécialiste en évaluation des niveaux A1 à C2 du CECRL.
+
+📌 SUJET : ${topicTitle}
+📏 NOMBRE DE MOTS : ${wordMin}-${wordMax} mots
+
+⚠️ INSTRUCTION IMPORTANTE : 
+À la fin de ta correction, tu DOIS obligatoirement indiquer le niveau CECRL estimé du texte (A1, A2, B1, B2, C1 ou C2) avec une justification claire et précise.
+
+RÉPONDS EN FRANÇAIS AVEC CETTE STRUCTURE :
+
+📝 **Évaluation**
+- Nombre de mots : [compter] mots
+- Note : [X/分数]
+
+✅ **Ce qui est bien** :
+- [point 1]
+- [point 2]
+- [point 3]
+
+🔧 **À améliorer** (erreurs + corrections) :
+- ❌ "..." → ✅ "..."
+
+💡 **Conseils** :
+- [conseil 1]
+- [conseil 2]
+
+📄 **Proposition de correction** :
+[réécriture complète du texte]
+
+📊 **Niveau CECRL estimé** : [A1/A2/B1/B2/C1/C2]
+📝 **Justification** : [expliquer pourquoi ce niveau, avec des exemples précis du texte]
+
+---
+
+TEXTE DE L'ÉLÈVE :`;
+
+    const taskSpecific = {
+        'tache1': `
+📋 CRITÈRES SPÉCIFIQUES (Tâche 1 - 4 points) :
+1. Respect du nombre de mots (30-60) → 1 point
+2. Contenu centré sur le sujet → 1 point
+3. Utilisation du vocabulaire approprié → 1 point
+4. Correction grammaticale et orthographique → 1 point`,
+
+        'tache2': `
+📋 CRITÈRES SPÉCIFIQUES (Tâche 2 - 6 points) :
+1. Respect du nombre de mots (40-90) → 1 point
+2. Utilisation d'au moins 2 temps verbaux → 1.5 points
+3. Cohérence du récit → 1.5 points
+4. Richesse du vocabulaire → 1 point
+5. Correction grammaticale → 1 point`,
+
+        'tache3': `
+📋 CRITÈRES SPÉCIFIQUES (Tâche 3 - 10 points) :
+1. Respect du nombre de mots (40-90) → 1 point
+2. Présence d'une opinion claire → 2 points
+3. Arguments et justifications → 2.5 points
+4. Structure logique → 2 points
+5. Vocabulaire et grammaire → 2.5 points`
+    };
+
+    const specific = taskSpecific[taskType] || taskSpecific['tache1'];
+    return basePrompt + '\n' + specific;
+}
+
+// ============================================================
 // 导出所有功能
 // ============================================================
 
 window.supabaseAuth = {
+    // ===== 工具 =====
+    getSupabaseClient: getSupabaseClient,
+    getTypeLabel: getTypeLabel,
+    getTypeClass: getTypeClass,
+
     // ===== 公民考试模块 =====
     validateStudent: validateStudent,
     checkAccess: checkAccess,
-    getSupabaseClient: getSupabaseClient,
     recordMistake: recordMistakeToDB,
     getStudentMistakes: getStudentMistakes,
     getMistakesStats: getMistakesStats,
@@ -1035,11 +1459,20 @@ window.supabaseAuth = {
 
     // ===== 法语模块 - 资源 =====
     getFrenchResources: getFrenchResources,
-    
-    // ===== 工具 =====
-    getTypeLabel: getTypeLabel,
-    getTypeClass: getTypeClass
+
+    // ===== 写作模块 =====
+    getWritingTopics: getWritingTopics,
+    getWritingTopicById: getWritingTopicById,
+    createWritingTopic: createWritingTopic,
+    updateWritingTopic: updateWritingTopic,
+    deleteWritingTopic: deleteWritingTopic,
+    saveWritingHistory: saveWritingHistory,
+    getWritingHistory: getWritingHistory,
+    deleteWritingHistory: deleteWritingHistory,
+    callGeminiAI: callMistralAI,  // 优先使用 Mistral
+    getWritingPrompt: getWritingPrompt
 };
 
-console.log('✅ Supabase 配置已加载 (公民考试 + 法语模块)');
+console.log('✅ Supabase 配置已加载 (公民考试 + 法语 + 写作模块)');
 console.log('📚 可用方法:', Object.keys(window.supabaseAuth));
+console.log('🤖 AI 服务: 优先 Mistral，备用 Gemini');
