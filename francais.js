@@ -556,9 +556,6 @@ function renderRessources() {
 // ============================================================
 // 资源点击处理 - 带 token 跳转
 // ============================================================
-// ============================================================
-// 资源点击处理 - 带 token 跳转
-// ============================================================
 function handleResourceClick(event, type) {
     const user = getCurrentUser();
 
@@ -581,13 +578,14 @@ function handleResourceClick(event, type) {
 
     // 根据类型跳转
     if (type === 'writing') {
-        // 写作 → 跳转到写作页面
         window.location.href = `ecriture.html?token=${token}`;
     } else if (type === 'grammar') {
-        // ✅ 语法 → 跳转到语法页面
         window.location.href = `grammaire.html?token=${token}`;
+    } else if (type === 'reading') {
+        // ✅ 阅读 → 跳转到阅读页面
+        window.location.href = `lecture.html?token=${token}`;
     } else {
-        // 其他（listening, reading, speaking）→ 跳转到开发中页面
+        // listening, speaking → 开发中
         window.location.href = `developpement.html?token=${token}&type=${type}`;
     }
 }

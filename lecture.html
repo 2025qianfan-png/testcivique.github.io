@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture · FLE - Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="lecture.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="main-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="header-logo">
+                <img src="images/logo.png" alt="Mille Voiles" onerror="this.style.display='none'">
+            </div>
+            <div class="header-text">
+                <h1>📖 Compréhension écrite</h1>
+                <p>Entraînez-vous avec des textes authentiques du TCF</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- NAVIGATION -->
+<nav class="main-nav">
+    <div class="container nav-container">
+        <a href="francais.html" class="nav-brand">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+        <div class="nav-links">
+            <span class="user-badge"><i class="fas fa-user-circle"></i> <span id="userName">Élève</span></span>
+        </div>
+    </div>
+</nav>
+
+<!-- MAIN -->
+<main class="lecture-main">
+    <div class="container">
+
+        <!-- LEVEL FILTER -->
+        <div class="level-filter">
+            <span class="filter-label">Niveau :</span>
+            <div class="level-buttons" id="levelButtons">
+                <button class="level-btn active" data-level="A1" onclick="switchLevel('A1')">A1</button>
+                <button class="level-btn" data-level="A2" onclick="switchLevel('A2')">A2</button>
+                <button class="level-btn" data-level="B1" onclick="switchLevel('B1')">B1</button>
+                <button class="level-btn" data-level="B2" onclick="switchLevel('B2')">B2</button>
+                <button class="level-btn" data-level="C1" onclick="switchLevel('C1')">C1</button>
+                <button class="level-btn" data-level="C2" onclick="switchLevel('C2')">C2</button>
+            </div>
+            <span class="progress-badge" id="progressBadge">📊 0%</span>
+            <button class="btn-shuffle" onclick="reshuffleArticles()">
+                <i class="fas fa-dice"></i> Nouvelle série
+            </button>
+        </div>
+
+        <!-- GRID -->
+        <div class="lecture-grid">
+
+            <!-- LEFT: ARTICLE -->
+            <div class="lecture-left">
+                <div class="article-card">
+                    <div class="article-header">
+                        <span class="article-level-badge" id="articleLevel">A1</span>
+                        <span class="article-source" id="articleSource">TCF 250</span>
+                        <span class="article-question-count" id="articleQuestionCount">3 questions</span>
+                    </div>
+                    <h2 id="articleTitle">Titre de l'article</h2>
+                    <div class="article-body" id="articleBody">
+                        <p>Chargement de l'article...</p>
+                    </div>
+                    <div class="article-nav">
+                        <button class="btn-article-prev" onclick="prevArticle()"><i class="fas fa-chevron-left"></i></button>
+                        <span class="article-counter" id="articleCounter">1 / 10</span>
+                        <button class="btn-article-next" onclick="nextArticle()"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: EXERCISE -->
+            <div class="lecture-right">
+                <div class="exercise-panel">
+                    <div class="exercise-header">
+                        <span class="exercise-counter" id="exerciseCounter">Question 1 / 3</span>
+                        <span class="exercise-article-title" id="exerciseArticleTitle">Article: Titre</span>
+                    </div>
+
+                    <!-- ✅ 预览区只显示提示，不显示文章内容 -->
+                    <div class="exercise-preview" id="exercisePreview">
+                        <i class="fas fa-arrow-left" style="color:var(--orange);"></i>
+                        Lisez l'article à gauche, puis répondez aux questions.
+                    </div>
+
+                    <div class="exercise-card" id="exerciseCard">
+                        <div class="question-number" id="questionNumber">Q1</div>
+                        <p class="question-text" id="questionText">Question...</p>
+                        <div class="answer-area" id="answerArea"></div>
+                        <div class="feedback-area" id="feedbackArea" style="display:none;">
+                            <div class="feedback-result" id="feedbackResult"></div>
+                            <div class="feedback-explanation" id="feedbackExplanation"></div>
+                        </div>
+                        <div class="exercise-actions">
+                            <button class="btn-check" id="btnCheck" onclick="checkAnswer()"><i class="fas fa-check"></i> Vérifier</button>
+                            <button class="btn-next" id="btnNext" onclick="nextQuestion()"><i class="fas fa-arrow-right"></i> Suivant</button>
+                        </div>
+                    </div>
+
+                    <div class="exercise-progress">
+                        <div class="progress-bar"><span id="progressFill" style="width: 0%;"></span></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="lecture.js"></script>
+</body>
+</html>

@@ -1402,6 +1402,7 @@ TEXTE DE L'ÉLÈVE :`;
     const specific = taskSpecific[taskType] || taskSpecific['tache1'];
     return basePrompt + '\n' + specific;
 }
+
 // ============================================================
 // 语法模块 - 数据获取
 // ============================================================
@@ -1490,7 +1491,6 @@ async function getQuizQuestions(quizId) {
 async function saveGrammarProgress(progressData) {
     try {
         const supabase = getSupabaseClient();
-        // Vérifier si un enregistrement existe déjà
         const { data: existing, error: checkError } = await supabase
             .from('grammar_progress')
             .select('id')
@@ -1504,7 +1504,6 @@ async function saveGrammarProgress(progressData) {
         }
 
         if (existing) {
-            // Mettre à jour
             const { error: updateError } = await supabase
                 .from('grammar_progress')
                 .update({
@@ -1518,7 +1517,6 @@ async function saveGrammarProgress(progressData) {
 
             if (updateError) throw updateError;
         } else {
-            // Insérer
             const { error: insertError } = await supabase
                 .from('grammar_progress')
                 .insert([{
@@ -1559,6 +1557,129 @@ async function getGrammarProgress(userId) {
         return [];
     }
 }
+
+// ============================================================
+// 阅读模块 - 数据获取
+// ============================================================
+
+async function getReadingTexts(level) {
+    try {
+        const supabase = getSupabaseClient();
+        let query = supabase
+            .from('reading_texts')
+            .select('*')
+            .order('title', { ascending: true });
+
+        if (level) {
+            query = query.eq('level', level);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('获取阅读文章失败:', error);
+        return [];
+    }
+}
+
+async function getReadingQuestions(textId) {
+    try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+            .from('reading_questions')
+            .select('*')
+            .eq('text_id', textId)
+            .order('sort_order', { ascending: true });
+
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('获取阅读题目失败:', error);
+        return [];
+    }
+}
+
+async function getReadingQuestionsByLevel(level) {
+    try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+            .from('reading_questions')
+            .select(`
+                *,
+                text:reading_texts!inner(level)
+            `)
+            .eq('text.level', level);
+
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('获取阅读题目失败:', error);
+        return [];
+    }
+}
+
+async function saveReadingProgress(progressData) {
+    try {
+        const supabase = getSupabaseClient();
+        const { data: existing, error: checkError } = await supabase
+            .from('reading_progress')
+            .select('id')
+            .eq('user_id', progressData.user_id)
+            .eq('text_id', progressData.text_id)
+            .maybeSingle();
+
+        if (checkError && checkError.code !== 'PGRST116') {
+            throw checkError;
+        }
+
+        if (existing) {
+            const { error: updateError } = await supabase
+                .from('reading_progress')
+                .update({
+                    status: progressData.status,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', existing.id);
+
+            if (updateError) throw updateError;
+        } else {
+            const { error: insertError } = await supabase
+                .from('reading_progress')
+                .insert([{
+                    user_id: progressData.user_id,
+                    text_id: progressData.text_id,
+                    status: progressData.status || 'in_progress',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                }]);
+
+            if (insertError) throw insertError;
+        }
+
+        return true;
+    } catch (error) {
+        console.error('保存阅读进度失败:', error);
+        return false;
+    }
+}
+
+async function getReadingProgress(userId) {
+    try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+            .from('reading_progress')
+            .select('*')
+            .eq('user_id', userId);
+
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('获取阅读进度失败:', error);
+        return [];
+    }
+}
+
 // ============================================================
 // 导出所有功能
 // ============================================================
@@ -1625,20 +1746,25 @@ window.supabaseAuth = {
     saveWritingHistory: saveWritingHistory,
     getWritingHistory: getWritingHistory,
     deleteWritingHistory: deleteWritingHistory,
-    callGeminiAI: callMistralAI,  // 优先使用 Mistral
+    callGeminiAI: callMistralAI,
     getWritingPrompt: getWritingPrompt,
 
-    // ============================================================
-    // 语法模块 (新增)
-    // ============================================================
+    // ===== 语法模块 =====
     getGrammarTopics: getGrammarTopics,
     getGrammarExercises: getGrammarExercises,
     getGrammarQuizzes: getGrammarQuizzes,
     getQuizQuestions: getQuizQuestions,
     saveGrammarProgress: saveGrammarProgress,
-    getGrammarProgress: getGrammarProgress
+    getGrammarProgress: getGrammarProgress,
+
+    // ===== 阅读模块 =====
+    getReadingTexts: getReadingTexts,
+    getReadingQuestions: getReadingQuestions,
+    getReadingQuestionsByLevel: getReadingQuestionsByLevel,
+    saveReadingProgress: saveReadingProgress,
+    getReadingProgress: getReadingProgress
 };
 
-console.log('✅ Supabase 配置已加载 (公民考试 + 法语 + 写作 + 语法模块)');
+console.log('✅ Supabase 配置已加载 (公民考试 + 法语 + 写作 + 语法 + 阅读模块)');
 console.log('📚 可用方法:', Object.keys(window.supabaseAuth));
 console.log('🤖 AI 服务: 优先 Mistral，备用 Gemini');
