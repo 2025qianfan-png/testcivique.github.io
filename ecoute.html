@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Écoute · FLE - Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="ecoute.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="main-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="header-logo">
+                <img src="images/logo.png" alt="Mille Voiles" onerror="this.style.display='none'">
+            </div>
+            <div class="header-text">
+                <h1>🎧 Compréhension orale</h1>
+                <p>Entraînez-vous avec des audios authentiques du TCF</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- NAVIGATION -->
+<nav class="main-nav">
+    <div class="container nav-container">
+        <a href="francais.html" class="nav-brand">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+        <div class="nav-links">
+            <span class="user-badge"><i class="fas fa-user-circle"></i> <span id="userName">Élève</span></span>
+        </div>
+    </div>
+</nav>
+
+<!-- MAIN -->
+<main class="ecoute-main">
+    <div class="container">
+
+        <!-- LEVEL FILTER -->
+        <div class="level-filter">
+            <span class="filter-label">Niveau :</span>
+            <div class="level-buttons" id="levelButtons">
+                <button class="level-btn active" data-level="A1" onclick="switchLevel('A1')">A1</button>
+                <button class="level-btn" data-level="A2" onclick="switchLevel('A2')">A2</button>
+                <button class="level-btn" data-level="B1" onclick="switchLevel('B1')">B1</button>
+                <button class="level-btn" data-level="B2" onclick="switchLevel('B2')">B2</button>
+                <button class="level-btn" data-level="C1" onclick="switchLevel('C1')">C1</button>
+                <button class="level-btn" data-level="C2" onclick="switchLevel('C2')">C2</button>
+            </div>
+            <span class="progress-badge" id="progressBadge">📊 0%</span>
+        </div>
+
+        <!-- MAIN GRID -->
+        <div class="ecoute-grid">
+
+            <!-- LEFT: AUDIO + IMAGE -->
+            <div class="ecoute-left">
+                <div class="audio-card">
+                    <div class="audio-header">
+                        <span class="audio-level-badge" id="audioLevel">A1</span>
+                        <span class="audio-title" id="audioTitle">Document 1</span>
+                    </div>
+
+                    <!-- Image -->
+                    <div class="audio-image" id="audioImage">
+                        <img id="audioImg" src="" alt="Image de l'audio" style="display:none;">
+                        <div class="image-placeholder" id="imagePlaceholder">
+                            <i class="fas fa-image"></i>
+                            <span>Aucune image</span>
+                        </div>
+                    </div>
+
+                    <!-- Audio Player -->
+                    <div class="audio-player">
+                        <button class="btn-play" id="playBtn" onclick="togglePlay()">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <div class="audio-progress">
+                            <span class="time-current" id="timeCurrent">0:00</span>
+                            <div class="progress-bar" onclick="seekAudio(event)">
+                                <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                            </div>
+                            <span class="time-total" id="timeTotal">0:00</span>
+                        </div>
+                        <button class="btn-sound" onclick="toggleMute()">
+                            <i class="fas fa-volume-up" id="soundIcon"></i>
+                        </button>
+                    </div>
+
+                    <!-- Script (optional) -->
+                    <div class="audio-script" id="audioScript" style="display:none;">
+                        <button class="btn-script-toggle" onclick="toggleScript()">
+                            <i class="fas fa-file-alt"></i> Voir la transcription
+                        </button>
+                        <div class="script-content" id="scriptContent"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: EXERCISE -->
+            <div class="ecoute-right">
+                <div class="exercise-panel">
+                    <div class="exercise-header">
+                        <span class="exercise-counter" id="exerciseCounter">Question 1 / 10</span>
+                        <button class="btn-shuffle" onclick="loadQuestions()">
+                            <i class="fas fa-dice"></i> Nouvelle série
+                        </button>
+                    </div>
+
+                    <div class="exercise-card">
+                        <div class="question-number" id="questionNumber">Q1</div>
+                        <p class="question-text" id="questionText">Question...</p>
+                        <div class="answer-area" id="answerArea"></div>
+                        <div class="feedback-area" id="feedbackArea" style="display:none;">
+                            <div class="feedback-result" id="feedbackResult"></div>
+                            <div class="feedback-explanation" id="feedbackExplanation"></div>
+                        </div>
+                        <div class="exercise-actions">
+                            <button class="btn-check" id="btnCheck" onclick="checkAnswer()"><i class="fas fa-check"></i> Vérifier</button>
+                            <button class="btn-next" id="btnNext" onclick="nextQuestion()"><i class="fas fa-arrow-right"></i> Suivant</button>
+                        </div>
+                    </div>
+
+                    <div class="exercise-progress">
+                        <div class="progress-bar"><span id="progressFill" style="width: 0%;"></span></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="ecoute.js"></script>
+</body>
+</html>
