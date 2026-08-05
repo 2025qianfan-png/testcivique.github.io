@@ -582,10 +582,12 @@ function handleResourceClick(event, type) {
     } else if (type === 'grammar') {
         window.location.href = `grammaire.html?token=${token}`;
     } else if (type === 'reading') {
-        // ✅ 阅读 → 跳转到阅读页面
         window.location.href = `lecture.html?token=${token}`;
+    } else if (type === 'listening') {
+        // ✅ 听力 → 跳转到听力页面
+        window.location.href = `ecoute.html?token=${token}`;
     } else {
-        // listening, speaking → 开发中
+        // speaking → 开发中
         window.location.href = `developpement.html?token=${token}&type=${type}`;
     }
 }

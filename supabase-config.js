@@ -1679,11 +1679,117 @@ async function getReadingProgress(userId) {
         return [];
     }
 }
+// ============================================================
+// 听力模块 - 数据获取
+// ============================================================
 
+async function getListeningTexts(level) {
+    try {
+        const supabase = getSupabaseClient();
+        let query = supabase
+            .from('listening_texts')
+            .select('*')
+            .order('sort_order', { ascending: true });
+
+        if (level) {
+            query = query.eq('level', level);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('获取听力失败:', error);
+        return [];
+    }
+}
+
+async function getListeningQuestions(textId) {
+    try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+            .from('listening_questions')
+            .select('*')
+            .eq('text_id', textId)
+            .order('sort_order', { ascending: true });
+
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('获取听力题目失败:', error);
+        return [];
+    }
+}
+
+async function saveListeningProgress(progressData) {
+    try {
+        const supabase = getSupabaseClient();
+        const { data: existing, error: checkError } = await supabase
+            .from('listening_progress')
+            .select('id')
+            .eq('user_id', progressData.user_id)
+            .eq('text_id', progressData.text_id)
+            .maybeSingle();
+
+        if (checkError && checkError.code !== 'PGRST116') {
+            throw checkError;
+        }
+
+        if (existing) {
+            const { error: updateError } = await supabase
+                .from('listening_progress')
+                .update({
+                    status: progressData.status,
+                    score: progressData.score || 0,
+                    attempts: 1,
+                    last_attempt_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', existing.id);
+
+            if (updateError) throw updateError;
+        } else {
+            const { error: insertError } = await supabase
+                .from('listening_progress')
+                .insert([{
+                    user_id: progressData.user_id,
+                    text_id: progressData.text_id,
+                    status: progressData.status || 'in_progress',
+                    score: progressData.score || 0,
+                    attempts: 1,
+                    last_attempt_at: new Date().toISOString(),
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                }]);
+
+            if (insertError) throw insertError;
+        }
+
+        return true;
+    } catch (error) {
+        console.error('保存听力进度失败:', error);
+        return false;
+    }
+}
+
+async function getListeningProgress(userId) {
+    try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+            .from('listening_progress')
+            .select('*')
+            .eq('user_id', userId);
+
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('获取听力进度失败:', error);
+        return [];
+    }
+}
 // ============================================================
 // 导出所有功能
 // ============================================================
-
 window.supabaseAuth = {
     // ===== 工具 =====
     getSupabaseClient: getSupabaseClient,
@@ -1762,9 +1868,16 @@ window.supabaseAuth = {
     getReadingQuestions: getReadingQuestions,
     getReadingQuestionsByLevel: getReadingQuestionsByLevel,
     saveReadingProgress: saveReadingProgress,
-    getReadingProgress: getReadingProgress
+    getReadingProgress: getReadingProgress,
+
+    // ===== 听力模块 (新增) =====
+    getListeningTexts: getListeningTexts,
+    getListeningQuestions: getListeningQuestions,
+    saveListeningProgress: saveListeningProgress,
+    getListeningProgress: getListeningProgress
 };
 
-console.log('✅ Supabase 配置已加载 (公民考试 + 法语 + 写作 + 语法 + 阅读模块)');
+console.log('✅ Supabase 配置已加载 (公民考试 + 法语 + 写作 + 语法 + 阅读 + 听力模块)');
 console.log('📚 可用方法:', Object.keys(window.supabaseAuth));
 console.log('🤖 AI 服务: 优先 Mistral，备用 Gemini');
+
