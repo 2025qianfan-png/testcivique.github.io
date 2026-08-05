@@ -1,4 +1,4 @@
-const CACHE_NAME = 'civique-exam-v1.67';
+const CACHE_NAME = 'civique-exam-v1.68';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -30,7 +30,8 @@ const urlsToCache = [
  '/ developpement.html',
    '/grammaire.html',
    '/lecture.html',
-   '/ecoute.html'
+   '/ecoute.html',
+   '/ecoute.js'
 ];
 
 // 安装 Service Worker
