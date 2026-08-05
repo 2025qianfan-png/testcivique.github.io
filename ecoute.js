@@ -114,10 +114,47 @@ async function loadListeningQuestions(textId) {
 // ============================================================
 // 切换级别
 // ============================================================
+// ============================================================
+// 切换级别
+// ============================================================
 async function switchLevel(level) {
     currentLevel = level;
     currentAudioIndex = 0;
+    
+    // ✅ 重置所有答题状态
+    currentQuestions = [];
+    currentQuestionIndex = 0;
+    answered = false;
+    
+    // ✅ 重置音频播放器
+    if (audioPlayer) {
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
+        isPlaying = false;
+        document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>';
+        document.getElementById('progressFill').style.width = '0%';
+        document.getElementById('timeCurrent').textContent = '0:00';
+    }
 
+    // ✅ 清空答题区域
+    document.getElementById('answerArea').innerHTML = '';
+    document.getElementById('feedbackArea').style.display = 'none';
+    document.getElementById('feedbackArea').classList.remove('show');
+    document.getElementById('questionText').textContent = 'Chargement...';
+    document.getElementById('questionNumber').textContent = 'Q1';
+    document.getElementById('exerciseCounter').textContent = '0 / 0';
+    document.getElementById('progressFill').style.width = '0%';
+    
+    // ✅ 清空图片
+    document.getElementById('audioImg').style.display = 'none';
+    document.getElementById('imagePlaceholder').style.display = 'flex';
+    
+    // ✅ 清空原文
+    document.getElementById('scriptContent').textContent = '';
+    document.getElementById('scriptContent').classList.remove('show');
+    document.getElementById('audioScript').style.display = 'none';
+
+    // 更新按钮高亮
     document.querySelectorAll('.level-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.level === level);
     });
@@ -125,7 +162,6 @@ async function switchLevel(level) {
     await loadAudioForLevel();
     await updateProgress();
 }
-
 // ============================================================
 // 加载音频
 // ============================================================
@@ -134,6 +170,7 @@ async function loadAudioForLevel() {
     allAudio = texts;
 
     if (allAudio.length === 0) {
+        document.getElementById('audioLevel').textContent = currentLevel;
         document.getElementById('audioTitle').textContent = 'Aucun audio disponible';
         document.getElementById('audioImg').style.display = 'none';
         document.getElementById('imagePlaceholder').style.display = 'flex';
@@ -141,6 +178,7 @@ async function loadAudioForLevel() {
         document.getElementById('answerArea').innerHTML = '';
         document.getElementById('exerciseCounter').textContent = '0 / 0';
         document.getElementById('progressFill').style.width = '0%';
+        document.getElementById('feedbackArea').style.display = 'none';
         return;
     }
 
@@ -155,10 +193,23 @@ async function loadAudioForLevel() {
 
     await loadAudio(0);
 }
-
 async function loadAudio(index) {
     const audio = sessionAudio[index];
     if (!audio) return;
+
+    // ✅ 重置答题状态（切换音频时清空）
+    currentQuestions = [];
+    currentQuestionIndex = 0;
+    answered = false;
+    document.getElementById('answerArea').innerHTML = '';
+    document.getElementById('feedbackArea').style.display = 'none';
+    document.getElementById('feedbackArea').classList.remove('show');
+    document.getElementById('btnCheck').disabled = false;
+    document.getElementById('btnNext').disabled = true;
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('questionText').textContent = 'Chargement...';
+    document.getElementById('questionNumber').textContent = 'Q1';
+    document.getElementById('exerciseCounter').textContent = '0 / 0';
 
     // 更新标题
     document.getElementById('audioLevel').textContent = audio.level;
@@ -200,6 +251,7 @@ async function loadAudio(index) {
         document.getElementById('audioScript').style.display = 'block';
     } else {
         document.getElementById('audioScript').style.display = 'none';
+        scriptContent.textContent = '';
     }
 
     // 重置播放按钮
@@ -214,15 +266,15 @@ async function loadAudio(index) {
     currentQuestionIndex = 0;
     answered = false;
 
-    document.getElementById('exerciseCounter').textContent = `Question 1 / ${currentQuestions.length || 0}`;
-    document.getElementById('progressFill').style.width = '0%';
-
     if (questions.length === 0) {
         document.getElementById('questionText').textContent = 'Aucune question pour cet audio.';
         document.getElementById('answerArea').innerHTML = '';
+        document.getElementById('exerciseCounter').textContent = '0 / 0';
+        document.getElementById('progressFill').style.width = '0%';
         return;
     }
 
+    document.getElementById('exerciseCounter').textContent = `Question 1 / ${questions.length}`;
     renderQuestion(0);
 }
 
