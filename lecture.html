@@ -61,7 +61,7 @@
         <!-- GRID -->
         <div class="lecture-grid">
 
-            <!-- LEFT: ARTICLE -->
+            <!-- LEFT: ARTICLE + IMAGE -->
             <div class="lecture-left">
                 <div class="article-card">
                     <div class="article-header">
@@ -70,6 +70,13 @@
                         <span class="article-question-count" id="articleQuestionCount">3 questions</span>
                     </div>
                     <h2 id="articleTitle">Titre de l'article</h2>
+
+                    <!-- 文章图片 - 显示在文章内容上方 -->
+                    <div class="article-image-container" id="articleImageContainer" style="display:none;">
+                        <img src="" alt="" id="articleImage" class="article-image" onclick="openImageModal(this.src, this.alt)">
+                        <p class="article-image-caption" id="articleImageCaption"></p>
+                    </div>
+
                     <div class="article-body" id="articleBody">
                         <p>Chargement de l'article...</p>
                     </div>
@@ -86,10 +93,9 @@
                 <div class="exercise-panel">
                     <div class="exercise-header">
                         <span class="exercise-counter" id="exerciseCounter">Question 1 / 3</span>
-                        <span class="exercise-article-title" id="exerciseArticleTitle">Article: Titre</span>
+                        <span class="exercise-article-title" id="exerciseArticleTitle">📄 Article: Titre</span>
                     </div>
 
-                    <!-- ✅ 预览区只显示提示，不显示文章内容 -->
                     <div class="exercise-preview" id="exercisePreview">
                         <i class="fas fa-arrow-left" style="color:var(--orange);"></i>
                         Lisez l'article à gauche, puis répondez aux questions.
@@ -118,6 +124,20 @@
         </div>
     </div>
 </main>
+
+<!-- IMAGE MODAL -->
+<div id="imageModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-image"></i> Aperçu de l'image</h3>
+            <button class="close-modal" onclick="closeImageModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <img src="" alt="" id="modalImageView">
+            <p id="modalImageCaption" class="image-caption-text"></p>
+        </div>
+    </div>
+</div>
 
 <!-- TOAST -->
 <div class="toast-container" id="toastContainer"></div>

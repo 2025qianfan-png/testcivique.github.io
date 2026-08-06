@@ -116,7 +116,7 @@ async function loadQuestionsForArticle(textId) {
 async function switchLevel(level) {
     currentLevel = level;
     currentArticleIndex = 0;
-    
+
     document.querySelectorAll('.level-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.level === level);
     });
@@ -131,7 +131,7 @@ async function switchLevel(level) {
 async function loadArticlesForLevel() {
     const texts = await loadArticles(currentLevel);
     allArticles = texts;
-    
+
     if (allArticles.length === 0) {
         document.getElementById('articleBody').innerHTML = `
             <div style="text-align:center;padding:40px 0;color:var(--text-muted);">
@@ -145,10 +145,10 @@ async function loadArticlesForLevel() {
         document.getElementById('exerciseCounter').textContent = '0 / 0';
         document.getElementById('progressFill').style.width = '0%';
         document.getElementById('exercisePreview').innerHTML = '<i class="fas fa-info-circle"></i> Aucun article disponible';
+        document.getElementById('articleImageContainer').style.display = 'none';
         return;
     }
-    
-    // 随机抽取最多10篇
+
     const shuffled = [...allArticles];
     for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -156,39 +156,54 @@ async function loadArticlesForLevel() {
     }
     sessionArticles = shuffled.slice(0, Math.min(MAX_ARTICLES_PER_SESSION, shuffled.length));
     currentArticleIndex = 0;
-    
+
     await loadArticle(0);
 }
 
 async function loadArticle(index) {
     const article = sessionArticles[index];
     if (!article) return;
-    
+
     currentArticle = article;
-    
-    // 显示文章
+
     document.getElementById('articleLevel').textContent = article.level;
     document.getElementById('articleSource').textContent = article.source || 'TCF 250';
     document.getElementById('articleTitle').textContent = article.title || 'Sans titre';
+
+    // 显示文章图片（如果有）
+    const imgContainer = document.getElementById('articleImageContainer');
+    const img = document.getElementById('articleImage');
+    const caption = document.getElementById('articleImageCaption');
+
+    if (article.image_url && article.image_url.trim() !== '' && article.image_url !== 'null') {
+        img.src = article.image_url;
+        img.alt = article.image_caption || article.title || 'Image de l\'article';
+        caption.textContent = article.image_caption || '';
+        imgContainer.style.display = 'block';
+    } else {
+        imgContainer.style.display = 'none';
+        img.src = '';
+        caption.textContent = '';
+    }
+
+    // 显示文章内容
     document.getElementById('articleBody').innerHTML = article.content ? article.content.replace(/\n/g, '<br>') : 'Contenu non disponible.';
     document.getElementById('articleCounter').textContent = `${index + 1} / ${sessionArticles.length}`;
-    
-    // 加载该文章的题目
+
+    // 加载题目
     const questions = await loadQuestionsForArticle(article.id);
     currentQuestions = questions;
     currentQuestionIndex = 0;
     answered = false;
-    
-    // 更新问题计数
+
     document.getElementById('articleQuestionCount').textContent = `${questions.length} question${questions.length > 1 ? 's' : ''}`;
     document.getElementById('exerciseArticleTitle').textContent = `📄 ${article.title || ''}`;
-    
-    // ✅ 预览区只显示提示
+
     document.getElementById('exercisePreview').innerHTML = `
         <i class="fas fa-arrow-left" style="color:var(--orange);"></i>
         Lisez l'article à gauche, puis répondez aux questions.
     `;
-    
+
     if (questions.length === 0) {
         document.getElementById('questionText').textContent = 'Aucune question pour cet article.';
         document.getElementById('answerArea').innerHTML = '';
@@ -196,62 +211,56 @@ async function loadArticle(index) {
         document.getElementById('progressFill').style.width = '0%';
         return;
     }
-    
+
     renderQuestion(0);
 }
 
+// ============================================================
+// 题目渲染（只显示选项，图片已在左侧文章区域）
+// ============================================================
 function renderQuestion(index) {
     const q = currentQuestions[index];
     if (!q) return;
-    
+
     document.getElementById('questionNumber').textContent = `Q${index + 1}`;
     document.getElementById('questionText').textContent = q.question;
     document.getElementById('exerciseCounter').textContent = `Question ${index + 1} / ${currentQuestions.length}`;
     document.getElementById('progressFill').style.width = `${((index + 1) / currentQuestions.length) * 100}%`;
-    
-    // 重置反馈
+
     const feedbackArea = document.getElementById('feedbackArea');
     feedbackArea.classList.remove('show');
     feedbackArea.style.display = 'none';
     answered = false;
-    
+
     document.getElementById('btnCheck').disabled = false;
     document.getElementById('btnNext').disabled = true;
-    
-    // 渲染选项
+
     const answerArea = document.getElementById('answerArea');
-    answerArea.innerHTML = '';
-    
+
+    // 只渲染选项，不显示题目图片
     const options = q.options || [];
     const letters = ['A', 'B', 'C', 'D'];
-    const grid = document.createElement('div');
-    grid.className = 'options-grid';
-    
+    let optionsHtml = '<div class="options-grid">';
     options.forEach((opt, i) => {
-        const div = document.createElement('div');
-        div.className = 'option-item';
-        div.dataset.index = i;
-        div.onclick = function() { selectOption(this, i); };
-        
-        // ✅ 去掉选项中已有的字母前缀（A. / B. / C. / D.）
         let displayText = opt;
         if (/^[A-D]\.\s/.test(opt)) {
             displayText = opt.replace(/^[A-D]\.\s/, '');
         }
-        
-        div.innerHTML = `
-            <input type="radio" name="questionOption" value="${opt}">
-            <span class="option-label">${letters[i]}. ${displayText}</span>
+        optionsHtml += `
+            <div class="option-item" data-index="${i}" onclick="selectOption(this, ${i})">
+                <input type="radio" name="questionOption" value="${opt}">
+                <span class="option-label">${letters[i]}. ${displayText}</span>
+            </div>
         `;
-        grid.appendChild(div);
     });
-    
-    answerArea.appendChild(grid);
+    optionsHtml += '</div>';
+
+    answerArea.innerHTML = optionsHtml;
 }
 
 function selectOption(el, index) {
     if (answered) return;
-    
+
     const radio = el.querySelector('input[type="radio"]');
     if (radio) {
         radio.checked = true;
@@ -259,34 +268,36 @@ function selectOption(el, index) {
         el.classList.add('selected');
     }
 }
+
+// ============================================================
+// 答题逻辑
+// ============================================================
 function checkAnswer() {
     if (answered) return;
-    
+
     const selected = document.querySelector('input[name="questionOption"]:checked');
     if (!selected) {
         showToast('Veuillez sélectionner une réponse', 'warning');
         return;
     }
-    
+
     const q = currentQuestions[currentQuestionIndex];
     const userAnswer = selected.value;
     const correctAnswer = q.correct_answer;
-    
-    // ✅ 提取选项字母（A/B/C/D）
+
     const getLetter = (str) => {
         const match = str.match(/^([A-D])/);
         return match ? match[1] : str;
     };
-    
+
     const userLetter = getLetter(userAnswer);
     const correctLetter = getLetter(correctAnswer);
     const isCorrect = userLetter === correctLetter;
-    
+
     answered = true;
     document.getElementById('btnCheck').disabled = true;
     document.getElementById('btnNext').disabled = false;
-    
-    // 标记选项颜色
+
     document.querySelectorAll('.option-item').forEach(el => {
         const radio = el.querySelector('input[type="radio"]');
         if (radio) {
@@ -298,24 +309,22 @@ function checkAnswer() {
             }
         }
     });
-    
-    // 显示反馈
+
     const feedbackArea = document.getElementById('feedbackArea');
     feedbackArea.style.display = 'block';
     feedbackArea.classList.add('show');
-    
+
     const resultEl = document.getElementById('feedbackResult');
     if (isCorrect) {
         resultEl.className = 'feedback-result correct';
         resultEl.innerHTML = '✅ Bonne réponse !';
     } else {
         resultEl.className = 'feedback-result wrong';
-        // ✅ 显示正确的选项字母 + 内容
         const correctOption = q.options ? q.options.find(opt => getLetter(opt) === correctLetter) : correctAnswer;
         const displayCorrect = correctOption || correctAnswer;
         resultEl.innerHTML = `❌ Mauvaise réponse. La bonne réponse est : <strong>${displayCorrect}</strong>`;
     }
-    
+
     document.getElementById('feedbackExplanation').textContent = q.explanation || '';
 }
 
@@ -324,14 +333,12 @@ function nextQuestion() {
         currentQuestionIndex++;
         renderQuestion(currentQuestionIndex);
     } else {
-        // 当前文章所有问题答完 -> 自动切换到下一篇文章
         showToast('🎉 Article terminé !', 'success');
         setTimeout(() => {
             if (currentArticleIndex < sessionArticles.length - 1) {
                 currentArticleIndex++;
                 loadArticle(currentArticleIndex);
             } else {
-                // 所有文章完成
                 document.getElementById('questionText').textContent = '🎉 Tous les articles de cette série sont terminés !';
                 document.getElementById('answerArea').innerHTML = '';
                 document.getElementById('feedbackArea').style.display = 'none';
@@ -367,6 +374,44 @@ async function reshuffleArticles() {
 }
 
 // ============================================================
+// 图片预览模态框
+// ============================================================
+function openImageModal(imageUrl, caption) {
+    let modal = document.getElementById('imageModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'imageModal';
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-image"></i> Aperçu de l'image</h3>
+                    <button class="close-modal" onclick="closeImageModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <img src="" alt="" id="modalImageView">
+                    <p id="modalImageCaption" class="image-caption-text"></p>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    document.getElementById('modalImageView').src = imageUrl;
+    document.getElementById('modalImageCaption').textContent = caption || '';
+    modal.classList.add('show');
+
+    modal.onclick = function(e) {
+        if (e.target === modal) closeImageModal();
+    };
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    if (modal) modal.classList.remove('show');
+}
+
+// ============================================================
 // 进度
 // ============================================================
 async function updateProgress() {
@@ -384,15 +429,24 @@ async function updateProgress() {
 }
 
 // ============================================================
+// 键盘快捷键
+// ============================================================
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeImageModal();
+    }
+});
+
+// ============================================================
 // 初始化
 // ============================================================
 document.addEventListener('DOMContentLoaded', async function() {
     const user = verifyUser();
     if (!user) return;
-    
+
     currentUser = user;
     document.getElementById('userName').textContent = user.name || 'Élève';
-    
+
     await loadArticlesForLevel();
     await updateProgress();
 });
@@ -408,3 +462,5 @@ window.selectOption = selectOption;
 window.checkAnswer = checkAnswer;
 window.nextQuestion = nextQuestion;
 window.showToast = showToast;
+window.openImageModal = openImageModal;
+window.closeImageModal = closeImageModal;
