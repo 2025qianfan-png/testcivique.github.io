@@ -386,6 +386,9 @@ const translations = {
         situationInfo2Desc: "Adapté aux débutants comme aux avancés",
         situationInfo3Title: "Suivi des progrès",
         situationInfo3Desc: "Historique de vos résultats et erreurs",
+        preRegisterTitle: "📝 Prêt à commencer ?",
+        preRegisterDesc: "Inscrivez-vous dès maintenant pour réserver votre place dans nos formations civiques et bénéficier d'un suivi personnalisé.",
+        preRegisterBtnText: "Je m'inscris maintenant",
         footerSituationLink: "Mises en situation"
     },
     zh: {
@@ -432,6 +435,9 @@ const translations = {
         annalesFeature3: "详细解析",
         annalesFeature4: "通过率统计",
         annalesFeature5: "每月更新",
+        preRegisterTitle: "📝 准备开始了吗？",
+        preRegisterDesc: "立即注册，预定您在公民培训课程中的名额，享受个性化跟踪指导。",
+        preRegisterBtnText: "立即注册",
         passwordInfoAnnales: '<i class="fas fa-key"></i> <strong>受保护访问：</strong> 报名后获取密码（联系我们）',
         annalesTestBtnText: '<i class="fas fa-play-circle"></i> 开始测试',
         studentTestTitle: "学员测试",

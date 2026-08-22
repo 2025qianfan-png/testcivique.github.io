@@ -9,13 +9,157 @@
     <link rel="stylesheet" href="admin.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
-    <script src="admin.js" defer></script>
+    <style>
+        /* ===== TAB SYSTEM ===== */
+        .admin-tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--light-gray);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .admin-tabs button {
+            padding: 12px 28px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--medium-gray);
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Montserrat', sans-serif;
+        }
+        .admin-tabs button:hover {
+            background: rgba(0,64,128,0.05);
+        }
+        .admin-tabs button.active {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,64,128,0.20);
+        }
+        .admin-tabs button i { margin-right: 8px; }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== PRE-REGISTRATION BADGE ===== */
+        .pre-reg-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-validated { background: #d1fae5; color: #065f46; }
+        .badge-rejected { background: #fee2e2; color: #991b1b; }
+
+        .pre-reg-count {
+            background: var(--primary-yellow);
+            color: var(--primary-blue);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
+        .action-btn-validate {
+            background: var(--green);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .action-btn-validate:hover { background: #219653; transform: scale(1.02); }
+
+        .action-btn-reject {
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-left: 6px;
+        }
+        .action-btn-reject:hover { background: #c0392b; transform: scale(1.02); }
+
+        .action-btn-detail {
+            background: var(--primary-light-blue);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-right: 6px;
+        }
+        .action-btn-detail:hover { background: var(--primary-blue); transform: scale(1.02); }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--medium-gray);
+        }
+        .empty-state i { font-size: 3rem; color: #ddd; margin-bottom: 15px; }
+
+        /* ===== DETAIL MODAL ===== */
+        .modal-detail .modal-content { max-width: 700px; }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 24px;
+            margin: 15px 0;
+        }
+        .detail-item { padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+        .detail-item .label { font-weight: 600; color: var(--primary-blue); font-size: 0.8rem; }
+        .detail-item .value { font-size: 0.95rem; color: var(--dark-gray); }
+        .detail-full { grid-column: 1 / -1; }
+
+        /* ===== PAYMENT BADGE ===== */
+        .payment-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .payment-wechat { background: rgba(7,193,96,0.15); color: #07c160; }
+        .payment-alipay { background: rgba(22,119,255,0.15); color: #1677ff; }
+        .payment-xiaohongshu { background: rgba(255,36,66,0.15); color: #ff2442; }
+        .payment-cb { background: rgba(26,115,232,0.15); color: #1a73e8; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .detail-grid { grid-template-columns: 1fr; }
+            .admin-tabs button { padding: 10px 16px; font-size: 0.8rem; }
+        }
+    </style>
 </head>
 <body>
     <header class="main-header">
         <div class="container">
-            <h1>Administration des utilisateurs</h1>
-            <p>Association Mille Voiles - Gestion des comptes étudiants et administrateurs</p>
+            <h1>Administration</h1>
+            <p>Association Mille Voiles - Gestion des comptes et pré-inscriptions</p>
         </div>
     </header>
 
@@ -29,13 +173,15 @@
 
     <main class="admin-content" id="adminContent">
         <div class="container">
+
+            <!-- ===== DASHBOARD ===== -->
             <section class="dashboard">
                 <div class="dashboard-header">
                     <div>
-                        <h1 class="dashboard-title">Tableau de bord administrateur</h1>
-                        <p>Gérez les utilisateurs et les paramètres de l'application</p>
+                        <h1 class="dashboard-title">Tableau de bord</h1>
+                        <p>Gérez les utilisateurs et les pré-inscriptions</p>
                     </div>
-                    <div style="display: flex; gap: 15px; align-items: center;">
+                    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
                         <div class="user-info">
                             <i class="fas fa-user-circle"></i>
                             <div>
@@ -51,7 +197,7 @@
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-users"></i></div>
                         <div class="stat-number" id="totalUsers">0</div>
-                        <div class="stat-label">Utilisateurs totaux</div>
+                        <div class="stat-label">Utilisateurs</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
@@ -81,63 +227,141 @@
                 </div>
             </section>
 
-            <div class="course-card">
-                <div class="course-info">
-                    <h3><i class="fas fa-book-open"></i> Gestion des cours</h3>
-                    <p>Créer, modifier et organiser les cours de l'association</p>
-                </div>
-                <button class="course-btn" id="courseManageBtn">Accéder <i class="fas fa-arrow-right"></i></button>
+            <!-- ===== TABS ===== -->
+            <div class="admin-tabs">
+                <button class="active" data-tab="users"><i class="fas fa-users"></i> Utilisateurs</button>
+                <button data-tab="prereg"><i class="fas fa-user-plus"></i> Pré-inscriptions <span class="pre-reg-count" id="preRegCount">0</span></button>
             </div>
 
-            <section class="users-table-container">
-                <div class="section-header">
-                    <h2>Gestion des utilisateurs</h2>
-                    <p>Visualisez, modifiez et gérez tous les utilisateurs de l'application</p>
-                </div>
-
-                <div class="controls">
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Rechercher un utilisateur par nom...">
-                        <button class="search-btn" id="searchBtn"><i class="fas fa-search"></i> Rechercher</button>
+            <!-- ===== TAB 1 : UTILISATEURS ===== -->
+            <div class="tab-content active" id="tab-users">
+                <div class="course-card">
+                    <div class="course-info">
+                        <h3><i class="fas fa-book-open"></i> Gestion des cours</h3>
+                        <p>Créer, modifier et organiser les cours de l'association</p>
                     </div>
-                    <div class="filters">
-                        <button class="filter-btn active" data-filter="all">Tous</button>
-                        <button class="filter-btn" data-filter="type-n">Type N</button>
-                        <button class="filter-btn" data-filter="type-r">Type R</button>
-                        <button class="filter-btn" data-filter="type-m">Type M</button>
-                        <button class="filter-btn" data-filter="type-t">Type T</button>
-                        <button class="filter-btn" data-filter="role-user">Membres</button>
-                        <button class="filter-btn" data-filter="role-stu">Élèves</button>
-                        <button class="filter-btn" data-filter="role-teacher">Intervenants</button>
-                        <button class="filter-btn" data-filter="role-admin">Administrateurs</button>
-                        <button class="filter-btn" data-filter="expired">Expirés</button>
+                    <button class="course-btn" id="courseManageBtn">Accéder <i class="fas fa-arrow-right"></i></button>
+                </div>
+
+                <section class="users-table-container">
+                    <div class="section-header">
+                        <h2>Gestion des utilisateurs</h2>
+                        <p>Visualisez, modifiez et gérez tous les utilisateurs de l'application</p>
                     </div>
-                </div>
 
-                <div class="table-wrapper">
-                    <table class="users-table">
-                        <thead>
-                         <th>Nom</th><th>Type</th><th>Rôle</th><th>Date de création</th><th>Date d'expiration</th><th>📚 Crédits</th><th>Mot de passe</th><th>Actions</th>
-                        </thead>
-                        <tbody id="usersTableBody"></tbody>
-                    </table>
-                </div>
+                    <div class="controls">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="Rechercher un utilisateur par nom...">
+                            <button class="search-btn" id="searchBtn"><i class="fas fa-search"></i> Rechercher</button>
+                        </div>
+                        <div class="filters">
+                            <button class="filter-btn active" data-filter="all">Tous</button>
+                            <button class="filter-btn" data-filter="type-n">Type N</button>
+                            <button class="filter-btn" data-filter="type-r">Type R</button>
+                            <button class="filter-btn" data-filter="type-m">Type M</button>
+                            <button class="filter-btn" data-filter="type-t">Type T</button>
+                            <button class="filter-btn" data-filter="role-user">Membres</button>
+                            <button class="filter-btn" data-filter="role-stu">Élèves</button>
+                            <button class="filter-btn" data-filter="role-teacher">Intervenants</button>
+                            <button class="filter-btn" data-filter="role-admin">Administrateurs</button>
+                            <button class="filter-btn" data-filter="expired">Expirés</button>
+                        </div>
+                    </div>
 
-                <div class="loading" id="tableLoading">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Chargement des données...</p>
-                </div>
+                    <div class="table-wrapper">
+                        <table class="users-table">
+                            <thead>
+                                <th>Nom</th><th>Type</th><th>Rôle</th>
+                                <th>Date de création</th><th>Date d'expiration</th>
+                                <th>📚 Crédits</th><th>Mot de passe</th><th>Actions</th>
+                            </thead>
+                            <tbody id="usersTableBody"></tbody>
+                        </table>
+                    </div>
 
-                <div style="text-align: center; margin-top: 20px;">
-                    <button class="login-btn" id="addUserBtn" style="width: auto; padding: 12px 30px;">
-                        <i class="fas fa-user-plus"></i> Ajouter un utilisateur
-                    </button>
-                </div>
-            </section>
+                    <div class="loading" id="tableLoading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Chargement des données...</p>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="login-btn" id="addUserBtn" style="width: auto; padding: 12px 30px;">
+                            <i class="fas fa-user-plus"></i> Ajouter un utilisateur
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ===== TAB 2 : PRÉ-INSCRIPTIONS ===== -->
+            <div class="tab-content" id="tab-prereg">
+                <section class="users-table-container">
+                    <div class="section-header">
+                        <h2>Pré-inscriptions <span class="pre-reg-count" id="preRegCount2">0</span></h2>
+                        <p>Validez ou rejetez les demandes d'inscription en attente</p>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="users-table">
+                            <thead>
+                                <th>Nom</th>
+                                <th>Type</th>
+                                <th>Rôle</th>
+                                <th>Date d'inscription</th>
+                                <th>Date d'expiration</th>
+                                <th>📚 Crédits</th>
+                                <th>📦 Commande</th>
+                                <th>💳 Paiement</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </thead>
+                            <tbody id="preRegTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="loading" id="preRegLoading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Chargement des pré-inscriptions...</p>
+                    </div>
+                </section>
+            </div>
+
         </div>
     </main>
 
-    <!-- 编辑用户模态框 -->
+    <!-- ===== MODAL DÉTAIL PRÉ-INSCRIPTION ===== -->
+    <div class="modal modal-detail" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Détails de la pré-inscription</h2>
+                <button class="close-btn" id="closeDetailBtn">&times;</button>
+            </div>
+            <div id="detailContent">
+                <div class="detail-grid">
+                    <div class="detail-item"><span class="label">Nom</span><div class="value" id="dName">-</div></div>
+                    <div class="detail-item"><span class="label">Type</span><div class="value" id="dType">-</div></div>
+                    <div class="detail-item"><span class="label">Rôle</span><div class="value" id="dRole">-</div></div>
+                    <div class="detail-item"><span class="label">Date d'inscription</span><div class="value" id="dCreated">-</div></div>
+                    <div class="detail-item"><span class="label">Date d'expiration</span><div class="value" id="dTimer">-</div></div>
+                    <div class="detail-item"><span class="label">📚 Crédits</span><div class="value" id="dCredit">-</div></div>
+                    <div class="detail-item"><span class="label">Prix estimé</span><div class="value" id="dPrice">-</div></div>
+                    <div class="detail-item"><span class="label">📦 Numéro de commande</span><div class="value" id="dOrderNumber">-</div></div>
+                    <div class="detail-item"><span class="label">💳 Moyen de paiement</span><div class="value" id="dPaymentMethod">-</div></div>
+                    <div class="detail-item"><span class="label">Statut</span><div class="value" id="dStatus">-</div></div>
+                    <div class="detail-item detail-full"><span class="label">Email</span><div class="value" id="dEmail">-</div></div>
+                    <div class="detail-item detail-full"><span class="label">Date de naissance</span><div class="value" id="dBirth">-</div></div>
+                    <div class="detail-item detail-full"><span class="label">Lieu de naissance</span><div class="value" id="dBirthPlace">-</div></div>
+                    <div class="detail-item detail-full"><span class="label">Adresse</span><div class="value" id="dAddress">-</div></div>
+                    <div class="detail-item detail-full"><span class="label">Téléphone</span><div class="value" id="dPhone">-</div></div>
+                    <div class="detail-item detail-full"><span class="label">Forfait</span><div class="value" id="dPack">-</div></div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
+                <button class="cancel-btn" id="closeDetailBtn2">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL ÉDITION UTILISATEUR ===== -->
     <div class="modal" id="editUserModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -198,7 +422,7 @@
         </div>
     </div>
 
-    <!-- 添加用户模态框 -->
+    <!-- ===== MODAL AJOUT UTILISATEUR ===== -->
     <div class="modal" id="addUserModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -254,7 +478,7 @@
         </div>
     </div>
 
-    <!-- 删除确认对话框 -->
+    <!-- ===== CONFIRMATION SUPPRESSION ===== -->
     <div class="confirm-dialog" id="deleteConfirmDialog">
         <div class="confirm-content">
             <h3><i class="fas fa-exclamation-triangle" style="color: var(--red); margin-right: 10px;"></i> Confirmer la suppression</h3>
@@ -273,5 +497,7 @@
             </div>
         </div>
     </footer>
+
+    <script src="admin.js"></script>
 </body>
 </html>

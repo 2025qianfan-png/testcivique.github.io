@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Pré-inscription - Association Mille Voiles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <style>
+        :root {
+            --primary-blue: #004080;
+            --primary-light-blue: #0066cc;
+            --primary-yellow: #ffd633;
+            --primary-light-yellow: #ffe066;
+            --dark-gray: #333333;
+            --medium-gray: #666666;
+            --light-gray: #f5f7fa;
+            --white: #ffffff;
+            --green: #27ae60;
+            --orange: #f39c12;
+            --red: #e74c3c;
+            --purple: #8e44ad;
+            --wechat: #07c160;
+            --alipay: #1677ff;
+            --xiaohongshu: #ff2442;
+            --cb: #1a73e8;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: var(--light-gray);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            color: var(--dark-gray);
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            max-width: 680px;
+            width: 100%;
+            padding: 40px 44px 32px;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .header-left { display:flex; align-items:center; gap:16px; }
+        .header-left .logo-icon {
+            width:52px; height:52px;
+            background: var(--primary-blue);
+            border-radius: 14px;
+            display:flex; align-items:center; justify-content:center;
+            color: var(--primary-yellow); font-size:1.6rem;
+            flex-shrink:0;
+        }
+        .header-left h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size:1.6rem; font-weight:800; color:var(--primary-blue);
+        }
+        .header-left .sub {
+            font-weight:400; font-size:0.8rem; color:var(--medium-gray); display:block; margin-top:-2px;
+        }
+
+        .lang-toggle {
+            display:flex; gap:4px; background:var(--light-gray); border-radius:30px; padding:4px; flex-shrink:0;
+        }
+        .lang-toggle button {
+            border:none; background:transparent; padding:8px 20px; border-radius:26px;
+            font-size:0.8rem; font-weight:600; cursor:pointer; color:var(--medium-gray);
+            transition:var(--transition); font-family:inherit;
+        }
+        .lang-toggle button.active { background:var(--primary-blue); color:var(--white); }
+        .lang-toggle button:hover:not(.active) { background:rgba(0,64,128,0.06); }
+
+        .status-badge {
+            display:inline-block; background:var(--primary-light-yellow); color:#8a6d00;
+            font-size:0.8rem; font-weight:600; padding:6px 20px; border-radius:30px;
+            margin-bottom:14px;
+        }
+        .status-badge i { margin-right:8px; color:var(--orange); }
+
+        .back-link {
+            display:inline-flex; align-items:center; gap:8px;
+            color:var(--medium-gray); text-decoration:none; font-size:0.85rem; font-weight:600;
+            margin-bottom:18px; transition:var(--transition);
+        }
+        .back-link:hover { color:var(--primary-blue); }
+
+        /* ===== FORM ===== */
+        .form-group { margin-bottom:20px; }
+        .form-group label {
+            display:block; font-weight:700; font-size:0.9rem; color:var(--primary-blue); margin-bottom:6px;
+        }
+        .form-group label .required { color:var(--red); margin-left:3px; }
+        .form-group label .optional { color:var(--medium-gray); font-weight:400; font-size:0.8rem; }
+        .form-group .hint {
+            font-size:0.78rem; color:var(--medium-gray); margin-top:5px;
+        }
+        .form-group input,
+        .form-group select {
+            width:100%; padding:13px 18px;
+            border:2px solid #e2e8f0; border-radius:10px;
+            font-size:1rem; font-family:inherit;
+            transition:var(--transition); background:var(--white); color:var(--dark-gray);
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline:none; border-color:var(--primary-blue);
+            box-shadow:0 0 0 4px rgba(0,64,128,0.08);
+        }
+        .form-group input::placeholder { color:#a0aec0; }
+        .form-group select { appearance:auto; }
+
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+
+        /* ===== PAYMENT METHOD ===== */
+        .payment-options {
+            display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px;
+        }
+        .payment-option {
+            padding:12px 6px; border:2px solid #e2e8f0; border-radius:10px;
+            text-align:center; cursor:pointer; transition:var(--transition);
+            background:var(--white);
+        }
+        .payment-option:hover { border-color:var(--primary-blue); transform:translateY(-2px); }
+        .payment-option.active {
+            border-color:var(--primary-blue); background:rgba(0,64,128,0.05);
+            box-shadow:0 0 0 4px rgba(0,64,128,0.06);
+        }
+        .payment-option .icon { font-size:1.5rem; display:block; margin-bottom:2px; }
+        .payment-option .name { font-weight:600; font-size:0.75rem; color:var(--dark-gray); }
+        .payment-option .sub { font-size:0.6rem; color:var(--medium-gray); }
+        .payment-option input { display:none; }
+        .payment-option.wechat .icon { color:var(--wechat); }
+        .payment-option.alipay .icon { color:var(--alipay); }
+        .payment-option.xiaohongshu .icon { color:var(--xiaohongshu); }
+        .payment-option.cb .icon { color:var(--cb); }
+
+        /* ===== ROLE ===== */
+        .role-selector { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .role-card {
+            padding:18px 16px; border:2px solid #e2e8f0; border-radius:12px;
+            text-align:center; cursor:pointer; transition:var(--transition);
+            background:var(--white);
+        }
+        .role-card:hover { border-color:var(--primary-blue); transform:translateY(-2px); }
+        .role-card.active {
+            border-color:var(--primary-blue); background:rgba(0,64,128,0.05);
+            box-shadow:0 0 0 4px rgba(0,64,128,0.06);
+        }
+        .role-card .emoji { font-size:2.2rem; display:block; margin-bottom:4px; }
+        .role-card .name { font-weight:800; font-size:1.1rem; color:var(--primary-blue); display:block; }
+        .role-card .desc { font-size:0.8rem; color:var(--medium-gray); }
+        .role-card input { display:none; }
+
+        /* ===== TYPE ===== */
+        .type-selector { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+        .type-card {
+            padding:16px 12px; border:2px solid #e2e8f0; border-radius:12px;
+            text-align:center; cursor:pointer; transition:var(--transition);
+            background:var(--white);
+        }
+        .type-card:hover { border-color:var(--primary-blue); transform:translateY(-2px); }
+        .type-card.active {
+            border-color:var(--primary-blue); background:rgba(0,64,128,0.05);
+            box-shadow:0 0 0 4px rgba(0,64,128,0.06);
+        }
+        .type-card .badge {
+            display:inline-block; padding:2px 14px; border-radius:14px;
+            font-size:0.65rem; font-weight:800; color:var(--white); letter-spacing:0.5px;
+        }
+        .badge-n { background:var(--green); }
+        .badge-r { background:var(--purple); }
+        .badge-m { background:var(--primary-light-blue); }
+        .type-card .name { font-weight:700; font-size:0.95rem; color:var(--primary-blue); display:block; margin-top:4px; }
+        .type-card .sub { font-size:0.7rem; color:var(--medium-gray); display:block; }
+        .type-card input { display:none; }
+
+        /* ===== PACK ===== */
+        .pack-selector { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+        .pack-card {
+            padding:16px 12px; border:2px solid #e2e8f0; border-radius:12px;
+            text-align:center; cursor:pointer; transition:var(--transition);
+            background:var(--white);
+        }
+        .pack-card:hover { border-color:var(--primary-blue); transform:translateY(-2px); }
+        .pack-card.active {
+            border-color:var(--primary-blue); background:rgba(0,64,128,0.05);
+            box-shadow:0 0 0 4px rgba(0,64,128,0.06);
+        }
+        .pack-card .name { font-weight:700; font-size:1rem; color:var(--primary-blue); display:block; }
+        .pack-card .sub { font-size:0.7rem; color:var(--medium-gray); display:block; }
+        .pack-card .price { font-weight:800; font-size:1.1rem; color:var(--primary-blue); display:block; margin-top:4px; }
+        .pack-card input { display:none; }
+
+        /* ===== STUDENT FIELDS ===== */
+        .student-fields {
+            display:none;
+            animation:fadeIn 0.3s ease;
+        }
+        .student-fields.show { display:block; }
+        @keyframes fadeIn {
+            from { opacity:0; transform:translateY(-8px); }
+            to { opacity:1; transform:translateY(0); }
+        }
+
+        .email-field { display:block; }
+
+        /* ===== PRICE BOX ===== */
+        .price-box {
+            background: linear-gradient(135deg, rgba(0,64,128,0.04), rgba(255,214,51,0.06));
+            border-radius:12px; padding:16px 20px;
+            border-left:5px solid var(--primary-yellow);
+            margin-top:6px;
+            display:none;
+        }
+        .price-box.show { display:block; }
+        .price-box .row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+        .price-box .label { font-weight:700; font-size:1rem; color:var(--primary-blue); }
+        .price-box .label i { color:var(--primary-yellow); margin-right:8px; }
+        .price-box .amount {
+            font-family: 'Montserrat', sans-serif;
+            font-size:1.8rem; font-weight:900; color:var(--primary-blue);
+        }
+        .price-box .detail { font-size:0.85rem; color:var(--medium-gray); margin-top:6px; }
+
+        /* ===== CGU ===== */
+        .cgu {
+            display:flex; align-items:flex-start; gap:14px;
+            margin:18px 0 16px; padding-top:4px;
+        }
+        .cgu input[type="checkbox"] {
+            width:20px; height:20px; margin-top:2px; flex-shrink:0;
+            accent-color:var(--primary-blue); cursor:pointer;
+        }
+        .cgu label {
+            font-size:0.9rem; color:var(--dark-gray); cursor:pointer; font-weight:400; line-height:1.6;
+        }
+        .cgu label a { color:var(--primary-blue); font-weight:600; text-decoration:underline; }
+        .cgu label .required { color:var(--red); }
+
+        /* ===== TIMER ===== */
+        .timer-field { display:block; }
+        .timer-field .hint { color:var(--green); font-weight:600; }
+
+        /* ===== SUBMIT ===== */
+        .submit-btn {
+            width:100%; padding:16px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-light-blue));
+            color:var(--white); border:none; border-radius:12px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight:700; font-size:1.05rem;
+            cursor:pointer; transition:var(--transition);
+            display:flex; align-items:center; justify-content:center; gap:12px;
+            margin-top:4px;
+        }
+        .submit-btn:hover {
+            transform:translateY(-2px);
+            box-shadow:var(--shadow-hover);
+        }
+        .submit-btn:disabled {
+            opacity:0.6; cursor:not-allowed; transform:none;
+        }
+
+        .footer {
+            text-align:center; margin-top:22px;
+            font-size:0.75rem; color:var(--medium-gray);
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position:fixed; bottom:24px; right:24px;
+            padding:16px 24px; border-radius:12px;
+            color:var(--white); font-weight:600; font-size:0.9rem;
+            z-index:1000; display:flex; align-items:center; gap:14px;
+            box-shadow:var(--shadow-hover);
+            animation:toastIn 0.35s ease;
+            max-width:440px;
+        }
+        @keyframes toastIn {
+            from { opacity:0; transform:translateY(20px) scale(0.96); }
+            to { opacity:1; transform:translateY(0) scale(1); }
+        }
+        .toast-success { background:var(--green); }
+        .toast-error { background:var(--red); }
+        .toast-warning { background:var(--orange); }
+        .toast i { font-size:1.3rem; }
+
+        /* ===== OVERLAY ===== */
+        .overlay {
+            display:none; position:fixed; inset:0;
+            background:rgba(0,0,0,0.4); backdrop-filter:blur(6px);
+            z-index:999; align-items:center; justify-content:center;
+        }
+        .overlay.show { display:flex; }
+        .modal {
+            background:var(--white); border-radius:var(--border-radius); padding:44px 40px;
+            max-width:420px; width:90%; text-align:center;
+            animation:modalIn 0.4s ease;
+        }
+        @keyframes modalIn {
+            from { opacity:0; transform:scale(0.92) translateY(16px); }
+            to { opacity:1; transform:scale(1) translateY(0); }
+        }
+        .modal .icon { font-size:4rem; color:var(--green); margin-bottom:12px; }
+        .modal h2 { font-family: 'Montserrat', sans-serif; font-size:1.5rem; color:var(--primary-blue); margin-bottom:6px; }
+        .modal p { color:var(--medium-gray); font-size:1rem; }
+        .modal .highlight {
+            display:inline-block; background:var(--primary-light-yellow); color:#8a6d00;
+            padding:4px 18px; border-radius:8px; font-weight:700;
+            margin-top:8px;
+        }
+        .modal .btn {
+            margin-top:22px; padding:14px 40px;
+            background:var(--primary-blue); color:var(--white); border:none; border-radius:10px;
+            font-weight:700; font-size:1rem; cursor:pointer;
+            transition:var(--transition); font-family:inherit;
+        }
+        .modal .btn:hover { background:var(--primary-light-blue); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .card { padding:24px 18px; }
+            .header { flex-direction:column; align-items:stretch; }
+            .header-left .logo-icon { width:44px; height:44px; font-size:1.3rem; }
+            .header-left h1 { font-size:1.3rem; }
+            .lang-toggle { align-self:flex-start; }
+            .lang-toggle button { padding:6px 14px; font-size:0.75rem; }
+            .form-row { grid-template-columns:1fr; gap:0; }
+            .role-selector { grid-template-columns:1fr; }
+            .type-selector { grid-template-columns:1fr; }
+            .pack-selector { grid-template-columns:1fr; }
+            .payment-options { grid-template-columns:1fr 1fr; }
+            .price-box .amount { font-size:1.4rem; }
+            .modal { padding:32px 20px; }
+            .toast { right:16px; left:16px; bottom:16px; max-width:100%; font-size:0.85rem; }
+        }
+        @media (max-width: 400px) {
+            .card { padding:16px 12px; }
+            .type-card { padding:12px 8px; }
+            .pack-card { padding:12px 8px; }
+            .role-card { padding:14px 12px; }
+            .payment-option { padding:10px 6px; }
+            .payment-option .icon { font-size:1.2rem; }
+            .payment-option .name { font-size:0.65rem; }
+            .payment-option .sub { font-size:0.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+
+    <!-- ===== HEADER ===== -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo-icon"><i class="fas fa-sailboat"></i></div>
+            <div>
+                <h1>
+                    <span id="title">Pré-inscription</span>
+                    <span class="sub" id="subtitle">Association Mille Voiles</span>
+                </h1>
+            </div>
+        </div>
+        <div class="lang-toggle">
+            <button class="active" data-lang="fr" onclick="setLang('fr')">FR</button>
+            <button data-lang="zh" onclick="setLang('zh')">中文</button>
+        </div>
+    </div>
+
+    <!-- ===== STATUS ===== -->
+    <div class="status-badge">
+        <i class="fas fa-clock"></i>
+        <span id="statusText">En attente de validation par l'administrateur</span>
+    </div>
+
+    <!-- ===== BACK ===== -->
+    <a href="examen-civique.html" class="back-link" id="backLink">
+        <i class="fas fa-arrow-left"></i>
+        <span id="backText">Retour à l'accueil</span>
+    </a>
+
+    <!-- ===== FORM ===== -->
+    <form id="registerForm" novalidate>
+
+        <!-- === RÔLE === -->
+        <div class="form-group">
+            <label id="roleLabel">Je suis <span class="required">*</span></label>
+            <div class="role-selector">
+                <div class="role-card active" data-role="user" onclick="selectRole('user')">
+                    <input type="radio" name="userRole" value="user" checked>
+                    <span class="emoji">👤</span>
+                    <span class="name"><span id="roleUser">Membre</span></span>
+                    <span class="desc"><span id="roleUserDesc">Accès aux ressources</span></span>
+                </div>
+                <div class="role-card" data-role="stu" onclick="selectRole('stu')">
+                    <input type="radio" name="userRole" value="stu">
+                    <span class="emoji">📚</span>
+                    <span class="name"><span id="roleStu">Élève</span></span>
+                    <span class="desc"><span id="roleStuDesc">Accès + suivi de cours</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- === NOM === -->
+        <div class="form-group">
+            <label for="fullName" id="nameLabel">Nom complet <span class="required">*</span></label>
+            <input type="text" id="fullName" placeholder="Ex: Dupont Jean" required>
+        </div>
+
+        <!-- === MOT DE PASSE === -->
+        <div class="form-row">
+            <div class="form-group">
+                <label for="password" id="passLabel">Mot de passe <span class="required">*</span></label>
+                <input type="password" id="password" placeholder="Min. 6 caractères" required minlength="6">
+            </div>
+            <div class="form-group">
+                <label for="passwordConfirm" id="confirmLabel">Confirmer <span class="required">*</span></label>
+                <input type="password" id="passwordConfirm" placeholder="Confirmez" required>
+            </div>
+        </div>
+
+        <!-- === EMAIL - visible pour TOUS === -->
+        <div class="form-group email-field">
+            <label for="userEmail" id="emailLabel">Adresse email <span class="required">*</span></label>
+            <input type="email" id="userEmail" placeholder="exemple@email.com" required>
+            <div class="hint" id="emailHint">Utilisé pour les communications et l'activation du compte</div>
+        </div>
+
+        <!-- === TYPE === -->
+        <div class="form-group">
+            <label id="typeLabel">Type d'examen <span class="required">*</span></label>
+            <div class="type-selector">
+                <div class="type-card active" data-type="n" onclick="selectType('n')">
+                    <input type="radio" name="userType" value="n" checked>
+                    <span class="badge badge-n">N</span>
+                    <span class="name"><span id="typeN">Naturalisation</span></span>
+                    <span class="sub"><span id="typeNSub">Examen civique</span></span>
+                </div>
+                <div class="type-card" data-type="r" onclick="selectType('r')">
+                    <input type="radio" name="userType" value="r">
+                    <span class="badge badge-r">R</span>
+                    <span class="name"><span id="typeR">Carte 10 ans</span></span>
+                    <span class="sub"><span id="typeRSub">Examen renouvellement</span></span>
+                </div>
+                <div class="type-card" data-type="m" onclick="selectType('m')">
+                    <input type="radio" name="userType" value="m">
+                    <span class="badge badge-m">M</span>
+                    <span class="name"><span id="typeM">Pluriannuelle</span></span>
+                    <span class="sub"><span id="typeMSub">Examen renouvellement</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- === TIMER === -->
+        <div class="form-group timer-field">
+            <label for="timer" id="timerLabel">Date d'expiration <span class="required">*</span></label>
+            <input type="datetime-local" id="timer" required>
+            <div class="hint" id="timerHint">📅 Choisissez la date d'expiration</div>
+        </div>
+
+        <!-- === MEMBER FIELDS (订单编号 + 付款方式) === -->
+        <div class="form-group" id="memberFields">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="orderNumber" id="orderLabel">Numéro de commande <span class="optional">(facultatif)</span></label>
+                    <input type="text" id="orderNumber" placeholder="Ex: #2026-001">
+                    <div class="hint" id="orderHint">Pour les membres ayant déjà effectué un paiement</div>
+                </div>
+                <div class="form-group">
+                    <label id="paymentLabel">Moyen de paiement <span class="optional">(facultatif)</span></label>
+                    <div class="payment-options" id="paymentOptions">
+                        <div class="payment-option wechat" data-value="wechat" onclick="selectPayment('wechat')">
+                            <input type="radio" name="paymentMethod" value="wechat">
+                            <span class="icon"><i class="fab fa-weixin"></i></span>
+                            <span class="name">WeChat</span>
+                            <span class="sub">微信</span>
+                        </div>
+                        <div class="payment-option alipay" data-value="alipay" onclick="selectPayment('alipay')">
+                            <input type="radio" name="paymentMethod" value="alipay">
+                            <span class="icon"><i class="fab fa-alipay"></i></span>
+                            <span class="name">Alipay</span>
+                            <span class="sub">支付宝</span>
+                        </div>
+                        <div class="payment-option xiaohongshu" data-value="xiaohongshu" onclick="selectPayment('xiaohongshu')">
+                            <input type="radio" name="paymentMethod" value="xiaohongshu">
+                            <span class="icon"><i class="fas fa-book"></i></span>
+                            <span class="name">Xiaohongshu</span>
+                            <span class="sub">小红书</span>
+                        </div>
+                        <div class="payment-option cb" data-value="cb" onclick="selectPayment('cb')">
+                            <input type="radio" name="paymentMethod" value="cb">
+                            <span class="icon"><i class="fas fa-credit-card"></i></span>
+                            <span class="name">CB</span>
+                            <span class="sub">银行卡</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === STUDENT FIELDS === -->
+        <div class="student-fields" id="studentFields">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="birthDate" id="birthLabel">Date de naissance <span class="required">*</span></label>
+                    <input type="date" id="birthDate">
+                </div>
+                <div class="form-group">
+                    <label for="birthPlace" id="placeLabel">Lieu de naissance</label>
+                    <input type="text" id="birthPlace" placeholder="Ville, pays">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="address" id="addressLabel">Adresse postale <span class="required">*</span></label>
+                <input type="text" id="address" placeholder="Numéro, rue, code postal, ville">
+            </div>
+
+            <div class="form-group">
+                <label for="phone" id="phoneLabel">Téléphone</label>
+                <input type="tel" id="phone" placeholder="06 12 34 56 78">
+            </div>
+
+            <!-- === FORFAIT === -->
+            <div class="form-group">
+                <label id="packLabel">📚 Choisissez votre forfait <span class="required">*</span></label>
+                <div class="pack-selector">
+                    <div class="pack-card active" data-hours="16" data-price="200" onclick="selectPack('16','200')">
+                        <span class="name"><span id="packComplete">Complet</span></span>
+                        <span class="sub">16 heures</span>
+                        <span class="price">200 €</span>
+                    </div>
+                    <div class="pack-card" data-hours="8" data-price="100" onclick="selectPack('8','100')">
+                        <span class="name"><span id="packMedium">Intermédiaire</span></span>
+                        <span class="sub">8 heures</span>
+                        <span class="price">100 €</span>
+                    </div>
+                    <div class="pack-card" data-hours="4" data-price="50" onclick="selectPack('4','50')">
+                        <span class="name"><span id="packExpress">Express</span></span>
+                        <span class="sub">4 heures</span>
+                        <span class="price">50 €</span>
+                    </div>
+                </div>
+                <div class="hint" id="packHint">12,50 € / heure</div>
+            </div>
+
+            <!-- === PRIX === -->
+            <div class="price-box show" id="priceBox">
+                <div class="row">
+                    <span class="label"><i class="fas fa-euro-sign"></i> <span id="totalLabel">Total</span></span>
+                    <span class="amount" id="priceAmount">200 €</span>
+                </div>
+                <div class="detail" id="priceDetail">Naturalisation · 16 h</div>
+            </div>
+        </div>
+
+        <!-- === CGU === -->
+        <div class="cgu">
+            <input type="checkbox" id="cgu" required>
+            <label for="cgu" id="cguLabel">
+                J'accepte les <a href="#" onclick="alert('Conditions Générales d\'Utilisation'); return false;">conditions générales</a> et je certifie que les informations fournies sont exactes <span class="required">*</span>
+            </label>
+        </div>
+
+        <!-- === SUBMIT === -->
+        <button type="submit" class="submit-btn" id="submitBtn">
+            <i class="fas fa-paper-plane"></i>
+            <span id="submitText">Envoyer ma pré-inscription</span>
+        </button>
+
+        <div class="footer" id="footerText">© 2025 Association Mille Voiles — Tous droits réservés</div>
+
+    </form>
+</div>
+
+<!-- ===== SUCCESS OVERLAY ===== -->
+<div class="overlay" id="successOverlay">
+    <div class="modal">
+        <div class="icon"><i class="fas fa-check-circle"></i></div>
+        <h2 id="successTitle">✅ Pré-inscription envoyée !</h2>
+        <p id="successMsg">Votre demande a bien été enregistrée.</p>
+        <div class="highlight" id="successStatus"><i class="fas fa-hourglass-half"></i> En attente de validation</div>
+        <p style="font-size:0.85rem; color:var(--medium-gray); margin-top:8px;" id="successInfo">Un administrateur validera votre compte prochainement.</p>
+        <button class="btn" onclick="window.location.href='examen-civique.html'">
+            <i class="fas fa-home"></i> <span id="successBtn">Retour à l'accueil</span>
+        </button>
+    </div>
+</div>
+
+<script>
+// =====================================================================
+//  TRADUCTIONS
+// =====================================================================
+const LANG = {
+    fr: {
+        title: 'Pré-inscription',
+        subtitle: 'Association Mille Voiles',
+        status: 'En attente de validation par l\'administrateur',
+        back: 'Retour à l\'accueil',
+        roleLabel: 'Je suis',
+        roleUser: 'Membre',
+        roleUserDesc: 'Accès aux ressources',
+        roleStu: 'Élève',
+        roleStuDesc: 'Accès + suivi de cours',
+        nameLabel: 'Nom complet',
+        passLabel: 'Mot de passe',
+        confirmLabel: 'Confirmer',
+        emailLabel: 'Adresse email',
+        emailHint: 'Utilisé pour les communications et l\'activation du compte',
+        typeLabel: 'Type d\'examen',
+        typeN: 'Naturalisation',
+        typeNSub: 'Examen civique',
+        typeR: 'Carte 10 ans',
+        typeRSub: 'Examen renouvellement',
+        typeM: 'Pluriannuelle',
+        typeMSub: 'Examen renouvellement',
+        timerLabel: 'Date d\'expiration',
+        timerHint: '📅 Choisissez la date d\'expiration',
+        timerAuto: '✅ Date automatique : aujourd\'hui + 6 mois',
+        birthLabel: 'Date de naissance',
+        placeLabel: 'Lieu de naissance',
+        addressLabel: 'Adresse postale',
+        phoneLabel: 'Téléphone',
+        packLabel: '📚 Choisissez votre forfait',
+        packComplete: 'Complet',
+        packMedium: 'Intermédiaire',
+        packExpress: 'Express',
+        packHint: '12,50 € / heure',
+        totalLabel: 'Total',
+        orderLabel: 'Numéro de commande',
+        orderHint: 'Pour les membres ayant déjà effectué un paiement',
+        paymentLabel: 'Moyen de paiement',
+        cguLabel: 'J\'accepte les <a href="#" onclick="alert(\'Conditions Générales d\'Utilisation\'); return false;">conditions générales</a> et je certifie que les informations fournies sont exactes',
+        submitText: 'Envoyer ma pré-inscription',
+        footer: '© 2025 Association Mille Voiles — Tous droits réservés',
+        successTitle: '✅ Pré-inscription envoyée !',
+        successMsg: 'Votre demande a bien été enregistrée.',
+        successStatus: 'En attente de validation',
+        successInfo: 'Un administrateur validera votre compte prochainement.',
+        successBtn: 'Retour à l\'accueil',
+        errorMissing: 'Champs manquants',
+        errorMissingMsg: 'Veuillez remplir tous les champs obligatoires (*)',
+        errorPass: 'Mot de passe trop court',
+        errorPassMsg: 'Minimum 6 caractères',
+        errorMatch: 'Mots de passe différents',
+        errorMatchMsg: 'Les mots de passe ne correspondent pas',
+        errorStudent: 'Champs étudiants manquants',
+        errorStudentMsg: 'Date de naissance et adresse requis',
+        errorEmail: 'Email invalide',
+        errorEmailMsg: 'Adresse email valide requise',
+        errorPack: 'Forfait non sélectionné',
+        errorPackMsg: 'Veuillez choisir un forfait',
+        errorCgu: 'CGU non acceptées',
+        errorCguMsg: 'Vous devez accepter les conditions générales',
+        errorNameUsed: 'Nom déjà utilisé',
+        errorNameUsedMsg: 'Ce nom existe déjà dans notre système',
+        errorGeneric: 'Erreur',
+        errorGenericMsg: 'Une erreur est survenue. Veuillez réessayer.'
+    },
+    zh: {
+        title: '预注册',
+        subtitle: '千帆协会',
+        status: '等待管理员审核',
+        back: '返回首页',
+        roleLabel: '我是',
+        roleUser: '会员',
+        roleUserDesc: '访问学习资源',
+        roleStu: '学员',
+        roleStuDesc: '访问 + 上课',
+        nameLabel: '姓名',
+        passLabel: '密码',
+        confirmLabel: '确认密码',
+        emailLabel: '电子邮箱',
+        emailHint: '用于协会联系和账户激活',
+        typeLabel: '考试类型',
+        typeN: '入籍',
+        typeNSub: '公民考试',
+        typeR: '十年居留',
+        typeRSub: '续签考试',
+        typeM: '多年居留',
+        typeMSub: '续签考试',
+        timerLabel: '有效期截止日期',
+        timerHint: '📅 选择有效期截止日期',
+        timerAuto: '✅ 自动日期：今天 + 6个月',
+        birthLabel: '出生日期',
+        placeLabel: '出生地点',
+        addressLabel: '家庭住址',
+        phoneLabel: '电话号码',
+        packLabel: '📚 选择您的套餐',
+        packComplete: '全能',
+        packMedium: '中级',
+        packExpress: '速通',
+        packHint: '12,50 € / 小时',
+        totalLabel: '总计',
+        orderLabel: '订单编号',
+        orderHint: '已付款的会员可填写',
+        paymentLabel: '付款方式',
+        cguLabel: '我接受<a href="#" onclick="alert(\'使用条款\'); return false;">使用条款</a>并确认所填信息属实',
+        submitText: '提交预注册',
+        footer: '© 2025 千帆协会 — 保留所有权利',
+        successTitle: '✅ 预注册已提交！',
+        successMsg: '您的申请已成功提交。',
+        successStatus: '等待管理员审核',
+        successInfo: '管理员将尽快审核您的账户。',
+        successBtn: '返回首页',
+        errorMissing: '缺少字段',
+        errorMissingMsg: '请填写所有必填字段 (*)',
+        errorPass: '密码太短',
+        errorPassMsg: '至少6位字符',
+        errorMatch: '密码不一致',
+        errorMatchMsg: '两次输入的密码不一致',
+        errorStudent: '学员信息缺失',
+        errorStudentMsg: '请填写出生日期和住址',
+        errorEmail: '邮箱无效',
+        errorEmailMsg: '请输入有效的邮箱地址',
+        errorPack: '未选择套餐',
+        errorPackMsg: '请选择套餐',
+        errorCgu: '未接受条款',
+        errorCguMsg: '您必须接受使用条款',
+        errorNameUsed: '姓名已被使用',
+        errorNameUsedMsg: '该姓名已在系统中存在',
+        errorGeneric: '错误',
+        errorGenericMsg: '发生错误，请重试。'
+    }
+};
+
+// =====================================================================
+//  CONFIGURATION
+// =====================================================================
+const PRICE_PER_HOUR = 12.5;
+let currentLang = 'fr';
+let selectedHours = 16;
+let selectedPrice = 200;
+let selectedPayment = null;
+
+// =====================================================================
+//  LANGUE
+// =====================================================================
+function setLang(lang) {
+    currentLang = lang;
+    const t = LANG[lang];
+
+    document.querySelectorAll('.lang-toggle button').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+
+    document.getElementById('title').textContent = t.title;
+    document.getElementById('subtitle').textContent = t.subtitle;
+    document.getElementById('statusText').textContent = t.status;
+    document.getElementById('backText').textContent = t.back;
+    document.getElementById('roleLabel').innerHTML = t.roleLabel + ' <span class="required">*</span>';
+    document.getElementById('roleUser').textContent = t.roleUser;
+    document.getElementById('roleUserDesc').textContent = t.roleUserDesc;
+    document.getElementById('roleStu').textContent = t.roleStu;
+    document.getElementById('roleStuDesc').textContent = t.roleStuDesc;
+    document.getElementById('nameLabel').innerHTML = t.nameLabel + ' <span class="required">*</span>';
+    document.getElementById('passLabel').innerHTML = t.passLabel + ' <span class="required">*</span>';
+    document.getElementById('confirmLabel').innerHTML = t.confirmLabel + ' <span class="required">*</span>';
+    document.getElementById('emailLabel').innerHTML = t.emailLabel + ' <span class="required">*</span>';
+    document.getElementById('emailHint').textContent = t.emailHint;
+    document.getElementById('typeLabel').innerHTML = t.typeLabel + ' <span class="required">*</span>';
+    document.getElementById('typeN').textContent = t.typeN;
+    document.getElementById('typeNSub').textContent = t.typeNSub;
+    document.getElementById('typeR').textContent = t.typeR;
+    document.getElementById('typeRSub').textContent = t.typeRSub;
+    document.getElementById('typeM').textContent = t.typeM;
+    document.getElementById('typeMSub').textContent = t.typeMSub;
+    document.getElementById('timerLabel').innerHTML = t.timerLabel + ' <span class="required">*</span>';
+    document.getElementById('orderLabel').innerHTML = t.orderLabel + ' <span class="optional">(facultatif)</span>';
+    document.getElementById('orderHint').textContent = t.orderHint;
+    document.getElementById('paymentLabel').innerHTML = t.paymentLabel + ' <span class="optional">(facultatif)</span>';
+    document.getElementById('birthLabel').innerHTML = t.birthLabel + ' <span class="required">*</span>';
+    document.getElementById('placeLabel').textContent = t.placeLabel;
+    document.getElementById('addressLabel').innerHTML = t.addressLabel + ' <span class="required">*</span>';
+    document.getElementById('phoneLabel').textContent = t.phoneLabel;
+    document.getElementById('packLabel').innerHTML = t.packLabel + ' <span class="required">*</span>';
+    document.getElementById('packComplete').textContent = t.packComplete;
+    document.getElementById('packMedium').textContent = t.packMedium;
+    document.getElementById('packExpress').textContent = t.packExpress;
+    document.getElementById('packHint').textContent = t.packHint;
+    document.getElementById('totalLabel').textContent = t.totalLabel;
+    document.getElementById('cguLabel').innerHTML = t.cguLabel + ' <span class="required">*</span>';
+    document.getElementById('submitText').textContent = t.submitText;
+    document.getElementById('footerText').textContent = t.footer;
+    document.getElementById('successTitle').textContent = t.successTitle;
+    document.getElementById('successMsg').textContent = t.successMsg;
+    document.getElementById('successStatus').innerHTML = '<i class="fas fa-hourglass-half"></i> ' + t.successStatus;
+    document.getElementById('successInfo').textContent = t.successInfo;
+    document.getElementById('successBtn').textContent = t.successBtn;
+
+    updateTimerHint();
+    updatePrice();
+}
+
+// =====================================================================
+//  PAYMENT SELECTION
+// =====================================================================
+function selectPayment(value) {
+    selectedPayment = value;
+    document.querySelectorAll('.payment-option').forEach(el => {
+        el.classList.toggle('active', el.dataset.value === value);
+        const radio = el.querySelector('input[type="radio"]');
+        if (radio) radio.checked = (el.dataset.value === value);
+    });
+}
+
+// =====================================================================
+//  TIMER HINT
+// =====================================================================
+function updateTimerHint() {
+    const roleCard = document.querySelector('.role-card.active');
+    const role = roleCard ? roleCard.dataset.role : null;
+    const hint = document.getElementById('timerHint');
+    const t = LANG[currentLang];
+
+    if (role === 'stu') {
+        hint.textContent = t.timerAuto;
+        hint.style.color = '#27ae60';
+        hint.style.fontWeight = '600';
+    } else {
+        hint.textContent = t.timerHint;
+        hint.style.color = '';
+        hint.style.fontWeight = '';
+    }
+}
+
+// =====================================================================
+//  RÔLE
+// =====================================================================
+function selectRole(role) {
+    document.querySelectorAll('.role-card').forEach(c => {
+        c.classList.toggle('active', c.dataset.role === role);
+        const radio = c.querySelector('input[type="radio"]');
+        if (radio) radio.checked = (c.dataset.role === role);
+    });
+
+    const isStudent = role === 'stu';
+    const fields = document.getElementById('studentFields');
+    const memberFields = document.getElementById('memberFields');
+    const priceBox = document.getElementById('priceBox');
+    const timerInput = document.getElementById('timer');
+
+    // 会员字段：对所有人可见（订单编号 + 付款方式）
+    memberFields.style.display = 'block';
+
+    fields.classList.toggle('show', isStudent);
+
+    if (isStudent) {
+        priceBox.classList.add('show');
+        const now = new Date();
+        now.setMonth(now.getMonth() + 6);
+        timerInput.value = now.toISOString().slice(0, 16);
+        timerInput.disabled = true;
+    } else {
+        priceBox.classList.remove('show');
+        timerInput.value = '';
+        timerInput.disabled = false;
+    }
+
+    document.getElementById('birthDate').required = isStudent;
+    document.getElementById('address').required = isStudent;
+
+    if (!isStudent) {
+        selectedHours = 0;
+        selectedPrice = 0;
+    } else {
+        document.querySelectorAll('.pack-card').forEach(p => p.classList.remove('active'));
+        document.querySelector('.pack-card[data-hours="16"]').classList.add('active');
+        selectedHours = 16;
+        selectedPrice = 200;
+    }
+
+    updateTimerHint();
+    updatePrice();
+}
+
+// =====================================================================
+//  TYPE
+// =====================================================================
+function selectType(type) {
+    document.querySelectorAll('.type-card').forEach(c => {
+        c.classList.toggle('active', c.dataset.type === type);
+        const radio = c.querySelector('input[type="radio"]');
+        if (radio) radio.checked = (c.dataset.type === type);
+    });
+    updatePrice();
+}
+
+// =====================================================================
+//  PACK
+// =====================================================================
+function selectPack(hours, price) {
+    document.querySelectorAll('.pack-card').forEach(c => c.classList.remove('active'));
+    const target = document.querySelector(`.pack-card[data-hours="${hours}"]`);
+    if (target) target.classList.add('active');
+    selectedHours = parseInt(hours);
+    selectedPrice = parseInt(price);
+    updatePrice();
+}
+
+// =====================================================================
+//  PRIX
+// =====================================================================
+function updatePrice() {
+    const typeCard = document.querySelector('.type-card.active');
+    const roleCard = document.querySelector('.role-card.active');
+    const role = roleCard ? roleCard.dataset.role : null;
+    const amountEl = document.getElementById('priceAmount');
+    const detailEl = document.getElementById('priceDetail');
+    const priceBox = document.getElementById('priceBox');
+
+    const typeMap = {
+        'n': { fr: 'Naturalisation', zh: '入籍' },
+        'r': { fr: 'Carte 10 ans', zh: '十年居留' },
+        'm': { fr: 'Pluriannuelle', zh: '多年居留' }
+    };
+
+    if (!typeCard || !role || role === 'user') {
+        priceBox.classList.remove('show');
+        return;
+    }
+
+    priceBox.classList.add('show');
+
+    const type = typeCard.dataset.type;
+    const t = LANG[currentLang];
+    const typeLabel = typeMap[type] || { fr: type, zh: type };
+    const label = currentLang === 'fr' ? typeLabel.fr : typeLabel.zh;
+
+    if (selectedHours === 0) {
+        amountEl.textContent = '0 €';
+        detailEl.textContent = label + ' · Aucun forfait';
+    } else {
+        amountEl.textContent = selectedPrice + ' €';
+        detailEl.textContent = label + ' · ' + selectedHours + ' h · ' + selectedPrice + ' €';
+    }
+}
+
+// =====================================================================
+//  TOAST
+// =====================================================================
+function showToast(title, message, type = 'success') {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle'
+    };
+    toast.innerHTML = `
+        <i class="fas ${icons[type]}"></i>
+        <div>
+            <div style="font-weight:700;font-size:1rem;">${title}</div>
+            <div style="font-weight:400;font-size:0.85rem;opacity:0.9;">${message}</div>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.style.animation = 'toastIn 0.35s ease reverse';
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 350);
+        }
+    }, 5000);
+}
+
+// =====================================================================
+//  SUBMIT
+// =====================================================================
+const form = document.getElementById('registerForm');
+const submitBtn = document.getElementById('submitBtn');
+const successOverlay = document.getElementById('successOverlay');
+
+form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const t = LANG[currentLang];
+
+    const fullName = document.getElementById('fullName').value.trim();
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('passwordConfirm').value;
+    const userEmail = document.getElementById('userEmail').value.trim();
+    const typeCard = document.querySelector('.type-card.active');
+    const roleCard = document.querySelector('.role-card.active');
+    const userRole = roleCard ? roleCard.dataset.role : null;
+    const timer = document.getElementById('timer').value;
+    const cgu = document.getElementById('cgu').checked;
+    const isStudent = userRole === 'stu';
+
+    // 会员字段
+    const orderNumber = document.getElementById('orderNumber').value.trim();
+    const paymentMethod = selectedPayment;
+
+    const birthDate = document.getElementById('birthDate').value;
+    const birthPlace = document.getElementById('birthPlace').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+
+    // Validations
+    if (!fullName || !password || !userEmail || !typeCard || !userRole || !timer) {
+        showToast(t.errorMissing, t.errorMissingMsg, 'error');
+        return;
+    }
+
+    if (!userEmail.includes('@') || !userEmail.includes('.')) {
+        showToast(t.errorEmail, t.errorEmailMsg, 'error');
+        return;
+    }
+
+    if (password.length < 6) {
+        showToast(t.errorPass, t.errorPassMsg, 'error');
+        return;
+    }
+
+    if (password !== passwordConfirm) {
+        showToast(t.errorMatch, t.errorMatchMsg, 'error');
+        return;
+    }
+
+    if (isStudent) {
+        if (!birthDate || !address) {
+            showToast(t.errorStudent, t.errorStudentMsg, 'error');
+            return;
+        }
+        if (selectedHours === 0) {
+            showToast(t.errorPack, t.errorPackMsg, 'warning');
+            return;
+        }
+    }
+
+    if (!cgu) {
+        showToast(t.errorCgu, t.errorCguMsg, 'warning');
+        return;
+    }
+
+    const userData = {
+        name: fullName,
+        password: password,
+        email: userEmail,
+        type: typeCard.dataset.type,
+        role: userRole,
+        created_at: new Date().toISOString(),
+        timer: timer,
+        status: 'pending',
+        credit: isStudent ? selectedHours : 0,
+        // 会员字段
+        order_number: orderNumber || null,
+        payment_method: paymentMethod || null
+    };
+
+    if (isStudent) {
+        userData.estimated_price = selectedPrice;
+        userData.birth_date = birthDate;
+        userData.birth_place = birthPlace || null;
+        userData.address = address;
+        userData.phone = phone || null;
+        userData.pack_hours = selectedHours;
+        userData.pack_price = selectedPrice;
+    }
+
+    try {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${currentLang === 'fr' ? 'Envoi...' : '提交中...'}`;
+
+        if (typeof window.supabaseAuth === 'undefined' || !window.supabaseAuth.getSupabaseClient) {
+            showToast('Erreur technique', 'Supabase n\'est pas chargé. Veuillez rafraîchir.', 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> ${currentLang === 'fr' ? 'Envoyer' : '提交'}`;
+            return;
+        }
+
+        const supabase = window.supabaseAuth.getSupabaseClient();
+
+        const { data: existing } = await supabase
+            .from('students')
+            .select('name')
+            .eq('name', fullName)
+            .maybeSingle();
+
+        if (existing) {
+            showToast(t.errorNameUsed, t.errorNameUsedMsg, 'warning');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> ${currentLang === 'fr' ? 'Envoyer' : '提交'}`;
+            return;
+        }
+
+        const { error } = await supabase.from('pre_registrations').insert([userData]);
+
+        if (error) {
+            if (error.code === '42P01') {
+                const fallbackData = { ...userData, is_pre_registration: true };
+                const { error: fbErr } = await supabase.from('students').insert([fallbackData]);
+                if (fbErr) throw fbErr;
+            } else {
+                throw error;
+            }
+        }
+
+        successOverlay.classList.add('show');
+        form.reset();
+
+        // Reset selections
+        document.querySelectorAll('.type-card').forEach(c => c.classList.remove('active'));
+        document.querySelector('.type-card[data-type="n"]').classList.add('active');
+        document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
+        document.querySelector('.role-card[data-role="user"]').classList.add('active');
+        document.querySelector('input[name="userRole"][value="user"]').checked = true;
+        document.querySelectorAll('.pack-card').forEach(c => c.classList.remove('active'));
+        document.querySelector('.pack-card[data-hours="16"]').classList.add('active');
+        document.querySelectorAll('.payment-option').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('input[name="paymentMethod"]').forEach(r => r.checked = false);
+        selectedPayment = null;
+        document.getElementById('studentFields').classList.remove('show');
+        document.getElementById('priceBox').classList.remove('show');
+        document.getElementById('timer').value = '';
+        document.getElementById('timer').disabled = false;
+        document.getElementById('orderNumber').value = '';
+        selectedHours = 16;
+        selectedPrice = 200;
+        updateTimerHint();
+
+    } catch (err) {
+        console.error('Erreur:', err);
+        let message = t.errorGenericMsg;
+        if (err.code === '23505') {
+            message = t.errorNameUsedMsg;
+        }
+        showToast(t.errorGeneric, message, 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> ${currentLang === 'fr' ? 'Envoyer' : '提交'}`;
+    }
+});
+
+// =====================================================================
+//  INIT
+// =====================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    let attempts = 0;
+    const checkSupabase = setInterval(() => {
+        attempts++;
+        if (typeof window.supabaseAuth !== 'undefined' && window.supabaseAuth.getSupabaseClient) {
+            console.log('✅ Supabase chargé avec succès');
+            clearInterval(checkSupabase);
+        } else if (attempts > 10) {
+            console.warn('⚠️ Supabase non chargé après 10 tentatives');
+            clearInterval(checkSupabase);
+        }
+    }, 400);
+
+    document.querySelector('.type-card[data-type="n"]').classList.add('active');
+    document.querySelector('.role-card[data-role="user"]').classList.add('active');
+    document.querySelector('.pack-card[data-hours="16"]').classList.add('active');
+    selectedHours = 16;
+    selectedPrice = 200;
+
+    // 会员字段默认可见（订单编号 + 付款方式）
+    document.getElementById('memberFields').style.display = 'block';
+    document.getElementById('priceBox').classList.remove('show');
+    updateTimerHint();
+
+    document.querySelectorAll('input[name="userType"]').forEach(r => {
+        r.addEventListener('change', updatePrice);
+    });
+});
+</script>
+
+</body>
+</html>

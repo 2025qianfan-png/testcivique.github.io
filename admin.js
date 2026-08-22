@@ -11,9 +11,17 @@ if (typeof window.supabaseAuth === 'undefined') {
 }
 
 // ==============================
+// EMAILJS 配置
+// ==============================
+const EMAILJS_CONFIG = {
+    PUBLIC_KEY: 'D2jk67ERbrJZSUyvC',
+    SERVICE_ID: 'service_5i2hyhb',
+    TEMPLATE_ID: 'template_ywlxxks'
+};
+
+// ==============================
 // Token 解析函数
 // ==============================
-// ========== Token 解析函数（支持 URL 参数和 sessionStorage）==========
 function getAdminToken() {
     const urlParams = new URLSearchParams(window.location.search);
     let token = urlParams.get('token');
@@ -50,15 +58,12 @@ function parseTokenFromUrl() {
     }
 }
 
-// 验证 token 中的管理员身份
 function validateAdminToken(tokenData) {
     if (!tokenData) return false;
-    // 检查角色是否为 admin
     if (tokenData.role !== 'admin') {
         console.error('不是管理员账户');
         return false;
     }
-    // 检查是否过期
     if (tokenData.expiry) {
         const expiryDate = new Date(tokenData.expiry);
         const now = new Date();
@@ -75,21 +80,22 @@ function validateAdminToken(tokenData) {
 // ==============================
 const adminContent = document.getElementById('adminContent');
 const usersTableBody = document.getElementById('usersTableBody');
+const preRegTableBody = document.getElementById('preRegTableBody');
 const tableLoading = document.getElementById('tableLoading');
+const preRegLoading = document.getElementById('preRegLoading');
 const editUserModal = document.getElementById('editUserModal');
 const addUserModal = document.getElementById('addUserModal');
+const detailModal = document.getElementById('detailModal');
 const editUserForm = document.getElementById('editUserForm');
 const addUserForm = document.getElementById('addUserForm');
 const logoutBtn = document.getElementById('logoutBtn');
 const deleteConfirmDialog = document.getElementById('deleteConfirmDialog');
 
-// 搜索和过滤元素
 const searchInput = document.getElementById('searchInput');
 const searchBtn = document.getElementById('searchBtn');
 const filterButtons = document.querySelectorAll('.filter-btn');
 const addUserBtn = document.getElementById('addUserBtn');
 
-// 统计数据元素
 const totalUsersEl = document.getElementById('totalUsers');
 const typeNCountEl = document.getElementById('typeNCount');
 const typeRCountEl = document.getElementById('typeRCount');
@@ -99,6 +105,8 @@ const currentAdminNameEl = document.getElementById('currentAdminName');
 const currentAdminRoleEl = document.getElementById('currentAdminRole');
 const stuCountEl = document.getElementById('stuCount');
 const courseManageBtn = document.getElementById('courseManageBtn');
+const preRegCountEl = document.getElementById('preRegCount');
+const preRegCountEl2 = document.getElementById('preRegCount2');
 
 // ==============================
 // 全局变量
@@ -106,6 +114,7 @@ const courseManageBtn = document.getElementById('courseManageBtn');
 let currentAdmin = null;
 let allUsers = [];
 let filteredUsers = [];
+let allPreRegs = [];
 let currentFilter = 'all';
 let userToDelete = null;
 let currentSearchTerm = '';
@@ -118,12 +127,9 @@ function isExpired(user) {
 // 页面加载初始化
 // ==============================
 document.addEventListener('DOMContentLoaded', function() {
-    // 解析 token
     const tokenData = parseTokenFromUrl();
     
-    // 验证 token
     if (!tokenData || !validateAdminToken(tokenData)) {
-        // 验证失败，跳转到首页登录
         showToast(
             'Accès refusé',
             'Vous devez être connecté en tant qu\'administrateur pour accéder à cette page.',
@@ -135,7 +141,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    // 保存管理员信息
     currentAdmin = {
         id: tokenData.userId,
         name: tokenData.name,
@@ -145,36 +150,50 @@ document.addEventListener('DOMContentLoaded', function() {
         daysLeft: tokenData.daysLeft
     };
     
-    // 更新界面显示
     currentAdminNameEl.textContent = currentAdmin.name;
     currentAdminRoleEl.textContent = `Rôle: Administrateur`;
     
-    // 显示管理界面
     adminContent.style.display = 'block';
     
-    // 初始化事件和加载数据
     initEventListeners();
     loadUsers();
+    loadPreRegistrations();
+    setupTabs();
+    
+    // 预加载 EmailJS
+    loadEmailJS();
 });
+
+// ==============================
+// TABS
+// ==============================
+function setupTabs() {
+    document.querySelectorAll('.admin-tabs button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.admin-tabs button').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const tab = this.dataset.tab;
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+        });
+    });
+}
 
 // ==============================
 // 初始化事件监听器
 // ==============================
 function initEventListeners() {
-    // 登出按钮 - 跳转到首页
-  logoutBtn.addEventListener('click', function() {
-    sessionStorage.removeItem('adminToken');
-    sessionStorage.removeItem('adminUser');
-    window.location.href = 'index.html';
-});
+    logoutBtn.addEventListener('click', function() {
+        sessionStorage.removeItem('adminToken');
+        sessionStorage.removeItem('adminUser');
+        window.location.href = 'index.html';
+    });
     
-    // 搜索功能
     searchBtn.addEventListener('click', handleSearch);
     searchInput.addEventListener('keyup', function(e) {
         if (e.key === 'Enter') handleSearch();
     });
     
-    // 过滤按钮
     filterButtons.forEach(btn => {
         btn.addEventListener('click', function() {
             filterButtons.forEach(b => b.classList.remove('active'));
@@ -184,10 +203,8 @@ function initEventListeners() {
         });
     });
     
-    // 添加用户按钮
     addUserBtn.addEventListener('click', showAddUserModal);
     
-    // 角色选择时显示/隐藏课时输入框
     document.getElementById('addUserRole').addEventListener('change', function() {
         const creditGroup = document.getElementById('addCreditGroup');
         if (this.value === 'stu') {
@@ -197,32 +214,109 @@ function initEventListeners() {
         }
     });
     
-    // 模态框关闭按钮
     document.getElementById('closeModalBtn').addEventListener('click', () => closeModal(editUserModal));
     document.getElementById('closeAddModalBtn').addEventListener('click', () => closeModal(addUserModal));
+    document.getElementById('closeDetailBtn').addEventListener('click', () => closeModal(detailModal));
+    document.getElementById('closeDetailBtn2').addEventListener('click', () => closeModal(detailModal));
     document.getElementById('cancelEditBtn').addEventListener('click', () => closeModal(editUserModal));
     document.getElementById('cancelAddBtn').addEventListener('click', () => closeModal(addUserModal));
     
-    // 表单提交
     editUserForm.addEventListener('submit', handleEditUser);
     addUserForm.addEventListener('submit', handleAddUser);
     
-    // 确认删除对话框
     document.getElementById('cancelDeleteBtn').addEventListener('click', () => closeModal(deleteConfirmDialog));
     document.getElementById('confirmDeleteBtn').addEventListener('click', handleDeleteUser);
     
-    // 点击模态框外部关闭
     window.addEventListener('click', function(e) {
         if (e.target === editUserModal) closeModal(editUserModal);
         if (e.target === addUserModal) closeModal(addUserModal);
+        if (e.target === detailModal) closeModal(detailModal);
         if (e.target === deleteConfirmDialog) closeModal(deleteConfirmDialog);
     });
     
-    // 课程管理按钮
     if (courseManageBtn) {
         courseManageBtn.addEventListener('click', function() {
             window.location.href = 'cours.html';
         });
+    }
+}
+
+// ==============================
+// EmailJS 加载函数
+// ==============================
+function loadEmailJS() {
+    return new Promise((resolve, reject) => {
+        if (typeof emailjs !== 'undefined') {
+            console.log('✅ EmailJS déjà chargé');
+            resolve();
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+        script.onload = () => {
+            console.log('✅ EmailJS chargé avec succès');
+            emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+            resolve();
+        };
+        script.onerror = () => {
+            console.error('❌ Échec chargement EmailJS');
+            reject(new Error('Impossible de charger EmailJS'));
+        };
+        document.head.appendChild(script);
+    });
+}
+
+// ==============================
+// 发送邮件函数
+// ==============================
+async function sendActivationEmail(userEmail, userName, userType, userRole, userPassword) {
+    try {
+        // Vérifier que EmailJS est chargé
+        if (typeof emailjs === 'undefined') {
+            console.log('📧 Chargement de EmailJS...');
+            await loadEmailJS();
+        }
+
+        const typeLabels = {
+            'n': 'Naturalisation (入籍)',
+            'r': 'Carte 10 ans (十年居留)',
+            'm': 'Carte pluriannuelle (多年居留)'
+        };
+        
+        const roleLabels = {
+            'user': 'Membre (会员)',
+            'stu': 'Élève (学员)'
+        };
+
+        const templateParams = {
+            to_email: userEmail,
+            to_name: userName,
+            user_name: userName,
+            user_type: typeLabels[userType] || userType,
+            user_role: roleLabels[userRole] || userRole,
+            user_password: userPassword || 'Votre mot de passe',
+            login_url: 'https://www.assmv.fr/examen-civique.html',
+            contact_email: '2025qianfan@gmail.com',
+            subject: '🎉 Votre compte Mille Voiles est activé ! / 🎉 您的千帆协会账户已激活！'
+        };
+
+        console.log('📧 Envoi email à:', userEmail);
+        console.log('📧 Template ID:', EMAILJS_CONFIG.TEMPLATE_ID);
+        console.log('🔗 Lien de connexion:', templateParams.login_url);
+
+        const response = await emailjs.send(
+            EMAILJS_CONFIG.SERVICE_ID,
+            EMAILJS_CONFIG.TEMPLATE_ID,
+            templateParams,
+            EMAILJS_CONFIG.PUBLIC_KEY
+        );
+
+        console.log('✅ Email envoyé avec succès:', response);
+        return { success: true, response };
+
+    } catch (error) {
+        console.error('❌ Erreur envoi email:', error);
+        return { success: false, error: error.message };
     }
 }
 
@@ -243,12 +337,8 @@ async function loadUsers() {
         if (error) throw error;
         
         allUsers = data || [];
-        
-        // 应用当前的筛选
         applyFilters();
-        
         updateStats();
-        
         showLoading(false);
         
     } catch (error) {
@@ -258,7 +348,6 @@ async function loadUsers() {
     }
 }
 
-// 渲染课时单元格（只有 stu 才显示课时）
 function renderCreditCell(user) {
     if (user.role !== 'stu') {
         return '<span class="credit-na">—</span>';
@@ -287,15 +376,10 @@ function renderUsersTable() {
     
     filteredUsers.forEach(user => {
         const row = document.createElement('tr');
-       
         if (isExpired(user)) row.classList.add('expired-row');
         
         const createdAt = user.created_at ? new Date(user.created_at).toLocaleDateString('fr-FR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+            day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
         }) : 'N/A';
         
         let timerInfo = 'Pas de date';
@@ -303,20 +387,17 @@ function renderUsersTable() {
         if (user.timer) {
             const timerDate = new Date(user.timer);
             const now = new Date();
-            
             if (timerDate < now) {
                 timerInfo = `Expiré le ${timerDate.toLocaleDateString('fr-FR')}`;
                 timerClass = 'expired';
             } else {
-                const timeDiff = timerDate - now;
-                const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                const daysLeft = Math.ceil((timerDate - now) / (1000 * 60 * 60 * 24));
                 timerInfo = `${timerDate.toLocaleDateString('fr-FR')} (${daysLeft} jours restants)`;
                 timerClass = daysLeft <= 7 ? 'warning' : 'active';
             }
         }
         
-        let typeClass = '';
-        let typeText = '';
+        let typeClass = '', typeText = '';
         switch(user.type) {
             case 'n': typeClass = 'type-n'; typeText = 'Type N'; break;
             case 'r': typeClass = 'type-r'; typeText = 'Type R'; break;
@@ -325,24 +406,11 @@ function renderUsersTable() {
             default: typeClass = 'type-t'; typeText = 'Type T';
         }
         
-        let roleClass = '';
-        let roleText = '';
-        if (user.role === 'admin') {
-            roleClass = 'role-admin';
-            roleText = 'Administrateur';
-        } else if (user.role === 'user') {
-            roleClass = 'role-user';
-            roleText = 'Membre';
-        } else if (user.role === 'stu') {
-            roleClass = 'role-stu';
-            roleText = 'Élève';
-        } else if (user.role === 'teacher') {
-            roleClass = 'role-teacher';
-            roleText = 'Intervenant';
-        } else {
-            roleClass = '';
-            roleText = '';
-        }
+        let roleClass = '', roleText = '';
+        if (user.role === 'admin') { roleClass = 'role-admin'; roleText = 'Administrateur'; }
+        else if (user.role === 'user') { roleClass = 'role-user'; roleText = 'Membre'; }
+        else if (user.role === 'stu') { roleClass = 'role-stu'; roleText = 'Élève'; }
+        else if (user.role === 'teacher') { roleClass = 'role-teacher'; roleText = 'Intervenant'; }
         
         row.innerHTML = `
             <td><strong>${escapeHtml(user.name)}</strong></td>
@@ -367,19 +435,16 @@ function renderUsersTable() {
         usersTableBody.appendChild(row);
     });
     
-    // ========== 添加事件监听器 ==========
     document.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            const userId = this.dataset.id;
-            openEditUserModal(userId);
+            openEditUserModal(this.dataset.id);
         });
     });
     
     document.querySelectorAll('.delete-btn').forEach(btn => {
         if (!btn.disabled) {
             btn.addEventListener('click', function() {
-                const userId = this.dataset.id;
-                showDeleteConfirmation(userId);
+                showDeleteConfirmation(this.dataset.id);
             });
         }
     });
@@ -397,6 +462,7 @@ function renderUsersTable() {
         });
     });
 }
+
 // ==============================
 // 统计功能
 // ==============================
@@ -429,19 +495,13 @@ function applyFilters() {
         if (currentSearchTerm && !user.name.toLowerCase().includes(currentSearchTerm)) {
             return false;
         }
-        
         if (currentFilter !== 'all') {
-            if (currentFilter === 'role-user') {
-                return user.role === 'user';
-            } else if (currentFilter === 'role-stu') {
-                return user.role === 'stu';
-            } else if (currentFilter === 'role-teacher') {
-                return user.role === 'teacher';
-            } else if (currentFilter === 'expired') {
-                return isExpired(user);
-            } else if (currentFilter === 'admin' || currentFilter === 'role-admin') {
-                return user.role === 'admin';
-            } else {
+            if (currentFilter === 'role-user') return user.role === 'user';
+            else if (currentFilter === 'role-stu') return user.role === 'stu';
+            else if (currentFilter === 'role-teacher') return user.role === 'teacher';
+            else if (currentFilter === 'expired') return isExpired(user);
+            else if (currentFilter === 'admin' || currentFilter === 'role-admin') return user.role === 'admin';
+            else {
                 const type = currentFilter.split('-')[1];
                 return user.type === type;
             }
@@ -466,19 +526,14 @@ function openEditUserModal(userId) {
     document.getElementById('editUserRole').value = user.role || '';
     
     const createdAt = user.created_at ? new Date(user.created_at).toLocaleDateString('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
     }) : 'Date non disponible';
     document.getElementById('editUserCreatedAt').textContent = createdAt;
     
     if (user.timer) {
         const timerDate = new Date(user.timer);
         const localDate = new Date(timerDate.getTime() - (timerDate.getTimezoneOffset() * 60000))
-            .toISOString()
-            .slice(0, 16);
+            .toISOString().slice(0, 16);
         document.getElementById('editUserTimer').value = localDate;
     } else {
         document.getElementById('editUserTimer').value = '';
@@ -514,31 +569,16 @@ async function handleEditUser(e) {
         return;
     }
     
-    const updateData = {
-        name: username,
-        type: userType
-    };
-    
-    if (password.trim()) {
-        updateData.password = password;
-    }
-    
-    if (userRole) {
-        updateData.role = userRole;
-    } else {
-        updateData.role = null;
-    }
+    const updateData = { name: username, type: userType };
+    if (password.trim()) updateData.password = password;
+    if (userRole) updateData.role = userRole;
+    else updateData.role = null;
     
     if (timer) {
         try {
             const date = new Date(timer);
-            if (isNaN(date.getTime())) {
-                throw new Error('Date invalide');
-            }
-            updateData.timer = date.toISOString();
-        } catch (error) {
-            console.warn('日期格式错误，跳过timer字段');
-        }
+            if (!isNaN(date.getTime())) updateData.timer = date.toISOString();
+        } catch (error) { console.warn('日期格式错误，跳过timer字段'); }
     } else {
         updateData.timer = null;
     }
@@ -547,9 +587,7 @@ async function handleEditUser(e) {
         const creditValue = document.getElementById('editUserCredit').value;
         if (creditValue !== '' && creditValue !== null) {
             const creditNum = parseInt(creditValue);
-            if (!isNaN(creditNum)) {
-                updateData.credit = creditNum;
-            }
+            if (!isNaN(creditNum)) updateData.credit = creditNum;
         } else {
             updateData.credit = 0;
         }
@@ -557,28 +595,16 @@ async function handleEditUser(e) {
     
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
-        
-        const { error } = await supabase
-            .from('students')
-            .update(updateData)
-            .eq('id', userId);
-        
+        const { error } = await supabase.from('students').update(updateData).eq('id', userId);
         if (error) throw error;
-        
         closeModal(editUserModal);
         await loadUsers();
         showToast('Utilisateur modifié avec succès', 'success');
-        
     } catch (error) {
         console.error('修改用户错误:', error);
-        
         let errorMessage = 'Erreur lors de la modification';
-        if (error.code === '23505') {
-            errorMessage = 'Ce nom d\'utilisateur existe déjà';
-        } else if (error.code === '23514') {
-            errorMessage = 'Type d\'utilisateur invalide';
-        }
-        
+        if (error.code === '23505') errorMessage = 'Ce nom d\'utilisateur existe déjà';
+        else if (error.code === '23514') errorMessage = 'Type d\'utilisateur invalide';
         showToast(errorMessage, 'error');
     }
 }
@@ -628,58 +654,32 @@ async function handleAddUser(e) {
         created_at: new Date().toISOString()
     };
     
-    if (userRole) {
-        newUser.role = userRole;
-    }
-    
+    if (userRole) newUser.role = userRole;
     if (userRole === 'stu') {
         const creditValue = document.getElementById('addUserCredit').value;
-        if (creditValue && creditValue !== '') {
-            const creditNum = parseInt(creditValue);
-            if (!isNaN(creditNum)) {
-                newUser.credit = creditNum;
-            }
-        } else {
-            newUser.credit = 0;
-        }
+        newUser.credit = (creditValue && creditValue !== '') ? parseInt(creditValue) || 0 : 0;
     }
-    
     if (timer) {
         try {
             const date = new Date(timer);
-            if (isNaN(date.getTime())) {
-                throw new Error('Date invalide');
-            }
-            newUser.timer = date.toISOString();
-        } catch (error) {
-            console.warn('日期格式错误，跳过timer字段');
-        }
+            if (!isNaN(date.getTime())) newUser.timer = date.toISOString();
+        } catch (error) { console.warn('日期格式错误，跳过timer字段'); }
     }
     
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
-        
-        const { data, error } = await supabase
-            .from('students')
-            .insert([newUser])
-            .select();
-            
+        const { error } = await supabase.from('students').insert([newUser]);
         if (error) {
             console.error('Supabase插入错误:', error);
             let errorMessage = 'Erreur lors de la création';
-            if (error.code === '23505') {
-                errorMessage = 'Ce nom d\'utilisateur existe déjà';
-            } else if (error.code === '23514') {
-                errorMessage = 'Type d\'utilisateur invalide';
-            }
+            if (error.code === '23505') errorMessage = 'Ce nom d\'utilisateur existe déjà';
+            else if (error.code === '23514') errorMessage = 'Type d\'utilisateur invalide';
             showToast(errorMessage, 'error');
             return;
         }
-        
         closeModal(addUserModal);
         await loadUsers();
         showToast('Utilisateur créé avec succès', 'success');
-        
     } catch (error) {
         console.error('创建用户错误:', error);
         showToast('Erreur technique lors de la création', 'error');
@@ -699,22 +699,14 @@ function showDeleteConfirmation(userId) {
 
 async function handleDeleteUser() {
     if (!userToDelete) return;
-    
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
-        
-        const { error } = await supabase
-            .from('students')
-            .delete()
-            .eq('id', userToDelete.id);
-        
+        const { error } = await supabase.from('students').delete().eq('id', userToDelete.id);
         if (error) throw error;
-        
         closeModal(deleteConfirmDialog);
         await loadUsers();
         showToast('Utilisateur supprimé avec succès', 'success');
         userToDelete = null;
-        
     } catch (error) {
         console.error('删除用户错误:', error);
         showToast('Erreur lors de la suppression', 'error');
@@ -722,14 +714,418 @@ async function handleDeleteUser() {
 }
 
 // ==============================
+// PRÉ-INSCRIPTIONS - GESTION
+// ==============================
+
+async function loadPreRegistrations() {
+    if (preRegLoading) {
+        preRegLoading.style.display = 'block';
+    }
+    
+    try {
+        console.log('📋 Chargement des pré-inscriptions...');
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        
+        const { data, error } = await supabase
+            .from('pre_registrations')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('❌ Erreur Supabase:', error);
+            throw error;
+        }
+        
+        console.log('✅ Pré-inscriptions chargées:', data ? data.length : 0);
+        allPreRegs = data || [];
+        renderPreRegTable();
+        updatePreRegCount();
+        
+        if (preRegLoading) {
+            preRegLoading.style.display = 'none';
+        }
+        
+    } catch (error) {
+        console.error('❌ 加载预注册错误:', error);
+        showToast('Erreur lors du chargement des pré-inscriptions', 'error');
+        if (preRegLoading) {
+            preRegLoading.style.display = 'none';
+        }
+        if (preRegTableBody) {
+            preRegTableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" style="text-align: center; padding: 40px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: var(--red); margin-bottom: 15px;"></i>
+                        <p style="color: var(--red);">Erreur de chargement</p>
+                        <p style="color: var(--medium-gray); font-size: 0.85rem; margin-top: 8px;">${error.message || 'Veuillez vérifier la table pre_registrations'}</p>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+}
+
+function renderPreRegTable() {
+    if (!preRegTableBody) return;
+    
+    if (!allPreRegs || allPreRegs.length === 0) {
+        preRegTableBody.innerHTML = `
+            <tr>
+                <td colspan="10" style="text-align: center; padding: 40px;">
+                    <i class="fas fa-user-plus" style="font-size: 3rem; color: #ddd; margin-bottom: 15px;"></i>
+                    <p style="color: var(--medium-gray);">Aucune pré-inscription trouvée</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    preRegTableBody.innerHTML = '';
+    
+    allPreRegs.forEach(reg => {
+        const row = document.createElement('tr');
+        if (reg.status === 'pending') row.style.background = 'rgba(255,214,51,0.08)';
+        
+        const created = reg.created_at ? new Date(reg.created_at).toLocaleDateString('fr-FR', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        }) : 'N/A';
+        
+        const timer = reg.timer ? new Date(reg.timer).toLocaleDateString('fr-FR', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        }) : 'Pas de date';
+        
+        let typeText = '';
+        switch(reg.type) {
+            case 'n': typeText = 'Type N (Naturalisation)'; break;
+            case 'r': typeText = 'Type R (10 ans)'; break;
+            case 'm': typeText = 'Type M (Pluriannuelle)'; break;
+            default: typeText = reg.type;
+        }
+        
+        let roleText = '';
+        if (reg.role === 'user') roleText = 'Membre';
+        else if (reg.role === 'stu') roleText = 'Élève';
+        else roleText = reg.role;
+        
+        let statusText = '', statusClass = '';
+        if (reg.status === 'pending') { statusText = 'En attente'; statusClass = 'badge-pending'; }
+        else if (reg.status === 'validated') { statusText = 'Validé'; statusClass = 'badge-validated'; }
+        else if (reg.status === 'rejected') { statusText = 'Rejeté'; statusClass = 'badge-rejected'; }
+        else { statusText = reg.status; statusClass = ''; }
+        
+        const credit = reg.credit || 0;
+        
+        // 付款方式显示
+        let paymentDisplay = '-';
+        if (reg.payment_method) {
+            const paymentMap = {
+                'wechat': 'WeChat 微信',
+                'alipay': 'Alipay 支付宝',
+                'xiaohongshu': 'Xiaohongshu 小红书',
+                'cb': 'CB 银行卡'
+            };
+            paymentDisplay = paymentMap[reg.payment_method] || reg.payment_method;
+        }
+        
+        const orderNumber = reg.order_number || '-';
+        
+        row.innerHTML = `
+            <td><strong>${escapeHtml(reg.name)}</strong></td>
+            <td><span class="user-type">${typeText}</span></td>
+            <td>${roleText}</td>
+            <td>${created}</td>
+            <td>${timer}</td>
+            <td>${credit > 0 ? `📚 ${credit} h` : '—'}</td>
+            <td style="font-size:0.8rem; max-width:100px; word-break:break-word;">${orderNumber}</td>
+            <td style="font-size:0.8rem;">${paymentDisplay}</td>
+            <td><span class="pre-reg-badge ${statusClass}">${statusText}</span></td>
+            <td>
+                <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                    ${reg.status === 'pending' ? `
+                        <button class="action-btn-validate" data-id="${reg.id}"><i class="fas fa-check"></i> Valider</button>
+                        <button class="action-btn-reject" data-id="${reg.id}"><i class="fas fa-times"></i> Rejeter</button>
+                    ` : ''}
+                    <button class="action-btn-detail" data-id="${reg.id}"><i class="fas fa-eye"></i> Détail</button>
+                </div>
+            </td>
+        `;
+        preRegTableBody.appendChild(row);
+    });
+    
+    // 事件绑定
+    document.querySelectorAll('.action-btn-validate').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = parseInt(this.dataset.id);
+            validatePreRegistration(id);
+        });
+    });
+    
+    document.querySelectorAll('.action-btn-reject').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = parseInt(this.dataset.id);
+            rejectPreRegistration(id);
+        });
+    });
+    
+    document.querySelectorAll('.action-btn-detail').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = parseInt(this.dataset.id);
+            showPreRegistrationDetail(id);
+        });
+    });
+}
+function updatePreRegCount() {
+    const pending = allPreRegs ? allPreRegs.filter(r => r.status === 'pending').length : 0;
+    if (preRegCountEl) preRegCountEl.textContent = pending;
+    if (preRegCountEl2) preRegCountEl2.textContent = pending;
+}
+
+function getTypeLabel(type) {
+    const map = { 
+        'n': 'Type N (Naturalisation / 入籍)', 
+        'r': 'Type R (Carte 10 ans / 十年居留)', 
+        'm': 'Type M (Pluriannuelle / 多年居留)' 
+    };
+    return map[type] || type;
+}
+
+function getRoleLabel(role) {
+    const map = { 'user': 'Membre / 会员', 'stu': 'Élève / 学员' };
+    return map[role] || role;
+}
+
+function showPreRegistrationDetail(id) {
+    const reg = allPreRegs.find(r => r.id === id);
+    if (!reg) {
+        showToast('Erreur', 'Pré-inscription non trouvée', 'error');
+        return;
+    }
+    
+    document.getElementById('dName').textContent = reg.name || '-';
+    document.getElementById('dType').textContent = getTypeLabel(reg.type) || '-';
+    document.getElementById('dRole').textContent = getRoleLabel(reg.role) || '-';
+    document.getElementById('dCreated').textContent = reg.created_at ? new Date(reg.created_at).toLocaleString('fr-FR') : '-';
+    document.getElementById('dTimer').textContent = reg.timer ? new Date(reg.timer).toLocaleString('fr-FR') : 'Pas de date';
+    document.getElementById('dCredit').textContent = reg.credit || '0';
+    document.getElementById('dPrice').textContent = reg.estimated_price ? reg.estimated_price + ' €' : '-';
+    
+    // 订单编号
+    document.getElementById('dOrderNumber').textContent = reg.order_number || '-';
+    
+    // 付款方式
+    let paymentDisplay = '-';
+    if (reg.payment_method) {
+        const paymentMap = {
+            'wechat': 'WeChat 微信支付',
+            'alipay': 'Alipay 支付宝',
+            'xiaohongshu': 'Xiaohongshu 小红书',
+            'cb': 'CB 银行卡'
+        };
+        paymentDisplay = paymentMap[reg.payment_method] || reg.payment_method;
+    }
+    document.getElementById('dPaymentMethod').textContent = paymentDisplay;
+    
+    let statusText = '';
+    if (reg.status === 'pending') statusText = 'En attente / 等待中';
+    else if (reg.status === 'validated') statusText = 'Validé / 已通过';
+    else if (reg.status === 'rejected') statusText = 'Rejeté / 已拒绝';
+    else statusText = reg.status;
+    document.getElementById('dStatus').textContent = statusText;
+    
+    document.getElementById('dEmail').textContent = reg.email || '-';
+    document.getElementById('dBirth').textContent = reg.birth_date || '-';
+    document.getElementById('dBirthPlace').textContent = reg.birth_place || '-';
+    document.getElementById('dAddress').textContent = reg.address || '-';
+    document.getElementById('dPhone').textContent = reg.phone || '-';
+    
+    let packInfo = '';
+    if (reg.pack_hours) {
+        packInfo = `${reg.pack_hours} h`;
+        if (reg.pack_price) packInfo += ` (${reg.pack_price} €)`;
+    } else {
+        packInfo = '-';
+    }
+    document.getElementById('dPack').textContent = packInfo;
+    
+    detailModal.style.display = 'flex';
+}
+
+// ==============================
+// VALIDATION PRÉ-INSCRIPTION AVEC EMAIL
+// ==============================
+async function validatePreRegistration(id) {
+    const reg = allPreRegs.find(r => r.id === id);
+    if (!reg) {
+        showToast('Erreur', 'Pré-inscription non trouvée', 'error');
+        return;
+    }
+    
+    if (reg.status !== 'pending') {
+        showToast('Déjà traité', 'Cette pré-inscription a déjà été traitée', 'warning');
+        return;
+    }
+    
+    if (!confirm(`Valider la pré-inscription de ${reg.name} ?\n\nL'utilisateur sera ajouté à la base students.`)) {
+        return;
+    }
+    
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        
+        // 1. Copier dans students
+        const studentData = {
+            name: reg.name,
+            password: reg.password,
+            type: reg.type,
+            role: reg.role,
+            created_at: reg.created_at || new Date().toISOString(),
+            timer: reg.timer || null,
+            credit: reg.credit || 0
+        };
+        
+        console.log('📤 Insertion dans students:', studentData);
+        
+        const { error: insertError } = await supabase
+            .from('students')
+            .insert([studentData]);
+        
+        if (insertError) {
+            console.error('❌ Erreur insertion student:', insertError);
+            if (insertError.code === '23505') {
+                showToast('Erreur', 'Ce nom d\'utilisateur existe déjà dans la base', 'error');
+                return;
+            }
+            throw insertError;
+        }
+        
+        console.log('✅ Utilisateur ajouté à students');
+        
+        // 2. Mettre à jour le statut
+        const { error: updateError } = await supabase
+            .from('pre_registrations')
+            .update({
+                status: 'validated',
+                validated_at: new Date().toISOString(),
+                validated_by: currentAdmin?.name || 'admin'
+            })
+            .eq('id', id);
+        
+        if (updateError) {
+            console.error('❌ Erreur mise à jour statut:', updateError);
+            throw updateError;
+        }
+        
+        console.log('✅ Statut pré-inscription mis à jour');
+        
+        // ============================================================
+        // 3. 🆕 ENVOYER L'EMAIL D'ACTIVATION
+        // ============================================================
+        if (reg.email) {
+            try {
+                const emailResult = await sendActivationEmail(
+                    reg.email,
+                    reg.name,
+                    reg.type,
+                    reg.role,
+                    reg.password
+                );
+                
+                if (emailResult.success) {
+                    console.log('✅ Email d\'activation envoyé à', reg.email);
+                    showToast(
+                        '📧 Email envoyé',
+                        `Un email d'activation a été envoyé à ${reg.email}`,
+                        'success'
+                    );
+                } else {
+                    console.warn('⚠️ Échec envoi email:', emailResult.error);
+                    showToast(
+                        '⚠️ Email non envoyé',
+                        `L'utilisateur a été validé mais l'email n'a pas pu être envoyé.`,
+                        'warning'
+                    );
+                }
+            } catch (emailError) {
+                console.warn('⚠️ Erreur lors de l\'envoi de l\'email:', emailError);
+                showToast(
+                    '⚠️ Email non envoyé',
+                    'L\'utilisateur a été validé mais l\'email n\'a pas pu être envoyé.',
+                    'warning'
+                );
+            }
+        } else {
+            console.log('ℹ️ Pas d\'email pour cet utilisateur');
+            showToast(
+                'ℹ️ Pas d\'email',
+                `L'utilisateur ${reg.name} a été validé mais n'a pas d'adresse email.`,
+                'info'
+            );
+        }
+        
+        // 4. Recharger les données
+        await loadUsers();
+        await loadPreRegistrations();
+        
+        showToast('✅ Pré-inscription validée', `L'utilisateur ${reg.name} a été ajouté à la base`, 'success');
+        
+    } catch (error) {
+        console.error('❌ Erreur validation:', error);
+        showToast('Erreur', 'Une erreur est survenue lors de la validation: ' + error.message, 'error');
+    }
+}
+
+async function rejectPreRegistration(id) {
+    const reg = allPreRegs.find(r => r.id === id);
+    if (!reg) {
+        showToast('Erreur', 'Pré-inscription non trouvée', 'error');
+        return;
+    }
+    
+    if (reg.status !== 'pending') {
+        showToast('Déjà traité', 'Cette pré-inscription a déjà été traitée', 'warning');
+        return;
+    }
+    
+    if (!confirm(`Êtes-vous sûr de vouloir rejeter la pré-inscription de ${reg.name} ?`)) {
+        return;
+    }
+    
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        
+        const { error } = await supabase
+            .from('pre_registrations')
+            .update({
+                status: 'rejected',
+                validated_at: new Date().toISOString(),
+                validated_by: currentAdmin?.name || 'admin'
+            })
+            .eq('id', id);
+        
+        if (error) throw error;
+        
+        await loadPreRegistrations();
+        showToast('❌ Pré-inscription rejetée', `La demande de ${reg.name} a été rejetée`, 'warning');
+        
+    } catch (error) {
+        console.error('Erreur rejet:', error);
+        showToast('Erreur', 'Une erreur est survenue lors du rejet', 'error');
+    }
+}
+
+// ==============================
 // 辅助函数
 // ==============================
 function showLoading(show) {
-    tableLoading.style.display = show ? 'block' : 'none';
+    if (tableLoading) {
+        tableLoading.style.display = show ? 'block' : 'none';
+    }
 }
 
 function closeModal(modal) {
-    modal.style.display = 'none';
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
 
 function escapeHtml(s) {

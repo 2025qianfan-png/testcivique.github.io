@@ -395,7 +395,6 @@ h1, h2, h3, h4, h5 {
     text-align: center;
 }
 
-/* ===== 下拉菜单 - 学习进度入口 ===== */
 .user-dropdown a.progress-link {
     background: rgba(108, 92, 231, 0.08);
     border-left: 3px solid #6c5ce7;
@@ -631,6 +630,116 @@ h1, h2, h3, h4, h5 {
     text-align: center;
     padding: 12px 20px;
     font-size: 0.95rem;
+}
+
+/* ============================================
+   预注册按钮区域
+   ============================================ */
+.pre-register-section {
+    margin-top: 60px;
+    padding: 40px 45px;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light-blue) 100%);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-hover);
+    position: relative;
+    overflow: hidden;
+}
+
+.pre-register-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+}
+
+.pre-register-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 50%;
+}
+
+.pre-register-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
+}
+
+.pre-register-icon {
+    font-size: 3.5rem;
+    color: var(--primary-yellow);
+    flex-shrink: 0;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.pre-register-text {
+    flex: 1;
+    min-width: 200px;
+}
+
+.pre-register-text h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 8px;
+}
+
+.pre-register-text p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 500px;
+}
+
+.btn-pre-register {
+    background: var(--primary-yellow);
+    color: var(--primary-blue);
+    padding: 16px 32px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    transition: var(--transition);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    width: auto;
+}
+
+.btn-pre-register:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 35px rgba(255, 214, 51, 0.4);
+    background: var(--primary-light-yellow);
+}
+
+.btn-pre-register i:last-child {
+    transition: transform 0.3s ease;
+}
+
+.btn-pre-register:hover i:last-child {
+    transform: translateX(5px);
 }
 
 /* ============================================
@@ -1852,6 +1961,39 @@ h1, h2, h3, h4, h5 {
         font-size: 1.5rem;
         width: 40px;
     }
+
+    /* ===== 预注册按钮响应式 ===== */
+    .pre-register-section {
+        padding: 30px 20px;
+        margin-top: 40px;
+    }
+    
+    .pre-register-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .pre-register-icon {
+        font-size: 2.8rem;
+    }
+    
+    .pre-register-text h3 {
+        font-size: 1.3rem;
+    }
+    
+    .pre-register-text p {
+        font-size: 0.9rem;
+        max-width: 100%;
+    }
+    
+    .btn-pre-register {
+        padding: 14px 24px;
+        font-size: 1rem;
+        white-space: normal;
+        justify-content: center;
+        width: 100%;
+        max-width: 300px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1898,6 +2040,27 @@ h1, h2, h3, h4, h5 {
     }
     .situation-icon {
         font-size: 2.5rem;
+    }
+
+    /* ===== 预注册按钮响应式 ===== */
+    .pre-register-section {
+        padding: 24px 16px;
+        margin-top: 30px;
+    }
+    
+    .pre-register-icon {
+        font-size: 2.2rem;
+    }
+    
+    .pre-register-text h3 {
+        font-size: 1.1rem;
+    }
+    
+    .btn-pre-register {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+        gap: 8px;
+        max-width: 100%;
     }
 }
 
