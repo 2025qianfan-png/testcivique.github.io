@@ -263,7 +263,7 @@
         .chart-wrapper { flex: 1; position: relative; min-height: 260px; }
         #scoreChart { width: 100% !important; height: 100% !important; min-height: 260px; }
 
-        /* ===== 错题消消乐 - 精美设计 ===== */
+        /* ===== 错题消消乐 ===== */
         .quiz-wrapper {
             max-width: 860px;
             margin: 0 auto;
@@ -481,7 +481,6 @@
             padding-top: 4px;
         }
 
-        /* 空状态 */
         .quiz-empty {
             text-align: center;
             padding: 50px 20px;
@@ -735,7 +734,6 @@
             <button class="btn btn-primary" onclick="refreshData()"><i class="fas fa-sync"></i> <span data-i18n="refresh">Rafraîchir</span></button>
             <button class="btn btn-yellow" onclick="goToTest()"><i class="fas fa-pencil-alt"></i> <span data-i18n="test">Test</span></button>
             <button class="btn btn-outline" onclick="goBackToHome()"><i class="fas fa-home"></i> <span data-i18n="home">Accueil</span></button>
-            <button class="btn btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Déconnexion</span></button>
         </div>
     </header>
 
@@ -875,7 +873,7 @@ let quizAnswered = false;
 // ============================================================
 const i18n = {
     fr: {
-        refresh: 'Rafraîchir', test: 'Test', home: 'Accueil', logout: 'Déconnexion',
+        refresh: 'Rafraîchir', test: 'Test', home: 'Accueil',
         totalTests: 'Tests passés', passed: 'Réussis', failed: 'Échoués', avg: 'Moyenne', mistakes: 'Erreurs totales',
         tabHistory: 'Historique', tabMistakes: 'Mes erreurs', tabQuiz: 'Éliminez vos erreurs', tabStats: 'Statistiques',
         historyTitle: 'Historique des scores', chartTitle: 'Évolution des scores',
@@ -886,8 +884,7 @@ const i18n = {
         statsTitle: 'Analyse détaillée', loading: 'Chargement des données...',
         noData: 'Aucune donnée', noMistakes: '🎉 Aucune erreur !',
         masteredLabel: 'Maîtrisé', toReview: 'À réviser',
-        delete: 'Supprimer', detail: 'Détail',
-        clearAll: 'Tout supprimer',
+        delete: 'Supprimer', clearAll: 'Tout supprimer',
         date: 'Date', type: 'Type', score: 'Score', status: 'Statut',
         passedLabel: 'Réussi', failedLabel: 'Échoué',
         totalTestsLabel: 'test(s) trouvé(s)',
@@ -911,7 +908,7 @@ const i18n = {
         quizWrongCount: 'Erreurs'
     },
     zh: {
-        refresh: '刷新', test: '测试', home: '首页', logout: '退出登录',
+        refresh: '刷新', test: '测试', home: '首页',
         totalTests: '测试次数', passed: '通过', failed: '未通过', avg: '平均分', mistakes: '总错题数',
         tabHistory: '历史记录', tabMistakes: '我的错题', tabQuiz: '消灭错题', tabStats: '统计分析',
         historyTitle: '成绩历史', chartTitle: '分数变化',
@@ -922,8 +919,7 @@ const i18n = {
         statsTitle: '详细分析', loading: '加载数据中...',
         noData: '暂无数据', noMistakes: '🎉 没有错题！',
         masteredLabel: '已掌握', toReview: '待复习',
-        delete: '删除', detail: '详情',
-        clearAll: '全部删除',
+        delete: '删除', clearAll: '全部删除',
         date: '日期', type: '类型', score: '分数', status: '状态',
         passedLabel: '通过', failedLabel: '未通过',
         totalTestsLabel: '次测试',
@@ -950,9 +946,6 @@ const i18n = {
 
 function t(key) { return i18n[currentLang]?.[key] || key; }
 
-// ============================================================
-// 获取测试类型友好名称
-// ============================================================
 function getTestTypeName(type) {
     if (!type) return t('type_unknown');
     const map = {
@@ -1110,7 +1103,7 @@ function getTypeLabel(type) {
 }
 
 // ============================================================
-// 🔥 加载数据 - 同时从 Supabase 和本地读取
+// 🔥 加载数据
 // ============================================================
 async function loadAllData() {
     showLoading(true);
@@ -1593,9 +1586,6 @@ function renderMistakesList() {
                     <button class="btn-sm btn-danger" onclick="deleteMistake('${mistake.id}')">
                         <i class="fas fa-trash"></i> ${t('delete')}
                     </button>
-                    <button class="btn-sm btn-primary" onclick="viewMistakeDetail('${mistake.id}')">
-                        <i class="fas fa-eye"></i> ${t('detail')}
-                    </button>
                 </div>
             </div>
         `;
@@ -1605,7 +1595,7 @@ function renderMistakesList() {
 }
 
 // ============================================================
-// 🎮 错题消消乐 - 精美版
+// 🎮 错题消消乐
 // ============================================================
 function renderQuiz() {
     const container = document.getElementById('quizContainer');
@@ -2050,30 +2040,6 @@ async function clearAllMistakes() {
     }
 }
 
-function viewMistakeDetail(mistakeId) {
-    const mistake = allMistakes.find(m => m.id === mistakeId);
-    if (!mistake) return;
-    const optionLetters = ['A', 'B', 'C', 'D'];
-    let optionsStr = '';
-    (mistake.options || []).forEach((opt, idx) => {
-        const isCorrect = idx === mistake.correct_answer;
-        const isUser = idx === mistake.user_answer;
-        let marker = '';
-        if (isCorrect) marker = ' ✅';
-        if (isUser && !isCorrect) marker = ' ❌';
-        optionsStr += `\n   ${optionLetters[idx]}. ${opt}${marker}`;
-    });
-    alert(
-        `📝 QUESTION / 题目:\n${mistake.question}\n\n` +
-        `📋 OPTIONS / 选项:${optionsStr}\n\n` +
-        `🏷️ Thème: ${mistake.category || mistake.theme || 'Autre'}\n` +
-        `📊 Difficulté: ${mistake.difficulty || 'Moyen'}\n` +
-        `❌ Erreurs: ${mistake.times_wrong || 1} fois\n` +
-        `📌 Statut: ${mistake.mastered ? '✅ Maîtrisé' : '📝 À réviser'}\n` +
-        (mistake.explanation ? `\n📖 Explication:\n${mistake.explanation}` : '')
-    );
-}
-
 // ============================================================
 // 工具函数
 // ============================================================
@@ -2151,16 +2117,8 @@ function goBackToHome() {
     }
 }
 
-function logout() {
-    if (confirm(currentLang === 'fr' ? 'Se déconnecter ?' : '退出登录？')) {
-        sessionStorage.removeItem('student_dashboard_data');
-        localStorage.removeItem('student_dashboard_data');
-        window.location.href = 'examen-civique.html';
-    }
-}
-
 window.dashboard = {
-    loadAllData, refreshData, goToTest, goBackToHome, logout,
+    loadAllData, refreshData, goToTest, goBackToHome,
     switchTab, applyFilters, resetFilters,
     toggleMastered, deleteMistake, clearAllMistakes,
     studentInfo, allScores, allMistakes, setLang,
