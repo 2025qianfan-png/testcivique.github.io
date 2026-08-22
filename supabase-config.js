@@ -139,25 +139,55 @@ async function recordMistakeToDB(studentInfo, question, userAnswer, testType) {
         return null;
     }
 
-    const mistakeData = {
-        student_name: studentInfo.name,
-        question_id: question.question_id || question.id || `local_${Date.now()}`,
-        question: question.question,
-        category: question.category || question.theme || question.主题 || 'Autre',
-        difficulty: question.难度 || question.difficulty || '中等',
-        options: question.options,
-        correct_answer: question.answer,
-        user_answer: userAnswer,
-        test_type: testType,
-        explanation: question.explanation || question.解释 || '',
-        times_wrong: 1,
-        mastered: false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-    };
-
+    // 生成问题唯一标识
+    const questionId = question.question_id || question.id || `local_${Date.now()}`;
+    const questionText = question.question;
+    
     try {
         const supabase = getSupabaseClient();
+        
+        // 🔥 1. 先检查是否已存在相同的错题
+        const { data: existing, error: findError } = await supabase
+            .from('mistakes')
+            .select('id, times_wrong, mastered')
+            .eq('student_name', studentInfo.name)
+            .eq('question_id', questionId)
+            .maybeSingle();
+        
+        if (findError && findError.code !== 'PGRST116') {
+            console.warn('查询已有错题失败:', findError.message);
+        }
+        
+        // 🔥 2. 如果已存在，更新 times_wrong
+        if (existing) {
+            console.log(`📝 错题已存在，更新次数: ${existing.times_wrong + 1}`);
+            
+            const { data, error } = await supabase
+                .from('mistakes')
+                .update({
+                    times_wrong: existing.times_wrong + 1,
+                    user_answer: userAnswer,
+                    updated_at: new Date().toISOString(),
+                    // 如果之前标记为已掌握，取消标记
+                    mastered: false
+                })
+                .eq('id', existing.id)
+                .select()
+                .single();
+            
+            if (error) {
+                console.warn('更新错题失败:', error.message);
+                return await insertMistakeViaREST(createMistakeData(studentInfo, question, userAnswer, testType, questionId));
+            }
+            
+            console.log('✅ 错题更新成功 (SDK):', data.id, '次数:', data.times_wrong);
+            return data.id;
+        }
+        
+        // 🔥 3. 不存在则插入新记录
+        console.log('📝 新错题，插入记录');
+        const mistakeData = createMistakeData(studentInfo, question, userAnswer, testType, questionId);
+        
         const { data, error } = await supabase
             .from('mistakes')
             .insert([mistakeData])
@@ -174,8 +204,28 @@ async function recordMistakeToDB(studentInfo, question, userAnswer, testType) {
 
     } catch (error) {
         console.error('记录错题失败:', error);
-        return saveMistakeToLocalStorage(studentInfo.name, mistakeData);
+        return saveMistakeToLocalStorage(studentInfo.name, createMistakeData(studentInfo, question, userAnswer, testType, questionId));
     }
+}
+
+// 🔥 辅助函数：创建错题数据对象
+function createMistakeData(studentInfo, question, userAnswer, testType, questionId) {
+    return {
+        student_name: studentInfo.name,
+        question_id: questionId,
+        question: question.question,
+        category: question.category || question.theme || question.主题 || 'Autre',
+        difficulty: question.难度 || question.difficulty || '中等',
+        options: question.options,
+        correct_answer: question.answer,
+        user_answer: userAnswer,
+        test_type: testType,
+        explanation: question.explanation || question.解释 || '',
+        times_wrong: 1,
+        mastered: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+    };
 }
 
 async function insertMistakeViaREST(mistakeData) {
@@ -1788,6 +1838,211 @@ async function getListeningProgress(userId) {
     }
 }
 // ============================================================
+// 公民考试模块 - 成绩记录（完整版）
+// ============================================================
+
+// ============================================================
+// 公民考试模块 - 成绩记录（修复版）
+// ============================================================
+// ============================================================
+// 公民考试模块 - 成绩记录（修复版）
+// ============================================================
+
+async function recordTestScore(studentInfo, testResult) {
+    try {
+        console.log('📊 [recordTestScore] 开始记录成绩');
+        console.log('📊 学生信息:', studentInfo);
+        console.log('📊 测试结果:', testResult);
+        
+        const supabase = getSupabaseClient();
+        
+        // 构建成绩记录
+        const scoreRecord = {
+            student_name: studentInfo.name || 'Étudiant',
+            student_id: studentInfo.id || studentInfo.userId || null,
+            test_type: testResult.testType || 'unknown',
+            score: testResult.score || 0,
+            total: testResult.total || 40,
+            percentage: testResult.percentage || 0,
+            passed: testResult.passed || false,
+            test_date: new Date().toISOString(),
+            details: {
+                correct_count: testResult.score || 0,
+                wrong_count: (testResult.total || 40) - (testResult.score || 0),
+                duration: testResult.duration || null,
+                question_count: testResult.questions ? testResult.questions.length : 0
+            }
+        };
+        
+        console.log('📤 准备插入数据:', JSON.stringify(scoreRecord, null, 2));
+        
+        // 方法1: 使用 Supabase SDK
+        try {
+            const { data, error } = await supabase
+                .from('test_scores')
+                .insert([scoreRecord])
+                .select();
+            
+            if (error) {
+                console.error('❌ Supabase SDK 插入失败:', error.message);
+                console.error('错误详情:', error);
+                // 尝试方法2
+                return await insertScoreViaREST(scoreRecord);
+            }
+            
+            console.log('✅ 成绩记录成功 (SDK):', data);
+            return data ? data[0] : null;
+            
+        } catch (sdkError) {
+            console.warn('SDK 方法失败，尝试 REST API:', sdkError.message);
+            return await insertScoreViaREST(scoreRecord);
+        }
+        
+    } catch (error) {
+        console.error('❌ 记录成绩失败:', error);
+        // 返回 null 让调用方处理
+        return null;
+    }
+}
+
+// ==================== 通过 REST API 插入成绩 ====================
+async function insertScoreViaREST(scoreRecord) {
+    try {
+        console.log('📤 使用 REST API 插入成绩...');
+        
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/test_scores`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_PUBLISHABLE_KEY,
+                'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(scoreRecord)
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ REST API 错误:', response.status, errorText);
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+        
+        const data = await response.json();
+        console.log('✅ 成绩记录成功 (REST):', data);
+        return data ? data[0] : null;
+        
+    } catch (error) {
+        console.error('❌ REST API 插入失败:', error);
+        throw error;
+    }
+}
+
+/**
+ * 本地保存成绩（备用）
+ */
+function saveScoreToLocalStorage(studentName, scoreRecord) {
+    try {
+        const key = `test_scores_${studentName}`;
+        const existing = JSON.parse(localStorage.getItem(key) || '[]');
+        const newRecord = {
+            ...scoreRecord,
+            id: `local_${Date.now()}`,
+            local_only: true
+        };
+        existing.push(newRecord);
+        localStorage.setItem(key, JSON.stringify(existing));
+        console.log('✅ 成绩保存到本地存储');
+        return newRecord;
+    } catch (e) {
+        console.error('本地保存失败:', e);
+        return null;
+    }
+}
+
+/**
+ * 获取学生所有成绩历史
+ * @param {string} studentName - 学生姓名
+ * @param {string} testType - 测试类型（可选）
+ */
+/**
+ * 获取学生所有成绩历史（修复版）
+ */
+async function getStudentScores(studentName, testType = null) {
+    try {
+        console.log('📊 [getStudentScores] 获取成绩:', studentName);
+        
+        const supabase = getSupabaseClient();
+        
+        let query = supabase
+            .from('test_scores')
+            .select('*')
+            .eq('student_name', studentName)
+            .order('test_date', { ascending: false });
+
+        if (testType) {
+            query = query.eq('test_type', testType);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+            console.error('❌ 获取成绩历史失败:', error.message);
+            // 失败时从本地获取
+            const localScores = getLocalScores(studentName);
+            console.log('📊 从本地获取成绩:', localScores.length);
+            return localScores;
+        }
+
+        console.log('✅ 从数据库获取成绩:', data ? data.length : 0);
+        
+        // 只返回数据库数据，不合并本地（避免重复）
+        // 本地数据在 loadScores 中作为备用
+        return data || [];
+        
+    } catch (error) {
+        console.error('❌ 获取成绩历史失败:', error);
+        return getLocalScores(studentName);
+    }
+}
+
+/**
+ * 从本地获取成绩
+ */
+function getLocalScores(studentName) {
+    try {
+        const key = `test_scores_${studentName}`;
+        return JSON.parse(localStorage.getItem(key) || '[]');
+    } catch {
+        return [];
+    }
+}
+
+/**
+ * 获取成绩统计
+ */
+async function getScoreStats(studentName) {
+    try {
+        const scores = await getStudentScores(studentName);
+        
+        if (scores.length === 0) {
+            return { total: 0, average: 0, best: 0, worst: 0, passed: 0, failed: 0 };
+        }
+        
+        const percentages = scores.map(s => s.percentage || 0);
+        const total = scores.length;
+        const average = Math.round(percentages.reduce((a, b) => a + b, 0) / total);
+        const best = Math.max(...percentages);
+        const worst = Math.min(...percentages);
+        const passed = scores.filter(s => s.passed).length;
+        const failed = total - passed;
+        
+        return { total, average, best, worst, passed, failed };
+    } catch (error) {
+        console.error('获取成绩统计失败:', error);
+        return { total: 0, average: 0, best: 0, worst: 0, passed: 0, failed: 0 };
+    }
+}
+// ============================================================
 // 导出所有功能
 // ============================================================
 window.supabaseAuth = {
@@ -1805,6 +2060,9 @@ window.supabaseAuth = {
     markMistakeAsMastered: markMistakeAsMastered,
     deleteMistake: deleteMistake,
     clearAllMistakes: clearAllMistakes,
+    recordTestScore: recordTestScore,
+    getStudentScores: getStudentScores,
+    getScoreStats: getScoreStats,
 
     // ===== 法语模块 - 用户管理 =====
     validateFrenchUser: validateFrenchUser,
