@@ -57,6 +57,7 @@
                 </a>
                 <a href="#tests" id="navTests">Tests en ligne</a>
                 <a href="#thematiques" id="navThemes">Thématiques</a>
+                <a href="#situation" id="navSituation">Mises en situation</a>
                 <a href="#politique" id="navPolicy">Nouvelle politique</a>
                 <a href="#faq" id="navFAQ">FAQ</a>
                 <a href="#contact" id="navContact">Contact</a>
@@ -71,6 +72,9 @@
                     </button>
                     <div class="user-dropdown" id="userDropdown">
                         <a href="#" onclick="showProfileModal()"><i class="fas fa-user-cog"></i> <span id="profileMenuItem">Mon profil</span></a>
+                      <a href="#" onclick="window.location.href='dashboard-etudiant.html' + window.location.search" class="progress-link">
+    <i class="fas fa-chart-line"></i> <span id="learningProgressMenuItem">📊 Mon apprentissage</span>
+</a>
                         <div id="roleBasedMenu"></div>
                         <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span id="logoutMenuItem">Déconnexion</span></a>
                     </div>
@@ -88,7 +92,6 @@
     </section>
 
     <!-- ==================== 课程介绍 ==================== -->
-        <!-- ==================== 课程介绍 ==================== -->
     <section class="course-intro">
         <div class="container">
             <div class="section-title">
@@ -96,7 +99,6 @@
                 <p id="courseSubtitle">Des cursus adaptés à votre niveau et vos besoins</p>
             </div>
             <div class="course-grid">
-                <!-- 初级课程 - 最受欢迎 -->
                 <div class="course-card featured">
                     <div class="course-level beginner">Débutant</div>
                     <div class="course-icon"><i class="fas fa-seedling"></i></div>
@@ -119,7 +121,6 @@
                     </a>
                 </div>
 
-                <!-- 中级课程 -->
                 <div class="course-card">
                     <div class="course-level intermediate">Intermédiaire</div>
                     <div class="course-icon"><i class="fas fa-rocket"></i></div>
@@ -141,7 +142,6 @@
                     </a>
                 </div>
 
-                <!-- 高级课程 -->
                 <div class="course-card">
                     <div class="course-level advanced">Avancé</div>
                     <div class="course-icon"><i class="fas fa-crown"></i></div>
@@ -166,7 +166,7 @@
         </div>
     </section>
 
-       <!-- ==================== 学员数据统计 ==================== -->
+    <!-- ==================== 学员数据统计 ==================== -->
     <section class="stats-highlight" id="statsSection">
         <div class="container">
             <div class="stats-highlight-grid">
@@ -298,6 +298,64 @@
         </div>
     </section>
 
+    <!-- ==================== 情景题专项练习 ==================== -->
+    <section class="situation-section" id="situation">
+        <div class="container">
+            <div class="section-title">
+                <h2 id="situationTitle">🎯 Mises en situation</h2>
+                <p id="situationSubtitle">Entraînez-vous avec des questions pratiques basées sur des scénarios réels de la vie quotidienne en France</p>
+            </div>
+            <div class="situation-card-wrapper">
+                <div class="situation-card">
+                    <div class="situation-card-header">
+                        <div class="situation-icon"><i class="fas fa-comment-dots"></i></div>
+                        <div class="situation-badge">⭐ Nouveau</div>
+                    </div>
+                    <div class="situation-card-body">
+                        <h3 id="situationCardTitle">Mises en situation</h3>
+                        <p id="situationCardDesc">20 questions basées sur des scénarios de la vie quotidienne pour tester votre compréhension des valeurs républicaines, des droits et des devoirs en France.</p>
+                        <ul class="situation-features">
+                            <li><i class="fas fa-check-circle"></i> <span id="situationFeature1">20 questions de mise en situation</span></li>
+                            <li><i class="fas fa-check-circle"></i> <span id="situationFeature2">Scénarios réalistes de la vie quotidienne</span></li>
+                            <li><i class="fas fa-check-circle"></i> <span id="situationFeature3">Correction immédiate avec explications</span></li>
+                            <li><i class="fas fa-check-circle"></i> <span id="situationFeature4">Pas de limite de temps</span></li>
+                            <li><i class="fas fa-check-circle"></i> <span id="situationFeature5">Seuil de réussite : 16/20 (80%)</span></li>
+                        </ul>
+                        <div class="password-info">
+                            <p id="situationPasswordInfo"><i class="fas fa-key"></i> <strong>Accès protégé :</strong> Mot de passe disponible après inscription</p>
+                        </div>
+                        <a href="#" class="btn btn-primary situation-btn protected-link" data-page="situation" data-href="test-situation.html" data-needs-auth="true" data-needs-userinfo="true">
+                            <i class="fas fa-play-circle"></i> <span id="situationBtnText">Commencer le test</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="situation-info">
+                    <div class="situation-info-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <h4 id="situationInfo1Title">20 questions</h4>
+                            <p id="situationInfo1Desc">Questions basées sur des scénarios réels</p>
+                        </div>
+                    </div>
+                    <div class="situation-info-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <div>
+                            <h4 id="situationInfo2Title">Tous niveaux</h4>
+                            <p id="situationInfo2Desc">Adapté aux débutants comme aux avancés</p>
+                        </div>
+                    </div>
+                    <div class="situation-info-item">
+                        <i class="fas fa-chart-line"></i>
+                        <div>
+                            <h4 id="situationInfo3Title">Suivi des progrès</h4>
+                            <p id="situationInfo3Desc">Historique de vos résultats et erreurs</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="policy-content" id="politique">
         <div class="container">
             <div class="article-content">
@@ -405,6 +463,7 @@
                         <li><a href="#accueil"><i class="fas fa-chevron-right"></i> <span id="footerLink1">Accueil</span></a></li>
                         <li><a href="#tests"><i class="fas fa-chevron-right"></i> <span id="footerLink2">Tests en ligne</span></a></li>
                         <li><a href="#thematiques"><i class="fas fa-chevron-right"></i> <span id="footerLink3">Thématiques</span></a></li>
+                        <li><a href="#situation"><i class="fas fa-chevron-right"></i> <span id="footerSituationLink">Mises en situation</span></a></li>
                         <li><a href="#politique"><i class="fas fa-chevron-right"></i> <span id="footerLink4">Nouvelle politique</span></a></li>
                         <li><a href="#faq"><i class="fas fa-chevron-right"></i> <span id="footerLink5">FAQ</span></a></li>
                     </ul>

@@ -1685,12 +1685,67 @@ function startTest() {
     }, 1500);
 }
 function selectQuestionsByTheme() {
-    console.log("开始按主题分布选择题目...");
+    console.log("========== 开始选题 ==========");
+    console.log("学生类型:", studentInfo.type);
+    console.log("总题库大小:", allQuestions.length);
     
-    // 1. 按category字段分组题目
+    // ========== 1. 定义允许的主题 ==========
+    const ALLOWED_THEMES = [
+        "Travail",
+        "Accès aux soins",
+        "Autorité parentale et système éducatif",
+        "S'installer et résider en France"
+    ];
+    
+    // ========== 2. 过滤：只保留允许的主题 ==========
+    const filteredQuestions = allQuestions.filter(q => {
+        const category = q.category || "Autre";
+        return ALLOWED_THEMES.includes(category);
+    });
+    
+    console.log(`📊 过滤前: ${allQuestions.length} 题`);
+    console.log(`📊 过滤后: ${filteredQuestions.length} 题 (只保留 4 个主题)`);
+    
+    // 打印各主题数量
+    const tempCount = {};
+    filteredQuestions.forEach(q => {
+        const t = q.category || "Autre";
+        tempCount[t] = (tempCount[t] || 0) + 1;
+    });
+    console.log("📋 各主题题目数量:");
+    for (const [theme, count] of Object.entries(tempCount)) {
+        console.log(`  ${theme}: ${count} 题`);
+    }
+    
+    // 如果过滤后题目不够，报错
+    if (filteredQuestions.length < 20) {
+        console.error(`❌ 错误：过滤后只有 ${filteredQuestions.length} 题，需要 20 题`);
+        // 紧急情况：从所有题目中取
+        const shuffled = shuffleArray([...allQuestions]);
+        selectedQuestions = shuffled.slice(0, 20);
+        // 添加标签后返回
+        selectedQuestions = selectedQuestions.map((question) => {
+            const category = question.category || "Autre";
+            let tags = [];
+            if (category.includes("Travail")) tags.push("Travail");
+            else if (category.includes("soins") || category.includes("santé")) tags.push("Santé");
+            else if (category.includes("éducatif") || category.includes("parentale")) tags.push("Éducation");
+            else if (category.includes("résider") || category.includes("installer")) tags.push("Résidence");
+            else tags.push(category);
+            if (question.difficulté) tags.push(question.difficulté);
+            if (question.typeQuestion) tags.push(question.typeQuestion);
+            return {
+                ...question,
+                customTags: tags,
+                theme: category
+            };
+        });
+        return;
+    }
+    
+    // ========== 3. 按主题分组 ==========
     const questionsByCategory = {};
-    
-    allQuestions.forEach((question) => {
+    filteredQuestions.forEach((question) => {
         const category = question.category || "Autre";
         if (!questionsByCategory[category]) {
             questionsByCategory[category] = [];
@@ -1698,93 +1753,90 @@ function selectQuestionsByTheme() {
         questionsByCategory[category].push(question);
     });
     
-    console.log("题库分类分布:", Object.keys(questionsByCategory));
+    // ========== 4. 从每个主题中选题 ==========
+    const themeRequirements = {
+        "Travail": 5,
+        "Accès aux soins": 5,
+        "Autorité parentale et système éducatif": 5,
+        "S'installer et résider en France": 5
+    };
     
-    // 2. 根据新主题分布选择题目
     selectedQuestions = [];
     let totalSelected = 0;
     
-    // 选择"Travail"题目 (5题)
-    const travailQuestions = questionsByCategory["Travail"] || [];
-    if (travailQuestions.length > 0) {
-        const shuffled = shuffleArray([...travailQuestions]);
-        const selected = shuffled.slice(0, Math.min(5, travailQuestions.length));
-        selectedQuestions.push(...selected);
-        totalSelected += selected.length;
-        console.log(`选择了${selected.length}道工作相关题目`);
-    } else {
-        console.warn("警告：没有找到Travail题目");
+    for (const [theme, requiredCount] of Object.entries(themeRequirements)) {
+        const available = questionsByCategory[theme] || [];
+        if (available.length === 0) {
+            console.warn(`⚠️ 主题 "${theme}" 没有题目！`);
+            continue;
+        }
+        
+        const shuffled = shuffleArray([...available]);
+        const toAdd = shuffled.slice(0, Math.min(requiredCount, available.length));
+        selectedQuestions.push(...toAdd);
+        totalSelected += toAdd.length;
+        console.log(`✅ "${theme}" 选中 ${toAdd.length} 题 (共 ${available.length} 题)`);
     }
     
-    // 选择"Accès aux soins"题目 (5题)
-    const soinsQuestions = questionsByCategory["Accès aux soins"] || [];
-    if (soinsQuestions.length > 0) {
-        const shuffled = shuffleArray([...soinsQuestions]);
-        const selected = shuffled.slice(0, Math.min(5, soinsQuestions.length));
-        selectedQuestions.push(...selected);
-        totalSelected += selected.length;
-        console.log(`选择了${selected.length}道医疗相关题目`);
-    } else {
-        console.warn("警告：没有找到Accès aux soins题目");
-    }
+    console.log(`📊 已选 ${totalSelected} 题`);
     
-    // 选择"Autorité parentale et système éducatif"题目 (5题)
-    const educationQuestions = questionsByCategory["Autorité parentale et système éducatif"] || [];
-    if (educationQuestions.length > 0) {
-        const shuffled = shuffleArray([...educationQuestions]);
-        const selected = shuffled.slice(0, Math.min(5, educationQuestions.length));
-        selectedQuestions.push(...selected);
-        totalSelected += selected.length;
-        console.log(`选择了${selected.length}道教育和监护权题目`);
-    } else {
-        console.warn("警告：没有找到Autorité parentale et système éducatif题目");
-    }
-    
-    // 选择"S'installer et résider en France"题目 (5题)
-    const residenceQuestions = questionsByCategory["S'installer et résider en France"] || [];
-    if (residenceQuestions.length > 0) {
-        const shuffled = shuffleArray([...residenceQuestions]);
-        const selected = shuffled.slice(0, Math.min(5, residenceQuestions.length));
-        selectedQuestions.push(...selected);
-        totalSelected += selected.length;
-        console.log(`选择了${selected.length}道居住相关题目`);
-    } else {
-        console.warn("警告：没有找到S'installer et résider en France题目");
-    }
-    
-    console.log(`已选择 ${totalSelected} 题`);
-    
-    // 3. 如果题目不足20，从其他题目中补充
+    // ========== 5. 如果不够 20 题，从允许的主题中补充（关键修改） ==========
     if (totalSelected < 20) {
         const needed = 20 - totalSelected;
-        
         const selectedSet = new Set(selectedQuestions);
-        const availableQuestions = allQuestions.filter(q => !selectedSet.has(q));
+        const extraPool = [];
         
-        if (availableQuestions.length > 0) {
-            const shuffled = shuffleArray([...availableQuestions]);
-            const toAdd = shuffled.slice(0, Math.min(needed, availableQuestions.length));
+        // 🔥 只从允许的主题中补充
+        for (const theme of ALLOWED_THEMES) {
+            const available = (questionsByCategory[theme] || []).filter(q => !selectedSet.has(q));
+            extraPool.push(...available);
+        }
+        
+        if (extraPool.length > 0) {
+            const shuffled = shuffleArray(extraPool);
+            const toAdd = shuffled.slice(0, Math.min(needed, extraPool.length));
             selectedQuestions.push(...toAdd);
-            console.log(`补充了${toAdd.length}道其他题目`);
+            totalSelected += toAdd.length;
+            console.log(`🔄 从允许主题补充了 ${toAdd.length} 题`);
         }
     }
     
-    // 如果题目太多，截取前20题
+    // ========== 6. 如果还是不够，从所有题目中强行补足（紧急情况） ==========
+    if (totalSelected < 20) {
+        const needed = 20 - totalSelected;
+        const selectedSet = new Set(selectedQuestions);
+        const allAvailable = allQuestions.filter(q => !selectedSet.has(q));
+        if (allAvailable.length > 0) {
+            const shuffled = shuffleArray(allAvailable);
+            const toAdd = shuffled.slice(0, Math.min(needed, allAvailable.length));
+            selectedQuestions.push(...toAdd);
+            console.warn(`⚠️ 紧急：从所有题目补充了 ${toAdd.length} 题（可能混入其他主题）`);
+        }
+    }
+    
+    // ========== 7. 截取前 20 题 ==========
     if (selectedQuestions.length > 20) {
         selectedQuestions = selectedQuestions.slice(0, 20);
     }
     
-    // 最终随机打乱所有题目顺序
+    // ========== 8. 打乱顺序 ==========
     selectedQuestions = shuffleArray(selectedQuestions);
     
-    console.log(`最终选择 ${selectedQuestions.length} 题`);
+    console.log(`🎯 最终选择 ${selectedQuestions.length} 题`);
     
-    // 4. 为新主题添加标签
+    // ========== 9. 打印选中的主题分布 ==========
+    const finalThemes = {};
+    selectedQuestions.forEach(q => {
+        const t = q.category || "Autre";
+        finalThemes[t] = (finalThemes[t] || 0) + 1;
+    });
+    console.log("📋 选中的主题分布:", finalThemes);
+    
+    // ========== 10. 添加标签 ==========
     selectedQuestions = selectedQuestions.map((question) => {
         const category = question.category || "Autre";
         let tags = [];
         
-        // 根据category添加标签
         if (category.includes("Travail")) {
             tags.push("Travail");
         } else if (category.includes("soins") || category.includes("santé")) {
@@ -1793,17 +1845,12 @@ function selectQuestionsByTheme() {
             tags.push("Éducation");
         } else if (category.includes("résider") || category.includes("installer")) {
             tags.push("Résidence");
+        } else {
+            tags.push(category);
         }
         
-        // 添加难度标签（如果存在）
-        if (question.difficulté) {
-            tags.push(question.difficulté);
-        }
-        
-        // 添加类型标签（如果存在）
-        if (question.typeQuestion) {
-            tags.push(question.typeQuestion);
-        }
+        if (question.difficulté) tags.push(question.difficulté);
+        if (question.typeQuestion) tags.push(question.typeQuestion);
         
         return {
             ...question,
@@ -1811,6 +1858,8 @@ function selectQuestionsByTheme() {
             theme: category
         };
     });
+    
+    console.log("========== 选题完成 ==========");
 }
 // Fisher-Yates 洗牌算法
 function shuffleArray(array) {
@@ -2181,7 +2230,7 @@ async function recordMistakesToDatabase() {
                         studentInfo,
                         questionToSave,
                         userAnswer,
-                        'droits_obligations'  // 测试类型标识
+                        'vie_pratique'  // 测试类型标识
                     );
                     if (result) {
                         recordedCount++;
@@ -2198,10 +2247,46 @@ async function recordMistakesToDatabase() {
         console.error('记录错题过程失败:', error);
     }
 }
-
-// 修改 proceedWithSubmission 函数
 function proceedWithSubmission() {
     calculateScore();
+    
+    // 🔥 构建成绩数据
+    const testResult = {
+        score: currentScore,
+        total: selectedQuestions.length,
+        percentage: currentPercentage,
+        passed: currentScore >= 16,
+        testType: 'vie_pratique',
+        duration: 0,
+        questions: selectedQuestions.map((q, i) => ({
+            id: q.id || q.question_id || i,
+            correct: q.answer,
+            userAnswer: userAnswers[i],
+            isCorrect: userAnswers[i] === q.answer
+        }))
+    };
+    
+    console.log('📊 准备记录成绩:', testResult);
+    
+    // 🔥 保存成绩到 Supabase
+    if (window.supabaseAuth && window.supabaseAuth.recordTestScore) {
+        window.supabaseAuth.recordTestScore(studentInfo, testResult)
+            .then(result => {
+                if (result) {
+                    console.log('✅ 成绩已记录到数据库');
+                } else {
+                    console.warn('⚠️ 成绩记录失败，保存到本地');
+                    saveScoreToLocalOnly(testResult);
+                }
+            })
+            .catch(err => {
+                console.error('❌ 成绩记录失败:', err);
+                saveScoreToLocalOnly(testResult);
+            });
+    } else {
+        console.warn('⚠️ Supabase成绩记录功能不可用，保存到本地');
+        saveScoreToLocalOnly(testResult);
+    }
     
     // 记录错题
     recordMistakesToDatabase().then(() => {
@@ -2212,6 +2297,33 @@ function proceedWithSubmission() {
     });
 }
 
+// ==================== 本地保存成绩 ====================
+function saveScoreToLocalOnly(testResult) {
+    try {
+        const key = `test_scores_${studentInfo.name || 'guest'}`;
+        const existing = JSON.parse(localStorage.getItem(key) || '[]');
+        
+        const record = {
+            id: `local_${Date.now()}`,
+            student_name: studentInfo.name || 'Étudiant',
+            test_type: testResult.testType || 'vie_pratique',
+            score: testResult.score,
+            total: testResult.total,
+            percentage: testResult.percentage,
+            passed: testResult.passed,
+            test_date: new Date().toISOString(),
+            local_only: true
+        };
+        
+        existing.push(record);
+        localStorage.setItem(key, JSON.stringify(existing));
+        console.log('💾 成绩已保存到本地');
+        return record;
+    } catch (e) {
+        console.error('❌ 本地保存失败:', e);
+        return null;
+    }
+}
 function calculateScore() {
     let correct = 0;
     

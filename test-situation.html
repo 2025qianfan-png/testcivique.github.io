@@ -1,17 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Test - Histoire, Géographie et Culture française</title>
+<title>Test - Mises en situation</title>
 <!-- 添加Supabase库和配置文件 -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
 /* Variables et reset */
 :root {
@@ -173,101 +171,7 @@ h1, h2, h3, h4 {
   margin-top: 25px;
 }
 
-/* Login Modal */
-.login-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.85);
-  z-index: 3000;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.login-content {
-  background-color: var(--white);
-  padding: 30px;
-  border-radius: var(--border-radius);
-  max-width: 500px;
-  width: 100%;
-  margin: 40px auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: modalFade 0.4s ease-out;
-}
-
-.login-content h2 {
-  font-size: 1.8rem;
-  margin-bottom: 15px;
-  color: var(--primary-blue);
-  text-align: center;
-}
-
-.login-content p {
-  margin-bottom: 20px;
-  color: var(--medium-gray);
-  font-size: 1rem;
-  text-align: center;
-}
-
-.login-form {
-  text-align: left;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: var(--primary-blue);
-}
-
-.form-group input {
-  width: 100%;
-  padding: 14px;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 16px;
-  transition: var(--transition);
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1);
-}
-
-.form-error {
-  color: var(--red);
-  margin-top: 10px;
-  font-weight: 600;
-  display: none;
-  font-size: 0.9rem;
-}
-
-.login-btns {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  margin-top: 25px;
-}
-
-.btn-modal {
-  padding: 14px 30px;
-  min-width: 140px;
-}
-
-/* ========== 修改以下样式 ========== */
-
-/* Training Info Modal - 改为和登录框一样的样式 */
+/* Training Info Modal */
 .training-info-modal {
   position: fixed;
   top: 0;
@@ -278,9 +182,9 @@ h1, h2, h3, h4 {
   z-index: 3001;
   display: none;
   justify-content: center;
-  align-items: flex-start; /* 改这里：从center改为flex-start */
+  align-items: flex-start;
   padding: 20px;
-  overflow-y: auto; /* 加这行：启用垂直滚动 */
+  overflow-y: auto;
 }
 
 .training-info-content {
@@ -289,37 +193,27 @@ h1, h2, h3, h4 {
   border-radius: var(--border-radius);
   max-width: 700px;
   width: 100%;
-  margin: 40px auto; /* 改这里：添加上下边距 */
+  margin: 40px auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: modalFade 0.4s ease-out;
-  /* 添加这两行 */
   max-height: calc(100vh - 80px);
   overflow-y: auto;
 }
 
-/* ========== 删除下面这些旧的响应式样式（如果有的话）========== */
-/*
-.training-info-content {
-  max-height: 90vh;
-}
-*/
-
-/* 保持现有的响应式样式，但要修改max-height值 */
 @media (min-width: 768px) {
   .training-info-content {
     padding: 25px;
-    margin: 20px auto; /* 调整边距 */
-    max-height: 85vh; /* 改为使用vh单位 */
+    margin: 20px auto;
+    max-height: 85vh;
   }
 }
 
 @media (max-width: 576px) {
   .training-info-content {
     padding: 15px;
-    margin: 10px auto; /* 调整边距 */
-    max-height: 90vh; /* 改为使用vh单位 */
+    margin: 10px auto;
+    max-height: 90vh;
   }
-  
   .training-info-header h2 {
     font-size: 1.3rem;
     margin-bottom: 8px;
@@ -329,14 +223,14 @@ h1, h2, h3, h4 {
 @media (max-width: 375px) {
   .training-info-content {
     padding: 10px;
-    margin: 5px auto; /* 调整边距 */
-    max-height: 95vh; /* 增加高度 */
+    margin: 5px auto;
+    max-height: 95vh;
   }
-  
   .training-info-header h2 {
     font-size: 1.2rem;
   }
 }
+
 .training-info-header {
   text-align: center;
   margin-bottom: 25px;
@@ -400,8 +294,6 @@ h1, h2, h3, h4 {
   margin-right: 8px;
 }
 
-/* 移除题目分布部分的样式 */
-
 /* Test Container */
 .test-container {
   display: none;
@@ -411,7 +303,7 @@ h1, h2, h3, h4 {
   display: block;
 }
 
-/* Question Counter - 增强样式 */
+/* Question Counter */
 .question-counter {
   background-color: var(--white);
   padding: 20px;
@@ -453,7 +345,7 @@ h1, h2, h3, h4 {
   transition: width 0.5s ease;
 }
 
-/* Question Card - 增强版 */
+/* Question Card */
 .question-card {
   background-color: var(--white);
   border-radius: var(--border-radius);
@@ -515,7 +407,7 @@ h1, h2, h3, h4 {
   line-height: 1.4;
 }
 
-/* Options with ABCD labels */
+/* Options */
 .options-container {
   display: flex;
   flex-direction: column;
@@ -591,7 +483,7 @@ h1, h2, h3, h4 {
   line-height: 1.4;
 }
 
-/* 答案反馈区域 */
+/* Answer Feedback */
 .answer-feedback {
   display: none;
   margin-top: 30px;
@@ -982,50 +874,6 @@ h1, h2, h3, h4 {
   font-weight: 600;
 }
 
-/* Loading Spinner */
-.loading-spinner {
-  display: none;
-  text-align: center;
-  padding: 30px;
-}
-
-.spinner {
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid var(--primary-blue);
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 20px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* 烟花和心碎动画效果 */
-@keyframes fireworks {
-  0% { transform: scale(0.8); opacity: 0.5; }
-  50% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-@keyframes heartbreak {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(-15deg); }
-  75% { transform: rotate(15deg); }
-  100% { transform: rotate(0deg); }
-}
-
-.fireworks {
-  animation: fireworks 1s ease-in-out 3;
-}
-
-.heartbreak {
-  animation: heartbreak 0.5s ease-in-out 3;
-}
-
 /* Test Header */
 .test-header {
   display: none;
@@ -1064,7 +912,7 @@ h1, h2, h3, h4 {
   font-size: 0.9rem;
 }
 
-/* 全局滚动条样式 */
+/* Global Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -1084,102 +932,80 @@ h1, h2, h3, h4 {
   background: #a8a8a8;
 }
 
-/* Responsive - 移动端优先设计 */
-
-/* 平板 - 768px以上 */
+/* Responsive */
 @media (min-width: 768px) {
   .training-info-content {
     padding: 25px;
     margin: 20px auto;
     max-height: 90vh;
   }
-  
   .training-info-header h2 {
     font-size: 1.8rem;
   }
 }
 
-/* 小手机优化 - 576px以下 */
 @media (max-width: 576px) {
   .training-info-content {
     padding: 15px;
     margin: 5px auto;
     max-height: 98vh;
   }
-  
   .training-info-header h2 {
     font-size: 1.3rem;
     margin-bottom: 8px;
   }
-  
   .training-type-info {
     padding: 15px;
   }
-  
-  /* 其他页面的移动端优化 */
   .question-map {
     grid-template-columns: repeat(5, 1fr);
     gap: 8px;
   }
-  
   .map-item {
     font-size: 0.9rem;
   }
-  
   .question-card {
     padding: 20px;
   }
-  
   .question-text {
     font-size: 1.2rem;
   }
-  
   .option {
     padding: 12px 15px;
   }
-  
   .option-letter {
     width: 25px;
     height: 25px;
     font-size: 0.8rem;
   }
-  
   .navigation-btns {
     flex-direction: column;
   }
-  
   .nav-btn {
     width: 100%;
   }
-  
   .results-actions {
     flex-direction: column;
   }
-  
   .results-actions .btn {
     width: 100%;
     margin-bottom: 10px;
   }
-  
   .score-display {
     font-size: 2.5rem;
   }
-  
   .score-text {
     font-size: 1.3rem;
   }
 }
 
-/* 超小手机 - 375px以下 */
 @media (max-width: 375px) {
   .question-map {
     grid-template-columns: repeat(4, 1fr);
   }
-  
   .training-info-content {
     padding: 10px;
   }
-  
   .training-info-header h2 {
     font-size: 1.2rem;
   }
@@ -1202,36 +1028,32 @@ h1, h2, h3, h4 {
   </div>
 </div>
 
-
-
-<!-- 找到这个部分 -->
+<!-- Training Info Modal -->
 <div id="trainingInfoModal" class="training-info-modal">
   <div class="training-info-content">
-    <!-- 在这两行中间添加： -->
     <div style="max-height: 100%; overflow-y: auto; padding-right: 5px;">
     
     <div class="training-info-header">
       <h2>Informations sur votre formation</h2>
-      <p>Informations sur le test et votre compte</p>
+      <p>Test spécialisé : Mises en situation</p>
     </div>
     
     <div class="training-info-body">
       <div class="training-type-info" id="trainingTypeInfo">
-        <!-- 内容不变 -->
+        <!-- 由 JavaScript 动态填充 -->
       </div>
       
       <div class="access-days-info" id="accessDaysInfo" style="display: none;">
-        <!-- 内容不变 -->
+        <!-- 由 JavaScript 动态填充 -->
       </div>
       
-      <!-- 添加这个额外信息块让内容更充实 -->
       <div style="margin-top: 30px; padding: 15px; background-color: rgba(0, 64, 128, 0.05); border-radius: 8px; border-left: 4px solid var(--primary-blue);">
         <h3 style="color: var(--primary-blue); margin-bottom: 10px; font-size: 1.1rem;">
           <i class="fas fa-lightbulb"></i> Conseils pour le test
         </h3>
         <ul style="color: var(--medium-gray); padding-left: 20px; line-height: 1.6;">
           <li>Prenez votre temps, il n'y a pas de limite de temps</li>
-          <li>Lisez attentivement chaque question</li>
+          <li>Lisez attentivement chaque mise en situation</li>
           <li>Consultez les explications après chaque réponse</li>
           <li>Le test peut être recommencé si nécessaire</li>
           <li>Seuil de réussite : 16/20 (80%)</li>
@@ -1245,7 +1067,6 @@ h1, h2, h3, h4 {
       </button>
     </div>
     
-    <!-- 在这行之前添加： -->
     </div>
   </div>
 </div>
@@ -1253,7 +1074,7 @@ h1, h2, h3, h4 {
 <!-- Test Header -->
 <header class="test-header" style="display: none;">
   <div class="container">
-    <h1 id="testTitle">Histoire et Culture Française</h1>
+    <h1 id="testTitle">Mises en situation</h1>
     <p id="testSubtitle">20 questions - Pas de limite de temps</p>
     <div class="header-actions">
       <button class="btn" onclick="showInstructions()">
@@ -1277,7 +1098,7 @@ h1, h2, h3, h4 {
       <div class="counter-info">
         <div>
           <h3>Question <span id="currentQuestion">1</span> sur <span id="totalQuestions">20</span></h3>
-          <p id="testTypeInfo">Test des Valeurs Républicaines</p>
+          <p id="testTypeInfo">Test Mises en situation</p>
         </div>
         <div class="progress-container">
           <div>Progression: <span id="progressPercent">0%</span></div>
@@ -1290,9 +1111,8 @@ h1, h2, h3, h4 {
     
     <!-- Question -->
     <div class="question-card">
-      <!-- 题目元数据标签区域 -->
       <div class="question-meta" id="questionMeta">
-        <!-- 标签将由JavaScript动态添加 -->
+        <!-- 标签由JavaScript动态添加 -->
       </div>
       
       <div class="question-text" id="questionText">Chargement de la question...</div>
@@ -1301,12 +1121,10 @@ h1, h2, h3, h4 {
         <!-- Options will be inserted here by JavaScript -->
       </div>
       
-      <!-- 答案反馈区域 -->
       <div class="answer-feedback" id="answerFeedback">
-        <!-- 反馈内容将由JavaScript动态添加 -->
+        <!-- 反馈内容由JavaScript动态添加 -->
       </div>
       
-      <!-- 下一题按钮 -->
       <div class="next-question-btn" id="nextQuestionBtn">
         <button class="btn btn-primary" onclick="nextQuestion()">
           <i class="fas fa-arrow-right"></i> Question suivante
@@ -1323,7 +1141,6 @@ h1, h2, h3, h4 {
       </div>
     </div>
     
-    <!-- 提交测试按钮（在最后一题显示） -->
     <div style="text-align: center; margin-top: 40px;">
       <button class="btn btn-primary" id="finishTestBtn" onclick="submitTest()" style="padding: 18px 50px; font-size: 1.2rem; display: none;">
         <i class="fas fa-paper-plane"></i> Terminer le test
@@ -1335,17 +1152,14 @@ h1, h2, h3, h4 {
   <div id="resultsContainer" class="results-container">
     <div class="results-content">
       <div class="results-header">
-        <!-- 显示总分 -->
         <div class="score-display" id="scoreDisplay">0/20</div>
         <div class="score-text" id="scoreText">Chargement du résultat...</div>
         
-        <!-- 显示进度条 -->
         <div class="score-bar">
           <div class="score-fill" id="scoreFill"></div>
         </div>
       </div>
       
-      <!-- Question Map -->
       <div class="question-map-container" id="questionMapContainer">
         <h3>Carte des Réponses</h3>
         <div class="question-map" id="questionMap">
@@ -1367,7 +1181,6 @@ h1, h2, h3, h4 {
         </div>
       </div>
       
-      <!-- Question Review -->
       <div class="question-review-container" id="questionReview">
         <!-- Question review will be inserted here when user clicks on map -->
       </div>
@@ -1388,11 +1201,10 @@ h1, h2, h3, h4 {
 <footer class="test-footer">
   <div class="container">
     <p>© 2026 Association Mille Voiles</p>
-    <p id="footerTestInfo">Test des Valeurs Républicaines - Simulation spécialisée</p>
+    <p id="footerTestInfo">Test Mises en situation - Simulation spécialisée</p>
     <p><a href="examen-civique.html">Retour au site principal</a></p>
   </div>
 </footer>
-
 
 <script src="question_multia.js"></script>
 <script src="question_resident.js"></script>
@@ -1400,13 +1212,10 @@ h1, h2, h3, h4 {
 
 <script>
 // ==================== 全局配置 ====================
-let selectedTestType = 'culture_module'
-// 禁止右键
 document.addEventListener('contextmenu', function (e) {
     e.preventDefault();
 });
 
-// 禁止常见快捷键
 document.addEventListener('keydown', function (e) {
     if (e.ctrlKey && ['c', 'u', 's', 'x', 'v', 'a'].includes(e.key.toLowerCase())) {
         e.preventDefault();
@@ -1416,23 +1225,20 @@ document.addEventListener('keydown', function (e) {
     }
 });
 
+let selectedTestType = 'situation_module';
 
-// ==================== 主题分布配置 ====================
-// 模块四：法国历史、地理和文化
+// ==================== 主题分布配置（只有情景题） ====================
 const themeDistribution = {
-    "Grandes périodes et personnages historiques": 7,  // 历史时期和人物：7道
-    "Territoires et géographie": 7,                     // 领土和地理：7道
-    "Patrimoine français": 6                           // 法国遗产：6道
+    "Mises en situation": 20
 };
-// 总计：20题
 
 // ==================== 全局变量 ====================
 let studentInfo = { name: "", testDate: "", type: "", daysLeft: 0 };
 let selectedQuestions = [];
 let currentQuestionIndex = 0;
 let userAnswers = [];
-let answeredQuestions = new Set(); // 记录已回答的题目
-let currentAnswerSubmitted = false; // 当前题目是否已提交
+let answeredQuestions = new Set();
+let currentAnswerSubmitted = false;
 
 let currentScore = 0;
 let currentPercentage = 0;
@@ -1447,11 +1253,9 @@ function showAlert(title, message, type = 'info') {
     const alertMessage = document.getElementById('alertMessage');
     const alertIcon = document.getElementById('alertIcon');
     
-    // 设置标题和消息
     alertTitle.textContent = title;
     alertMessage.textContent = message;
     
-    // 设置图标类型
     alertIcon.className = 'alert-icon';
     switch(type) {
         case 'success':
@@ -1473,7 +1277,6 @@ function showAlert(title, message, type = 'info') {
             break;
     }
     
-    // 显示窗口
     alertModal.style.display = 'flex';
 }
 
@@ -1481,20 +1284,23 @@ function closeAlert() {
     document.getElementById('alertModal').style.display = 'none';
 }
 
+function closeTrainingInfo() {
+    document.getElementById('trainingInfoModal').style.display = 'none';
+    startTest();
+}
+
 // ==================== 培训信息窗口 ====================
 function showTrainingInfo() {
     const trainingTypeInfo = document.getElementById('trainingTypeInfo');
     const accessDaysInfo = document.getElementById('accessDaysInfo');
     
-    // 根据学生类型显示不同的培训信息
     let trainingHTML = '';
-    let difficultyNote = '';
-    let bankInfo = ''; // 新增：题库信息
+    let bankInfo = '';
     
     switch(studentInfo.type) {
-        case 'm': // 四年居留
+        case 'm':
             trainingHTML = `
-                <h3><i class="fas fa-landmark-flag"></i> Formation : Histoire, Géographie et Culture Française</h3>
+                <h3><i class="fas fa-comment-dots"></i> Formation : Mises en situation</h3>
                 <p><strong>Public visé :</strong> Demandeurs de titre de séjour pluriannuel (2-4 ans)</p>
                 <p><strong>Target audience :</strong> Multi-year residence permit applicants (2-4 years)</p>
                 <div class="chinese">
@@ -1505,12 +1311,11 @@ function showTrainingInfo() {
                 <p><strong><i class="fas fa-database"></i> Base de questions :</strong> multi année</p>
                 <p><strong>题库来源：</strong> 多年期居留题库</p>
             `;
-            difficultyNote = '<p><strong>Note :</strong> Questions sur les connaissances de base de l\'histoire, géographie et culture française.</p>';
             break;
             
-        case 'n': // 入籍
+        case 'n':
             trainingHTML = `
-                <h3><i class="fas fa-landmark-flag"></i> Formation : Histoire, Géographie et Culture Française</h3>
+                <h3><i class="fas fa-comment-dots"></i> Formation : Mises en situation</h3>
                 <p><strong>Public visé :</strong> Demandeurs de nationalité française</p>
                 <p><strong>Target audience :</strong> French nationality applicants</p>
                 <div class="chinese">
@@ -1521,12 +1326,11 @@ function showTrainingInfo() {
                 <p><strong><i class="fas fa-database"></i> Base de questions :</strong> Nationalité</p>
                 <p><strong>题库来源：</strong> 入籍题库</p>
             `;
-            difficultyNote = '<p><strong>Note :</strong> Questions approfondies sur l\'histoire, la géographie et le patrimoine culturel français.</p>';
             break;
             
-        case 'r': // 十年居留
+        case 'r':
             trainingHTML = `
-                <h3><i class="fas fa-landmark-flag"></i> Formation : Histoire, Géographie et Culture Française</h3>
+                <h3><i class="fas fa-comment-dots"></i> Formation : Mises en situation</h3>
                 <p><strong>Public visé :</strong> Demandeurs de carte de résident de 10 ans</p>
                 <p><strong>Target audience :</strong> 10-year resident card applicants</p>
                 <div class="chinese">
@@ -1534,15 +1338,15 @@ function showTrainingInfo() {
                 </div>
             `;
             bankInfo = `
-                <p><strong><i class="fas fa-database"></i> Base de questions :</strong>Résident</p>
+                <p><strong><i class="fas fa-database"></i> Base de questions :</strong> Résident</p>
                 <p><strong>题库来源：</strong> 10年居留卡题库</p>
             `;
-            difficultyNote = '<p><strong>Note :</strong> Questions sur la compréhension de l\'histoire et de la culture française.</p>';
             break;
             
-        case 't': // 所有类型
+        case 't':
+        default:
             trainingHTML = `
-                <h3><i class="fas fa-landmark-flag"></i> Formation : Histoire, Géographie et Culture Française</h3>
+                <h3><i class="fas fa-comment-dots"></i> Formation : Mises en situation</h3>
                 <p><strong>Public visé :</strong> Tous les demandeurs (accès complet)</p>
                 <p><strong>Target audience :</strong> All applicants (full access)</p>
                 <div class="chinese">
@@ -1550,39 +1354,33 @@ function showTrainingInfo() {
                 </div>
             `;
             bankInfo = `
-                <p><strong><i class="fas fa-database"></i> Base de questions :</strong> Toutes les bases </p>
+                <p><strong><i class="fas fa-database"></i> Base de questions :</strong> Toutes les bases</p>
                 <p><strong>题库来源：</strong> 所有题库</p>
             `;
-            difficultyNote = '<p><strong>Note :</strong> Vous avez accès à toutes les questions sur l\'histoire, la géographie et la culture française.</p>';
             break;
     }
     
-    // 将题库信息添加到显示内容中
     trainingHTML += bankInfo;
-    trainingHTML += difficultyNote;
     
-    // 添加测试具体信息
     trainingHTML += `
         <div style="margin-top: 15px; padding: 12px; background-color: rgba(0, 64, 128, 0.08); border-radius: 6px;">
             <p style="margin-bottom: 8px;"><strong><i class="fas fa-question-circle"></i> Test spécialisé :</strong></p>
-            <p><strong>Domaines de connaissances :</strong></p>
+            <p><strong>Thème principal :</strong> Mises en situation</p>
             <ul style="margin-left: 20px; margin-bottom: 10px;">
-                <li><i class="fas fa-landmark"></i> Histoire de France (périodes clés, personnages historiques)</li>
-                <li><i class="fas fa-map"></i> Géographie (régions, villes, territoires)</li>
-                <li><i class="fas fa-theater-masks"></i> Culture française (patrimoine, arts, traditions)</li>
-                <li><i class="fas fa-book-open"></i> Connaissances générales sur la France</li>
+                <li><i class="fas fa-user-friends"></i> Situations de la vie quotidienne</li>
+                <li><i class="fas fa-balance-scale"></i> Application des droits et devoirs</li>
+                <li><i class="fas fa-gavel"></i> Respect des lois et des valeurs républicaines</li>
             </ul>
-            <p>• 20 questions culturelles - Pas de limite de temps</p>
+            <p>• 20 questions de mise en situation - Pas de limite de temps</p>
             <p>• Seuil de réussite : 16/20 (80%)</p>
             <div class="chinese" style="margin-top: 10px;">
-                <p><strong>知识领域：</strong></p>
+                <p><strong>主要主题：</strong> 情景题</p>
                 <ul style="margin-left: 20px; margin-bottom: 10px;">
-                    <li>法国历史（关键时期、历史人物）</li>
-                    <li>地理（大区、城市、领土）</li>
-                    <li>法国文化（遗产、艺术、传统）</li>
-                    <li>关于法国的一般知识</li>
+                    <li>日常生活场景</li>
+                    <li>权利与义务的应用</li>
+                    <li>遵守法律和共和价值观</li>
                 </ul>
-                <p>• 20道文化题目 - 无时间限制</p>
+                <p>• 20道情景题 - 无时间限制</p>
                 <p>• 通过标准：16/20 (80%)</p>
             </div>
         </div>
@@ -1590,7 +1388,6 @@ function showTrainingInfo() {
     
     trainingTypeInfo.innerHTML = trainingHTML;
     
-    // 显示剩余天数信息
     if (studentInfo.daysLeft > 0) {
         accessDaysInfo.style.display = 'block';
         if (studentInfo.daysLeft === 1) {
@@ -1603,42 +1400,29 @@ function showTrainingInfo() {
         accessDaysInfo.innerHTML = `<p><i class="fas fa-infinity"></i> Votre accès est valide <strong>sans limitation de durée</strong>.</p>`;
     }
     
-    // 显示培训信息窗口
     document.getElementById('trainingInfoModal').style.display = 'flex';
 }
 
-function closeTrainingInfo() {
-    document.getElementById('trainingInfoModal').style.display = 'none';
-    startTest();
-}
-
-
 // ==================== 开始测试 ====================
 function startTest() {
-    // 显示加载动画
     document.getElementById('trainingInfoModal').style.display = 'none';
     
-    // 创建加载提示
     showAlert("Préparation du test", "Chargement des questions en cours...", 'info');
     
     setTimeout(() => {
         try {
-            // 根据学生类型选择题库
             if (studentInfo.type === 'm') {
-                // 四年居留：只用 question_multia
                 allQuestions = [...question_multi];
-                console.log("四年居留题库：使用 question_multia，总数:", allQuestions.length);
+                console.log("四年居留题库：使用 question_multi，总数:", allQuestions.length);
             } else if (studentInfo.type === 'r') {
-                // 十年居留：使用 question_multia + question_resident
                 allQuestions = [...question_multi];
                 if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
                     allQuestions = allQuestions.concat(question_resident);
-                    console.log("十年居留题库：使用 question_multia + question_resident，总数:", allQuestions.length);
+                    console.log("十年居留题库：使用 question_multi + question_resident，总数:", allQuestions.length);
                 } else {
-                    console.warn("question_resident.js 未找到，仅使用 question_multia");
+                    console.warn("question_resident.js 未找到，仅使用 question_multi");
                 }
             } else if (studentInfo.type === 'n') {
-                // 法国入籍：使用 question_multia + question_resident + question_nat
                 allQuestions = [...question_multi];
                 if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
                     allQuestions = allQuestions.concat(question_resident);
@@ -1650,7 +1434,6 @@ function startTest() {
                     console.warn("question_nat.js 未找到，仅使用 question_multia + question_resident");
                 }
             } else {
-                // 完全访问：使用所有题库
                 allQuestions = [...question_multi];
                 if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
                     allQuestions = allQuestions.concat(question_resident);
@@ -1665,19 +1448,17 @@ function startTest() {
                 throw new Error("题库为空，请检查题库文件");
             }
             
-            // 隐藏提示窗口
             closeAlert();
             
-            // 显示测试界面
             document.querySelector('.test-header').style.display = 'block';
             document.getElementById('testContainer').classList.add('show');
             document.querySelector('.test-footer').style.display = 'block';
             
-            document.getElementById('testTitle').textContent = "Histoire et Culture";
-            document.getElementById('testSubtitle').textContent = "Histoire, géographie et patrimoine français";
-            document.getElementById('testTypeInfo').textContent = "Test Histoire et Culture";
+            document.getElementById('testTitle').textContent = "Mises en situation";
+            document.getElementById('testSubtitle').textContent = "20 questions - Pas de limite de temps";
+            document.getElementById('testTypeInfo').textContent = "Test Mises en situation";
             document.getElementById('footerTestInfo').textContent = 
-                "Histoire, géographie et culture française - 20 questions";
+                "Mises en situation - 20 questions - Pas de limite de temps";
             
             initializeTest();
             
@@ -1687,38 +1468,24 @@ function startTest() {
         }
     }, 1500);
 }
-// ==================== 根据主题分布选择题目 ====================
+
+// ==================== 根据主题分布选择题目（只有情景题） ====================
 function selectQuestionsByTheme() {
-    console.log("========== 开始选题 ==========");
+    console.log("========== 开始选题（情景题专项） ==========");
     console.log("学生类型:", studentInfo.type);
     console.log("总题库大小:", allQuestions.length);
     
-    // ========== 1. 定义允许的主题 ==========
-    const ALLOWED_THEMES = [
-        "Grandes périodes et personnages historiques",
-        "Territoires et géographie",
-        "Patrimoine français"
-    ];
+    // ========== 1. 只保留情景题 ==========
+    const ALLOWED_THEMES = ["Mises en situation"];
     
-    // ========== 2. 过滤：只保留允许的主题 ==========
-    const filteredQuestions = allQuestions.filter(q => {
+    // ========== 2. 过滤：只保留情景题 ==========
+    let filteredQuestions = allQuestions.filter(q => {
         const category = q.category || "Autre";
         return ALLOWED_THEMES.includes(category);
     });
     
     console.log(`📊 过滤前: ${allQuestions.length} 题`);
-    console.log(`📊 过滤后: ${filteredQuestions.length} 题 (只保留 3 个主题)`);
-    
-    // 打印各主题数量
-    const tempCount = {};
-    filteredQuestions.forEach(q => {
-        const t = q.category || "Autre";
-        tempCount[t] = (tempCount[t] || 0) + 1;
-    });
-    console.log("📋 各主题题目数量:");
-    for (const [theme, count] of Object.entries(tempCount)) {
-        console.log(`  ${theme}: ${count} 题`);
-    }
+    console.log(`📊 过滤后: ${filteredQuestions.length} 题 (只保留 Mises en situation)`);
     
     // 如果过滤后题目不够，报错
     if (filteredQuestions.length < 20) {
@@ -1726,14 +1493,14 @@ function selectQuestionsByTheme() {
         // 紧急情况：从所有题目中取
         const shuffled = shuffleArray([...allQuestions]);
         selectedQuestions = shuffled.slice(0, 20);
-        // 添加标签后返回
         selectedQuestions = selectedQuestions.map((question) => {
             const category = question.category || "Autre";
             let tags = [];
-            if (category.includes("historiques") || category.includes("personnages")) tags.push("Histoire");
-            else if (category.includes("géographie") || category.includes("Territoires")) tags.push("Géographie");
-            else if (category.includes("Patrimoine") || category.includes("culture")) tags.push("Patrimoine");
-            else tags.push(category);
+            if (category.includes("Mises en situation") || (question.id && question.id.toLowerCase().startsWith("si"))) {
+                tags.push("Situation");
+            } else {
+                tags.push(category);
+            }
             if (question.difficulté) tags.push(question.difficulté);
             if (question.typeQuestion) tags.push(question.typeQuestion);
             return {
@@ -1755,77 +1522,45 @@ function selectQuestionsByTheme() {
         questionsByCategory[category].push(question);
     });
     
-    // ========== 4. 从每个主题中选题 ==========
-    const themeRequirements = {
-        "Grandes périodes et personnages historiques": 7,
-        "Territoires et géographie": 7,
-        "Patrimoine français": 6
-    };
+    // ========== 4. 从情景题中选题 ==========
+    const available = questionsByCategory["Mises en situation"] || [];
     
-    selectedQuestions = [];
-    let totalSelected = 0;
-    
-    for (const [theme, requiredCount] of Object.entries(themeRequirements)) {
-        const available = questionsByCategory[theme] || [];
-        if (available.length === 0) {
-            console.warn(`⚠️ 主题 "${theme}" 没有题目！`);
-            continue;
-        }
-        
-        const shuffled = shuffleArray([...available]);
-        const toAdd = shuffled.slice(0, Math.min(requiredCount, available.length));
-        selectedQuestions.push(...toAdd);
-        totalSelected += toAdd.length;
-        console.log(`✅ "${theme}" 选中 ${toAdd.length} 题 (共 ${available.length} 题)`);
+    if (available.length === 0) {
+        console.error("❌ 没有找到任何情景题");
+        showAlert("Erreur", "Aucune question de mise en situation trouvée.", 'error');
+        return;
     }
     
-    console.log(`📊 已选 ${totalSelected} 题`);
+    const shuffled = shuffleArray([...available]);
+    const toAdd = shuffled.slice(0, Math.min(20, available.length));
+    selectedQuestions = toAdd;
     
-    // ========== 5. 如果不够 20 题，从允许的主题中补充（关键修改） ==========
-    if (totalSelected < 20) {
-        const needed = 20 - totalSelected;
-        const selectedSet = new Set(selectedQuestions);
-        const extraPool = [];
-        
-        // 🔥 只从允许的主题中补充
-        for (const theme of ALLOWED_THEMES) {
-            const available = (questionsByCategory[theme] || []).filter(q => !selectedSet.has(q));
-            extraPool.push(...available);
-        }
-        
-        if (extraPool.length > 0) {
-            const shuffled = shuffleArray(extraPool);
-            const toAdd = shuffled.slice(0, Math.min(needed, extraPool.length));
-            selectedQuestions.push(...toAdd);
-            totalSelected += toAdd.length;
-            console.log(`🔄 从允许主题补充了 ${toAdd.length} 题`);
-        }
-    }
+    console.log(`✅ "Mises en situation" 选中 ${selectedQuestions.length} 题 (共 ${available.length} 题)`);
     
-    // ========== 6. 如果还是不够，从所有题目中强行补足（紧急情况） ==========
-    if (totalSelected < 20) {
-        const needed = 20 - totalSelected;
+    // ========== 5. 如果不够 20 题，从所有题目中强行补足 ==========
+    if (selectedQuestions.length < 20) {
+        const needed = 20 - selectedQuestions.length;
         const selectedSet = new Set(selectedQuestions);
         const allAvailable = allQuestions.filter(q => !selectedSet.has(q));
         if (allAvailable.length > 0) {
-            const shuffled = shuffleArray(allAvailable);
-            const toAdd = shuffled.slice(0, Math.min(needed, allAvailable.length));
-            selectedQuestions.push(...toAdd);
-            console.warn(`⚠️ 紧急：从所有题目补充了 ${toAdd.length} 题（可能混入其他主题）`);
+            const shuffledAll = shuffleArray(allAvailable);
+            const toAddExtra = shuffledAll.slice(0, Math.min(needed, allAvailable.length));
+            selectedQuestions.push(...toAddExtra);
+            console.warn(`⚠️ 紧急：从所有题目补充了 ${toAddExtra.length} 题（可能不是情景题）`);
         }
     }
     
-    // ========== 7. 截取前 20 题 ==========
+    // ========== 6. 截取前 20 题 ==========
     if (selectedQuestions.length > 20) {
         selectedQuestions = selectedQuestions.slice(0, 20);
     }
     
-    // ========== 8. 打乱顺序 ==========
+    // ========== 7. 打乱顺序 ==========
     selectedQuestions = shuffleArray(selectedQuestions);
     
     console.log(`🎯 最终选择 ${selectedQuestions.length} 题`);
     
-    // ========== 9. 打印选中的主题分布 ==========
+    // ========== 8. 打印选中的主题分布 ==========
     const finalThemes = {};
     selectedQuestions.forEach(q => {
         const t = q.category || "Autre";
@@ -1833,17 +1568,13 @@ function selectQuestionsByTheme() {
     });
     console.log("📋 选中的主题分布:", finalThemes);
     
-    // ========== 10. 添加标签 ==========
+    // ========== 9. 添加标签 ==========
     selectedQuestions = selectedQuestions.map((question) => {
         const category = question.category || "Autre";
         let tags = [];
         
-        if (category.includes("historiques") || category.includes("personnages")) {
-            tags.push("Histoire");
-        } else if (category.includes("géographie") || category.includes("Territoires")) {
-            tags.push("Géographie");
-        } else if (category.includes("Patrimoine") || category.includes("culture")) {
-            tags.push("Patrimoine");
+        if (category.includes("Mises en situation") || (question.id && question.id.toLowerCase().startsWith("si"))) {
+            tags.push("Situation");
         } else {
             tags.push(category);
         }
@@ -1860,6 +1591,7 @@ function selectQuestionsByTheme() {
     
     console.log("========== 选题完成 ==========");
 }
+
 // Fisher-Yates 洗牌算法
 function shuffleArray(array) {
     const newArray = [...array];
@@ -1870,7 +1602,7 @@ function shuffleArray(array) {
     return newArray;
 }
 
-// ==================== 显示题目 - 修改为一道题一道题的交互模式 ====================
+// ==================== 显示题目 ====================
 function showQuestion(index) {
     if (!selectedQuestions[index]) {
         console.error("题目不存在:", index);
@@ -1878,36 +1610,25 @@ function showQuestion(index) {
     }
     
     const question = selectedQuestions[index];
-    
-    // 重置当前题目状态
     currentAnswerSubmitted = answeredQuestions.has(index);
     
-    // 显示题目元数据标签 - 只显示一份
     const questionMeta = document.getElementById('questionMeta');
     questionMeta.innerHTML = '';
     
-    // 添加主题标签（只显示一个主要标签）
+    // 添加主题标签
     const theme = question.theme || question.category || "Autre";
-    
-    // 根据主题判断显示哪个标签
     let mainTag = '';
-    if (theme.includes("Laïcité")) {
-        mainTag = 'Laïcité';
-    } else if (theme.includes("Devise") || theme.includes("symboles")) {
-        mainTag = 'Symboles';
-    } else if (theme.includes("Mises en situation") || (question.id && question.id.toLowerCase().startsWith("si"))) {
+    if (theme.includes("Mises en situation") || (question.id && question.id.toLowerCase().startsWith("si"))) {
         mainTag = 'Situation';
     } else {
         mainTag = theme;
     }
     
-    // 添加主题标签
     const themeTag = document.createElement('span');
     themeTag.className = 'question-tag tag-theme';
     themeTag.innerHTML = `<i class="fas fa-tag"></i> ${mainTag}`;
     questionMeta.appendChild(themeTag);
     
-    // 添加难度标签（如果存在）
     if (question.difficulté) {
         const difficultyTag = document.createElement('span');
         difficultyTag.className = 'question-tag tag-difficulty';
@@ -1915,7 +1636,6 @@ function showQuestion(index) {
         questionMeta.appendChild(difficultyTag);
     }
     
-    // 添加类型标签（如果存在）
     if (question.typeQuestion) {
         const typeTag = document.createElement('span');
         typeTag.className = 'question-tag tag-type';
@@ -1923,7 +1643,6 @@ function showQuestion(index) {
         questionMeta.appendChild(typeTag);
     }
     
-    // 显示题目文本
     document.getElementById('questionText').textContent = `${index + 1}. ${question.question}`;
     
     const optionsContainer = document.getElementById('optionsContainer');
@@ -1934,14 +1653,12 @@ function showQuestion(index) {
         return;
     }
     
-    // 为选项分配ABCD标签
     const optionLetters = ['A', 'B', 'C', 'D'];
     
     question.options.forEach((option, optionIndex) => {
         const optionDiv = document.createElement('div');
         optionDiv.className = 'option';
         
-        // 如果已经回答了这道题，显示答案状态
         if (currentAnswerSubmitted) {
             if (optionIndex === question.answer) {
                 optionDiv.classList.add('correct');
@@ -1953,12 +1670,10 @@ function showQuestion(index) {
             optionDiv.classList.add('selected');
         }
         
-        // 创建选项字母标签
         const letterSpan = document.createElement('span');
         letterSpan.className = 'option-letter';
         letterSpan.textContent = optionLetters[optionIndex];
         
-        // 隐藏的radio input
         const input = document.createElement('input');
         input.type = 'radio';
         input.name = 'question';
@@ -1970,15 +1685,12 @@ function showQuestion(index) {
         
         const label = document.createElement('label');
         label.htmlFor = `option${index}_${optionIndex}`;
-        
-        // 添加选项内容
         label.appendChild(letterSpan);
         label.appendChild(document.createTextNode(option));
         
         optionDiv.appendChild(input);
         optionDiv.appendChild(label);
         
-        // 如果还没有提交答案，可以点击选择
         if (!currentAnswerSubmitted) {
             optionDiv.addEventListener('click', () => {
                 userAnswers[index] = optionIndex;
@@ -1990,24 +1702,19 @@ function showQuestion(index) {
         optionsContainer.appendChild(optionDiv);
     });
     
-    // 显示或隐藏提交按钮
     document.getElementById('submitBtn').style.display = 
         (!currentAnswerSubmitted && userAnswers[index] !== null) ? 'block' : 'none';
     
-    // 显示或隐藏下一题按钮
     document.getElementById('nextQuestionBtn').style.display = 
         (currentAnswerSubmitted) ? 'block' : 'none';
     
-    // 显示或隐藏完成测试按钮（最后一题）
     document.getElementById('finishTestBtn').style.display = 
         (index === selectedQuestions.length - 1 && answeredQuestions.size === selectedQuestions.length) ? 'block' : 'none';
     
     document.getElementById('prevBtn').disabled = index === 0;
     
-    // 更新导航按钮状态
     updateNavigationButtons();
     
-    // 显示答案反馈（如果已经提交）
     if (currentAnswerSubmitted) {
         showAnswerFeedback(index);
     } else {
@@ -2043,7 +1750,6 @@ function showAnswerFeedback(index) {
     feedbackDiv.innerHTML = feedbackHTML;
     feedbackDiv.style.display = 'block';
     
-    // 滚动到反馈区域
     setTimeout(() => {
         feedbackDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 300);
@@ -2056,18 +1762,13 @@ function submitCurrentQuestion() {
         return;
     }
     
-    // 标记此题已提交
     answeredQuestions.add(currentQuestionIndex);
     currentAnswerSubmitted = true;
     
-    // 显示答案反馈
     showAnswerFeedback(currentQuestionIndex);
-    
-    // 更新界面
     showQuestion(currentQuestionIndex);
     updateQuestionCounter();
     
-    // 如果是最后一题，显示完成测试按钮
     if (currentQuestionIndex === selectedQuestions.length - 1) {
         document.getElementById('finishTestBtn').style.display = 'block';
     }
@@ -2083,7 +1784,6 @@ function createQuestionMap() {
         mapItem.className = 'map-item';
         mapItem.textContent = i + 1;
         
-        // 设置状态
         if (!answeredQuestions.has(i)) {
             mapItem.classList.add('unanswered');
         } else {
@@ -2095,7 +1795,6 @@ function createQuestionMap() {
             }
         }
         
-        // 添加点击事件
         mapItem.addEventListener('click', () => {
             showQuestionReview(i);
         });
@@ -2123,7 +1822,6 @@ function showQuestionReview(index) {
         <div class="review-options">
     `;
     
-    // 显示所有选项
     question.options.forEach((option, optionIndex) => {
         let optionClass = 'review-option';
         let badgeText = '';
@@ -2156,7 +1854,6 @@ function showQuestionReview(index) {
         </div>
     `;
     
-    // 添加解释
     if (question.explanation) {
         reviewHTML += `
             <div class="review-explanation">
@@ -2168,21 +1865,17 @@ function showQuestionReview(index) {
     
     questionReview.innerHTML = reviewHTML;
     questionReview.classList.add('active');
-    
-    // 滚动到回顾区域
     questionReview.scrollIntoView({ behavior: 'smooth' });
 }
 
 // ==================== 提交和评分 ====================
 function submitTest() {
-    // 检查是否所有题目都已回答
     if (answeredQuestions.size < selectedQuestions.length) {
         const unanswered = selectedQuestions.length - answeredQuestions.size;
         showAlert("Questions non répondues", 
             `${unanswered} question(s) non répondues. Souhaitez-vous soumettre quand même?`, 
             'warning');
         
-        // 创建一个确认按钮
         setTimeout(() => {
             const alertBtns = document.querySelector('.alert-btns');
             alertBtns.innerHTML = `
@@ -2196,7 +1889,6 @@ function submitTest() {
     proceedWithSubmission();
 }
 
-// 在文件末尾添加错题记录函数
 async function recordMistakesToDatabase() {
     console.log('开始记录错题到数据库...');
     
@@ -2206,7 +1898,6 @@ async function recordMistakesToDatabase() {
             return;
         }
         
-        // 确保 studentInfo 有 name
         if (!studentInfo.name || studentInfo.name === "Visiteur") {
             console.warn('学生姓名未知，无法记录错题');
             return;
@@ -2220,7 +1911,6 @@ async function recordMistakesToDatabase() {
                     const userAnswer = userAnswers[i] !== null ? userAnswers[i] : -1;
                     
                     const questionToSave = { ...selectedQuestions[i] };
-                    // 确保有 difficulty 属性
                     if (!questionToSave.difficulty && questionToSave['difficulté']) {
                         questionToSave.difficulty = questionToSave['difficulté'];
                     }
@@ -2229,7 +1919,7 @@ async function recordMistakesToDatabase() {
                         studentInfo,
                         questionToSave,
                         userAnswer,
-                        'culture_francaise'  // 测试类型标识
+                        'situation_module'
                     );
                     if (result) {
                         recordedCount++;
@@ -2256,7 +1946,7 @@ function proceedWithSubmission() {
         total: selectedQuestions.length,
         percentage: currentPercentage,
         passed: currentScore >= 16,
-        testType: 'culture_francaise',
+        testType: 'situation_module',
         duration: 0,
         questions: selectedQuestions.map((q, i) => ({
             id: q.id || q.question_id || i,
@@ -2306,7 +1996,7 @@ function saveScoreToLocalOnly(testResult) {
         const record = {
             id: `local_${Date.now()}`,
             student_name: studentInfo.name || 'Étudiant',
-            test_type: testResult.testType || 'culture_francaise',
+            test_type: testResult.testType || 'situation_module',
             score: testResult.score,
             total: testResult.total,
             percentage: testResult.percentage,
@@ -2324,7 +2014,6 @@ function saveScoreToLocalOnly(testResult) {
         return null;
     }
 }
-
 function calculateScore() {
     let correct = 0;
     
@@ -2337,24 +2026,20 @@ function calculateScore() {
     currentScore = correct;
     currentPercentage = Math.round((correct / selectedQuestions.length) * 100);
     
-    // 显示通过/不通过，同时显示具体分数
-    const passed = correct >= 16; // 80% of 20 = 16
+    const passed = correct >= 16;
     
-    // 添加烟花或心碎效果
     if (passed) {
         currentScoreText = `🎉 Félicitations! Vous avez réussi le test! 🎉`;
     } else {
         currentScoreText = `💔 Désolé, vous n'avez pas réussi le test. 💔`;
     }
     
-    // 添加分数详情
     currentScoreText += `\nScore: ${correct}/20 (${currentPercentage}%)`;
 }
 
 function displayResults() {
     document.getElementById('testContainer').style.display = 'none';
     
-    // 显示分数
     document.getElementById('scoreDisplay').style.display = 'block';
     document.getElementById('scoreDisplay').textContent = `${currentScore}/20`;
     
@@ -2365,25 +2050,21 @@ function displayResults() {
     document.getElementById('scoreText').style.marginBottom = '20px';
     document.getElementById('scoreText').style.whiteSpace = 'pre-line';
     
-    // 应用动画效果
     if (currentScoreText.includes("🎉")) {
         document.getElementById('scoreText').classList.add('fireworks');
     } else if (currentScoreText.includes("💔")) {
         document.getElementById('scoreText').classList.add('heartbreak');
     }
     
-    // 显示进度条
     document.querySelector('.score-bar').style.display = 'block';
     setTimeout(() => {
         document.getElementById('scoreFill').style.width = currentPercentage + '%';
     }, 300);
     
-    // 创建题目地图
     createQuestionMap();
     
     document.getElementById('resultsContainer').classList.add('show');
     
-    // 滚动到结果区域
     setTimeout(() => {
         document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth' });
     }, 500);
@@ -2405,30 +2086,22 @@ function restartTest() {
 }
 
 function proceedWithRestart() {
-    // 重新根据学生类型加载题库
     if (studentInfo.type === 'm') {
-        // 四年居留：只用 question_multia
         allQuestions = [...question_multi];
-        console.log("重新加载四年居留题库：", allQuestions.length);
     } else if (studentInfo.type === 'r') {
-        // 十年居留：使用 question_multia + question_resident
         allQuestions = [...question_multi];
         if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
             allQuestions = allQuestions.concat(question_resident);
-            console.log("重新加载十年居留题库：", allQuestions.length);
         }
     } else if (studentInfo.type === 'n') {
-        // 法国入籍：使用 question_multia + question_resident + question_nat
         allQuestions = [...question_multi];
         if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
             allQuestions = allQuestions.concat(question_resident);
         }
         if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
             allQuestions = allQuestions.concat(question_nat);
-            console.log("重新加载法国入籍题库：", allQuestions.length);
         }
     } else {
-        // 完全访问：使用所有题库
         allQuestions = [...question_multi];
         if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
             allQuestions = allQuestions.concat(question_resident);
@@ -2436,10 +2109,8 @@ function proceedWithRestart() {
         if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
             allQuestions = allQuestions.concat(question_nat);
         }
-        console.log("重新加载完全访问题库：", allQuestions.length);
     }
     
-    // 完全重新初始化
     currentQuestionIndex = 0;
     answeredQuestions.clear();
     currentAnswerSubmitted = false;
@@ -2448,7 +2119,6 @@ function proceedWithRestart() {
     document.getElementById('questionReview').classList.remove('active');
     document.getElementById('testContainer').style.display = 'block';
     
-    // 重新选择题目
     selectQuestionsByTheme();
     userAnswers = new Array(selectedQuestions.length).fill(null);
     
@@ -2459,9 +2129,10 @@ function proceedWithRestart() {
     
     window.scrollTo(0, 0);
 }
+
 function showInstructions() {
     showAlert("Instructions du test",
-        "TEST DES VALEURS RÉPUBLICAINES ET LAÏCITÉ\n\n" +
+        "TEST MISES EN SITUATION\n\n" +
         "1. 20 questions à choix multiples\n" +
         "2. Pas de limite de temps\n" +
         "3. Cliquez sur une réponse pour la sélectionner\n" +
@@ -2518,19 +2189,15 @@ function updateNavigationButtons() {
 
 // ==================== 初始化 ====================
 function initializeTest() {
-    // 重置所有状态
     currentQuestionIndex = 0;
     userAnswers = [];
     answeredQuestions.clear();
     currentAnswerSubmitted = false;
     
-    // 根据主题分布选择题目
     selectQuestionsByTheme();
     
-    // 初始化用户答案数组
     userAnswers = new Array(selectedQuestions.length).fill(null);
     
-    // 更新界面
     document.getElementById('totalQuestions').textContent = selectedQuestions.length;
     
     showQuestion(currentQuestionIndex);
@@ -2539,10 +2206,10 @@ function initializeTest() {
     window.scrollTo(0, 0);
 }
 
+// ==================== 页面加载 ====================
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("页面加载完成");
+    console.log("页面加载完成 - 情景题专项练习");
     
-    // 从URL获取参数
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
     const type = urlParams.get('type');
@@ -2551,7 +2218,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (token) {
         try {
-            // 解析token
             let userData;
             try {
                 const utf8String = atob(token);
@@ -2563,7 +2229,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log("使用旧方式解析token成功:", userData);
             }
             
-            // 填充学生信息
             studentInfo = {
                 name: userData.name || userData.userId || "Étudiant",
                 testDate: new Date().toLocaleString('fr-FR'),
@@ -2573,26 +2238,22 @@ document.addEventListener('DOMContentLoaded', function() {
             
             console.log("学生信息:", studentInfo);
             
-     
-            // 直接显示培训信息窗口
             showTrainingInfo();
             
         } catch (e) {
             console.error("Token解析失败:", e);
             showAlert("Erreur de connexion", "Impossible de charger les informations. Utilisation du mode visiteur.", 'warning');
             
-            // 使用默认访客信息
             studentInfo = {
                 name: "Visiteur",
                 testDate: new Date().toLocaleString('fr-FR'),
                 type: "t",
                 daysLeft: -1
             };
-
+            
             showTrainingInfo();
         }
     } else {
-        // 如果没有token，使用默认访客信息
         console.log("没有token，使用访客模式");
         
         studentInfo = {
@@ -2602,18 +2263,8 @@ document.addEventListener('DOMContentLoaded', function() {
             daysLeft: -1
         };
         
-   
-        
         showTrainingInfo();
     }
-    
-    // 保留回车键监听（但登录框已隐藏，可以删除）
-    // document.getElementById('studentPassword').addEventListener('keypress', function(e) {
-    //     if (e.key === 'Enter') {
-    //         e.preventDefault();
-    //         validateLogin();
-    //     }
-    // });
 });
 </script>
 </body>

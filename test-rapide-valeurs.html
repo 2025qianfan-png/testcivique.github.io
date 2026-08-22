@@ -1645,130 +1645,167 @@ function startTest() {
     }, 1500);
 }
 // ==================== 根据主题分布选择题目 ====================
+// ==================== 根据主题分布选择题目 ====================
 function selectQuestionsByTheme() {
-    console.log("开始按主题分布选择题目...");
+    console.log("========== 开始选题 ==========");
+    console.log("学生类型:", studentInfo.type);
+    console.log("总题库大小:", allQuestions.length);
     
-    // 1. 按主题分组题目
+    // ========== 1. 定义允许的主题（不要情景题） ==========
+    const ALLOWED_THEMES = [
+        "Laïcité",
+        "Devise et symboles de la République"
+    ];
+    
+    // ========== 2. 过滤：只保留允许的主题 ==========
+    const filteredQuestions = allQuestions.filter(q => {
+        const theme = q.category || q.theme || "Autre";
+        return ALLOWED_THEMES.includes(theme);
+    });
+    
+    console.log(`📊 过滤前: ${allQuestions.length} 题`);
+    console.log(`📊 过滤后: ${filteredQuestions.length} 题 (只保留 Laïcité + Devise)`);
+    
+    // 打印各主题数量
+    const tempCount = {};
+    filteredQuestions.forEach(q => {
+        const t = q.category || q.theme || "Autre";
+        tempCount[t] = (tempCount[t] || 0) + 1;
+    });
+    console.log("📋 各主题题目数量:");
+    for (const [theme, count] of Object.entries(tempCount)) {
+        console.log(`  ${theme}: ${count} 题`);
+    }
+    
+    // 如果过滤后题目不够，报错并从所有题目中强行取
+    if (filteredQuestions.length < 20) {
+        console.error(`❌ 错误：过滤后只有 ${filteredQuestions.length} 题，需要 20 题`);
+        // 紧急情况：从所有题目中取
+        const shuffled = shuffleArray([...allQuestions]);
+        selectedQuestions = shuffled.slice(0, 20);
+        // 添加标签后返回
+        selectedQuestions = selectedQuestions.map((question) => {
+            const theme = question.category || question.theme || "Autre";
+            let tags = [];
+            if (theme.includes("Laïcité")) tags.push("Laïcité");
+            else if (theme.includes("Devise") || theme.includes("symboles")) tags.push("Symboles");
+            else tags.push(theme);
+            if (question.difficulté) tags.push(question.difficulté);
+            if (question.typeQuestion) tags.push(question.typeQuestion);
+            return {
+                ...question,
+                customTags: tags,
+                theme: theme
+            };
+        });
+        return;
+    }
+    
+    // ========== 3. 按主题分组 ==========
     const questionsByTheme = {};
-    
-    allQuestions.forEach((question) => {
-        const theme = question.theme || question.category || "Autre";
+    filteredQuestions.forEach((question) => {
+        const theme = question.category || question.theme || "Autre";
         if (!questionsByTheme[theme]) {
             questionsByTheme[theme] = [];
         }
         questionsByTheme[theme].push(question);
     });
     
-    console.log("题库主题分布:", Object.keys(questionsByTheme));
+    // ========== 4. 从每个主题中选题 ==========
+    const themeRequirements = {
+        "Laïcité": 10,
+        "Devise et symboles de la République": 10
+    };
     
-    // 2. 专门处理Mises en situation - 从si001到si0047中随机选择
-    let situationQuestions = [];
-    if (questionsByTheme["Mises en situation"]) {
-        situationQuestions = questionsByTheme["Mises en situation"];
-    } else {
-        // 如果没有"Mises en situation"分类，尝试从所有题目中筛选id以"si"开头的
-        situationQuestions = allQuestions.filter(q => {
-            const id = q.id || "";
-            return id.toLowerCase().startsWith("si") && parseInt(id.substring(2)) >= 1 && parseInt(id.substring(2)) <= 47;
-        });
-    }
-    
-    console.log("Mises en situation题目数量:", situationQuestions.length);
-    
-    // 3. 根据配置选择题目
     selectedQuestions = [];
     let totalSelected = 0;
     
-    // 选择Laïcité题目
-    const laiciteQuestions = questionsByTheme["Laïcité"] || [];
-    if (laiciteQuestions.length > 0) {
-        const shuffled = shuffleArray([...laiciteQuestions]);
-        const selected = shuffled.slice(0, Math.min(3, laiciteQuestions.length));
-        selectedQuestions.push(...selected);
-        totalSelected += selected.length;
-    } else {
-        console.warn("警告：没有找到Laïcité题目");
+    for (const [theme, requiredCount] of Object.entries(themeRequirements)) {
+        const available = questionsByTheme[theme] || [];
+        if (available.length === 0) {
+            console.warn(`⚠️ 主题 "${theme}" 没有题目！`);
+            continue;
+        }
+        
+        const shuffled = shuffleArray([...available]);
+        const toAdd = shuffled.slice(0, Math.min(requiredCount, available.length));
+        selectedQuestions.push(...toAdd);
+        totalSelected += toAdd.length;
+        console.log(`✅ "${theme}" 选中 ${toAdd.length} 题 (共 ${available.length} 题)`);
     }
     
-    // 选择Devise et symboles题目
-    const deviseQuestions = questionsByTheme["Devise et symboles de la République"] || [];
-    if (deviseQuestions.length > 0) {
-        const shuffled = shuffleArray([...deviseQuestions]);
-        const selected = shuffled.slice(0, Math.min(7, deviseQuestions.length));
-        selectedQuestions.push(...selected);
-        totalSelected += selected.length;
-    } else {
-        console.warn("警告：没有找到Devise et symboles de la République题目");
-    }
+    console.log(`📊 已选 ${totalSelected} 题`);
     
-    // 选择Mises en situation题目
-    if (situationQuestions.length > 0) {
-        const shuffled = shuffleArray([...situationQuestions]);
-        const selected = shuffled.slice(0, Math.min(10, situationQuestions.length));
-        selectedQuestions.push(...selected);
-        totalSelected += selected.length;
-    } else {
-        console.warn("警告：没有找到Mises en situation题目");
-    }
-    
-    console.log(`已选择 ${totalSelected} 题`);
-    
-    // 4. 如果题目不足20，从其他题目中补充
+    // ========== 5. 如果不够 20 题，从允许的主题中补充（不是从所有题目） ==========
     if (totalSelected < 20) {
         const needed = 20 - totalSelected;
-        
         const selectedSet = new Set(selectedQuestions);
-        const availableQuestions = allQuestions.filter(q => !selectedSet.has(q));
+        const extraPool = [];
         
-        if (availableQuestions.length > 0) {
-            const shuffled = shuffleArray([...availableQuestions]);
-            const toAdd = shuffled.slice(0, Math.min(needed, availableQuestions.length));
+        // 🔥 关键修改：只从允许的主题中补充
+        for (const theme of ALLOWED_THEMES) {
+            const available = (questionsByTheme[theme] || []).filter(q => !selectedSet.has(q));
+            extraPool.push(...available);
+        }
+        
+        if (extraPool.length > 0) {
+            const shuffled = shuffleArray(extraPool);
+            const toAdd = shuffled.slice(0, Math.min(needed, extraPool.length));
             selectedQuestions.push(...toAdd);
+            totalSelected += toAdd.length;
+            console.log(`🔄 从允许主题补充了 ${toAdd.length} 题`);
         }
     }
     
-    // 如果题目太多，截取前20题
+    // ========== 6. 如果还是不够，从所有题目中强行补足（紧急情况） ==========
+    if (totalSelected < 20) {
+        const needed = 20 - totalSelected;
+        const selectedSet = new Set(selectedQuestions);
+        const allAvailable = allQuestions.filter(q => !selectedSet.has(q));
+        if (allAvailable.length > 0) {
+            const shuffled = shuffleArray(allAvailable);
+            const toAdd = shuffled.slice(0, Math.min(needed, allAvailable.length));
+            selectedQuestions.push(...toAdd);
+            console.warn(`⚠️ 紧急：从所有题目补充了 ${toAdd.length} 题（可能混入其他主题）`);
+        }
+    }
+    
+    // ========== 7. 截取前 20 题 ==========
     if (selectedQuestions.length > 20) {
         selectedQuestions = selectedQuestions.slice(0, 20);
     }
     
-    // 最终随机打乱所有题目顺序
+    // ========== 8. 打乱顺序 ==========
     selectedQuestions = shuffleArray(selectedQuestions);
     
-    console.log(`最终选择 ${selectedQuestions.length} 题`);
+    console.log(`🎯 最终选择 ${selectedQuestions.length} 题`);
     
-    // 为题目添加标签 - 修复重复标签问题
+    // ========== 9. 打印选中的主题分布 ==========
+    const finalThemes = {};
+    selectedQuestions.forEach(q => {
+        const t = q.category || q.theme || "Autre";
+        finalThemes[t] = (finalThemes[t] || 0) + 1;
+    });
+    console.log("📋 选中的主题分布:", finalThemes);
+    
+    // ========== 10. 添加标签 ==========
     selectedQuestions = selectedQuestions.map((question) => {
-        const theme = question.theme || question.category || "Autre";
+        const theme = question.category || question.theme || "Autre";
         let tags = [];
-        
-        // 根据主题添加主要标签（只加一个）
-        if (theme.includes("Laïcité")) {
-            tags.push("Laïcité");
-        } else if (theme.includes("Devise") || theme.includes("symboles")) {
-            tags.push("Symboles");
-        } else if (theme.includes("Mises en situation") || (question.id && question.id.toLowerCase().startsWith("si"))) {
-            tags.push("Situation");
-        }
-        
-        // 只添加难度标签（如果存在）
-        if (question.difficulté) {
-            tags.push(question.difficulté);
-        }
-        
-        // 只添加类型标签（如果存在）
-        if (question.typeQuestion) {
-            tags.push(question.typeQuestion);
-        }
-        
+        if (theme.includes("Laïcité")) tags.push("Laïcité");
+        else if (theme.includes("Devise") || theme.includes("symboles")) tags.push("Symboles");
+        else tags.push(theme);
+        if (question.difficulté) tags.push(question.difficulté);
+        if (question.typeQuestion) tags.push(question.typeQuestion);
         return {
             ...question,
             customTags: tags,
-            theme: theme // 确保theme字段存在
+            theme: theme
         };
     });
+    
+    console.log("========== 选题完成 ==========");
 }
-
 // Fisher-Yates 洗牌算法
 function shuffleArray(array) {
     const newArray = [...array];
@@ -2138,7 +2175,7 @@ async function recordMistakesToDatabase() {
                         studentInfo,
                         questionToSave,
                         userAnswer,
-                        'droits_obligations'  // 测试类型标识
+                        'valeurs_republique'  // 测试类型标识
                     );
                     if (result) {
                         recordedCount++;
@@ -2156,9 +2193,46 @@ async function recordMistakesToDatabase() {
     }
 }
 
-// 修改 proceedWithSubmission 函数
 function proceedWithSubmission() {
     calculateScore();
+    
+    // 🔥 构建成绩数据
+    const testResult = {
+        score: currentScore,
+        total: selectedQuestions.length,
+        percentage: currentPercentage,
+        passed: currentScore >= 16,
+        testType: 'valeurs_republique',
+        duration: 0,
+        questions: selectedQuestions.map((q, i) => ({
+            id: q.id || q.question_id || i,
+            correct: q.answer,
+            userAnswer: userAnswers[i],
+            isCorrect: userAnswers[i] === q.answer
+        }))
+    };
+    
+    console.log('📊 准备记录成绩:', testResult);
+    
+    // 🔥 保存成绩到 Supabase
+    if (window.supabaseAuth && window.supabaseAuth.recordTestScore) {
+        window.supabaseAuth.recordTestScore(studentInfo, testResult)
+            .then(result => {
+                if (result) {
+                    console.log('✅ 成绩已记录到数据库');
+                } else {
+                    console.warn('⚠️ 成绩记录失败，保存到本地');
+                    saveScoreToLocalOnly(testResult);
+                }
+            })
+            .catch(err => {
+                console.error('❌ 成绩记录失败:', err);
+                saveScoreToLocalOnly(testResult);
+            });
+    } else {
+        console.warn('⚠️ Supabase成绩记录功能不可用，保存到本地');
+        saveScoreToLocalOnly(testResult);
+    }
     
     // 记录错题
     recordMistakesToDatabase().then(() => {
@@ -2169,6 +2243,33 @@ function proceedWithSubmission() {
     });
 }
 
+// ==================== 本地保存成绩 ====================
+function saveScoreToLocalOnly(testResult) {
+    try {
+        const key = `test_scores_${studentInfo.name || 'guest'}`;
+        const existing = JSON.parse(localStorage.getItem(key) || '[]');
+        
+        const record = {
+            id: `local_${Date.now()}`,
+            student_name: studentInfo.name || 'Étudiant',
+            test_type: testResult.testType || 'valeurs_republique',
+            score: testResult.score,
+            total: testResult.total,
+            percentage: testResult.percentage,
+            passed: testResult.passed,
+            test_date: new Date().toISOString(),
+            local_only: true
+        };
+        
+        existing.push(record);
+        localStorage.setItem(key, JSON.stringify(existing));
+        console.log('💾 成绩已保存到本地');
+        return record;
+    } catch (e) {
+        console.error('❌ 本地保存失败:', e);
+        return null;
+    }
+}
 function calculateScore() {
     let correct = 0;
     

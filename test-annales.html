@@ -1808,7 +1808,7 @@ async function recordMistakesToDatabase() {
                         studentInfo,
                         questionToSave,
                         userAnswer,
-                        'droits_obligations'  // 测试类型标识
+                        'annales_officielles'  // 测试类型标识
                     );
                     if (result) {
                         recordedCount++;
@@ -1830,6 +1830,43 @@ async function recordMistakesToDatabase() {
 function proceedWithSubmission() {
     calculateScore();
     
+    const testResult = {
+        score: currentScore,
+        total: selectedQuestions.length,
+        percentage: currentPercentage,
+        passed: currentScore >= 16,
+        testType: 'annales_officielles',
+        duration: 0,
+        questions: selectedQuestions.map((q, i) => ({
+            id: q.id || q.question_id || i,
+            correct: q.answer,
+            userAnswer: userAnswers[i],
+            isCorrect: userAnswers[i] === q.answer
+        }))
+    };
+    
+    console.log('📊 准备记录成绩:', testResult);
+    
+    // 保存成绩
+    if (window.supabaseAuth && window.supabaseAuth.recordTestScore) {
+        window.supabaseAuth.recordTestScore(studentInfo, testResult)
+            .then(result => {
+                if (result) {
+                    console.log('✅ 成绩已记录到数据库');
+                } else {
+                    console.warn('⚠️ 成绩记录失败，保存到本地');
+                    saveScoreToLocalOnly(testResult);
+                }
+            })
+            .catch(err => {
+                console.error('❌ 成绩记录失败:', err);
+                saveScoreToLocalOnly(testResult);
+            });
+    } else {
+        console.warn('⚠️ Supabase成绩记录功能不可用，保存到本地');
+        saveScoreToLocalOnly(testResult);
+    }
+    
     // 记录错题
     recordMistakesToDatabase().then(() => {
         displayResults();
@@ -1839,6 +1876,33 @@ function proceedWithSubmission() {
     });
 }
 
+// ==================== 本地保存成绩 ====================
+function saveScoreToLocalOnly(testResult) {
+    try {
+        const key = `test_scores_${studentInfo.name || 'guest'}`;
+        const existing = JSON.parse(localStorage.getItem(key) || '[]');
+        
+        const record = {
+            id: `local_${Date.now()}`,
+            student_name: studentInfo.name || 'Étudiant',
+            test_type: testResult.testType || 'annales_officielles',
+            score: testResult.score,
+            total: testResult.total,
+            percentage: testResult.percentage,
+            passed: testResult.passed,
+            test_date: new Date().toISOString(),
+            local_only: true
+        };
+        
+        existing.push(record);
+        localStorage.setItem(key, JSON.stringify(existing));
+        console.log('💾 成绩已保存到本地');
+        return record;
+    } catch (e) {
+        console.error('❌ 本地保存失败:', e);
+        return null;
+    }
+}
 function calculateScore() {
     let correct = 0;
     selectedQuestions.forEach((q, idx) => { if (userAnswers[idx] === q.answer) correct++; });

@@ -121,6 +121,18 @@ h1, h2, h3, h4, h5 {
     pointer-events: none;
 }
 
+.btn-outline {
+    background: transparent;
+    color: var(--primary-blue);
+    border: 2px solid var(--primary-blue);
+    box-shadow: none;
+}
+
+.btn-outline:hover {
+    background: var(--primary-blue);
+    color: var(--white);
+}
+
 /* ============================================
    头部
    ============================================ */
@@ -341,7 +353,7 @@ h1, h2, h3, h4, h5 {
     background: white;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-hover);
-    min-width: 220px;
+    min-width: 240px;
     display: none;
     z-index: 1000;
     margin-top: 8px;
@@ -381,6 +393,23 @@ h1, h2, h3, h4, h5 {
     font-size: 1.1rem;
     color: var(--primary-blue);
     text-align: center;
+}
+
+/* ===== 下拉菜单 - 学习进度入口 ===== */
+.user-dropdown a.progress-link {
+    background: rgba(108, 92, 231, 0.08);
+    border-left: 3px solid #6c5ce7;
+    font-weight: 600;
+}
+
+.user-dropdown a.progress-link:hover {
+    background: rgba(108, 92, 231, 0.18);
+    border-left-width: 5px;
+    padding-left: 22px;
+}
+
+.user-dropdown a.progress-link i {
+    color: #6c5ce7;
 }
 
 .admin-access {
@@ -604,29 +633,8 @@ h1, h2, h3, h4, h5 {
     font-size: 0.95rem;
 }
 
-.course-card .btn-outline {
-    background: transparent;
-    color: var(--primary-blue);
-    border: 2px solid var(--primary-blue);
-    box-shadow: none;
-}
-
-.course-card .btn-outline:hover {
-    background: var(--primary-blue);
-    color: var(--white);
-}
-
-.course-card .btn-primary {
-    background: var(--orange);
-    color: var(--white);
-}
-
-.course-card .btn-primary:hover {
-    background: #e67e22;
-}
-
 /* ============================================
-   统计区域 - 精致卡片设计
+   统计区域
    ============================================ */
 .stats-highlight {
     padding: 50px 0;
@@ -854,6 +862,153 @@ h1, h2, h3, h4, h5 {
     font-weight: 600;
     font-size: 0.9rem;
     flex-shrink: 0;
+}
+
+/* ============================================
+   情景题专项练习模块
+   ============================================ */
+.situation-section {
+    padding: 80px 0;
+    background: linear-gradient(135deg, var(--light-gray) 0%, #e8f0fe 100%);
+}
+
+.situation-card-wrapper {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr;
+    gap: 40px;
+    align-items: stretch;
+    margin-top: 30px;
+}
+
+.situation-card {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+.situation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary-blue);
+}
+
+.situation-card-header {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light-blue) 100%);
+    padding: 30px 30px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+}
+
+.situation-icon {
+    font-size: 3rem;
+    color: var(--white);
+}
+
+.situation-badge {
+    background: var(--primary-yellow);
+    color: var(--primary-blue);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.situation-card-body {
+    padding: 30px;
+}
+
+.situation-card-body h3 {
+    font-size: 1.6rem;
+    color: var(--primary-blue);
+    margin-bottom: 15px;
+}
+
+.situation-card-body > p {
+    color: var(--medium-gray);
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+.situation-features {
+    list-style: none;
+    margin-bottom: 25px;
+}
+
+.situation-features li {
+    padding: 8px 0;
+    font-size: 0.95rem;
+    color: var(--dark-gray);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.situation-features li:last-child {
+    border-bottom: none;
+}
+
+.situation-features li i {
+    color: var(--green);
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.situation-btn {
+    width: 100%;
+    text-align: center;
+    padding: 14px;
+    font-size: 1rem;
+}
+
+.situation-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.situation-info-item {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    padding: 25px 30px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: var(--transition);
+    border-left: 4px solid var(--primary-blue);
+}
+
+.situation-info-item:hover {
+    transform: translateX(5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.situation-info-item i {
+    font-size: 2rem;
+    color: var(--primary-blue);
+    width: 50px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.situation-info-item h4 {
+    font-size: 1.1rem;
+    margin-bottom: 2px;
+    color: var(--dark-gray);
+}
+
+.situation-info-item p {
+    color: var(--medium-gray);
+    font-size: 0.9rem;
+    margin: 0;
 }
 
 /* ============================================
@@ -1508,6 +1663,26 @@ h1, h2, h3, h4, h5 {
     .course-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+    .situation-card-wrapper {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    .situation-info {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+    .situation-info-item {
+        padding: 20px;
+        flex-direction: column;
+        text-align: center;
+        border-left: none;
+        border-top: 4px solid var(--primary-blue);
+    }
+    .situation-info-item i {
+        font-size: 1.8rem;
+        width: auto;
+    }
 }
 
 @media (max-width: 992px) {
@@ -1649,6 +1824,34 @@ h1, h2, h3, h4, h5 {
         min-width: 250px;
         right: -10px;
     }
+
+    .situation-section {
+        padding: 50px 0;
+    }
+    .situation-card-header {
+        padding: 20px;
+    }
+    .situation-card-body {
+        padding: 20px;
+    }
+    .situation-card-body h3 {
+        font-size: 1.3rem;
+    }
+    .situation-info {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    .situation-info-item {
+        flex-direction: row;
+        padding: 15px 20px;
+        border-left: 4px solid var(--primary-blue);
+        border-top: none;
+        text-align: left;
+    }
+    .situation-info-item i {
+        font-size: 1.5rem;
+        width: 40px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1686,6 +1889,15 @@ h1, h2, h3, h4, h5 {
     }
     .stat-highlight-label {
         font-size: 0.6rem;
+    }
+    .situation-card-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 10px;
+    }
+    .situation-icon {
+        font-size: 2.5rem;
     }
 }
 
