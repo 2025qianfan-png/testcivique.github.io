@@ -1,4 +1,4 @@
-const CACHE_NAME = 'civique-exam-v1.71';
+const CACHE_NAME = 'civique-exam-v1.72';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -40,7 +40,9 @@ const urlsToCache = [
    '/test-rapide-installation.html',
    '/test-rapide-valeurs.html',
    '/test-situation.html',
-  '/dashboard-etudiant.html'
+  '/dashboard-etudiant.html',
+   '/supabase-config.js'
+  
 ];
 
 // 安装 Service Worker
