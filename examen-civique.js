@@ -158,7 +158,7 @@ let isStandalone = window.matchMedia('(display-mode: standalone)').matches || wi
 
 // ==================== 教学评价变量 ====================
 let allFeedbacks = [];
-let feedbackDisplayCount = 5;
+let feedbackDisplayCount = 3;
 const FEEDBACK_INCREMENT = 5;
 
 // ==================== Toast 通知 ====================
