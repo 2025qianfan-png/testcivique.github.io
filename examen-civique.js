@@ -159,7 +159,7 @@ let isStandalone = window.matchMedia('(display-mode: standalone)').matches || wi
 // ==================== 教学评价变量 ====================
 let allFeedbacks = [];
 let feedbackDisplayCount = 3;
-const FEEDBACK_INCREMENT = 5;
+const FEEDBACK_INCREMENT = 3;
 
 // ==================== Toast 通知 ====================
 function showToast(title, message, type = 'warning') {
@@ -1232,7 +1232,7 @@ async function loadFeedbacks() {
         if (error) throw error;
         
         allFeedbacks = data || [];
-        feedbackDisplayCount = 5;
+        feedbackDisplayCount = 3;
         renderFeedbacks();
         updateFeedbackCount();
         
