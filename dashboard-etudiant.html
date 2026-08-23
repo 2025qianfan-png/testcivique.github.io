@@ -193,33 +193,100 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 24px;
+            margin-bottom: 28px;
+            align-items: stretch;
+        }
+        @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
         .table-container {
             background: var(--white);
             border-radius: var(--border-radius);
             padding: 22px;
             box-shadow: var(--shadow);
-            overflow-x: auto;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 420px;
         }
         .table-container h2 {
             font-size: 1.2rem;
             color: var(--primary-blue);
             margin-bottom: 16px;
             font-family: 'Montserrat', sans-serif;
+            flex-shrink: 0;
         }
 
-        table {
+        /* 🔥 表格滚动容器 - 修复 */
+        .table-scroll-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: auto;
+            max-height: 320px;
+            min-height: 200px;
+            position: relative;
+            border: 1px solid #eef2f7;
+            border-radius: 8px;
+        }
+
+        .table-scroll-wrapper::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .table-scroll-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .table-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        .table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .table-scroll-wrapper table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.9rem;
         }
-        thead { background: var(--primary-blue); color: white; }
-        thead th { padding: 10px 14px; text-align: left; font-weight: 600; font-size: 0.85rem; }
-        thead th:first-child { border-radius: 8px 0 0 0; }
-        thead th:last-child { border-radius: 0 8px 0 0; }
 
-        tbody tr { border-bottom: 1px solid var(--light-gray); transition: var(--transition); }
-        tbody tr:hover { background: #f8f9fa; }
-        tbody td { padding: 10px 14px; vertical-align: middle; font-size: 0.85rem; }
+        .table-scroll-wrapper thead {
+            background: var(--primary-blue);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table-scroll-wrapper thead th {
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            background: var(--primary-blue);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .table-scroll-wrapper thead th:first-child { border-radius: 8px 0 0 0; }
+        .table-scroll-wrapper thead th:last-child { border-radius: 0 8px 0 0; }
+
+        .table-scroll-wrapper tbody tr {
+            border-bottom: 1px solid var(--light-gray);
+            transition: var(--transition);
+        }
+        .table-scroll-wrapper tbody tr:hover { background: #f8f9fa; }
+        .table-scroll-wrapper tbody td {
+            padding: 10px 14px;
+            vertical-align: middle;
+            font-size: 0.85rem;
+        }
 
         .status-badge {
             padding: 3px 12px;
@@ -235,14 +302,6 @@
         .score-medium { color: var(--orange); font-weight: 700; }
         .score-low { color: var(--red); font-weight: 700; }
 
-        .two-col {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 24px;
-            margin-bottom: 28px;
-        }
-        @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
-
         .chart-box {
             background: var(--white);
             border-radius: var(--border-radius);
@@ -250,6 +309,7 @@
             box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
+            min-height: 340px;
         }
         .chart-box h3 {
             font-size: 1.1rem;
@@ -259,15 +319,51 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-shrink: 0;
         }
-        .chart-wrapper { flex: 1; position: relative; min-height: 260px; }
-        #scoreChart { width: 100% !important; height: 100% !important; min-height: 260px; }
+        .chart-wrapper {
+            flex: 1;
+            position: relative;
+            min-height: 260px;
+            height: 260px;
+        }
+        #scoreChart {
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 260px;
+        }
 
-        /* ===== 错题消消乐 ===== */
-        .quiz-wrapper {
-            max-width: 860px;
-            margin: 0 auto;
+        .streak-banner {
+            background: linear-gradient(135deg, #f1c40f, #f39c12);
+            color: var(--dark-gray);
+            padding: 14px 22px;
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 14px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 20px rgba(243, 156, 18, 0.3);
+            animation: pulse-banner 2s ease-in-out infinite;
+            flex-shrink: 0;
         }
+        .streak-banner.show { display: flex; }
+        @keyframes pulse-banner {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.01); }
+        }
+        .streak-banner i { font-size: 1.6rem; color: var(--primary-blue); }
+        .streak-banner .badge-ready {
+            background: var(--green);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+        }
+
+        .quiz-wrapper { max-width: 860px; margin: 0 auto; }
         .quiz-container {
             background: var(--white);
             border-radius: 24px;
@@ -315,10 +411,7 @@
             padding: 6px 20px;
             border-radius: 50px;
         }
-        .quiz-header .quiz-progress strong {
-            color: var(--primary-blue);
-            font-size: 1rem;
-        }
+        .quiz-header .quiz-progress strong { color: var(--primary-blue); font-size: 1rem; }
 
         .quiz-meta-tags {
             display: flex;
@@ -340,7 +433,6 @@
         .tag-difficulty-medium { background: #fef3c7; color: #92400e; }
         .tag-difficulty-hard { background: #fee2e2; color: #991b1b; }
         .tag-wrong { background: #fee2e2; color: var(--red); }
-        .tag-wrong i { color: var(--red); }
 
         .quiz-question-number {
             font-weight: 600;
@@ -381,14 +473,12 @@
             align-items: center;
             gap: 16px;
             font-family: 'Open Sans', sans-serif;
-            position: relative;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
         .quiz-options .option-btn:hover:not(.disabled) {
             border-color: var(--primary-blue);
             background: #f0f6ff;
             transform: translateX(6px);
-            box-shadow: var(--shadow);
         }
         .quiz-options .option-btn .letter {
             display: inline-flex;
@@ -405,44 +495,23 @@
             transition: var(--transition);
         }
         .quiz-options .option-btn .option-text { flex: 1; }
-        .quiz-options .option-btn .result-icon {
-            font-size: 1.3rem;
-            opacity: 0;
-            transition: var(--transition);
-        }
+        .quiz-options .option-btn .result-icon { font-size: 1.3rem; opacity: 0; transition: var(--transition); }
         .quiz-options .option-btn.correct {
             border-color: var(--green);
             background: rgba(39,174,96,0.06);
             box-shadow: 0 0 0 3px rgba(39,174,96,0.12);
         }
-        .quiz-options .option-btn.correct .letter {
-            background: var(--green);
-            color: white;
-        }
-        .quiz-options .option-btn.correct .result-icon {
-            opacity: 1;
-            color: var(--green);
-        }
+        .quiz-options .option-btn.correct .letter { background: var(--green); color: white; }
+        .quiz-options .option-btn.correct .result-icon { opacity: 1; color: var(--green); }
         .quiz-options .option-btn.wrong {
             border-color: var(--red);
             background: rgba(231,76,60,0.06);
             box-shadow: 0 0 0 3px rgba(231,76,60,0.12);
         }
-        .quiz-options .option-btn.wrong .letter {
-            background: var(--red);
-            color: white;
-        }
-        .quiz-options .option-btn.wrong .result-icon {
-            opacity: 1;
-            color: var(--red);
-        }
-        .quiz-options .option-btn.disabled {
-            cursor: default;
-        }
-        .quiz-options .option-btn.disabled:hover {
-            transform: none;
-            box-shadow: none;
-        }
+        .quiz-options .option-btn.wrong .letter { background: var(--red); color: white; }
+        .quiz-options .option-btn.wrong .result-icon { opacity: 1; color: var(--red); }
+        .quiz-options .option-btn.disabled { cursor: default; }
+        .quiz-options .option-btn.disabled:hover { transform: none; }
 
         .quiz-feedback {
             padding: 16px 22px;
@@ -452,14 +521,8 @@
             animation: fadeIn 0.4s ease;
         }
         .quiz-feedback.show { display: block; }
-        .quiz-feedback.success {
-            background: rgba(39,174,96,0.08);
-            border: 2px solid var(--green);
-        }
-        .quiz-feedback.error {
-            background: rgba(231,76,60,0.08);
-            border: 2px solid var(--red);
-        }
+        .quiz-feedback.success { background: rgba(39,174,96,0.08); border: 2px solid var(--green); }
+        .quiz-feedback.error { background: rgba(231,76,60,0.08); border: 2px solid var(--red); }
         .quiz-feedback .feedback-title { font-weight: 700; font-size: 1rem; }
         .quiz-feedback.success .feedback-title { color: var(--green); }
         .quiz-feedback.error .feedback-title { color: var(--red); }
@@ -485,26 +548,8 @@
             text-align: center;
             padding: 50px 20px;
         }
-        .quiz-empty .empty-icon {
-            font-size: 4.5rem;
-            background: linear-gradient(135deg, var(--green), #2ecc71);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 16px;
-        }
-        .quiz-empty h3 {
-            color: var(--dark-gray);
-            margin-bottom: 8px;
-            font-size: 1.3rem;
-        }
-        .quiz-empty p {
-            color: var(--medium-gray);
-            font-size: 0.95rem;
-            max-width: 400px;
-            margin: 0 auto;
-        }
+        .quiz-empty .empty-icon { font-size: 4.5rem; margin-bottom: 16px; }
 
-        /* ===== 错题列表 ===== */
         .filter-bar {
             background: var(--white);
             border-radius: var(--border-radius);
@@ -693,6 +738,32 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        .scroll-indicator {
+            text-align: center;
+            padding: 10px 0 4px 0;
+            color: var(--medium-gray);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--light-gray);
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+            user-select: none;
+            margin-top: 8px;
+        }
+        .scroll-indicator:hover {
+            color: var(--primary-blue);
+            background: var(--light-gray);
+            border-radius: 0 0 8px 8px;
+        }
+        .scroll-indicator i {
+            display: inline-block;
+            animation: bounce-down 1.5s ease-in-out infinite;
+        }
+        @keyframes bounce-down {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(4px); }
+        }
+
         @media (max-width: 768px) {
             body { padding: 10px; }
             .dashboard-header { flex-direction: column; text-align: center; }
@@ -702,10 +773,16 @@
             .filter-bar { flex-direction: column; align-items: stretch; }
             .filter-bar .filter-actions { margin-left: 0; justify-content: center; }
             .two-col { grid-template-columns: 1fr; }
+            .table-scroll-wrapper { max-height: 200px; min-height: 120px; }
+            .table-container { min-height: 320px; }
+            .chart-wrapper { min-height: 200px; height: 200px; }
+            .chart-box { min-height: 280px; }
             .quiz-container { padding: 20px 18px; }
             .quiz-question-text { font-size: 1rem; padding: 14px 16px; }
             .quiz-options .option-btn { padding: 12px 16px; font-size: 0.88rem; }
+            .streak-banner { flex-wrap: wrap; text-align: center; justify-content: center; }
         }
+
         @media (max-width: 480px) {
             .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
             .stat-card { padding: 12px; }
@@ -716,7 +793,6 @@
 <body>
 
 <div class="dashboard-container" id="app">
-    <!-- ===== 顶部导航 ===== -->
     <header class="dashboard-header">
         <div class="logo">
             <h1><i class="fas fa-graduation-cap"></i> Mille Voiles</h1>
@@ -737,7 +813,12 @@
         </div>
     </header>
 
-    <!-- ===== 统计卡片 ===== -->
+    <div class="streak-banner" id="streakBanner">
+        <i class="fas fa-rocket"></i>
+        <span id="streakMessage">🎯 Vous avez obtenu 35/40 ou plus 5 fois de suite !</span>
+        <span class="badge-ready"><i class="fas fa-check"></i> <span id="streakReadyText">Prêt(e) pour l'examen !</span></span>
+    </div>
+
     <div class="stats-grid" id="statsGrid">
         <div class="stat-card blue">
             <div class="stat-icon"><i class="fas fa-tasks"></i></div>
@@ -766,7 +847,6 @@
         </div>
     </div>
 
-    <!-- ===== 标签切换 ===== -->
     <div class="tabs-container">
         <button class="tab-btn active" data-tab="history" onclick="switchTab('history')">
             <i class="fas fa-history"></i> <span data-i18n="tabHistory">Historique</span>
@@ -783,13 +863,11 @@
         </button>
     </div>
 
-    <!-- ===== 加载动画 ===== -->
     <div class="loading-spinner" id="loadingSpinner">
         <div class="spinner"></div>
         <p style="color: var(--medium-gray);" data-i18n="loading">Chargement des données...</p>
     </div>
 
-    <!-- ===== TAB 1: 历史 + 折线图 ===== -->
     <div class="tab-content active" id="tab-history">
         <div class="two-col">
             <div class="table-container">
@@ -805,7 +883,6 @@
         </div>
     </div>
 
-    <!-- ===== TAB 2: 错题集 ===== -->
     <div class="tab-content" id="tab-mistakes">
         <div class="filter-bar" id="filterBar">
             <label><i class="fas fa-filter"></i> <span data-i18n="filter">Filtrer</span>:</label>
@@ -835,14 +912,10 @@
         <div id="mistakesListContainer"></div>
     </div>
 
-    <!-- ===== TAB 3: 错题消消乐 ===== -->
     <div class="tab-content" id="tab-quiz">
-        <div class="quiz-wrapper" id="quizContainer">
-            <!-- 由 JS 动态渲染 -->
-        </div>
+        <div class="quiz-wrapper" id="quizContainer"></div>
     </div>
 
-    <!-- ===== TAB 4: 统计 ===== -->
     <div class="tab-content" id="tab-stats">
         <div class="table-container">
             <h2><i class="fas fa-chart-pie"></i> <span data-i18n="statsTitle">Analyse détaillée</span></h2>
@@ -851,7 +924,6 @@
     </div>
 </div>
 
-<!-- Toast 容器 -->
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
@@ -905,7 +977,10 @@ const i18n = {
         quizRestart: 'Recommencer',
         quizTheme: 'Thème',
         quizDifficulty: 'Difficulté',
-        quizWrongCount: 'Erreurs'
+        quizWrongCount: 'Erreurs',
+        streakTitle: '🎯 Vous avez obtenu 35/40 ou plus 5 fois de suite !',
+        streakReady: 'Prêt(e) pour l\'examen !',
+        streakCheck: 'Bravo ! Vous êtes prêt(e) pour l\'examen officiel.'
     },
     zh: {
         refresh: '刷新', test: '测试', home: '首页',
@@ -940,7 +1015,10 @@ const i18n = {
         quizRestart: '重新开始',
         quizTheme: '主题',
         quizDifficulty: '难度',
-        quizWrongCount: '错误次数'
+        quizWrongCount: '错误次数',
+        streakTitle: '🎯 您已连续5次获得35/40或以上！',
+        streakReady: '准备报名考试！',
+        streakCheck: '太棒了！您已经准备好参加正式考试了。'
     }
 };
 
@@ -974,6 +1052,7 @@ function setLang(lang) {
     updateFilterOptionsText();
     updateStatsLabels();
     updateQuizBadge();
+    checkStreak();
 }
 
 function updateFilterOptionsText() {
@@ -1008,6 +1087,40 @@ function updateQuizBadge() {
         badge.textContent = unmastered;
     } else {
         badge.style.display = 'none';
+    }
+}
+
+function checkStreak() {
+    const banner = document.getElementById('streakBanner');
+    const message = document.getElementById('streakMessage');
+    const readyText = document.getElementById('streakReadyText');
+    
+    if (!banner) return;
+    
+    const fortyTests = allScores
+        .filter(s => s.total === 40)
+        .sort((a, b) => new Date(a.test_date || a.created_at || 0) - new Date(b.test_date || b.created_at || 0));
+    
+    const lastFive = fortyTests.slice(-5);
+    
+    if (lastFive.length >= 5 && lastFive.every(s => (s.score || 0) >= 35)) {
+        banner.classList.add('show');
+        message.textContent = t('streakTitle');
+        readyText.textContent = t('streakReady');
+        banner.style.display = 'flex';
+    } else {
+        banner.classList.remove('show');
+        banner.style.display = 'none';
+    }
+}
+
+function scrollToBottom() {
+    const wrapper = document.querySelector('.table-scroll-wrapper');
+    if (wrapper) {
+        wrapper.scrollTo({
+            top: wrapper.scrollHeight,
+            behavior: 'smooth'
+        });
     }
 }
 
@@ -1103,7 +1216,7 @@ function getTypeLabel(type) {
 }
 
 // ============================================================
-// 🔥 加载数据
+// 加载数据
 // ============================================================
 async function loadAllData() {
     showLoading(true);
@@ -1126,6 +1239,7 @@ async function loadAllData() {
         renderQuiz();
         populateFilterOptions();
         updateQuizBadge();
+        checkStreak();
 
         if (allScores.length > 0) {
             showToast('✅ Succès', `${allScores.length} test(s) chargé(s).`, 'success');
@@ -1278,7 +1392,7 @@ function updateStats() {
 }
 
 // ============================================================
-// 渲染历史成绩表格
+// 渲染历史成绩表格 - 可滚动
 // ============================================================
 function renderHistoryTable() {
     const container = document.getElementById('historyTableContainer');
@@ -1303,23 +1417,26 @@ function renderHistoryTable() {
         return dateB - dateA;
     });
 
+    const hasMore = sorted.length > 5;
+
     let html = `
-        <div style="margin-bottom: 12px; color: var(--medium-gray); font-size: 0.85rem;">
-            <i class="fas fa-info-circle"></i>
-            ${sorted.length} ${t('totalTestsLabel')}
+        <div style="margin-bottom: 12px; color: var(--medium-gray); font-size: 0.85rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; flex-shrink: 0;">
+            <span><i class="fas fa-info-circle"></i> ${sorted.length} ${t('totalTestsLabel')}</span>
+            ${hasMore ? `<span style="color: var(--primary-blue); font-size: 0.75rem;"><i class="fas fa-chevron-down"></i> ${currentLang === 'fr' ? 'Défilez pour voir plus' : '滚动查看更多'}</span>` : ''}
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>${t('date')}</th>
-                    <th>${t('type')}</th>
-                    <th>${t('score')}</th>
-                    <th>%</th>
-                    <th>${t('status')}</th>
-                </tr>
-            </thead>
-            <tbody>
+        <div class="table-scroll-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>${t('date')}</th>
+                        <th>${t('type')}</th>
+                        <th>${t('score')}</th>
+                        <th>%</th>
+                        <th>${t('status')}</th>
+                    </tr>
+                </thead>
+                <tbody>
     `;
 
     sorted.forEach((score, index) => {
@@ -1351,11 +1468,15 @@ function renderHistoryTable() {
     });
 
     html += `
-            </tbody>
-        </table>
-        <div style="margin-top: 12px; text-align: right; color: var(--medium-gray); font-size: 0.8rem;">
-            <i class="fas fa-info-circle"></i> ${sorted.length} ${t('totalTestsEnd')}
+                </tbody>
+            </table>
         </div>
+        ${hasMore ? `
+        <div class="scroll-indicator" onclick="scrollToBottom()">
+            <i class="fas fa-chevron-down"></i> 
+            ${sorted.length} ${t('totalTestsEnd')} 
+            <i class="fas fa-chevron-down"></i>
+        </div>` : ''}
     `;
 
     container.innerHTML = html;
@@ -1606,7 +1727,7 @@ function renderQuiz() {
         container.innerHTML = `
             <div class="quiz-container" style="text-align:center; padding:50px 30px;">
                 <div class="quiz-empty">
-                    <div class="empty-icon"><i class="fas fa-trophy"></i></div>
+                    <div class="empty-icon"><i class="fas fa-trophy" style="font-size:4.5rem;display:block;margin-bottom:16px;"></i></div>
                     <h3>${t('quizEmpty')}</h3>
                     <p>${t('quizEmptySub')}</p>
                     <button class="btn btn-primary" onclick="refreshData()" style="margin-top: 20px;">
@@ -1632,7 +1753,7 @@ function renderQuizQuestion() {
         container.innerHTML = `
             <div class="quiz-container" style="text-align:center; padding:50px 30px;">
                 <div class="quiz-empty">
-                    <div class="empty-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="empty-icon"><i class="fas fa-check-circle" style="font-size:4.5rem;display:block;margin-bottom:16px;"></i></div>
                     <h3>🎉 ${t('quizEmpty')}</h3>
                     <p>${t('quizEmptySub')}</p>
                     <button class="btn btn-primary" onclick="refreshData()" style="margin-top: 20px;">
@@ -1735,7 +1856,6 @@ async function selectQuizOption(selectedIndex) {
             ${q.explanation ? `<div class="feedback-detail">💡 ${q.explanation}</div>` : ''}
         `;
         
-        // 🔥 从 Supabase 删除错题
         try {
             if (window.supabaseAuth && window.supabaseAuth.deleteMistake) {
                 await window.supabaseAuth.deleteMistake(q.id);
@@ -1745,7 +1865,6 @@ async function selectQuizOption(selectedIndex) {
             console.warn('⚠️ Supabase 删除失败:', e.message);
         }
         
-        // 从本地数组删除
         const mistakeIndex = allMistakes.findIndex(m => m.id === q.id);
         if (mistakeIndex !== -1) {
             allMistakes.splice(mistakeIndex, 1);
@@ -1754,16 +1873,14 @@ async function selectQuizOption(selectedIndex) {
         if (filteredIdx !== -1) {
             filteredMistakes.splice(filteredIdx, 1);
         }
-        
-        // 从 quizQuestions 中移除
         quizQuestions.splice(quizIndex, 1);
         quizIndex--;
         
-        // 保存到本地
         saveMistakesToLocal();
         
         updateStats();
         updateQuizBadge();
+        checkStreak();
         
     } else {
         feedback.className = 'quiz-feedback show error';
@@ -1773,7 +1890,6 @@ async function selectQuizOption(selectedIndex) {
             ${q.explanation ? `<div class="feedback-detail">💡 ${q.explanation}</div>` : ''}
         `;
         
-        // 🔥 更新 Supabase 中的错误次数
         try {
             if (window.supabaseAuth && window.supabaseAuth.updateMistakeCount) {
                 await window.supabaseAuth.updateMistakeCount(q.id, (q.times_wrong || 0) + 1);
@@ -1783,7 +1899,6 @@ async function selectQuizOption(selectedIndex) {
             console.warn('⚠️ Supabase 更新失败:', e.message);
         }
         
-        // 本地更新
         const mistakeIndex = allMistakes.findIndex(m => m.id === q.id);
         if (mistakeIndex !== -1) {
             allMistakes[mistakeIndex].times_wrong = (allMistakes[mistakeIndex].times_wrong || 0) + 1;
@@ -1792,7 +1907,6 @@ async function selectQuizOption(selectedIndex) {
         if (filteredIdx !== -1) {
             filteredMistakes[filteredIdx].times_wrong = (filteredMistakes[filteredIdx].times_wrong || 0) + 1;
         }
-        // 更新 quizQuestions 中的引用
         q.times_wrong = (q.times_wrong || 0) + 1;
         
         saveMistakesToLocal();
@@ -2122,7 +2236,8 @@ window.dashboard = {
     switchTab, applyFilters, resetFilters,
     toggleMastered, deleteMistake, clearAllMistakes,
     studentInfo, allScores, allMistakes, setLang,
-    renderQuiz, resetQuiz, selectQuizOption, nextQuizQuestion
+    renderQuiz, resetQuiz, selectQuizOption, nextQuizQuestion,
+    scrollToBottom
 };
 
 console.log('✅ Tableau de bord chargé');
