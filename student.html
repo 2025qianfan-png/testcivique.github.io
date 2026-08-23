@@ -17,9 +17,12 @@
             --green: #27ae60;
             --red: #e74c3c;
             --orange: #f39c12;
+            --purple: #6c5ce7;
             --gray: #95a5a6;
             --shadow: 0 10px 30px rgba(0,0,0,0.08);
             --border-radius: 12px;
+            --dark-gray: #333;
+            --medium-gray: #666;
         }
         body {
             font-family: 'Open Sans', sans-serif;
@@ -34,6 +37,9 @@
             background: linear-gradient(135deg, var(--primary-blue), var(--primary-light-blue));
             color: white;
             padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         .header .container {
             display: flex;
@@ -136,27 +142,16 @@
         .section-header h3 { font-size: 1.2rem; }
         @media (max-width: 480px) { .section-header h3 { font-size: 1rem; } }
 
-        .filter-btn-active {
-            background: var(--primary-blue);
-            color: white;
+        .filter-btn {
             padding: 6px 14px;
             border: none;
             border-radius: 30px;
             cursor: pointer;
             font-weight: 600;
+            transition: all 0.2s;
         }
-        .filter-btn-inactive {
-            background: #95a5a6;
-            color: white;
-            padding: 6px 14px;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        @media (max-width: 480px) {
-            .filter-btn-active, .filter-btn-inactive { padding: 4px 10px; font-size: 0.75rem; }
-        }
+        .filter-btn.active { background: var(--primary-blue); color: white; }
+        .filter-btn.inactive { background: #95a5a6; color: white; }
 
         .course-card {
             border: 1px solid #eee;
@@ -235,8 +230,10 @@
         }
         .action-btn:hover { transform: translateY(-2px); }
         .btn-confirm { background: var(--green); color: white; }
-        .btn-rate { background: #f39c12; color: white; }
+        .btn-rate { background: var(--orange); color: white; }
         .btn-cancel { background: var(--red); color: white; }
+        .btn-feedback { background: var(--purple); color: white; }
+        .btn-feedback-done { background: var(--green); color: white; cursor: default; }
 
         .modal {
             display: none;
@@ -257,7 +254,7 @@
             border-radius: var(--border-radius);
             padding: 30px;
             width: 100%;
-            max-width: 500px;
+            max-width: 600px;
             max-height: 90vh;
             overflow-y: auto;
             animation: modalSlideIn 0.3s ease;
@@ -292,7 +289,9 @@
             border: 2px solid #ddd;
             border-radius: 8px;
             font-family: inherit;
+            font-size: 1rem;
         }
+        .form-group textarea { resize: vertical; min-height: 80px; }
         .form-actions {
             display: flex;
             justify-content: flex-end;
@@ -367,67 +366,96 @@
         }
         .teacher-comment-area i { color: var(--primary-blue); margin-right: 5px; }
 
-        .confirm-dialog {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        .confirm-dialog.active { opacity: 1; visibility: visible; }
-        .confirm-card {
-            background: white;
-            border-radius: 24px;
-            width: 90%;
-            max-width: 450px;
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-        .confirm-dialog.active .confirm-card { transform: scale(1); }
-        .confirm-header {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
+        .feedback-highlight {
+            background: linear-gradient(135deg, var(--purple), #a29bfe);
             color: white;
-            padding: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
             text-align: center;
         }
-        .confirm-header i { font-size: 2.5rem; margin-bottom: 10px; }
-        .confirm-header h3 { color: white; margin: 0; }
-        .confirm-body { padding: 25px; text-align: center; }
-        .confirm-body p { color: #666; }
-        .confirm-footer {
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            border-top: 1px solid #eee;
+        .feedback-highlight i { font-size: 2rem; margin-bottom: 10px; display: block; }
+        .feedback-highlight p { margin: 0; font-size: 0.95rem; opacity: 0.9; }
+
+        .privacy-note {
+            background: #f0f0f0;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #666;
+            margin: 10px 0;
         }
-        .confirm-cancel {
-            padding: 10px 24px;
-            background: #eee;
-            border: none;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .confirm-delete {
-            padding: 10px 24px;
-            background: #e74c3c;
+        .privacy-note i { color: var(--primary-blue); margin-right: 5px; }
+
+        .badge-gold {
+            background: linear-gradient(135deg, #f1c40f, #f39c12);
             color: white;
-            border: none;
-            border-radius: 40px;
-            cursor: pointer;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .feedback-rating-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .feedback-rating-row:last-child { border-bottom: none; }
+        .feedback-rating-row .label {
             font-weight: 600;
+            color: var(--dark-gray);
+            font-size: 0.95rem;
+            min-width: 180px;
+        }
+        .feedback-rating-row .label .sub {
+            font-weight: 400;
+            color: #999;
+            font-size: 0.75rem;
+            display: block;
+        }
+        .feedback-rating-row .stars-small {
+            display: flex;
+            gap: 5px;
+        }
+        .feedback-rating-row .stars-small .star-small {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #ddd;
+            transition: all 0.2s;
+        }
+        .feedback-rating-row .stars-small .star-small.active { color: #f1c40f; }
+        .feedback-rating-row .stars-small .star-small:hover { transform: scale(1.2); }
+        .feedback-rating-row .rating-value {
+            font-weight: 700;
+            color: var(--primary-blue);
+            min-width: 30px;
+            text-align: right;
+        }
+
+        .feedback-total {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-light-blue));
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 15px 0;
+        }
+        .feedback-total .big-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+        }
+        .feedback-total .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .feedback-total .stars-big {
+            font-size: 1.5rem;
+            letter-spacing: 3px;
         }
 
         .cancel-reason-group {
@@ -454,6 +482,18 @@
         .custom-reason-input { margin-top: 10px; display: none; }
         .custom-reason-input.show { display: block; }
         .custom-reason-input input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+
+        .feedback-done-banner {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .feedback-done-banner i { font-size: 3rem; margin-bottom: 10px; display: block; }
+        .feedback-done-banner h3 { color: white; margin-bottom: 5px; }
+        .feedback-done-banner p { opacity: 0.9; margin: 0; }
     </style>
 </head>
 <body>
@@ -462,8 +502,8 @@
             <h1><i class="fas fa-user-graduate"></i> <span id="pageTitle">Espace étudiant</span></h1>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <div class="lang-switch">
-                    <button class="lang-btn active" id="langFrBtn" data-lang="fr">FR</button>
-                    <button class="lang-btn" id="langZhBtn" data-lang="zh">中文</button>
+                    <button class="lang-btn active" id="langFrBtn">FR</button>
+                    <button class="lang-btn" id="langZhBtn">中文</button>
                 </div>
                 <div class="user-info">
                     <i class="fas fa-user-circle"></i>
@@ -473,7 +513,7 @@
             </div>
         </div>
     </header>
-    
+
     <main class="container" style="padding: 30px 0;">
         <div class="stats-grid">
             <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-check"></i></div><div class="stat-number" id="upcomingCount">0</div><div class="stat-label" id="statBookedLabel">Cours à venir</div></div>
@@ -483,51 +523,39 @@
         </div>
 
         <div class="credit-stats-grid">
-            <div class="stat-card credit-blue">
-                <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
-                <div class="stat-number" id="totalCredit">0</div>
-                <div class="stat-label" id="totalCreditLabel">📚 Crédits totaux</div>
-            </div>
-            <div class="stat-card credit-green">
-                <div class="stat-icon"><i class="fas fa-book"></i></div>
-                <div class="stat-number" id="scheduledHours">0</div>
-                <div class="stat-label" id="scheduledHoursLabel">⏰ Heures programmées</div>
-            </div>
-            <div class="stat-card credit-orange">
-                <div class="stat-icon"><i class="fas fa-play-circle"></i></div>
-                <div class="stat-number" id="inProgressHours">0</div>
-                <div class="stat-label" id="inProgressHoursLabel">🔄 En cours</div>
-            </div>
-            <div class="stat-card credit-purple">
-                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
-                <div class="stat-number" id="usedHours">0</div>
-                <div class="stat-label" id="usedHoursLabel">✅ Heures consommées</div>
-            </div>
-            <div class="stat-card credit-red">
-                <div class="stat-icon"><i class="fas fa-hourglass-end"></i></div>
-                <div class="stat-number" id="remainingCredit">0</div>
-                <div class="stat-label" id="remainingCreditLabel">⏳ Restant</div>
-            </div>
+            <div class="stat-card credit-blue"><div class="stat-icon"><i class="fas fa-hourglass-half"></i></div><div class="stat-number" id="totalCredit">0</div><div class="stat-label" id="totalCreditLabel">📚 Crédits totaux</div></div>
+            <div class="stat-card credit-green"><div class="stat-icon"><i class="fas fa-book"></i></div><div class="stat-number" id="scheduledHours">0</div><div class="stat-label" id="scheduledHoursLabel">⏰ Heures programmées</div></div>
+            <div class="stat-card credit-orange"><div class="stat-icon"><i class="fas fa-play-circle"></i></div><div class="stat-number" id="inProgressHours">0</div><div class="stat-label" id="inProgressHoursLabel">🔄 En cours</div></div>
+            <div class="stat-card credit-purple"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-number" id="usedHours">0</div><div class="stat-label" id="usedHoursLabel">✅ Heures consommées</div></div>
+            <div class="stat-card credit-red"><div class="stat-icon"><i class="fas fa-hourglass-end"></i></div><div class="stat-number" id="remainingCredit">0</div><div class="stat-label" id="remainingCreditLabel">⏳ Restant</div></div>
         </div>
-        
+
         <div class="courses-section">
             <div class="section-header">
                 <h3 id="myCoursesTitle"><i class="fas fa-calendar-day"></i> Mes cours</h3>
-                <div style="display: flex; gap: 10px;">
-                    <button id="showUpcomingBtn" class="filter-btn-active">📅 À venir</button>
-                    <button id="showPastBtn" class="filter-btn-inactive">📜 Historique</button>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button id="showUpcomingBtn" class="filter-btn active">📅 À venir</button>
+                    <button id="showPastBtn" class="filter-btn inactive">📜 Historique</button>
                 </div>
             </div>
-            <div id="coursesList"><div class="empty-state" id="emptyCoursesMsg">Chargement...</div></div>
+            <div id="coursesList"><div class="empty-state">Chargement...</div></div>
+        </div>
+
+        <div id="feedbackEntrySection" style="margin-top: 30px; display: none;">
+            <div class="courses-section" style="border: 2px solid var(--purple);">
+                <div class="section-header">
+                    <h3 style="color: var(--purple);"><i class="fas fa-comment-dots"></i> <span id="feedbackEntryTitle">📝 Évaluation de la formation</span></h3>
+                </div>
+                <div id="feedbackEntryContent"></div>
+            </div>
         </div>
     </main>
-    
+
     <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 Association Mille Voiles</p>
-        </div>
+        <div class="container"><p>&copy; 2025 Association Mille Voiles</p></div>
     </footer>
-    
+
+    <!-- ===== 评价课程模态框 ===== -->
     <div class="modal" id="ratingModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -558,7 +586,8 @@
             </form>
         </div>
     </div>
-    
+
+    <!-- ===== 取消课程模态框 ===== -->
     <div class="modal" id="cancelCourseModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -604,7 +633,8 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- ===== 老师评语模态框 ===== -->
     <div class="modal" id="teacherCommentModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -618,7 +648,146 @@
         </div>
     </div>
 
+    <!-- ===== 教学评价模态框 ===== -->
+    <div class="modal" id="feedbackModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 class="modal-title" id="feedbackTitle"><i class="fas fa-comment-dots"></i> 📝 Évaluation de la formation</h2>
+                <button class="close-modal" id="closeFeedbackBtn">&times;</button>
+            </div>
+            <div class="feedback-highlight">
+                <i class="fas fa-graduation-cap"></i>
+                <p id="feedbackIntro">Merci d'avoir suivi cette formation ! Votre retour est précieux.</p>
+            </div>
+            <form id="feedbackForm">
+                <div class="form-group">
+                    <label id="feedbackNameLabel"><i class="fas fa-user"></i> <span id="feedbackNameText">Nom / 姓名 (pseudonyme accepté)</span></label>
+                    <input type="text" id="feedbackName" placeholder="Entrez votre nom ou un pseudonyme..." required>
+                    <div class="privacy-note"><i class="fas fa-shield-alt"></i> <span id="privacyNote">⚠️ Pour protéger votre vie privée, vous pouvez utiliser un pseudonyme.</span></div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label id="feedbackExamLabel"><i class="fas fa-file-alt"></i> <span id="feedbackExamText">Type d'examen</span></label>
+                        <select id="feedbackExamType" required>
+                            <option value="">-- Sélectionnez --</option>
+                            <option value="carte_sejour_4ans">🎫 Carte de séjour 2-4 ans</option>
+                            <option value="carte_resident_10ans">📚 Carte de résident 10 ans</option>
+                            <option value="nationalite_francaise">🇫🇷 Nationalité française</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label id="feedbackScoreLabel"><i class="fas fa-star"></i> <span id="feedbackScoreText">Score (0-40)</span></label>
+                        <input type="number" id="feedbackScore" min="0" max="40" placeholder="0-40">
+                    </div>
+                </div>
+
+                <div style="background: #f8f9fa; border-radius: 10px; padding: 15px; margin: 15px 0;">
+                    <p style="font-weight: 700; color: var(--primary-blue); margin-bottom: 10px;"><i class="fas fa-clipboard-list"></i> <span id="ratingCriteriaTitle">Critères d'évaluation</span></p>
+                    
+                    <div class="feedback-rating-row">
+                        <div class="label">1. Qualité des cours <span class="sub">Contenu, logique, utilité</span></div>
+                        <div class="stars-small" data-criteria="quality">
+                            <span class="star-small" data-value="1">★</span>
+                            <span class="star-small" data-value="2">★</span>
+                            <span class="star-small" data-value="3">★</span>
+                            <span class="star-small" data-value="4">★</span>
+                            <span class="star-small" data-value="5">★</span>
+                        </div>
+                        <span class="rating-value" id="qualityValue">0</span>
+                    </div>
+
+                    <div class="feedback-rating-row">
+                        <div class="label">2. Pédagogie <span class="sub">Clarté, interaction, ambiance</span></div>
+                        <div class="stars-small" data-criteria="pedagogy">
+                            <span class="star-small" data-value="1">★</span>
+                            <span class="star-small" data-value="2">★</span>
+                            <span class="star-small" data-value="3">★</span>
+                            <span class="star-small" data-value="4">★</span>
+                            <span class="star-small" data-value="5">★</span>
+                        </div>
+                        <span class="rating-value" id="pedagogyValue">0</span>
+                    </div>
+
+                    <div class="feedback-rating-row">
+                        <div class="label">3. Supports de cours <span class="sub">PPT, exercices, ressources</span></div>
+                        <div class="stars-small" data-criteria="materials">
+                            <span class="star-small" data-value="1">★</span>
+                            <span class="star-small" data-value="2">★</span>
+                            <span class="star-small" data-value="3">★</span>
+                            <span class="star-small" data-value="4">★</span>
+                            <span class="star-small" data-value="5">★</span>
+                        </div>
+                        <span class="rating-value" id="materialsValue">0</span>
+                    </div>
+
+                    <div class="feedback-rating-row">
+                        <div class="label">4. Accompagnement <span class="sub">Soutien, suivi individualisé</span></div>
+                        <div class="stars-small" data-criteria="support">
+                            <span class="star-small" data-value="1">★</span>
+                            <span class="star-small" data-value="2">★</span>
+                            <span class="star-small" data-value="3">★</span>
+                            <span class="star-small" data-value="4">★</span>
+                            <span class="star-small" data-value="5">★</span>
+                        </div>
+                        <span class="rating-value" id="supportValue">0</span>
+                    </div>
+
+                    <div class="feedback-rating-row">
+                        <div class="label">5. Organisation <span class="sub">Planning, gestion du temps</span></div>
+                        <div class="stars-small" data-criteria="organization">
+                            <span class="star-small" data-value="1">★</span>
+                            <span class="star-small" data-value="2">★</span>
+                            <span class="star-small" data-value="3">★</span>
+                            <span class="star-small" data-value="4">★</span>
+                            <span class="star-small" data-value="5">★</span>
+                        </div>
+                        <span class="rating-value" id="organizationValue">0</span>
+                    </div>
+
+                    <div class="feedback-rating-row">
+                        <div class="label">6. Préparation à l'examen <span class="sub">Simulations, annales, techniques</span></div>
+                        <div class="stars-small" data-criteria="exam_prep">
+                            <span class="star-small" data-value="1">★</span>
+                            <span class="star-small" data-value="2">★</span>
+                            <span class="star-small" data-value="3">★</span>
+                            <span class="star-small" data-value="4">★</span>
+                            <span class="star-small" data-value="5">★</span>
+                        </div>
+                        <span class="rating-value" id="examPrepValue">0</span>
+                    </div>
+                </div>
+
+                <div class="feedback-total">
+                    <div class="label"><span id="totalScoreLabel">Score total</span></div>
+                    <div class="big-number" id="totalScoreDisplay">0.0</div>
+                    <div class="stars-big" id="totalStarsDisplay">☆☆☆☆☆</div>
+                    <div class="label" style="font-size: 0.8rem;">/ 5</div>
+                </div>
+
+                <div class="form-group">
+                    <label id="feedbackCommentLabel"><i class="fas fa-comment"></i> <span id="feedbackCommentText">Votre avis / Commentaire</span></label>
+                    <textarea id="feedbackComment" rows="3" placeholder="Partagez votre expérience..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 400; color: #555;">
+                        <input type="checkbox" id="feedbackPublic" checked>
+                        <span id="feedbackPublicText"><i class="fas fa-globe"></i> Je souhaite que mon avis soit partagé (anonymisé)</span>
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" id="feedbackCancelBtn"><span id="feedbackCancelText">Annuler</span></button>
+                    <button type="submit" class="save-btn" id="feedbackSubmitBtn"><i class="fas fa-paper-plane"></i> <span id="feedbackSubmitText">Envoyer</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
+        // ============================================================
+        // 翻译
+        // ============================================================
         const translations = {
             fr: {
                 pageTitle: "Espace étudiant",
@@ -663,9 +832,44 @@
                 reasonOther: "📝 Autre",
                 cancelBtnText: "Annuler",
                 confirmCancelBtnText: "Confirmer l'annulation",
-                cancelSuccess: "Cours annulé avec succès, crédits restitués",
+                cancelSuccess: "Cours annulé",
                 cancelFail: "Erreur lors de l'annulation",
-                cannotCancel: "⚠️ Les cours doivent être annulés au moins 24h à l'avance"
+                cannotCancel: "⚠️ Annulation au moins 24h à l'avance",
+                feedbackTitle: "📝 Évaluation de la formation",
+                feedbackIntro: "Merci d'avoir suivi cette formation ! Votre retour est précieux.",
+                feedbackNameText: "Nom (pseudonyme accepté)",
+                privacyNote: "⚠️ Pour protéger votre vie privée, vous pouvez utiliser un pseudonyme.",
+                feedbackExamText: "Type d'examen",
+                feedbackScoreText: "Score (0-40)",
+                feedbackCommentText: "Votre avis / Commentaire",
+                feedbackPublicText: "Je souhaite que mon avis soit partagé (anonymisé)",
+                feedbackCancelText: "Annuler",
+                feedbackSubmitText: "Envoyer",
+                toastFeedbackSuccess: "✅ Merci pour votre évaluation !",
+                toastFeedbackError: "❌ Erreur lors de l'envoi",
+                feedbackAlreadySubmitted: "⚠️ Vous avez déjà évalué cette formation.",
+                feedbackBtnText: "📝 Évaluer la formation",
+                feedbackDoneText: "✅ Formation évaluée",
+                feedbackEntryTitle: "📝 Évaluation de la formation",
+                ratingCriteriaTitle: "Critères d'évaluation",
+                totalScoreLabel: "Score total",
+                coursSuivis: "Cours suivis :",
+                partagez: "Partagez votre expérience pour nous aider à améliorer nos formations.",
+                vousAvezTermine: "Vous avez terminé tous vos cours !",
+                // 课程类型翻译
+                course_ec: "1️⃣ Civique",
+                course_ec110: "📚 10 ans - Complet",
+                course_ec14: "🎫 4 ans - Complet",
+                course_ec1f: "🛂 Nationalité - Complet",
+                course_ec210: "📚 10 ans - Accéléré",
+                course_ec24: "🎫 4 ans - Accéléré",
+                course_ec2f: "🛂 Nationalité - Accéléré",
+                course_ec310: "📚 10 ans - Sur mesure",
+                course_ec34: "🎫 4 ans - Sur mesure",
+                course_ec3f: "🛂 Nationalité - Sur mesure",
+                course_ex10: "📝 10 ans - Simulation",
+                course_ex4: "📝 4 ans - Simulation",
+                course_exf: "📝 Nationalité - Simulation"
             },
             zh: {
                 pageTitle: "学生空间",
@@ -710,101 +914,71 @@
                 reasonOther: "📝 其他",
                 cancelBtnText: "取消",
                 confirmCancelBtnText: "确认取消",
-                cancelSuccess: "课程已取消，课时已返还",
+                cancelSuccess: "课程已取消",
                 cancelFail: "取消失败",
-                cannotCancel: "⚠️ 课程必须提前至少24小时取消"
+                cannotCancel: "⚠️ 课程必须提前24小时取消",
+                feedbackTitle: "📝 教学评价",
+                feedbackIntro: "感谢您参加本次培训！您的反馈非常重要。",
+                feedbackNameText: "姓名（可使用化名）",
+                privacyNote: "⚠️ 为保护您的隐私，您可以使用化名。",
+                feedbackExamText: "考试类型",
+                feedbackScoreText: "分数 (0-40)",
+                feedbackCommentText: "您的评价",
+                feedbackPublicText: "我愿意分享我的评价（匿名）",
+                feedbackCancelText: "取消",
+                feedbackSubmitText: "提交",
+                toastFeedbackSuccess: "✅ 感谢您的评价！",
+                toastFeedbackError: "❌ 提交失败",
+                feedbackAlreadySubmitted: "⚠️ 您已经评价过本次培训了。",
+                feedbackBtnText: "📝 评价培训",
+                feedbackDoneText: "✅ 已评价",
+                feedbackEntryTitle: "📝 教学评价",
+                ratingCriteriaTitle: "评价标准",
+                totalScoreLabel: "总分",
+                coursSuivis: "已完成课程：",
+                partagez: "分享您的学习体验，帮助我们改进课程。",
+                vousAvezTermine: "您已完成所有课程！",
+                // 课程类型翻译
+                course_ec: "1️⃣ 公民考试",
+                course_ec110: "📚 十年卡 - 全能班",
+                course_ec14: "🎫 四年卡 - 全能班",
+                course_ec1f: "🛂 入籍 - 全能班",
+                course_ec210: "📚 十年卡 - 速成",
+                course_ec24: "🎫 四年卡 - 速成",
+                course_ec2f: "🛂 入籍 - 速成",
+                course_ec310: "📚 十年卡 - 自选",
+                course_ec34: "🎫 四年卡 - 自选",
+                course_ec3f: "🛂 入籍 - 自选",
+                course_ex10: "📝 十年卡 - 模拟",
+                course_ex4: "📝 四年卡 - 模拟",
+                course_exf: "📝 入籍 - 模拟"
             }
         };
-        
+
+        // ============================================================
+        // 全局变量
+        // ============================================================
         let currentLang = 'fr';
-        let showOnlyUpcoming = true;
         let currentStudent = null;
         let myCourses = [];
         let studentCredit = 0;
         let pendingCancelCourse = null;
-        
-        function updateUIText() {
-            const t = translations[currentLang];
-            document.getElementById('pageTitle').textContent = t.pageTitle;
-            document.getElementById('logoutText').textContent = t.logoutText;
-            document.getElementById('statBookedLabel').textContent = t.statBookedLabel;
-            document.getElementById('statCompletedLabel').textContent = t.statCompletedLabel;
-            document.getElementById('statRatingLabel').textContent = t.statRatingLabel;
-            document.getElementById('statTeacherLabel').textContent = t.statTeacherLabel;
-            document.getElementById('totalCreditLabel').textContent = t.totalCreditLabel;
-            document.getElementById('scheduledHoursLabel').textContent = t.scheduledHoursLabel;
-            document.getElementById('inProgressHoursLabel').textContent = t.inProgressHoursLabel;
-            document.getElementById('usedHoursLabel').textContent = t.usedHoursLabel;
-            document.getElementById('remainingCreditLabel').textContent = t.remainingCreditLabel;
-            document.getElementById('myCoursesTitle').innerHTML = `<i class="fas fa-calendar-day"></i> ${t.myCoursesTitle}`;
-            document.getElementById('ratingTitle').innerHTML = `<i class="fas fa-star"></i> ${t.ratingTitle}`;
-            document.getElementById('ratingLabel').textContent = t.ratingLabel;
-            document.getElementById('commentLabel').textContent = t.commentLabel;
-            document.getElementById('saveRatingText').textContent = t.saveRatingText;
-            document.getElementById('cancelRatingText').textContent = t.cancelRatingText;
-            document.getElementById('teacherCommentTitle').textContent = t.teacherCommentTitle;
-            document.getElementById('cancelModalTitle').textContent = t.cancelModalTitle;
-            document.getElementById('cancelReasonLabel').textContent = t.cancelReasonLabel;
-            document.getElementById('reasonStudentLeave').textContent = t.reasonStudentLeave;
-            document.getElementById('reasonTeacherBusy').textContent = t.reasonTeacherBusy;
-            document.getElementById('reasonStudentAbsent').textContent = t.reasonStudentAbsent;
-            document.getElementById('reasonOther').textContent = t.reasonOther;
-            document.getElementById('cancelBtnText').textContent = t.cancelBtnText;
-            document.getElementById('confirmCancelBtnText').textContent = t.confirmCancelBtnText;
-            document.getElementById('closeTeacherCommentModalBtn').textContent = "Fermer";
-            renderCoursesList();
-        }
-        
-        function switchLanguage(lang) {
-            currentLang = lang;
-            document.getElementById('langFrBtn').classList.toggle('active', lang === 'fr');
-            document.getElementById('langZhBtn').classList.toggle('active', lang === 'zh');
-            updateUIText();
-        }
-        
-        function getTypeText(t) {
-            const types = {
-                'ec': '1️⃣ 公民考试',
-                'ec110': '📚 十年卡全能班',
-                'ec14': '🎫 四年卡全能班',
-                'ec1f': '🛂 入籍全能班',
-                'ec210': '📚 十年卡速成',
-                'ec24': '🎫 四年卡速成',
-                'ec2f': '🛂 入籍速成',
-                'ec310': '📚 十年卡自选',
-                'ec34': '🎫 四年卡自选',
-                'ec3f': '🛂 入籍自选',
-                'ex10': '📝 十年卡模拟考试',
-                'ex4': '📝 四年卡模拟考试',
-                'exf': '📝 入籍模拟考试'
-            };
-            return types[t] || t;
-        }
-        
-        function formatDateTime(dateStr) {
-            if (!dateStr) return '-';
-            let d = new Date(dateStr);
-            return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
-        }
-        
-        function calculateEndTime(startTimeStr, duration) {
-            let d = new Date(startTimeStr);
-            d.setHours(d.getHours() + (duration || 2));
-            return d;
-        }
-        
-        function isMoreThan24HoursAhead(dateStr) {
-            const courseDate = new Date(dateStr);
-            const now = new Date();
-            const diffHours = (courseDate - now) / (1000 * 60 * 60);
-            return diffHours >= 24;
-        }
-        
-        function escapeHtml(s) {
-            if (!s) return '';
-            return s.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
-        }
-        
+        let currentFilter = 'upcoming';
+        let feedbackRatings = {
+            quality: 0,
+            pedagogy: 0,
+            materials: 0,
+            support: 0,
+            organization: 0,
+            exam_prep: 0
+        };
+        let feedbackSubmitted = false;
+
+        // ============================================================
+        // 工具函数
+        // ============================================================
+        function escapeHtml(s) { if (!s) return ''; return s.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+
         function showToast(msg, type) {
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
@@ -812,21 +986,154 @@
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
-        
-        async function refundStudentCredit(studentId, hours) {
-            if (!studentId || !hours || hours <= 0) return true;
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            const { data: student } = await supabase.from('students').select('credit').eq('id', studentId).single();
-            if (!student) return true;
-            const newCredit = (student.credit || 0) + hours;
-            const { error } = await supabase.from('students').update({ credit: newCredit }).eq('id', studentId);
-            if (error) {
-                console.error('返还课时失败:', error);
-                return false;
-            }
-            return true;
+
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '-';
+            let d = new Date(dateStr);
+            return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
         }
-        
+
+        // 🔥 双语课程名称
+        function getCourseTypeText(courseType) {
+            const t = translations[currentLang];
+            const key = 'course_' + courseType;
+            return t[key] || courseType;
+        }
+
+        function isMoreThan24HoursAhead(dateStr) {
+            const courseDate = new Date(dateStr);
+            const now = new Date();
+            const diffHours = (courseDate - now) / (1000 * 60 * 60);
+            return diffHours >= 24;
+        }
+
+        function calculateEndTime(startTimeStr, duration) {
+            let d = new Date(startTimeStr);
+            d.setHours(d.getHours() + (duration || 2));
+            return d;
+        }
+
+        // ============================================================
+        // 语言切换
+        // ============================================================
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('langFrBtn').classList.toggle('active', lang === 'fr');
+            document.getElementById('langZhBtn').classList.toggle('active', lang === 'zh');
+            updateUIText();
+        }
+
+        function updateUIText() {
+            const t = translations[currentLang];
+            const ids = [
+                'pageTitle', 'logoutText', 'statBookedLabel', 'statCompletedLabel', 
+                'statRatingLabel', 'statTeacherLabel', 'totalCreditLabel', 'scheduledHoursLabel',
+                'inProgressHoursLabel', 'usedHoursLabel', 'remainingCreditLabel',
+                'ratingTitle', 'ratingLabel', 'commentLabel', 'saveRatingText', 'cancelRatingText',
+                'teacherCommentTitle', 'cancelModalTitle', 'cancelReasonLabel',
+                'reasonStudentLeave', 'reasonTeacherBusy', 'reasonStudentAbsent', 'reasonOther',
+                'cancelBtnText', 'confirmCancelBtnText', 'feedbackTitle', 'feedbackIntro',
+                'feedbackNameText', 'privacyNote', 'feedbackExamText', 'feedbackScoreText',
+                'feedbackCommentText', 'feedbackPublicText', 'feedbackCancelText', 'feedbackSubmitText',
+                'feedbackEntryTitle', 'ratingCriteriaTitle', 'totalScoreLabel'
+            ];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && t[id] !== undefined) {
+                    el.textContent = t[id];
+                }
+            });
+            document.getElementById('myCoursesTitle').innerHTML = `<i class="fas fa-calendar-day"></i> ${t.myCoursesTitle}`;
+            document.getElementById('closeTeacherCommentModalBtn').textContent = "Fermer";
+            renderCoursesList();
+            renderFeedbackEntry();
+        }
+
+        // ============================================================
+        // 认证
+        // ============================================================
+        async function getStudentFromToken() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            if (!token) { window.location.href = 'examen-civique.html'; return null; }
+            try {
+                const data = JSON.parse(decodeURIComponent(atob(token)));
+                if (data.role !== 'stu') { window.location.href = 'examen-civique.html'; return null; }
+                return data;
+            } catch(e) { window.location.href = 'examen-civique.html'; return null; }
+        }
+
+        // ============================================================
+        // 数据加载
+        // ============================================================
+        async function loadMyCourses() {
+            if (!window.supabaseAuth) {
+                console.error('supabaseAuth 未加载');
+                setTimeout(loadMyCourses, 1000);
+                return;
+            }
+            const supabase = window.supabaseAuth.getSupabaseClient();
+
+            try {
+                const coursesRes = await supabase
+                    .from('courses')
+                    .select(`*, teachers:teacher_id(id, name)`)
+                    .eq('student_id', currentStudent.userId)
+                    .order('start_time', { ascending: true });
+
+                myCourses = coursesRes.data || [];
+
+                const studentRes = await supabase
+                    .from('students')
+                    .select('credit')
+                    .eq('id', currentStudent.userId)
+                    .single();
+                studentCredit = studentRes.data?.credit || 0;
+
+                try {
+                    const feedbackRes = await supabase
+                        .from('student_feedback')
+                        .select('id')
+                        .eq('student_id', currentStudent.userId)
+                        .maybeSingle();
+                    feedbackSubmitted = !!feedbackRes.data;
+                } catch (e) {
+                    feedbackSubmitted = false;
+                }
+
+                const teacherIds = [...new Set(myCourses.map(c => c.teacher_id).filter(id => id))];
+                let teacherData = [];
+                if (teacherIds.length > 0) {
+                    const { data } = await supabase.from('students').select('id, name').in('id', teacherIds);
+                    teacherData = data || [];
+                    myCourses.forEach(c => {
+                        if (c.teacher_id) {
+                            c.teacher = teacherData.find(t => t.id === c.teacher_id);
+                        }
+                    });
+                }
+
+                const activeCourses = myCourses.filter(c => c.status !== 'cancelled');
+                const toCome = activeCourses.filter(c => c.status !== 'completed' && new Date(c.start_time) > new Date()).length;
+                const completed = activeCourses.filter(c => c.status === 'completed').length;
+                const rated = activeCourses.filter(c => c.student_rating);
+                const avg = rated.length ? (rated.reduce((s, c) => s + c.student_rating, 0) / rated.length).toFixed(1) : 0;
+
+                document.getElementById('upcomingCount').textContent = toCome;
+                document.getElementById('completedCount').textContent = completed;
+                document.getElementById('avgRating').textContent = avg;
+                document.getElementById('teacherCount').textContent = teacherData.length;
+
+                updateCreditStats();
+                renderCoursesList();
+                renderFeedbackEntry();
+
+            } catch (error) {
+                console.error('加载课程失败:', error);
+                showToast('Erreur de chargement', 'error');
+            }
+        }
+
         function updateCreditStats() {
             const remainingCredit = studentCredit || 0;
             const scheduledCourses = myCourses.filter(c => c.status === 'scheduled');
@@ -837,113 +1144,45 @@
             const usedHours = completedCourses.reduce((sum, c) => sum + (c.duration || 2), 0);
             const totalSpent = usedHours + inProgressHours + scheduledHours;
             const originalTotal = totalSpent + remainingCredit;
-            
+
             document.getElementById('totalCredit').textContent = originalTotal;
             document.getElementById('scheduledHours').textContent = scheduledHours;
             document.getElementById('inProgressHours').textContent = inProgressHours;
             document.getElementById('usedHours').textContent = usedHours;
             document.getElementById('remainingCredit').textContent = remainingCredit;
         }
-        
-        function getFilteredCourses() {
-            if (showOnlyUpcoming) {
-                return myCourses.filter(c => c.status !== 'completed' && c.status !== 'cancelled');
-            } else {
-                return myCourses.filter(c => c.status === 'completed' || c.status === 'cancelled');
-            }
-        }
-        
-        function openCancelModal(courseId, startTime, teacherName, courseType) {
-            const t = translations[currentLang];
-            if (!isMoreThan24HoursAhead(startTime)) {
-                showToast(t.cannotCancel, 'error');
-                return;
-            }
-            pendingCancelCourse = { courseId, startTime, teacherName, courseType };
-            document.getElementById('cancelCourseType').textContent = getTypeText(courseType);
-            document.getElementById('cancelCourseTeacher').textContent = teacherName;
-            document.getElementById('cancelCourseDate').textContent = formatDateTime(startTime);
-            
-            document.querySelectorAll('input[name="cancelReason"]').forEach(r => r.checked = false);
-            document.getElementById('customReason').value = '';
-            document.getElementById('customReasonContainer').classList.remove('show');
-            document.querySelectorAll('.cancel-reason-option').forEach(opt => opt.classList.remove('selected'));
-            
-            document.getElementById('cancelCourseModal').style.display = 'flex';
-        }
-        
-        async function executeCancelCourse() {
-            if (!pendingCancelCourse) return;
-            const t = translations[currentLang];
-            const { courseId, startTime, teacherName, courseType } = pendingCancelCourse;
-            
-            let selectedReason = null;
-            document.querySelectorAll('input[name="cancelReason"]').forEach(r => {
-                if (r.checked) selectedReason = r.value;
-            });
-            if (selectedReason === '其他') {
-                const customReason = document.getElementById('customReason').value.trim();
-                if (customReason) selectedReason = customReason;
-            }
-            if (!selectedReason) {
-                showToast('Veuillez sélectionner un motif', 'error');
-                return;
-            }
-            
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            const course = myCourses.find(c => c.id === courseId);
-            if (!course) return;
-            
-            const isConsumingStatus = course.status === 'scheduled' || course.status === 'in_progress' || course.status === 'completed';
-            if (isConsumingStatus) {
-                await refundStudentCredit(course.student_id, course.duration || 2);
-            }
-            
-            const { error: updateError } = await supabase
-                .from('courses')
-                .update({ status: 'cancelled', cancel_reason: selectedReason })
-                .eq('id', courseId);
-            
-            if (updateError) {
-                showToast(t.cancelFail + ': ' + updateError.message, 'error');
-                return;
-            }
-            
-            document.getElementById('cancelCourseModal').style.display = 'none';
-            pendingCancelCourse = null;
-            showToast(t.cancelSuccess, 'success');
-            await loadMyCourses();
-        }
-        
-        function closeCancelModal() {
-            document.getElementById('cancelCourseModal').style.display = 'none';
-            pendingCancelCourse = null;
-        }
-        
+
+        // ============================================================
+        // 渲染课程列表
+        // ============================================================
         function renderCoursesList() {
             const container = document.getElementById('coursesList');
             const t = translations[currentLang];
-            if (!container) return;
-            
-            const filteredCourses = getFilteredCourses();
-            
-            if (filteredCourses.length === 0) {
-                const emptyMsg = showOnlyUpcoming ? t.emptyCoursesUpcoming : t.emptyCoursesPast;
-                container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
+
+            let filtered = [];
+            if (currentFilter === 'upcoming') {
+                filtered = myCourses.filter(c => c.status !== 'completed' && c.status !== 'cancelled');
+            } else {
+                filtered = myCourses.filter(c => c.status === 'completed' || c.status === 'cancelled');
+            }
+
+            if (filtered.length === 0) {
+                let msg = currentFilter === 'upcoming' ? t.emptyCoursesUpcoming : t.emptyCoursesPast;
+                container.innerHTML = `<div class="empty-state">${msg}</div>`;
                 return;
             }
-            
-            container.innerHTML = filteredCourses.map(c => {
-                const teacher = c.teachers;
+
+            container.innerHTML = filtered.map(c => {
+                const teacher = c.teacher || c.teachers;
                 const endTime = calculateEndTime(c.start_time, c.duration || 2);
                 const timeDisplay = `${formatDateTime(c.start_time)} - ${endTime.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}`;
-                
+
                 let statusText = '', statusClass = '';
                 const now = new Date();
                 const courseStart = new Date(c.start_time);
                 const courseEnd = endTime;
                 const isNow = courseStart <= now && courseEnd >= now;
-                
+
                 if (c.status === 'cancelled') {
                     statusText = t.statusCancelled;
                     statusClass = 'status-cancelled';
@@ -963,17 +1202,20 @@
                     statusText = t.statusScheduled;
                     statusClass = 'status-scheduled';
                 }
-                
+
                 const canConfirm = c.teacher_started && !c.student_confirmed && isNow;
                 const canRate = c.status === 'completed' && !c.student_rating;
                 const canCancel = c.status === 'scheduled' && !c.teacher_started && isMoreThan24HoursAhead(c.start_time);
                 const hasTeacherComment = c.teacher_comment && c.teacher_comment.trim() !== '';
                 const isCancelled = c.status === 'cancelled';
-                
+
+                // 🔥 使用双语课程名称
+                const courseTypeDisplay = getCourseTypeText(c.course_type);
+
                 return `
                     <div class="course-card">
                         <div class="course-header">
-                            <span class="course-title">${getTypeText(c.course_type)} - ${timeDisplay}</span>
+                            <span class="course-title">${courseTypeDisplay} - ${timeDisplay}</span>
                             <span class="status-badge ${statusClass}">${statusText}</span>
                         </div>
                         <div class="course-details">
@@ -999,47 +1241,46 @@
                 `;
             }).join('');
         }
-        
-        async function getStudentFromToken() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('token');
-            if (!token) { window.location.href = 'examen-civique.html'; return null; }
-            try {
-                const data = JSON.parse(decodeURIComponent(atob(token)));
-                if (data.role !== 'stu') { window.location.href = 'examen-civique.html'; return null; }
-                return data;
-            } catch(e) { window.location.href = 'examen-civique.html'; return null; }
+
+        // ============================================================
+        // 教学评价入口
+        // ============================================================
+        function renderFeedbackEntry() {
+            const section = document.getElementById('feedbackEntrySection');
+            const content = document.getElementById('feedbackEntryContent');
+            const t = translations[currentLang];
+
+            const hasCompletedCourses = myCourses.some(c => c.status === 'completed');
+            const canFeedback = studentCredit === 0 && hasCompletedCourses && !feedbackSubmitted;
+
+            if (!canFeedback) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+
+            // 去重并用双语显示
+            const completedCourses = myCourses.filter(c => c.status === 'completed');
+            const uniqueCourseTypes = [...new Set(completedCourses.map(c => c.course_type))];
+            const courseNames = uniqueCourseTypes.map(t => getCourseTypeText(t)).join(', ');
+
+            content.innerHTML = `
+                <div style="text-align: center; padding: 20px 0;">
+                    <div style="font-size: 3rem; margin-bottom: 15px;">🎓</div>
+                    <h3 style="color: var(--primary-blue); margin-bottom: 10px;">${t.vousAvezTermine}</h3>
+                    <p style="color: var(--medium-gray); margin-bottom: 5px;">${t.coursSuivis} ${courseNames}</p>
+                    <p style="color: var(--medium-gray); margin-bottom: 20px;">${t.partagez}</p>
+                    <button class="action-btn btn-feedback" onclick="openFeedbackModal()" style="padding: 14px 40px; font-size: 1.1rem;">
+                        <i class="fas fa-comment-dots"></i> ${t.feedbackBtnText}
+                    </button>
+                </div>
+            `;
         }
-        
-        async function loadMyCourses() {
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            
-            const [coursesRes, studentRes] = await Promise.all([
-                supabase.from('courses').select(`*, teachers:teacher_id(id, name)`).eq('student_id', currentStudent.userId).order('start_time', { ascending: true }),
-                supabase.from('students').select('credit').eq('id', currentStudent.userId).single()
-            ]);
-            
-            myCourses = coursesRes.data || [];
-            studentCredit = studentRes.data?.credit || 0;
-            
-            const teacherIds = [...new Set(myCourses.map(c => c.teacher_id))];
-            const { data: teacherData } = await supabase.from('students').select('id, name').in('id', teacherIds);
-            
-            const activeCourses = myCourses.filter(c => c.status !== 'cancelled');
-            const toCome = activeCourses.filter(c => c.status !== 'completed' && new Date(c.start_time) > new Date()).length;
-            const completed = activeCourses.filter(c => c.status === 'completed').length;
-            const rated = activeCourses.filter(c => c.student_rating);
-            const avg = rated.length ? (rated.reduce((s,c)=>s+c.student_rating,0)/rated.length).toFixed(1) : 0;
-            
-            document.getElementById('upcomingCount').textContent = toCome;
-            document.getElementById('completedCount').textContent = completed;
-            document.getElementById('avgRating').textContent = avg;
-            document.getElementById('teacherCount').textContent = teacherData?.length || 0;
-            
-            updateCreditStats();
-            renderCoursesList();
-        }
-        
+
+        // ============================================================
+        // 课程操作
+        // ============================================================
         async function confirmCourse(courseId) {
             const supabase = window.supabaseAuth.getSupabaseClient();
             const t = translations[currentLang];
@@ -1048,27 +1289,20 @@
             showToast(t.toastConfirmed, 'success');
             await loadMyCourses();
         }
-        
+
         function openRatingModal(courseId) {
             document.getElementById('ratingCourseId').value = courseId;
             document.getElementById('studentRating').value = '';
             document.getElementById('studentComment').value = '';
-            updateStarDisplay(0);
+            document.querySelectorAll('#ratingStars .star').forEach(s => s.classList.remove('active'));
             document.getElementById('ratingModal').style.display = 'flex';
         }
-        
+
         function showTeacherComment(comment) {
             document.getElementById('teacherCommentContent').innerHTML = `<div style="padding: 15px; background: #f5f5f5; border-radius: 8px;">${escapeHtml(comment)}</div>`;
             document.getElementById('teacherCommentModal').style.display = 'flex';
         }
-        
-        function updateStarDisplay(rating) {
-            document.querySelectorAll('#ratingStars .star').forEach((star, i) => { 
-                if (i < rating) star.classList.add('active'); 
-                else star.classList.remove('active'); 
-            });
-        }
-        
+
         async function saveRating(e) {
             e.preventDefault();
             const supabase = window.supabaseAuth.getSupabaseClient();
@@ -1083,33 +1317,252 @@
             showToast(t.toastRating, 'success');
             await loadMyCourses();
         }
-        
-        function initFilters() {
-            const upcomingBtn = document.getElementById('showUpcomingBtn');
-            const pastBtn = document.getElementById('showPastBtn');
-            
-            upcomingBtn.onclick = () => {
-                showOnlyUpcoming = true;
-                upcomingBtn.className = 'filter-btn-active';
-                pastBtn.className = 'filter-btn-inactive';
-                renderCoursesList();
-            };
-            pastBtn.onclick = () => {
-                showOnlyUpcoming = false;
-                pastBtn.className = 'filter-btn-active';
-                upcomingBtn.className = 'filter-btn-inactive';
-                renderCoursesList();
-            };
+
+        // ============================================================
+        // 取消课程
+        // ============================================================
+        function openCancelModal(courseId, startTime, teacherName, courseType) {
+            const t = translations[currentLang];
+            if (!isMoreThan24HoursAhead(startTime)) {
+                showToast(t.cannotCancel, 'error');
+                return;
+            }
+            pendingCancelCourse = { courseId, startTime, teacherName, courseType };
+            document.getElementById('cancelCourseType').textContent = getCourseTypeText(courseType);
+            document.getElementById('cancelCourseTeacher').textContent = teacherName;
+            document.getElementById('cancelCourseDate').textContent = formatDateTime(startTime);
+            document.querySelectorAll('input[name="cancelReason"]').forEach(r => r.checked = false);
+            document.getElementById('customReason').value = '';
+            document.getElementById('customReasonContainer').classList.remove('show');
+            document.querySelectorAll('.cancel-reason-option').forEach(opt => opt.classList.remove('selected'));
+            document.getElementById('cancelCourseModal').style.display = 'flex';
         }
-        
-        function initCancelModalEvents() {
+
+        function closeCancelModal() {
+            document.getElementById('cancelCourseModal').style.display = 'none';
+            pendingCancelCourse = null;
+        }
+
+        async function executeCancelCourse() {
+            if (!pendingCancelCourse) return;
+            const t = translations[currentLang];
+            const { courseId } = pendingCancelCourse;
+
+            let selectedReason = null;
+            document.querySelectorAll('input[name="cancelReason"]').forEach(r => {
+                if (r.checked) selectedReason = r.value;
+            });
+            if (selectedReason === '其他') {
+                const custom = document.getElementById('customReason').value.trim();
+                if (custom) selectedReason = custom;
+            }
+            if (!selectedReason) {
+                showToast('Veuillez sélectionner un motif', 'error');
+                return;
+            }
+
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const course = myCourses.find(c => c.id === courseId);
+            if (!course) return;
+
+            const isConsuming = course.status === 'scheduled' || course.status === 'in_progress' || course.status === 'completed';
+            if (isConsuming) {
+                await refundStudentCredit(course.student_id, course.duration || 2);
+            }
+
+            const { error } = await supabase.from('courses').update({ status: 'cancelled', cancel_reason: selectedReason }).eq('id', courseId);
+            if (error) {
+                showToast(t.cancelFail + ': ' + error.message, 'error');
+                return;
+            }
+
+            document.getElementById('cancelCourseModal').style.display = 'none';
+            pendingCancelCourse = null;
+            showToast(t.cancelSuccess, 'success');
+            await loadMyCourses();
+        }
+
+        async function refundStudentCredit(studentId, hours) {
+            if (!studentId || !hours || hours <= 0) return true;
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const { data: student } = await supabase.from('students').select('credit').eq('id', studentId).single();
+            if (!student) return true;
+            const newCredit = (student.credit || 0) + hours;
+            const { error } = await supabase.from('students').update({ credit: newCredit }).eq('id', studentId);
+            if (error) {
+                console.error('返还课时失败:', error);
+                return false;
+            }
+            return true;
+        }
+
+        // ============================================================
+        // 教学评价
+        // ============================================================
+        function openFeedbackModal() {
+            const t = translations[currentLang];
+
+            if (feedbackSubmitted) {
+                showToast(t.feedbackAlreadySubmitted, 'warning');
+                return;
+            }
+
+            feedbackRatings = {
+                quality: 0,
+                pedagogy: 0,
+                materials: 0,
+                support: 0,
+                organization: 0,
+                exam_prep: 0
+            };
+
+            document.getElementById('feedbackName').value = currentStudent.name || '';
+            document.getElementById('feedbackScore').value = '';
+            document.getElementById('feedbackComment').value = '';
+            document.getElementById('feedbackPublic').checked = true;
+            document.getElementById('feedbackExamType').value = '';
+
+            document.querySelectorAll('.stars-small').forEach(container => {
+                container.querySelectorAll('.star-small').forEach(s => s.classList.remove('active'));
+            });
+            ['quality', 'pedagogy', 'materials', 'support', 'organization', 'exam_prep'].forEach(key => {
+                const el = document.getElementById(key + 'Value');
+                if (el) el.textContent = '0';
+            });
+            updateTotalScore();
+
+            document.getElementById('feedbackModal').style.display = 'flex';
+        }
+
+        function closeFeedbackModal() {
+            document.getElementById('feedbackModal').style.display = 'none';
+        }
+
+        function updateTotalScore() {
+            const values = Object.values(feedbackRatings);
+            const total = values.reduce((a, b) => a + b, 0);
+            const avg = values.length > 0 ? (total / values.length) : 0;
+            const rounded = Math.round(avg * 10) / 10;
+
+            const totalDisplay = document.getElementById('totalScoreDisplay');
+            if (totalDisplay) totalDisplay.textContent = rounded.toFixed(1);
+
+            const fullStars = Math.round(avg);
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                starsHtml += i <= fullStars ? '★' : '☆';
+            }
+            const starsDisplay = document.getElementById('totalStarsDisplay');
+            if (starsDisplay) starsDisplay.textContent = starsHtml;
+        }
+
+        function initFeedbackStars() {
+            document.querySelectorAll('.stars-small').forEach(container => {
+                const criteria = container.dataset.criteria;
+                container.querySelectorAll('.star-small').forEach(star => {
+                    star.addEventListener('click', function() {
+                        const value = parseInt(this.dataset.value);
+                        feedbackRatings[criteria] = value;
+
+                        container.querySelectorAll('.star-small').forEach(s => {
+                            s.classList.toggle('active', parseInt(s.dataset.value) <= value);
+                        });
+
+                        const valueEl = document.getElementById(criteria + 'Value');
+                        if (valueEl) valueEl.textContent = value;
+                        updateTotalScore();
+                    });
+                });
+            });
+        }
+
+        async function submitFeedback(e) {
+            e.preventDefault();
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const t = translations[currentLang];
+
+            const name = document.getElementById('feedbackName').value.trim();
+            const examType = document.getElementById('feedbackExamType').value;
+            const examScore = parseInt(document.getElementById('feedbackScore').value) || null;
+            const comment = document.getElementById('feedbackComment').value.trim();
+            const isPublic = document.getElementById('feedbackPublic').checked;
+
+            const allRated = Object.values(feedbackRatings).every(v => v > 0);
+            if (!allRated) {
+                showToast('Veuillez noter tous les 6 critères', 'error');
+                return;
+            }
+
+            if (!name || !examType) {
+                showToast('Veuillez remplir tous les champs obligatoires', 'error');
+                return;
+            }
+
+            const totalScore = Object.values(feedbackRatings).reduce((a, b) => a + b, 0) / 6;
+
+            try {
+                const completedCourses = myCourses.filter(c => c.status === 'completed');
+                const courseIds = completedCourses.map(c => c.id).join(',');
+
+                const { error } = await supabase.from('student_feedback').insert({
+                    student_id: currentStudent.userId,
+                    student_name: name,
+                    course_id: courseIds,
+                    exam_type: examType,
+                    exam_score: examScore,
+                    rating_quality: feedbackRatings.quality,
+                    rating_pedagogy: feedbackRatings.pedagogy,
+                    rating_materials: feedbackRatings.materials,
+                    rating_support: feedbackRatings.support,
+                    rating_organization: feedbackRatings.organization,
+                    rating_exam_prep: feedbackRatings.exam_prep,
+                    total_score: Math.round(totalScore * 10) / 10,
+                    comment: comment,
+                    is_public: isPublic,
+                    created_at: new Date().toISOString()
+                });
+
+                if (error) {
+                    showToast(t.toastFeedbackError + ': ' + error.message, 'error');
+                    return;
+                }
+
+                feedbackSubmitted = true;
+                closeFeedbackModal();
+                showToast(t.toastFeedbackSuccess, 'success');
+                renderFeedbackEntry();
+
+            } catch (error) {
+                console.error('提交评价失败:', error);
+                showToast(t.toastFeedbackError, 'error');
+            }
+        }
+
+        // ============================================================
+        // 星星评分（课程评价）
+        // ============================================================
+        function initStars() {
+            document.querySelectorAll('#ratingStars .star').forEach(star => {
+                star.addEventListener('click', () => {
+                    const val = parseInt(star.dataset.value);
+                    document.getElementById('studentRating').value = val;
+                    document.querySelectorAll('#ratingStars .star').forEach((s, i) => {
+                        s.classList.toggle('active', i < val);
+                    });
+                });
+            });
+        }
+
+        // ============================================================
+        // 取消原因选择
+        // ============================================================
+        function initCancelReasons() {
             document.querySelectorAll('.cancel-reason-option').forEach(option => {
                 option.addEventListener('click', () => {
                     const radio = option.querySelector('input[type="radio"]');
                     radio.checked = true;
                     document.querySelectorAll('.cancel-reason-option').forEach(opt => opt.classList.remove('selected'));
                     option.classList.add('selected');
-                    
                     if (option.dataset.reason === 'other') {
                         document.getElementById('customReasonContainer').classList.add('show');
                     } else {
@@ -1117,60 +1570,107 @@
                     }
                 });
             });
-            
+        }
+
+        // ============================================================
+        // 筛选切换
+        // ============================================================
+        function initFilters() {
+            const upcomingBtn = document.getElementById('showUpcomingBtn');
+            const pastBtn = document.getElementById('showPastBtn');
+
+            const setFilter = (filter) => {
+                currentFilter = filter;
+                [upcomingBtn, pastBtn].forEach(b => b.className = 'filter-btn inactive');
+                if (filter === 'upcoming') upcomingBtn.className = 'filter-btn active';
+                else pastBtn.className = 'filter-btn active';
+                renderCoursesList();
+            };
+
+            upcomingBtn.onclick = () => setFilter('upcoming');
+            pastBtn.onclick = () => setFilter('past');
+        }
+
+        // ============================================================
+        // 模态框
+        // ============================================================
+        function initModals() {
+            document.getElementById('closeRatingModalBtn').onclick = () => document.getElementById('ratingModal').style.display = 'none';
+            document.getElementById('cancelRatingBtn').onclick = () => document.getElementById('ratingModal').style.display = 'none';
+            document.getElementById('ratingForm').addEventListener('submit', saveRating);
+            document.getElementById('ratingModal').onclick = (e) => {
+                if (e.target === document.getElementById('ratingModal')) document.getElementById('ratingModal').style.display = 'none';
+            };
+
+            document.getElementById('closeTeacherCommentBtn').onclick = () => document.getElementById('teacherCommentModal').style.display = 'none';
+            document.getElementById('closeTeacherCommentModalBtn').onclick = () => document.getElementById('teacherCommentModal').style.display = 'none';
+            document.getElementById('teacherCommentModal').onclick = (e) => {
+                if (e.target === document.getElementById('teacherCommentModal')) document.getElementById('teacherCommentModal').style.display = 'none';
+            };
+
             document.getElementById('confirmCancelBtn').onclick = executeCancelCourse;
             document.getElementById('closeCancelModalBtn').onclick = closeCancelModal;
             document.getElementById('cancelCancelBtn').onclick = closeCancelModal;
             document.getElementById('cancelCourseModal').onclick = (e) => {
                 if (e.target === document.getElementById('cancelCourseModal')) closeCancelModal();
             };
-        }
-        
-        function initModals() {
-            document.getElementById('closeRatingModalBtn').onclick = () => document.getElementById('ratingModal').style.display = 'none';
-            document.getElementById('cancelRatingBtn').onclick = () => document.getElementById('ratingModal').style.display = 'none';
-            document.getElementById('ratingForm').addEventListener('submit', saveRating);
-            
-            document.getElementById('closeTeacherCommentBtn').onclick = () => document.getElementById('teacherCommentModal').style.display = 'none';
-            document.getElementById('closeTeacherCommentModalBtn').onclick = () => document.getElementById('teacherCommentModal').style.display = 'none';
-            document.getElementById('teacherCommentModal').onclick = (e) => {
-                if (e.target === document.getElementById('teacherCommentModal')) document.getElementById('teacherCommentModal').style.display = 'none';
+
+            document.getElementById('closeFeedbackBtn').onclick = closeFeedbackModal;
+            document.getElementById('feedbackCancelBtn').onclick = closeFeedbackModal;
+            document.getElementById('feedbackModal').onclick = (e) => {
+                if (e.target === document.getElementById('feedbackModal')) closeFeedbackModal();
             };
-            
-            document.querySelectorAll('#ratingStars .star').forEach(star => { 
-                star.addEventListener('click', () => { 
-                    const val = parseInt(star.dataset.value); 
-                    document.getElementById('studentRating').value = val; 
-                    updateStarDisplay(val); 
-                }); 
-            });
-            document.getElementById('ratingModal').onclick = (e) => {
-                if (e.target === document.getElementById('ratingModal')) document.getElementById('ratingModal').style.display = 'none';
-            };
-            
+            document.getElementById('feedbackForm').addEventListener('submit', submitFeedback);
+
+            initFeedbackStars();
+
             document.getElementById('langFrBtn').onclick = () => switchLanguage('fr');
             document.getElementById('langZhBtn').onclick = () => switchLanguage('zh');
-            
-            initCancelModalEvents();
+
+            initStars();
+            initCancelReasons();
         }
-        
+
+        // ============================================================
+        // 初始化
+        // ============================================================
         async function init() {
+            let retries = 0;
+            while (!window.supabaseAuth && retries < 10) {
+                await new Promise(r => setTimeout(r, 500));
+                retries++;
+            }
+
+            if (!window.supabaseAuth) {
+                document.getElementById('coursesList').innerHTML = '<div class="empty-state">Erreur de chargement. Veuillez rafraîchir.</div>';
+                return;
+            }
+
             currentStudent = await getStudentFromToken();
             if (!currentStudent) return;
+
             document.getElementById('studentName').textContent = currentStudent.name;
-            document.getElementById('logoutBtn').onclick = () => { sessionStorage.clear(); window.location.href = 'examen-civique.html'; };
-            updateUIText();
+            document.getElementById('logoutBtn').onclick = () => {
+                sessionStorage.clear();
+                window.location.href = 'examen-civique.html';
+            };
+
             initModals();
             initFilters();
+            updateUIText();
             await loadMyCourses();
         }
-        
-        init();
-        
+
+        document.addEventListener('DOMContentLoaded', init);
+
         window.confirmCourse = confirmCourse;
         window.openRatingModal = openRatingModal;
         window.showTeacherComment = showTeacherComment;
         window.openCancelModal = openCancelModal;
+        window.closeCancelModal = closeCancelModal;
+        window.openFeedbackModal = openFeedbackModal;
+        window.closeFeedbackModal = closeFeedbackModal;
+        window.submitFeedback = submitFeedback;
     </script>
 </body>
 </html>

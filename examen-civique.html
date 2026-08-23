@@ -72,9 +72,9 @@
                     </button>
                     <div class="user-dropdown" id="userDropdown">
                         <a href="#" onclick="showProfileModal()"><i class="fas fa-user-cog"></i> <span id="profileMenuItem">Mon profil</span></a>
-                      <a href="#" onclick="window.location.href='dashboard-etudiant.html' + window.location.search" class="progress-link">
-    <i class="fas fa-chart-line"></i> <span id="learningProgressMenuItem">📊 Mon apprentissage</span>
-</a>
+                        <a href="#" onclick="window.location.href='dashboard-etudiant.html' + window.location.search" class="progress-link">
+                            <i class="fas fa-chart-line"></i> <span id="learningProgressMenuItem">📊 Mon apprentissage</span>
+                        </a>
                         <div id="roleBasedMenu"></div>
                         <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span id="logoutMenuItem">Déconnexion</span></a>
                     </div>
@@ -184,25 +184,46 @@
         </div>
     </section>
 
-    <!-- ==================== 学员数据统计 ==================== -->
-    <section class="stats-highlight" id="statsSection">
-        <div class="container">
-            <div class="stats-highlight-grid">
-                <div class="stat-highlight-item">
-                    <div class="stat-highlight-number"><span id="statStudentNumber">0</span></div>
-                    <div class="stat-highlight-label" id="statStudentLabel">👨‍🎓 Élèves</div>
-                </div>
-                <div class="stat-highlight-item">
-                    <div class="stat-highlight-number">99<span class="stat-percent">%</span></div>
-                    <div class="stat-highlight-label" id="statSuccessLabel">✅ Taux de réussite</div>
-                </div>
-                <div class="stat-highlight-item">
-                    <div class="stat-highlight-number"><span id="statTeacherNumber">0</span><span class="stat-plus">+</span></div>
-                    <div class="stat-highlight-label" id="statTeacherLabel">👨‍🏫 Intervenants</div>
-                </div>
+<!-- ==================== KPI 统计栏 + 教学评价 ==================== -->
+<section class="kpi-feedback-section" id="kpiSection">
+    <div class="container">
+        <!-- KPI 统计栏 - 卡片式 -->
+        <div class="kpi-cards">
+            <div class="kpi-card">
+                <div class="kpi-card-icon">👨‍🎓</div>
+                <div class="kpi-card-number"><span id="statStudentNumber">0</span></div>
+                <div class="kpi-card-label" id="statStudentLabel">Élèves</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-card-icon">✅</div>
+                <div class="kpi-card-number"><span id="statSuccessRate">0</span><span class="kpi-percent">%</span></div>
+                <div class="kpi-card-label" id="statSuccessLabel">Taux de réussite <span style="font-size:0.6rem;opacity:0.7;display:block;">(1er passage)</span></div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-card-icon">⭐</div>
+                <div class="kpi-card-number"><span id="fbAvgScoreStat">0.0</span></div>
+                <div class="kpi-card-label" id="fbAvgLabelStat">Évaluations</div>
             </div>
         </div>
-    </section>
+
+        <!-- 教学评价列表 -->
+        <div class="feedback-section">
+            <div class="feedback-header">
+                <div>
+                    <h3 id="feedbackShowcaseTitle">⭐ Avis des étudiants</h3>
+                    <p id="feedbackShowcaseSubtitle">Ce que nos étudiants pensent de nos formations</p>
+                </div>
+                <span class="feedback-count" id="feedbackCount">0 avis</span>
+            </div>
+            <div id="feedbackList">
+                <!-- 由 JavaScript 动态生成 -->
+            </div>
+            <button class="btn load-more-btn" id="loadMoreFeedbackBtn" onclick="loadMoreFeedback()" style="display: none;">
+                <span id="loadMoreFeedbackText">Voir plus d'avis</span> <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+    </div>
+</section>
 
     <section class="test-cards" id="tests">
         <div class="container">

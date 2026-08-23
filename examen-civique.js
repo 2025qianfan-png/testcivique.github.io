@@ -138,12 +138,28 @@ function checkAccess(student) {
     }
 }
 
+// ==================== 工具函数 ====================
+function escapeHtml(s) {
+    if (!s) return '';
+    return s.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
 // ==================== 变量 ====================
 let currentLang = 'fr';
 let deferredPrompt;
 let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 let isAndroid = /Android/.test(navigator.userAgent);
 let isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+// ==================== 教学评价变量 ====================
+let allFeedbacks = [];
+let feedbackDisplayCount = 5;
+const FEEDBACK_INCREMENT = 5;
 
 // ==================== Toast 通知 ====================
 function showToast(title, message, type = 'warning') {
@@ -344,10 +360,9 @@ const translations = {
         course3Feature4: "Accompagnement personnalisé",
         course3Feature5: "Conseils de préparation mentale",
         course3Btn: "En savoir plus",
-        statStudentLabel: "👨‍🎓 Élèves formés",
-        statSuccessLabel: "✅ Taux de réussite",
-        statTeacherLabel: "👨‍🏫 Intervenants",
-        statMemberLabel: "👥 Membres actifs",
+        statStudentLabel: "👨‍🎓 Élèves",
+        statSuccessLabel: "✅ Taux de réussite (1er passage)",
+        fbAvgLabelStat: "⭐ Évaluations",
         installBtnText: "Installer l'app",
         installGuideTitle: "Installer l'application",
         iosStep1: "Ouvrez Safari",
@@ -389,9 +404,22 @@ const translations = {
         preRegisterTitle: "📝 Prêt à commencer ?",
         preRegisterDesc: "Inscrivez-vous dès maintenant pour réserver votre place dans nos formations civiques et bénéficier d'un suivi personnalisé.",
         preRegisterBtnText: "Je m'inscris maintenant",
-        footerSituationLink: "Mises en situation"
+        footerSituationLink: "Mises en situation",
+        // 教学评价
+        feedbackTitle: "⭐ Avis des étudiants",
+        feedbackCountLabel: "avis",
+        loadMoreText: "Voir plus d'avis",
+        feedbackEmptyTitle: "Aucun avis",
+        feedbackEmptyText: "Soyez le premier à laisser un avis !",
+        feedbackAnonymous: "Anonyme",
+        feedbackExamType: "Examen",
+        feedbackShowcaseTitle: "⭐ Avis des étudiants",
+        feedbackShowcaseSubtitle: "Ce que nos étudiants pensent de nos formations",
+        feedbackScore: "Score"
     },
     zh: {
+        feedbackShowcaseTitle: "⭐ 学生评价",
+feedbackShowcaseSubtitle: "我们的学生怎么说",
         mainTitle: "法国公民考试",
         mainSubtitle: "千帆协会 - 2026年强制性公民考试准备",
         logoText: "千帆协会",
@@ -435,9 +463,6 @@ const translations = {
         annalesFeature3: "详细解析",
         annalesFeature4: "通过率统计",
         annalesFeature5: "每月更新",
-        preRegisterTitle: "📝 准备开始了吗？",
-        preRegisterDesc: "立即注册，预定您在公民培训课程中的名额，享受个性化跟踪指导。",
-        preRegisterBtnText: "立即注册",
         passwordInfoAnnales: '<i class="fas fa-key"></i> <strong>受保护访问：</strong> 报名后获取密码（联系我们）',
         annalesTestBtnText: '<i class="fas fa-play-circle"></i> 开始测试',
         studentTestTitle: "学员测试",
@@ -564,10 +589,9 @@ const translations = {
         course3Feature4: "一对一答疑指导",
         course3Feature5: "考前心理辅导",
         course3Btn: "了解更多",
-        statStudentLabel: "👨‍🎓 培训学员",
-        statSuccessLabel: "✅ 通过率",
-        statTeacherLabel: "👨‍🏫 教师团队",
-        statMemberLabel: "👥 活跃会员",
+        statStudentLabel: "👨‍🎓 学员",
+        statSuccessLabel: "✅ 通过率 (一次性通过)",
+        fbAvgLabelStat: "⭐ 评价",
         installBtnText: "安装应用",
         installGuideTitle: "安装应用程序",
         iosStep1: "打开Safari",
@@ -606,7 +630,19 @@ const translations = {
         situationInfo2Desc: "初学者和进阶者均可使用",
         situationInfo3Title: "进度追踪",
         situationInfo3Desc: "查看您的成绩和错题历史",
-        footerSituationLink: "情景题专项"
+        preRegisterTitle: "📝 准备开始了吗？",
+        preRegisterDesc: "立即注册，预定您在公民培训课程中的名额，享受个性化跟踪指导。",
+        preRegisterBtnText: "立即注册",
+        footerSituationLink: "情景题专项",
+        // 教学评价
+        feedbackTitle: "⭐ 学生评价",
+        feedbackCountLabel: "条评价",
+        loadMoreText: "查看更多评价",
+        feedbackEmptyTitle: "暂无评价",
+        feedbackEmptyText: "成为第一个留下评价的人！",
+        feedbackAnonymous: "匿名",
+        feedbackExamType: "考试类型",
+        feedbackScore: "分数"
     }
 };
 
@@ -712,7 +748,6 @@ function generatePageToken(page, user) {
     return btoa(utf8String);
 }
 
-// ==================== 初始化认证UI（只做状态切换，不重新生成菜单） ====================
 // ==================== 初始化认证UI ====================
 function initAuthUI() {
     const user = getCurrentUser();
@@ -728,7 +763,6 @@ function initAuthUI() {
         welcomeMessage.textContent = user.name;
         enableProtectedLinks(user);
         
-        // 🔥 重新生成整个下拉菜单（包含 token）
         if (userDropdown) {
             const t = translations[currentLang];
             const userToken = generatePageToken('dashboard', user);
@@ -741,7 +775,7 @@ function initAuthUI() {
                 </a>
             `;
             
-            // 2. 🔥 我的学习进度 - 带上 token
+            // 2. 我的学习进度
             const studentTypes = ['t', 'm', 'r', 'n', 'etudiant', 'stu'];
             if (studentTypes.includes(user.type) || studentTypes.includes(user.role)) {
                 const dashboardToken = generatePageToken('dashboard', user);
@@ -815,6 +849,7 @@ function initAuthUI() {
         }
     }
 }
+
 // ==================== 保护链接管理 ====================
 function disableProtectedLinks() {
     document.querySelectorAll('.protected-link').forEach(link => {
@@ -1073,18 +1108,15 @@ function switchLanguage(lang) {
     fixTestButtons();
     toggleFAQAnswers(lang);
     
-    // 🔥 只更新文本，不重新生成链接
+    // 更新下拉菜单文本
     const user = getCurrentUser();
     if (user) {
         const t = translations[currentLang];
-        
-        // 更新下拉菜单中的所有 span 文本
         const allSpans = document.querySelectorAll('.user-dropdown span');
         allSpans.forEach(span => {
             const parent = span.closest('a');
             if (!parent) return;
             const html = parent.innerHTML;
-            
             if (html.includes('fa-user-cog')) {
                 span.textContent = t.profileMenuItem || 'Mon profil';
             } else if (html.includes('fa-chart-line')) {
@@ -1100,6 +1132,15 @@ function switchLanguage(lang) {
             }
         });
     }
+            // 更新教学评价标题
+        const feedbackTitle = document.getElementById('feedbackShowcaseTitle');
+        if (feedbackTitle) {
+            feedbackTitle.textContent = data.feedbackShowcaseTitle || '⭐ Avis des étudiants';
+        }
+        const feedbackSubtitle = document.getElementById('feedbackShowcaseSubtitle');
+        if (feedbackSubtitle) {
+            feedbackSubtitle.textContent = data.feedbackShowcaseSubtitle || 'Ce que nos étudiants pensent de nos formations';
+        }
     
     // 更新登录按钮
     const navLogin = document.getElementById('navLogin');
@@ -1121,8 +1162,13 @@ function switchLanguage(lang) {
         footerSituationLink.textContent = data.footerSituationLink || (lang === 'fr' ? 'Mises en situation' : '情景题专项');
     }
     
+    // 重新加载 KPI 和评价
+    loadStats();
+    loadFeedbacks();
+    
     console.log(`🌐 Langue: ${lang === 'fr' ? 'Français' : '中文'}`);
 }
+
 // ==================== 修复测试按钮 ====================
 function fixTestButtons() {
     const freeBtn = document.getElementById('freeTestBtn');
@@ -1167,6 +1213,142 @@ function toggleFAQAnswers(lang) {
             container.style.display = container.id && container.id.includes('Zh') ? 'block' : 'none';
         }
     });
+}
+
+// ==================== 教学评价功能 ====================
+async function loadFeedbacks() {
+    const listContainer = document.getElementById('feedbackList');
+    if (!listContainer) return;
+    
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        
+        const { data, error } = await supabase
+            .from('student_feedback')
+            .select('*')
+            .eq('is_public', true)
+            .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        allFeedbacks = data || [];
+        feedbackDisplayCount = 5;
+        renderFeedbacks();
+        updateFeedbackCount();
+        
+    } catch (error) {
+        console.error('加载评价失败:', error);
+        listContainer.innerHTML = `
+            <div class="feedback-empty">
+                <i class="fas fa-exclamation-triangle" style="color: rgba(255,255,255,0.3);"></i>
+                <h3>${currentLang === 'fr' ? 'Erreur de chargement' : '加载失败'}</h3>
+                <p>${currentLang === 'fr' ? 'Impossible de charger les évaluations' : '无法加载评价'}</p>
+            </div>
+        `;
+    }
+}
+
+function renderFeedbacks() {
+    const listContainer = document.getElementById('feedbackList');
+    const loadMoreBtn = document.getElementById('loadMoreFeedbackBtn');
+    
+    if (!listContainer) return;
+    
+    const t = translations[currentLang];
+    const displayFeedbacks = allFeedbacks.slice(0, feedbackDisplayCount);
+    
+    if (displayFeedbacks.length === 0) {
+        listContainer.innerHTML = `
+            <div class="feedback-empty">
+                <i class="fas fa-star" style="color: rgba(255,255,255,0.2);"></i>
+                <h3>${t.feedbackEmptyTitle || 'Aucun avis'}</h3>
+                <p>${t.feedbackEmptyText || 'Soyez le premier à laisser un avis !'}</p>
+            </div>
+        `;
+        if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+        return;
+    }
+    
+    let html = '';
+    displayFeedbacks.forEach(fb => {
+        const avg = fb.total_score || 0;
+        const fullStars = Math.round(avg);
+        let starsHtml = '';
+        for (let i = 1; i <= 5; i++) {
+            starsHtml += i <= fullStars ? '★' : '☆';
+        }
+        
+        // 考试类型标签
+        let examLabel = fb.exam_type || '';
+        let examClass = '';
+        if (examLabel === 'carte_resident_10ans') {
+            examLabel = currentLang === 'fr' ? 'Carte 10 ans' : '十年居留';
+            examClass = 'type-resident';
+        } else if (examLabel === 'carte_sejour_4ans') {
+            examLabel = currentLang === 'fr' ? 'Carte 2-4 ans' : '多年居留';
+            examClass = 'type-sejour';
+        } else if (examLabel === 'nationalite_francaise') {
+            examLabel = currentLang === 'fr' ? 'Nationalité' : '法国国籍';
+            examClass = 'type-nationalite';
+        }
+        
+        const displayName = fb.is_public ? fb.student_name : (currentLang === 'fr' ? 'Anonyme' : '匿名');
+        const isAnonymous = !fb.is_public;
+        
+        html += `
+            <div class="feedback-card">
+                <div class="feedback-card-header">
+                    <div class="feedback-card-name">
+                        ${escapeHtml(displayName)}
+                        ${isAnonymous ? `<span class="badge-anonymous">${t.feedbackAnonymous || 'Anonyme'}</span>` : ''}
+                    </div>
+                    <div class="feedback-card-score">
+                        <span class="total">${avg.toFixed(1)}</span>
+                        <span class="stars">${starsHtml}</span>
+                    </div>
+                </div>
+                <div class="feedback-card-meta">
+                    ${examLabel ? `<span class="badge-exam ${examClass}">${t.feedbackExamType || 'Examen'}: ${examLabel}</span>` : ''}
+                    ${fb.exam_score !== null && fb.exam_score !== undefined ? `<span>📝 ${t.feedbackScore || 'Score'}: ${fb.exam_score}/40</span>` : ''}
+                    <span>📅 ${new Date(fb.created_at).toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'zh-CN')}</span>
+                </div>
+                ${fb.comment ? `
+                    <div class="feedback-card-comment">
+                        <i class="fas fa-quote-left"></i>
+                        ${escapeHtml(fb.comment)}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    });
+    
+    listContainer.innerHTML = html;
+    
+    // 显示/隐藏加载更多按钮
+    if (loadMoreBtn) {
+        if (feedbackDisplayCount < allFeedbacks.length) {
+            loadMoreBtn.style.display = 'block';
+            const span = loadMoreBtn.querySelector('span');
+            if (span) {
+                span.textContent = t.loadMoreText || 'Voir plus d\'avis';
+            }
+        } else {
+            loadMoreBtn.style.display = 'none';
+        }
+    }
+}
+
+function loadMoreFeedback() {
+    feedbackDisplayCount += FEEDBACK_INCREMENT;
+    renderFeedbacks();
+}
+
+function updateFeedbackCount() {
+    const countEl = document.getElementById('feedbackCount');
+    const t = translations[currentLang];
+    if (countEl) {
+        countEl.textContent = `${allFeedbacks.length} ${t.feedbackCountLabel || 'avis'}`;
+    }
 }
 
 // ==================== 平滑滚动 ====================
@@ -1284,26 +1466,51 @@ function updateOnlineStatus() {
 async function loadStats() {
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
+        
+        // 获取所有用户总数
         const { count: totalCount, error: totalError } = await supabase
             .from('students')
             .select('*', { count: 'exact', head: true });
         if (totalError) throw totalError;
-        const { count: teacherCount, error: teacherError } = await supabase
-            .from('students')
-            .select('*', { count: 'exact', head: true })
-            .eq('role', 'teacher');
-        if (teacherError) throw teacherError;
+        
+        // 一次性通过率 = (学生总数 - 2) / 学生总数 * 100
+        const studentCount = totalCount || 0;
+        const passRate = studentCount > 0 ? ((studentCount - 2) / studentCount * 100) : 0;
+        const passRateDisplay = Math.round(passRate);
+        
+        // 获取评价平均分
+        let avgScore = 0;
+        try {
+            const { data: feedbackData, error: feedbackError } = await supabase
+                .from('student_feedback')
+                .select('total_score');
+            if (!feedbackError && feedbackData && feedbackData.length > 0) {
+                const total = feedbackData.reduce((sum, f) => sum + (f.total_score || 0), 0);
+                avgScore = total / feedbackData.length;
+            }
+        } catch (e) {
+            console.log('评价数据加载跳过');
+        }
+        
+        // 更新 KPI
         const studentNumberEl = document.getElementById('statStudentNumber');
-        const teacherNumberEl = document.getElementById('statTeacherNumber');
-        if (studentNumberEl) studentNumberEl.textContent = totalCount || 0;
-        if (teacherNumberEl) teacherNumberEl.textContent = (teacherCount || 0) + '+';
-        console.log('📊 统计加载成功:', { total: totalCount, teachers: teacherCount });
+        const successRateEl = document.getElementById('statSuccessRate');
+        const avgScoreEl = document.getElementById('fbAvgScoreStat');
+        
+        if (studentNumberEl) studentNumberEl.textContent = studentCount;
+        if (successRateEl) successRateEl.textContent = passRateDisplay;
+        if (avgScoreEl) avgScoreEl.textContent = avgScore.toFixed(1);
+        
+        console.log('📊 KPI加载成功:', { students: studentCount, passRate: passRateDisplay + '%', avgScore: avgScore.toFixed(1) });
+        
     } catch (error) {
         console.error('加载统计数据失败:', error);
         const studentNumberEl = document.getElementById('statStudentNumber');
-        const teacherNumberEl = document.getElementById('statTeacherNumber');
+        const successRateEl = document.getElementById('statSuccessRate');
+        const avgScoreEl = document.getElementById('fbAvgScoreStat');
         if (studentNumberEl) studentNumberEl.textContent = '0';
-        if (teacherNumberEl) teacherNumberEl.textContent = '0+';
+        if (successRateEl) successRateEl.textContent = '0';
+        if (avgScoreEl) avgScoreEl.textContent = '0.0';
     }
 }
 
@@ -1348,6 +1555,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     loadStats();
+    loadFeedbacks();
 });
 
 // ==================== 暴露全局函数 ====================
@@ -1367,3 +1575,5 @@ window.installPWA = installPWA;
 window.copyWechat = copyWechat;
 window.fixTestButtons = fixTestButtons;
 window.toggleFAQAnswers = toggleFAQAnswers;
+window.loadMoreFeedback = loadMoreFeedback;
+window.loadFeedbacks = loadFeedbacks;
