@@ -1272,11 +1272,9 @@ function renderFeedbacks() {
     let html = '';
     displayFeedbacks.forEach(fb => {
         const avg = fb.total_score || 0;
-        const fullStars = Math.round(avg);
-        let starsHtml = '';
-        for (let i = 1; i <= 5; i++) {
-            starsHtml += i <= fullStars ? '★' : '☆';
-        }
+        
+        // 🔥 精确星星显示：根据分数计算每颗星的填充
+        const starsHtml = renderPreciseStars(avg);
         
         // 考试类型标签
         let examLabel = fb.exam_type || '';
@@ -1338,6 +1336,37 @@ function renderFeedbacks() {
     }
 }
 
+// ==================== 精确星星渲染函数 ====================
+// ==================== 精确星星渲染函数（半星方案） ====================
+function renderPreciseStars(score) {
+    // 限制分数在 0-5 之间
+    const clampedScore = Math.max(0, Math.min(5, score));
+    
+    // 计算实心星数量（整数部分）
+    const fullStars = Math.floor(clampedScore);
+    // 计算小数部分
+    const decimalPart = clampedScore - fullStars;
+    
+    let starsHtml = '';
+    
+    // 1. 渲染实心星 ★
+    for (let i = 0; i < fullStars; i++) {
+        starsHtml += '★';
+    }
+    
+    // 2. 🔥 只要不是满分（5分），并且还有星星剩余，就显示半星 ⯨
+    if (clampedScore < 5 && fullStars < 5) {
+        starsHtml += '⯨';
+    }
+    
+    // 3. 渲染剩余空心星 ☆
+    const remaining = 5 - fullStars - (clampedScore < 5 && fullStars < 5 ? 1 : 0);
+    for (let i = 0; i < remaining; i++) {
+        starsHtml += '☆';
+    }
+    
+    return starsHtml;
+}
 function loadMoreFeedback() {
     feedbackDisplayCount += FEEDBACK_INCREMENT;
     renderFeedbacks();
