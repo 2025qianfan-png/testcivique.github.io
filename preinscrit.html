@@ -54,7 +54,6 @@
             padding: 40px 44px 32px;
         }
 
-        /* ===== HEADER ===== */
         .header {
             display: flex;
             justify-content: space-between;
@@ -104,6 +103,181 @@
             margin-bottom:18px; transition:var(--transition);
         }
         .back-link:hover { color:var(--primary-blue); }
+
+        /* ===== NAME CHECK ===== */
+        .name-check-wrapper {
+            position: relative;
+        }
+        .name-check-wrapper .checking-indicator {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            display: none;
+        }
+        .name-check-wrapper .checking-indicator.show {
+            display: block;
+        }
+        .name-check-wrapper .checking-indicator.spinning i {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .name-check-wrapper .checking-indicator.available i {
+            color: var(--green);
+        }
+        .name-check-wrapper .checking-indicator.taken i {
+            color: var(--red);
+        }
+        .name-check-wrapper .checking-indicator.error i {
+            color: var(--red);
+        }
+
+        .name-status-msg {
+            font-size: 0.95rem;
+            margin-top: 8px;
+            font-weight: 700;
+            display: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+        }
+        .name-status-msg.show {
+            display: block;
+        }
+        .name-status-msg.available { 
+            color: var(--green); 
+            background: rgba(39, 174, 96, 0.1);
+            border: 2px solid var(--green);
+        }
+        .name-status-msg.taken { 
+            color: var(--red); 
+            background: rgba(231, 76, 60, 0.12);
+            border: 2px solid var(--red);
+        }
+        .name-status-msg.error { 
+            color: var(--red); 
+            background: rgba(231, 76, 60, 0.1);
+            border: 2px solid var(--red);
+        }
+        .name-status-msg.checking {
+            color: #666;
+            background: rgba(102, 102, 102, 0.08);
+            border: 2px solid #666;
+        }
+
+        .suggestion-box {
+            background: rgba(0,64,128,0.06);
+            border: 2px solid var(--primary-light-blue);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-top: 10px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity:0; transform:translateY(-6px); }
+            to { opacity:1; transform:translateY(0); }
+        }
+        .suggestion-box.show {
+            display: flex;
+        }
+        .suggestion-box .suggestion-text {
+            font-size: 0.95rem;
+            color: var(--dark-gray);
+        }
+        .suggestion-box .suggestion-text strong {
+            color: var(--primary-blue);
+            font-size: 1.05rem;
+            background: var(--primary-light-yellow);
+            padding: 2px 12px;
+            border-radius: 6px;
+        }
+        .suggestion-box .btn-use-suggestion {
+            background: var(--primary-blue);
+            color: var(--white);
+            border: none;
+            padding: 8px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .suggestion-box .btn-use-suggestion:hover {
+            background: var(--primary-light-blue);
+            transform: scale(1.05);
+        }
+        .suggestion-box .btn-use-suggestion i {
+            margin-right: 6px;
+        }
+
+        /* ===== BLOCKING MESSAGE ===== */
+        .blocking-message {
+            display: none;
+            background: rgba(231, 76, 60, 0.12);
+            border: 3px solid var(--red);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-top: 12px;
+            animation: shakeBlink 0.6s ease;
+        }
+        @keyframes shakeBlink {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        .blocking-message.show {
+            display: block;
+        }
+        .blocking-message .blocking-title {
+            font-weight: 800;
+            color: var(--red);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .blocking-message .blocking-title i {
+            font-size: 1.5rem;
+        }
+        .blocking-message .blocking-desc {
+            color: var(--dark-gray);
+            font-size: 0.95rem;
+            margin-top: 6px;
+            margin-left: 38px;
+        }
+        .blocking-message .blocking-solution {
+            color: var(--primary-blue);
+            font-size: 0.9rem;
+            margin-top: 8px;
+            margin-left: 38px;
+            font-weight: 600;
+        }
+        .blocking-message .blocking-solution i {
+            color: var(--primary-yellow);
+        }
+
+        .form-group input.name-error {
+            border-color: var(--red) !important;
+            background: #fff5f5;
+        }
+        .form-group input.name-valid {
+            border-color: var(--green) !important;
+            background: #f0fff4;
+        }
+        .form-group input.name-checking {
+            border-color: #666 !important;
+            background: #f5f5f5;
+        }
 
         /* ===== FORM ===== */
         .form-group { margin-bottom:20px; }
@@ -218,10 +392,6 @@
             animation:fadeIn 0.3s ease;
         }
         .student-fields.show { display:block; }
-        @keyframes fadeIn {
-            from { opacity:0; transform:translateY(-8px); }
-            to { opacity:1; transform:translateY(0); }
-        }
 
         .email-field { display:block; }
 
@@ -289,12 +459,12 @@
         /* ===== TOAST ===== */
         .toast {
             position:fixed; bottom:24px; right:24px;
-            padding:16px 24px; border-radius:12px;
-            color:var(--white); font-weight:600; font-size:0.9rem;
+            padding:18px 28px; border-radius:12px;
+            color:var(--white); font-weight:600; font-size:0.95rem;
             z-index:1000; display:flex; align-items:center; gap:14px;
             box-shadow:var(--shadow-hover);
             animation:toastIn 0.35s ease;
-            max-width:440px;
+            max-width:480px;
         }
         @keyframes toastIn {
             from { opacity:0; transform:translateY(20px) scale(0.96); }
@@ -303,9 +473,9 @@
         .toast-success { background:var(--green); }
         .toast-error { background:var(--red); }
         .toast-warning { background:var(--orange); }
-        .toast i { font-size:1.3rem; }
+        .toast i { font-size:1.5rem; }
 
-        /* ===== OVERLAY ===== */
+        /* ===== SUCCESS OVERLAY ===== */
         .overlay {
             display:none; position:fixed; inset:0;
             background:rgba(0,0,0,0.4); backdrop-filter:blur(6px);
@@ -353,6 +523,10 @@
             .price-box .amount { font-size:1.4rem; }
             .modal { padding:32px 20px; }
             .toast { right:16px; left:16px; bottom:16px; max-width:100%; font-size:0.85rem; }
+            .suggestion-box { flex-direction:column; align-items:stretch; text-align:center; }
+            .blocking-message .blocking-title { font-size:1rem; }
+            .blocking-message .blocking-desc { margin-left:0; }
+            .blocking-message .blocking-solution { margin-left:0; }
         }
         @media (max-width: 400px) {
             .card { padding:16px 12px; }
@@ -370,7 +544,6 @@
 
 <div class="card">
 
-    <!-- ===== HEADER ===== -->
     <div class="header">
         <div class="header-left">
             <div class="logo-icon"><i class="fas fa-sailboat"></i></div>
@@ -387,19 +560,16 @@
         </div>
     </div>
 
-    <!-- ===== STATUS ===== -->
     <div class="status-badge">
         <i class="fas fa-clock"></i>
         <span id="statusText">En attente de validation par l'administrateur</span>
     </div>
 
-    <!-- ===== BACK ===== -->
     <a href="examen-civique.html" class="back-link" id="backLink">
         <i class="fas fa-arrow-left"></i>
         <span id="backText">Retour à l'accueil</span>
     </a>
 
-    <!-- ===== FORM ===== -->
     <form id="registerForm" novalidate>
 
         <!-- === RÔLE === -->
@@ -421,10 +591,43 @@
             </div>
         </div>
 
-        <!-- === NOM === -->
+        <!-- === NOM avec vérification OBLIGATOIRE === -->
         <div class="form-group">
             <label for="fullName" id="nameLabel">Nom complet <span class="required">*</span></label>
-            <input type="text" id="fullName" placeholder="Ex: Dupont Jean" required>
+            <div class="name-check-wrapper">
+                <input type="text" id="fullName" placeholder="Ex: Dupont Jean" required autocomplete="off">
+                <span class="checking-indicator" id="nameCheckIndicator">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </span>
+            </div>
+            
+            <!-- 状态消息 - 始终显示文字 -->
+            <div class="name-status-msg" id="nameStatusMsg"></div>
+            
+            <!-- 阻塞提示框 -->
+            <div class="blocking-message" id="blockingMessage">
+                <div class="blocking-title">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="blockingTitle">⛔ ACTION REQUISE : Nom déjà utilisé</span>
+                </div>
+                <div class="blocking-desc" id="blockingDesc">
+                    Le nom que vous avez saisi est déjà utilisé par un autre utilisateur.
+                </div>
+                <div class="blocking-solution" id="blockingSolution">
+                    <i class="fas fa-lightbulb"></i> Utilisez la suggestion ci-dessous ou modifiez votre nom.
+                </div>
+            </div>
+
+            <div class="suggestion-box" id="suggestionBox">
+                <span class="suggestion-text">
+                    <i class="fas fa-lightbulb" style="color:var(--primary-yellow);"></i>
+                    <span id="suggestionText">💡 Utiliser <strong id="suggestedName">Dupont Jean_1</strong> à la place ?</span>
+                </span>
+                <button type="button" class="btn-use-suggestion" id="useSuggestionBtn">
+                    <i class="fas fa-check"></i> <span id="useSuggestionText">Utiliser</span>
+                </button>
+            </div>
+            <div class="hint" id="nameHint">✏️ Vérification automatique du nom - obligatoire avant soumission</div>
         </div>
 
         <!-- === MOT DE PASSE === -->
@@ -439,7 +642,7 @@
             </div>
         </div>
 
-        <!-- === EMAIL - visible pour TOUS === -->
+        <!-- === EMAIL === -->
         <div class="form-group email-field">
             <label for="userEmail" id="emailLabel">Adresse email <span class="required">*</span></label>
             <input type="email" id="userEmail" placeholder="exemple@email.com" required>
@@ -478,7 +681,7 @@
             <div class="hint" id="timerHint">📅 Choisissez la date d'expiration</div>
         </div>
 
-        <!-- === MEMBER FIELDS (订单编号 + 付款方式) === -->
+        <!-- === MEMBER FIELDS === -->
         <div class="form-group" id="memberFields">
             <div class="form-row">
                 <div class="form-group">
@@ -542,7 +745,6 @@
                 <input type="tel" id="phone" placeholder="06 12 34 56 78">
             </div>
 
-            <!-- === FORFAIT === -->
             <div class="form-group">
                 <label id="packLabel">📚 Choisissez votre forfait <span class="required">*</span></label>
                 <div class="pack-selector">
@@ -565,7 +767,6 @@
                 <div class="hint" id="packHint">12,50 € / heure</div>
             </div>
 
-            <!-- === PRIX === -->
             <div class="price-box show" id="priceBox">
                 <div class="row">
                     <span class="label"><i class="fas fa-euro-sign"></i> <span id="totalLabel">Total</span></span>
@@ -583,7 +784,6 @@
             </label>
         </div>
 
-        <!-- === SUBMIT === -->
         <button type="submit" class="submit-btn" id="submitBtn">
             <i class="fas fa-paper-plane"></i>
             <span id="submitText">Envoyer ma pré-inscription</span>
@@ -624,6 +824,16 @@ const LANG = {
         roleStu: 'Élève',
         roleStuDesc: 'Accès + suivi de cours',
         nameLabel: 'Nom complet',
+        nameHint: '✏️ Vérification automatique du nom - obligatoire avant soumission',
+        nameChecking: '⏳ Vérification du nom en cours...',
+        nameAvailable: '✅ Ce nom est disponible',
+        nameTaken: '⛔ Ce nom est déjà utilisé ! Veuillez le modifier ou utiliser la suggestion.',
+        nameError: '❌ Erreur lors de la vérification',
+        blockingTitle: '⛔ ACTION REQUISE : Nom déjà utilisé',
+        blockingDesc: 'Le nom que vous avez saisi est déjà utilisé par un autre utilisateur.',
+        blockingSolution: '💡 Utilisez la suggestion ci-dessous ou modifiez votre nom.',
+        suggestionText: '💡 Utiliser <strong>{name}</strong> à la place ?',
+        useSuggestion: 'Utiliser',
         passLabel: 'Mot de passe',
         confirmLabel: 'Confirmer',
         emailLabel: 'Adresse email',
@@ -673,8 +883,12 @@ const LANG = {
         errorPackMsg: 'Veuillez choisir un forfait',
         errorCgu: 'CGU non acceptées',
         errorCguMsg: 'Vous devez accepter les conditions générales',
-        errorNameUsed: 'Nom déjà utilisé',
-        errorNameUsedMsg: 'Ce nom existe déjà dans notre système',
+        errorNameNotChecked: '⛔ Nom non vérifié',
+        errorNameNotCheckedMsg: 'Attendez la fin de la vérification avant de soumettre.',
+        errorNameTaken: '⛔ Nom déjà utilisé',
+        errorNameTakenMsg: 'Ce nom est déjà utilisé. Utilisez la suggestion ci-dessous.',
+        errorNameInvalid: '⛔ Nom invalide',
+        errorNameInvalidMsg: 'Veuillez saisir votre nom.',
         errorGeneric: 'Erreur',
         errorGenericMsg: 'Une erreur est survenue. Veuillez réessayer.'
     },
@@ -689,6 +903,16 @@ const LANG = {
         roleStu: '学员',
         roleStuDesc: '访问 + 上课',
         nameLabel: '姓名',
+        nameHint: '✏️ 自动检查姓名 - 提交前必须验证',
+        nameChecking: '⏳ 正在检查姓名...',
+        nameAvailable: '✅ 该姓名可用',
+        nameTaken: '⛔ 该姓名已被使用！请修改或使用建议。',
+        nameError: '❌ 检查出错',
+        blockingTitle: '⛔ 需要操作：姓名已被使用',
+        blockingDesc: '您输入的姓名已被其他用户使用。',
+        blockingSolution: '💡 请使用下方的建议或修改您的姓名。',
+        suggestionText: '💡 使用 <strong>{name}</strong> 代替？',
+        useSuggestion: '使用',
         passLabel: '密码',
         confirmLabel: '确认密码',
         emailLabel: '电子邮箱',
@@ -738,8 +962,12 @@ const LANG = {
         errorPackMsg: '请选择套餐',
         errorCgu: '未接受条款',
         errorCguMsg: '您必须接受使用条款',
-        errorNameUsed: '姓名已被使用',
-        errorNameUsedMsg: '该姓名已在系统中存在',
+        errorNameNotChecked: '⛔ 姓名未验证',
+        errorNameNotCheckedMsg: '请等待姓名验证完成后再提交。',
+        errorNameTaken: '⛔ 姓名已被使用',
+        errorNameTakenMsg: '该姓名已被使用，请使用下方建议的姓名。',
+        errorNameInvalid: '⛔ 姓名无效',
+        errorNameInvalidMsg: '请输入您的姓名。',
         errorGeneric: '错误',
         errorGenericMsg: '发生错误，请重试。'
     }
@@ -748,11 +976,22 @@ const LANG = {
 // =====================================================================
 //  CONFIGURATION
 // =====================================================================
-const PRICE_PER_HOUR = 12.5;
 let currentLang = 'fr';
 let selectedHours = 16;
 let selectedPrice = 200;
 let selectedPayment = null;
+
+// Nom checking state
+let nameCheckState = {
+    isChecking: false,
+    isAvailable: null,
+    currentName: '',
+    suggestion: null,
+    usingSuggestion: false,
+    checked: false
+};
+
+let nameCheckTimeout = null;
 
 // =====================================================================
 //  LANGUE
@@ -775,6 +1014,7 @@ function setLang(lang) {
     document.getElementById('roleStu').textContent = t.roleStu;
     document.getElementById('roleStuDesc').textContent = t.roleStuDesc;
     document.getElementById('nameLabel').innerHTML = t.nameLabel + ' <span class="required">*</span>';
+    document.getElementById('nameHint').textContent = t.nameHint;
     document.getElementById('passLabel').innerHTML = t.passLabel + ' <span class="required">*</span>';
     document.getElementById('confirmLabel').innerHTML = t.confirmLabel + ' <span class="required">*</span>';
     document.getElementById('emailLabel').innerHTML = t.emailLabel + ' <span class="required">*</span>';
@@ -811,6 +1051,7 @@ function setLang(lang) {
 
     updateTimerHint();
     updatePrice();
+    updateNameStatusMessage();
 }
 
 // =====================================================================
@@ -861,7 +1102,6 @@ function selectRole(role) {
     const priceBox = document.getElementById('priceBox');
     const timerInput = document.getElementById('timer');
 
-    // 会员字段：对所有人可见（订单编号 + 付款方式）
     memberFields.style.display = 'block';
 
     fields.classList.toggle('show', isStudent);
@@ -958,6 +1198,238 @@ function updatePrice() {
 }
 
 // =====================================================================
+//  NAME CHECK
+// =====================================================================
+function generateSuggestion(baseName) {
+    if (!baseName || baseName.trim() === '') return null;
+    const trimmed = baseName.trim();
+    const match = trimmed.match(/^(.+?)_(\d+)$/);
+    let base = trimmed;
+    let lastNum = 0;
+    
+    if (match) {
+        base = match[1];
+        lastNum = parseInt(match[2]);
+    }
+    
+    return base + '_' + (lastNum + 1);
+}
+
+async function checkNameAvailability(name) {
+    if (!name || name.trim() === '') {
+        return { available: null, error: 'Nom vide' };
+    }
+
+    try {
+        if (typeof window.supabaseAuth === 'undefined' || !window.supabaseAuth.getSupabaseClient) {
+            return { available: null, error: 'Supabase non chargé' };
+        }
+
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        const trimmedName = name.trim();
+
+        const { data: studentData, error: studentError } = await supabase
+            .from('students')
+            .select('name')
+            .eq('name', trimmedName)
+            .maybeSingle();
+
+        if (studentError) {
+            if (studentError.code === '42P01') {
+                return { available: true, error: null };
+            }
+            return { available: null, error: studentError.message };
+        }
+
+        if (studentData) {
+            return { available: false, error: null };
+        }
+
+        return { available: true, error: null };
+
+    } catch (err) {
+        console.error('Erreur vérification nom:', err);
+        return { available: null, error: err.message };
+    }
+}
+
+function updateNameStatusMessage() {
+    const msgEl = document.getElementById('nameStatusMsg');
+    const indicator = document.getElementById('nameCheckIndicator');
+    const suggestionBox = document.getElementById('suggestionBox');
+    const blockingMsg = document.getElementById('blockingMessage');
+    const nameInput = document.getElementById('fullName');
+    const t = LANG[currentLang];
+    const name = nameInput.value.trim();
+
+    // 先隐藏所有
+    msgEl.className = 'name-status-msg';
+    msgEl.style.display = 'none';
+    indicator.className = 'checking-indicator';
+    indicator.style.display = 'none';
+    suggestionBox.classList.remove('show');
+    blockingMsg.classList.remove('show');
+    nameInput.classList.remove('name-error', 'name-valid', 'name-checking');
+
+    if (!name) {
+        return;
+    }
+
+    if (nameCheckState.isChecking) {
+        msgEl.className = 'name-status-msg show checking';
+        msgEl.textContent = t.nameChecking;
+        msgEl.style.display = 'block';
+        indicator.className = 'checking-indicator show spinning';
+        indicator.style.display = 'block';
+        indicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        nameInput.classList.add('name-checking');
+        return;
+    }
+
+    if (nameCheckState.isAvailable === true) {
+        msgEl.className = 'name-status-msg show available';
+        msgEl.textContent = t.nameAvailable;
+        msgEl.style.display = 'block';
+        indicator.className = 'checking-indicator show available';
+        indicator.style.display = 'block';
+        indicator.innerHTML = '<i class="fas fa-check-circle"></i>';
+        nameInput.classList.add('name-valid');
+    } else if (nameCheckState.isAvailable === false) {
+        msgEl.className = 'name-status-msg show taken';
+        msgEl.textContent = t.nameTaken;
+        msgEl.style.display = 'block';
+        indicator.className = 'checking-indicator show taken';
+        indicator.style.display = 'block';
+        indicator.innerHTML = '<i class="fas fa-times-circle"></i>';
+        nameInput.classList.add('name-error');
+        
+        // 显示阻塞消息
+        document.getElementById('blockingTitle').textContent = t.blockingTitle;
+        document.getElementById('blockingDesc').textContent = t.blockingDesc;
+        document.getElementById('blockingSolution').textContent = t.blockingSolution;
+        blockingMsg.classList.add('show');
+        
+        if (nameCheckState.suggestion) {
+            const suggestionText = t.suggestionText.replace('{name}', nameCheckState.suggestion);
+            document.getElementById('suggestionText').innerHTML = suggestionText;
+            document.getElementById('suggestedName').textContent = nameCheckState.suggestion;
+            suggestionBox.classList.add('show');
+        }
+    } else {
+        msgEl.className = 'name-status-msg show error';
+        msgEl.textContent = t.nameError;
+        msgEl.style.display = 'block';
+        indicator.className = 'checking-indicator show error';
+        indicator.style.display = 'block';
+        indicator.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+    }
+}
+
+function triggerNameCheck() {
+    const nameInput = document.getElementById('fullName');
+    const name = nameInput.value.trim();
+
+    if (nameCheckTimeout) {
+        clearTimeout(nameCheckTimeout);
+    }
+
+    nameCheckState.checked = false;
+
+    if (!name) {
+        nameCheckState.isChecking = false;
+        nameCheckState.isAvailable = null;
+        nameCheckState.currentName = '';
+        nameCheckState.suggestion = null;
+        nameCheckState.usingSuggestion = false;
+        updateNameStatusMessage();
+        return;
+    }
+
+    if (name === nameCheckState.currentName && nameCheckState.isAvailable !== null) {
+        nameCheckState.checked = true;
+        updateNameStatusMessage();
+        return;
+    }
+
+    nameCheckState.isChecking = true;
+    nameCheckState.currentName = name;
+    nameCheckState.usingSuggestion = false;
+    updateNameStatusMessage();
+
+    nameCheckTimeout = setTimeout(async () => {
+        try {
+            const result = await checkNameAvailability(name);
+            
+            const currentName = document.getElementById('fullName').value.trim();
+            if (currentName !== name) {
+                triggerNameCheck();
+                return;
+            }
+
+            nameCheckState.isChecking = false;
+            nameCheckState.isAvailable = result.available;
+            nameCheckState.currentName = name;
+            nameCheckState.checked = true;
+            
+            if (result.available === false) {
+                nameCheckState.suggestion = generateSuggestion(name);
+            } else {
+                nameCheckState.suggestion = null;
+            }
+            
+            updateNameStatusMessage();
+        } catch (err) {
+            console.error('Erreur vérification:', err);
+            nameCheckState.isChecking = false;
+            nameCheckState.isAvailable = null;
+            nameCheckState.checked = true;
+            updateNameStatusMessage();
+        }
+    }, 500);
+}
+
+// =====================================================================
+//  UTILISER LA SUGGESTION
+// =====================================================================
+function useSuggestion() {
+    if (nameCheckState.suggestion) {
+        const nameInput = document.getElementById('fullName');
+        nameInput.value = nameCheckState.suggestion;
+        nameCheckState.usingSuggestion = true;
+        nameCheckState.currentName = '';
+        nameCheckState.isAvailable = null;
+        nameCheckState.checked = false;
+        document.getElementById('blockingMessage').classList.remove('show');
+        triggerNameCheck();
+    }
+}
+
+// =====================================================================
+//  VÉRIFICATION POUR LE SUBMIT
+// =====================================================================
+function isNameValidForSubmit() {
+    const name = document.getElementById('fullName').value.trim();
+    
+    if (!name) return { valid: false, error: 'errorNameInvalid' };
+    if (nameCheckState.isChecking) return { valid: false, error: 'errorNameNotChecked' };
+    if (!nameCheckState.checked) return { valid: false, error: 'errorNameNotChecked' };
+    if (nameCheckState.isAvailable === true) return { valid: true, error: null };
+    
+    if (nameCheckState.isAvailable === false && nameCheckState.usingSuggestion) {
+        if (name === nameCheckState.suggestion) {
+            return { valid: true, error: null };
+        }
+        return { valid: false, error: 'errorNameTaken' };
+    }
+    
+    if (nameCheckState.isAvailable === false) {
+        return { valid: false, error: 'errorNameTaken' };
+    }
+    
+    return { valid: false, error: 'errorNameNotChecked' };
+}
+
+// =====================================================================
 //  TOAST
 // =====================================================================
 function showToast(title, message, type = 'success') {
@@ -982,9 +1454,9 @@ function showToast(title, message, type = 'success') {
     setTimeout(() => {
         if (toast.parentNode) {
             toast.style.animation = 'toastIn 0.35s ease reverse';
-            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 350);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 6000);
         }
-    }, 5000);
+    }, 6000);
 }
 
 // =====================================================================
@@ -999,6 +1471,28 @@ form.addEventListener('submit', async function(e) {
 
     const t = LANG[currentLang];
 
+    // === VÉRIFICATION OBLIGATOIRE DU NOM ===
+    const nameValidation = isNameValidForSubmit();
+    if (!nameValidation.valid) {
+        const name = document.getElementById('fullName').value.trim();
+        
+        // 显示非常明显的错误提示
+        showToast(
+            '❌ ' + t.errorNameTaken,
+            t.errorNameTakenMsg,
+            'error'
+        );
+        
+        // 确保阻塞消息显示
+        document.getElementById('blockingMessage').classList.add('show');
+        
+        // 滚动到姓名输入框
+        document.getElementById('fullName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        document.getElementById('fullName').focus();
+        return;
+    }
+
+    // ... 其余提交逻辑
     const fullName = document.getElementById('fullName').value.trim();
     const password = document.getElementById('password').value;
     const passwordConfirm = document.getElementById('passwordConfirm').value;
@@ -1010,7 +1504,6 @@ form.addEventListener('submit', async function(e) {
     const cgu = document.getElementById('cgu').checked;
     const isStudent = userRole === 'stu';
 
-    // 会员字段
     const orderNumber = document.getElementById('orderNumber').value.trim();
     const paymentMethod = selectedPayment;
 
@@ -1019,45 +1512,49 @@ form.addEventListener('submit', async function(e) {
     const address = document.getElementById('address').value.trim();
     const phone = document.getElementById('phone').value.trim();
 
-    // Validations
     if (!fullName || !password || !userEmail || !typeCard || !userRole || !timer) {
-        showToast(t.errorMissing, t.errorMissingMsg, 'error');
+        showToast('❌ ' + t.errorMissing, t.errorMissingMsg, 'error');
         return;
     }
 
     if (!userEmail.includes('@') || !userEmail.includes('.')) {
-        showToast(t.errorEmail, t.errorEmailMsg, 'error');
+        showToast('❌ ' + t.errorEmail, t.errorEmailMsg, 'error');
         return;
     }
 
     if (password.length < 6) {
-        showToast(t.errorPass, t.errorPassMsg, 'error');
+        showToast('❌ ' + t.errorPass, t.errorPassMsg, 'error');
         return;
     }
 
     if (password !== passwordConfirm) {
-        showToast(t.errorMatch, t.errorMatchMsg, 'error');
+        showToast('❌ ' + t.errorMatch, t.errorMatchMsg, 'error');
         return;
     }
 
     if (isStudent) {
         if (!birthDate || !address) {
-            showToast(t.errorStudent, t.errorStudentMsg, 'error');
+            showToast('❌ ' + t.errorStudent, t.errorStudentMsg, 'error');
             return;
         }
         if (selectedHours === 0) {
-            showToast(t.errorPack, t.errorPackMsg, 'warning');
+            showToast('⚠️ ' + t.errorPack, t.errorPackMsg, 'warning');
             return;
         }
     }
 
     if (!cgu) {
-        showToast(t.errorCgu, t.errorCguMsg, 'warning');
+        showToast('⚠️ ' + t.errorCgu, t.errorCguMsg, 'warning');
         return;
     }
 
+    let finalName = fullName;
+    if (nameCheckState.usingSuggestion && nameCheckState.suggestion) {
+        finalName = nameCheckState.suggestion;
+    }
+
     const userData = {
-        name: fullName,
+        name: finalName,
         password: password,
         email: userEmail,
         type: typeCard.dataset.type,
@@ -1066,7 +1563,6 @@ form.addEventListener('submit', async function(e) {
         timer: timer,
         status: 'pending',
         credit: isStudent ? selectedHours : 0,
-        // 会员字段
         order_number: orderNumber || null,
         payment_method: paymentMethod || null
     };
@@ -1086,7 +1582,7 @@ form.addEventListener('submit', async function(e) {
         submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${currentLang === 'fr' ? 'Envoi...' : '提交中...'}`;
 
         if (typeof window.supabaseAuth === 'undefined' || !window.supabaseAuth.getSupabaseClient) {
-            showToast('Erreur technique', 'Supabase n\'est pas chargé. Veuillez rafraîchir.', 'error');
+            showToast('Erreur technique', 'Supabase n\'est pas chargé.', 'error');
             submitBtn.disabled = false;
             submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> ${currentLang === 'fr' ? 'Envoyer' : '提交'}`;
             return;
@@ -1097,11 +1593,11 @@ form.addEventListener('submit', async function(e) {
         const { data: existing } = await supabase
             .from('students')
             .select('name')
-            .eq('name', fullName)
+            .eq('name', finalName)
             .maybeSingle();
 
         if (existing) {
-            showToast(t.errorNameUsed, t.errorNameUsedMsg, 'warning');
+            showToast('❌ ' + t.errorNameTaken, t.errorNameTakenMsg, 'error');
             submitBtn.disabled = false;
             submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> ${currentLang === 'fr' ? 'Envoyer' : '提交'}`;
             return;
@@ -1114,6 +1610,11 @@ form.addEventListener('submit', async function(e) {
                 const fallbackData = { ...userData, is_pre_registration: true };
                 const { error: fbErr } = await supabase.from('students').insert([fallbackData]);
                 if (fbErr) throw fbErr;
+            } else if (error.code === '23505') {
+                showToast('❌ ' + t.errorNameTaken, t.errorNameTakenMsg, 'error');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> ${currentLang === 'fr' ? 'Envoyer' : '提交'}`;
+                return;
             } else {
                 throw error;
             }
@@ -1122,7 +1623,6 @@ form.addEventListener('submit', async function(e) {
         successOverlay.classList.add('show');
         form.reset();
 
-        // Reset selections
         document.querySelectorAll('.type-card').forEach(c => c.classList.remove('active'));
         document.querySelector('.type-card[data-type="n"]').classList.add('active');
         document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
@@ -1141,14 +1641,27 @@ form.addEventListener('submit', async function(e) {
         selectedHours = 16;
         selectedPrice = 200;
         updateTimerHint();
+        
+        nameCheckState.isAvailable = null;
+        nameCheckState.currentName = '';
+        nameCheckState.suggestion = null;
+        nameCheckState.usingSuggestion = false;
+        nameCheckState.checked = false;
+        document.getElementById('nameStatusMsg').className = 'name-status-msg';
+        document.getElementById('nameStatusMsg').style.display = 'none';
+        document.getElementById('nameCheckIndicator').className = 'checking-indicator';
+        document.getElementById('nameCheckIndicator').style.display = 'none';
+        document.getElementById('suggestionBox').classList.remove('show');
+        document.getElementById('blockingMessage').classList.remove('show');
+        document.getElementById('fullName').classList.remove('name-error', 'name-valid', 'name-checking');
 
     } catch (err) {
         console.error('Erreur:', err);
         let message = t.errorGenericMsg;
         if (err.code === '23505') {
-            message = t.errorNameUsedMsg;
+            message = t.errorNameTakenMsg;
         }
-        showToast(t.errorGeneric, message, 'error');
+        showToast('❌ ' + t.errorGeneric, message, 'error');
     } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> ${currentLang === 'fr' ? 'Envoyer' : '提交'}`;
@@ -1177,13 +1690,42 @@ document.addEventListener('DOMContentLoaded', function() {
     selectedHours = 16;
     selectedPrice = 200;
 
-    // 会员字段默认可见（订单编号 + 付款方式）
     document.getElementById('memberFields').style.display = 'block';
     document.getElementById('priceBox').classList.remove('show');
     updateTimerHint();
 
     document.querySelectorAll('input[name="userType"]').forEach(r => {
         r.addEventListener('change', updatePrice);
+    });
+
+    const nameInput = document.getElementById('fullName');
+    nameInput.addEventListener('input', function() {
+        if (nameCheckState.usingSuggestion) {
+            nameCheckState.usingSuggestion = false;
+        }
+        nameCheckState.checked = false;
+        triggerNameCheck();
+    });
+
+    nameInput.addEventListener('blur', function() {
+        if (this.value.trim() !== '') {
+            triggerNameCheck();
+        }
+    });
+
+    document.getElementById('useSuggestionBtn').addEventListener('click', useSuggestion);
+
+    nameInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (this.value.trim() !== '') {
+                if (nameCheckTimeout) {
+                    clearTimeout(nameCheckTimeout);
+                }
+                nameCheckState.isChecking = false;
+                triggerNameCheck();
+            }
+        }
     });
 });
 </script>
