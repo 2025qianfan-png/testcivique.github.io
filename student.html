@@ -602,6 +602,186 @@
         .booking-type-btn.selected { border-color: var(--primary-blue); background: #e3f2fd; }
         .booking-type-btn .type-label { font-weight: 600; display: block; }
         .booking-type-btn .type-sub { font-size: 0.7rem; color: #999; }
+        /* ===== 折叠选课区域 ===== */
+            .teacher-group {
+                border: 1px solid #e8ecf1;
+                border-radius: 10px;
+                overflow: hidden;
+                background: #fafbfc;
+                margin-bottom: 12px;
+            }
+            .teacher-group-header {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 14px 18px;
+                background: #f0f4f8;
+                cursor: pointer;
+                transition: background 0.2s;
+                font-weight: 600;
+                color: var(--primary-blue);
+                user-select: none;
+            }
+            .teacher-group-header:hover {
+                background: #e6ecf3;
+            }
+            .teacher-group-header .toggle-icon {
+                transition: transform 0.3s ease;
+                font-size: 0.8rem;
+                color: var(--medium-gray);
+            }
+            .teacher-group-header .toggle-icon.collapsed {
+                transform: rotate(-90deg);
+            }
+            .teacher-group-header .teacher-name {
+                flex: 1;
+                font-size: 1rem;
+            }
+            .teacher-group-header .count-badge {
+                background: var(--green);
+                color: white;
+                padding: 2px 12px;
+                border-radius: 20px;
+                font-size: 0.7rem;
+                font-weight: 600;
+            }
+
+            .teacher-group-body {
+                padding: 8px 16px 16px 16px;
+            }
+
+            /* 日期分组 */
+            .date-group {
+                border: 1px solid #eef2f7;
+                border-radius: 8px;
+                overflow: hidden;
+                background: white;
+                margin-top: 8px;
+            }
+            .date-group-header {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px 14px;
+                background: #f8f9fb;
+                cursor: pointer;
+                transition: background 0.2s;
+                font-weight: 500;
+                color: var(--dark-gray);
+                user-select: none;
+            }
+            .date-group-header:hover {
+                background: #f0f2f5;
+            }
+            .date-group-header .toggle-icon {
+                transition: transform 0.3s ease;
+                font-size: 0.7rem;
+                color: var(--medium-gray);
+            }
+            .date-group-header .toggle-icon.collapsed {
+                transform: rotate(-90deg);
+            }
+            .date-group-header .date-label {
+                flex: 1;
+                font-size: 0.9rem;
+            }
+            .date-group-header .date-count {
+                background: var(--primary-blue);
+                color: white;
+                padding: 1px 10px;
+                border-radius: 20px;
+                font-size: 0.65rem;
+                font-weight: 600;
+            }
+
+            .date-group-body {
+                padding: 10px 12px 14px 12px;
+            }
+
+            /* 时间段卡片 */
+            .slot-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            @media (max-width: 600px) {
+                .slot-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .slot-card {
+                border: 1px solid #eef2f7;
+                border-radius: 8px;
+                padding: 10px 14px;
+                background: white;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 6px;
+                transition: all 0.2s;
+            }
+            .slot-card:hover {
+                border-color: var(--primary-blue);
+                box-shadow: 0 2px 8px rgba(0,64,128,0.06);
+            }
+            .slot-card .slot-time {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 0.85rem;
+                color: var(--dark-gray);
+            }
+            .slot-card .slot-time i {
+                color: var(--primary-blue);
+            }
+            .slot-card .slot-duration {
+                background: #e8f5e9;
+                color: #2e7d32;
+                padding: 1px 8px;
+                border-radius: 20px;
+                font-size: 0.65rem;
+                font-weight: 600;
+            }
+            .slot-card .slot-actions {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .slot-card .slot-status {
+                font-size: 0.75rem;
+                font-weight: 500;
+            }
+            .slot-card .slot-status i {
+                margin-right: 3px;
+            }
+
+            .btn-book {
+                background: var(--green);
+                color: white;
+                border: none;
+                padding: 5px 14px;
+                border-radius: 30px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 0.75rem;
+                transition: all 0.2s;
+            }
+            .btn-book:hover {
+                background: #219653;
+                transform: translateY(-1px);
+            }
+            .btn-book:disabled {
+                background: #95a5a6;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            .teacher-group-body.collapsed,
+            .date-group-body.collapsed {
+                display: none;
+            }
     </style>
 </head>
 <body>
@@ -1091,19 +1271,52 @@
                 cancelBooking: "Annuler la réservation",
                 toastBookingCancelled: "✅ Réservation annulée, crédits restitués",
                 // 课程类型
-                course_ec: "1️⃣ 公民考试",
-                course_ec110: "📚 十年卡 - 全能班",
-                course_ec14: "🎫 四年卡 - 全能班",
-                course_ec1f: "🛂 入籍 - 全能班",
-                course_ec210: "📚 十年卡 - 速成",
-                course_ec24: "🎫 四年卡 - 速成",
-                course_ec2f: "🛂 入籍 - 速成",
-                course_ec310: "📚 十年卡 - 自选",
-                course_ec34: "🎫 四年卡 - 自选",
-                course_ec3f: "🛂 入籍 - 自选",
-                course_ex10: "📝 十年卡 - 模拟考试",
-                course_ex4: "📝 四年卡 - 模拟考试",
-                course_exf: "📝 入籍 - 模拟考试",
+            
+                // 在 fr 中添加
+            weekdays_long: {
+                monday: 'Lundi',
+                tuesday: 'Mardi',
+                wednesday: 'Mercredi',
+                thursday: 'Jeudi',
+                friday: 'Vendredi',
+                saturday: 'Samedi',
+                sunday: 'Dimanche'
+            },
+            months_long: {
+                january: 'janvier',
+                february: 'février',
+                march: 'mars',
+                april: 'avril',
+                may: 'mai',
+                june: 'juin',
+                july: 'juillet',
+                august: 'août',
+                september: 'septembre',
+                october: 'octobre',
+                november: 'novembre',
+                december: 'décembre'
+            },
+            dateFormat: '{weekday} {day} {month} {year}',
+            créneaux: 'créneau(x)',
+            available: 'Disponible',
+            expired: 'Expiré',
+            booked: 'Réservé',
+            reserve: 'Réserver',
+            insufficientCredits: 'Crédits insuffisants',
+            noSlotsAvailable: '📭 Aucun créneau disponible pour le moment',
+            course_ec: "1️⃣ Examen civique",
+            course_ec110: "📚 Carte 10 ans - Complet",
+            course_ec14: "🎫 Carte 4 ans - Complet",
+            course_ec1f: "🛂 Nationalité - Complet",
+            course_ec210: "📚 Carte 10 ans - Accéléré",
+            course_ec24: "🎫 Carte 4 ans - Accéléré",
+            course_ec2f: "🛂 Nationalité - Accéléré",
+            course_ec310: "📚 Carte 10 ans - Sur mesure",
+            course_ec34: "🎫 Carte 4 ans - Sur mesure",
+            course_ec3f: "🛂 Nationalité - Sur mesure",
+            course_ex10: "📝 Carte 10 ans - Simulation",
+            course_ex4: "📝 Carte 4 ans - Simulation",
+            course_exf: "📝 Nationalité - Simulation",
                 // 新增
                 noTeacher: "Intervenant inconnu",
                 locationToDefine: "À définir",
@@ -1233,6 +1446,37 @@
                 sourceStudent: "📋 学生预约",
                 cancelBooking: "取消预约",
                 toastBookingCancelled: "✅ 预约已取消，课时已返还",
+                weekdays_long: {
+                    monday: '星期一',
+                    tuesday: '星期二',
+                    wednesday: '星期三',
+                    thursday: '星期四',
+                    friday: '星期五',
+                    saturday: '星期六',
+                    sunday: '星期日'
+                },
+                months_long: {
+                    january: '1月',
+                    february: '2月',
+                    march: '3月',
+                    april: '4月',
+                    may: '5月',
+                    june: '6月',
+                    july: '7月',
+                    august: '8月',
+                    september: '9月',
+                    october: '10月',
+                    november: '11月',
+                    december: '12月'
+                },
+                dateFormat: '{year}年{month}{day}日 {weekday}',
+                créneaux: '个时间段',
+                available: '可用',
+                expired: '已过期',
+                booked: '已预约',
+                reserve: '预约',
+                insufficientCredits: '课时不足',
+                noSlotsAvailable: '📭 暂无可用时间段',
                 // 课程类型
                 course_ec: "1️⃣ 公民考试",
                 course_ec110: "📚 十年卡 - 全能班",
@@ -1654,7 +1898,55 @@
                 container.innerHTML = `<div class="empty-state">❌ ${t.errorLoading || 'Erreur de chargement'}</div>`;
             }
         }
+             // ============================================================
+        // 日期格式化函数（支持中法双语）
+        // ============================================================
+        function formatDateLong(dateStr, lang) {
+            const d = new Date(dateStr);
+            const t = translations[lang];
+            
+            const weekdayMap = {
+                'Monday': 'monday',
+                'Tuesday': 'tuesday',
+                'Wednesday': 'wednesday',
+                'Thursday': 'thursday',
+                'Friday': 'friday',
+                'Saturday': 'saturday',
+                'Sunday': 'sunday'
+            };
+            const monthMap = {
+                'January': 'january',
+                'February': 'february',
+                'March': 'march',
+                'April': 'april',
+                'May': 'may',
+                'June': 'june',
+                'July': 'july',
+                'August': 'august',
+                'September': 'september',
+                'October': 'october',
+                'November': 'november',
+                'December': 'december'
+            };
+            
+            const weekdayEn = d.toLocaleDateString('en-US', { weekday: 'long' });
+            const monthEn = d.toLocaleDateString('en-US', { month: 'long' });
+            const day = d.getDate();
+            const year = d.getFullYear();
+            
+            const weekday = t.weekdays_long[weekdayMap[weekdayEn]] || weekdayEn;
+            const month = t.months_long[monthMap[monthEn]] || monthEn;
+            
+            if (lang === 'zh') {
+                return `${year}年${month}${day}日 ${weekday}`;
+            } else {
+                return `${weekday} ${day} ${month} ${year}`;
+            }
+        }
 
+        // ============================================================
+        // 渲染可用时间段（可折叠版本 - 中法双语）
+        // ============================================================
         function renderAvailableSlots() {
             const container = document.getElementById('availableSlotsList');
             const t = translations[currentLang];
@@ -1664,6 +1956,7 @@
                 return;
             }
 
+            // 按老师分组
             const groupedSlots = {};
             availableSlots.forEach(slot => {
                 const teacherId = slot.teacher_id;
@@ -1678,78 +1971,152 @@
             });
 
             let html = '';
+            let teacherIndex = 0;
+            
             for (const teacherId in groupedSlots) {
                 const group = groupedSlots[teacherId];
+                const teacherKey = `teacher_${teacherIndex}`;
+                const isTeacherOpen = teacherIndex === 0; // 默认第一个老师展开
+                
+                // 按日期分组
+                const slotsByDate = {};
+                group.slots.forEach(slot => {
+                    const dateKey = slot.start_time.split('T')[0];
+                    if (!slotsByDate[dateKey]) {
+                        slotsByDate[dateKey] = [];
+                    }
+                    slotsByDate[dateKey].push(slot);
+                });
+                
+                // 排序日期
+                const sortedDates = Object.keys(slotsByDate).sort();
+                
                 html += `
                     <div class="teacher-group">
-                        <div class="teacher-group-header">
-                            <i class="fas fa-chalkboard-user"></i>
-                            <strong>${escapeHtml(group.teacherName)}</strong>
-                            <span class="count-badge">${group.slots.length} créneau(x)</span>
+                        <div class="teacher-group-header" onclick="toggleTeacherGroup('${teacherKey}')">
+                            <i class="fas fa-chevron-right toggle-icon ${isTeacherOpen ? '' : 'collapsed'}" id="${teacherKey}_icon"></i>
+                            <i class="fas fa-chalkboard-user" style="color: var(--primary-blue);"></i>
+                            <span class="teacher-name">${escapeHtml(group.teacherName)}</span>
+                            <span class="count-badge">${group.slots.length} ${t.créneaux}</span>
                         </div>
-                        <div class="slot-grid">
-                            ${group.slots.map(slot => {
-                                const startDate = new Date(slot.start_time);
-                                const endDate = new Date(slot.end_time);
-                                const dateStr = formatDateShort(slot.start_time);
-                                const timeStr = `${formatTimeShort(slot.start_time)} - ${formatTimeShort(slot.end_time)}`;
-                                const duration = slot.duration || 2;
-                                const canBook = studentCredit >= duration;
-                                const isExpired = new Date(slot.end_time) < new Date();
-                                const isAvailable = slot.status === 'available' && !isExpired;
+                        <div class="teacher-group-body ${isTeacherOpen ? '' : 'collapsed'}" id="${teacherKey}_body">
+                `;
+                
+                sortedDates.forEach((dateKey, dateIndex) => {
+                    const dateSlots = slotsByDate[dateKey];
+                    const dateStr = formatDateLong(dateKey, currentLang);
+                    const dateKey2 = `${teacherKey}_date_${dateIndex}`;
+                    const isDateOpen = dateIndex === 0; // 每个老师默认展开第一个日期
+                    
+                    html += `
+                        <div class="date-group">
+                            <div class="date-group-header" onclick="toggleDateGroup('${dateKey2}')">
+                                <i class="fas fa-chevron-right toggle-icon ${isDateOpen ? '' : 'collapsed'}" id="${dateKey2}_icon"></i>
+                                <i class="fas fa-calendar-day" style="color: var(--primary-blue);"></i>
+                                <span class="date-label">${dateStr}</span>
+                                <span class="date-count">${dateSlots.length}</span>
+                            </div>
+                            <div class="date-group-body ${isDateOpen ? '' : 'collapsed'}" id="${dateKey2}_body">
+                                <div class="slot-grid">
+                    `;
+                    
+                    dateSlots.forEach(slot => {
+                        const timeStr = `${formatTimeShort(slot.start_time)} - ${formatTimeShort(slot.end_time)}`;
+                        const duration = slot.duration || 2;
+                        const canBook = studentCredit >= duration;
+                        const isExpired = new Date(slot.end_time) < new Date();
+                        const isAvailable = slot.status === 'available' && !isExpired;
 
-                                let statusText = '';
-                                let statusIcon = '';
-                                let statusColor = '';
-                                if (isAvailable) {
-                                    statusText = t.available;
-                                    statusIcon = 'fa-check-circle';
-                                    statusColor = 'var(--green)';
-                                } else if (isExpired || slot.status === 'expired') {
-                                    statusText = t.expired;
-                                    statusIcon = 'fa-clock';
-                                    statusColor = 'var(--gray)';
-                                } else {
-                                    statusText = t.booked;
-                                    statusIcon = 'fa-book';
-                                    statusColor = 'var(--orange)';
-                                }
+                        let statusText = '';
+                        let statusIcon = '';
+                        let statusColor = '';
+                        if (isAvailable) {
+                            statusText = t.available;
+                            statusIcon = 'fa-check-circle';
+                            statusColor = 'var(--green)';
+                        } else if (isExpired || slot.status === 'expired') {
+                            statusText = t.expired;
+                            statusIcon = 'fa-clock';
+                            statusColor = 'var(--gray)';
+                        } else {
+                            statusText = t.booked;
+                            statusIcon = 'fa-book';
+                            statusColor = 'var(--orange)';
+                        }
 
-                                return `
-                                    <div class="slot-card">
-                                        <div class="slot-time">
-                                            <i class="fas fa-calendar-day" style="color: var(--primary-blue);"></i> ${dateStr}
-                                            <br>
-                                            <i class="fas fa-clock" style="color: var(--primary-blue);"></i> ${timeStr}
-                                            <span class="slot-duration">${duration}h</span>
-                                        </div>
-                                        <div class="slot-actions">
-                                            <span class="slot-status" style="color: ${statusColor};">
-                                                <i class="fas ${statusIcon}"></i> ${statusText}
-                                            </span>
-                                            ${isAvailable && canBook ? 
-                                                `<button class="action-btn btn-book" onclick="openBookingConfirm('${slot.id}', '${escapeHtml(group.teacherName)}', '${slot.start_time}', ${duration})">
-                                                    <i class="fas fa-hand-point-right"></i> ${t.reserve}
-                                                </button>` :
-                                                isAvailable && !canBook ?
-                                                `<button class="action-btn btn-book" disabled style="background: #95a5a6; color: white; cursor: not-allowed;">
-                                                    <i class="fas fa-exclamation-triangle"></i> ${t.insufficientCredits}
-                                                </button>` :
-                                                `<button class="action-btn btn-book" disabled style="background: #95a5a6; color: white; cursor: not-allowed;">
-                                                    <i class="fas fa-ban"></i> ${isExpired ? t.expired : t.booked}
-                                                </button>`
-                                            }
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('')}
+                        html += `
+                            <div class="slot-card">
+                                <div class="slot-time">
+                                    <i class="fas fa-clock"></i>
+                                    ${timeStr}
+                                    <span class="slot-duration">${duration}h</span>
+                                </div>
+                                <div class="slot-actions">
+                                    <span class="slot-status" style="color: ${statusColor};">
+                                        <i class="fas ${statusIcon}"></i> ${statusText}
+                                    </span>
+                                    ${isAvailable && canBook ? 
+                                        `<button class="btn-book" onclick="openBookingConfirm('${slot.id}', '${escapeHtml(group.teacherName)}', '${slot.start_time}', ${duration})">
+                                            <i class="fas fa-hand-point-right"></i> ${t.reserve}
+                                        </button>` :
+                                        isAvailable && !canBook ?
+                                        `<button class="btn-book" disabled>
+                                            <i class="fas fa-exclamation-triangle"></i> ${t.insufficientCredits}
+                                        </button>` :
+                                        `<button class="btn-book" disabled>
+                                            <i class="fas fa-ban"></i> ${isExpired ? t.expired : t.booked}
+                                        </button>`
+                                    }
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
                         </div>
                     </div>
                 `;
+                
+                teacherIndex++;
             }
 
             container.innerHTML = html;
         }
+
+        // ============================================================
+        // 折叠/展开函数
+        // ============================================================
+        function toggleTeacherGroup(teacherKey) {
+            const body = document.getElementById(`${teacherKey}_body`);
+            const icon = document.getElementById(`${teacherKey}_icon`);
+            if (body) {
+                body.classList.toggle('collapsed');
+                if (icon) {
+                    icon.classList.toggle('collapsed');
+                }
+            }
+        }
+
+        function toggleDateGroup(dateKey) {
+            const body = document.getElementById(`${dateKey}_body`);
+            const icon = document.getElementById(`${dateKey}_icon`);
+            if (body) {
+                body.classList.toggle('collapsed');
+                if (icon) {
+                    icon.classList.toggle('collapsed');
+                }
+            }
+        }
+
+      
+
 
         // ============================================================
         // 预约确认
@@ -2475,6 +2842,10 @@
         window.closeBookingConfirm = closeBookingConfirm;
         window.confirmBooking = confirmBooking;
         window.cancelStudentBooking = openCancelBookingModal;
+          // 暴露折叠函数到全局
+        window.toggleTeacherGroup = toggleTeacherGroup;
+        window.toggleDateGroup = toggleDateGroup;
+       
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
