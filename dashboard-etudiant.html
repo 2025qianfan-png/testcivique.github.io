@@ -980,7 +980,13 @@ const i18n = {
         quizWrongCount: 'Erreurs',
         streakTitle: '🎯 Vous avez obtenu 35/40 ou plus 5 fois de suite !',
         streakReady: 'Prêt(e) pour l\'examen !',
-        streakCheck: 'Bravo ! Vous êtes prêt(e) pour l\'examen officiel.'
+        streakCheck: 'Bravo ! Vous êtes prêt(e) pour l\'examen officiel.',
+        type_droits_obligations: 'Droits et obligations',
+        type_valeurs_republique: 'Valeurs de la République',
+        type_institutions: 'Institutions',
+        type_vie_pratique: 'Vie pratique',
+        type_culture_francaise: 'Culture française',
+        type_situation_module: 'Mises en situation'
     },
     zh: {
         refresh: '刷新', test: '测试', home: '首页',
@@ -1018,7 +1024,13 @@ const i18n = {
         quizWrongCount: '错误次数',
         streakTitle: '🎯 您已连续5次获得35/40或以上！',
         streakReady: '准备报名考试！',
-        streakCheck: '太棒了！您已经准备好参加正式考试了。'
+        streakCheck: '太棒了！您已经准备好参加正式考试了。',
+        type_droits_obligations: '权利与义务',
+        type_valeurs_republique: '共和国价值观',
+        type_institutions: '政治机构',
+        type_vie_pratique: '实际生活',
+        type_culture_francaise: '法国文化',
+        type_situation_module: '情景题'
     }
 };
 
@@ -1031,7 +1043,13 @@ function getTestTypeName(type) {
         'annales_officielles': 'type_annales_officielles',
         'nationality': 'type_nationality',
         'ten_year': 'type_ten_year',
-        'multi_year': 'type_multi_year'
+        'multi_year': 'type_multi_year',
+         'droits_obligations': 'type_droits_obligations',   // 权利与义务
+        'valeurs_republique': 'type_valeurs_republique',   // 共和国价值观
+        'institutions': 'type_institutions',               // 政治机构
+        'vie_pratique': 'type_vie_pratique',               // 实际生活
+        'culture_francaise': 'type_culture_francaise',     // 历史与文化
+        'situation_module': 'type_situation_module',       // 情景题
     };
     const key = map[type] || 'type_unknown';
     return t(key);
