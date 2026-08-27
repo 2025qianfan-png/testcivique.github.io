@@ -122,6 +122,15 @@
         .credit-purple { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: white; }
         .credit-red { background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; }
 
+        .booking-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        @media (max-width: 768px) { .booking-section { padding: 15px; } }
+
         .courses-section {
             background: white;
             border-radius: var(--border-radius);
@@ -184,6 +193,15 @@
         .status-completed { background: rgba(46,204,113,0.1); color: #2ecc71; }
         .status-cancelled { background: rgba(149,165,166,0.2); color: #7f8c8d; }
 
+        .source-badge {
+            font-size: 0.65rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .source-badge.teacher { background: #e3f2fd; color: #1565c0; }
+        .source-badge.student { background: #e8f5e9; color: #2e7d32; }
+
         .course-details {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -234,6 +252,11 @@
         .btn-cancel { background: var(--red); color: white; }
         .btn-feedback { background: var(--purple); color: white; }
         .btn-feedback-done { background: var(--green); color: white; cursor: default; }
+        .btn-refresh { background: var(--primary-blue); color: white; }
+        .btn-book { background: var(--green); color: white; }
+        .btn-book:hover { background: #219653; }
+        .btn-book:disabled { background: #95a5a6; cursor: not-allowed; transform: none; }
+        .btn-unbook { background: var(--orange); color: white; }
 
         .modal {
             display: none;
@@ -494,6 +517,91 @@
         .feedback-done-banner i { font-size: 3rem; margin-bottom: 10px; display: block; }
         .feedback-done-banner h3 { color: white; margin-bottom: 5px; }
         .feedback-done-banner p { opacity: 0.9; margin: 0; }
+
+        /* 预约时间段卡片 */
+        .slot-card {
+            border: 2px solid #e8f5e9;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            transition: all 0.3s;
+            background: #fafffe;
+        }
+        .slot-card:hover { border-color: var(--green); box-shadow: var(--shadow); }
+        .slot-card .slot-teacher { font-weight: 700; color: var(--primary-blue); }
+        .slot-card .slot-time { color: var(--medium-gray); }
+        .slot-card .slot-duration {
+            display: inline-block;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .teacher-group {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        .teacher-group-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .teacher-group-header i { color: var(--primary-blue); font-size: 1.2rem; }
+        .teacher-group-header strong { color: var(--primary-blue); font-size: 1.1rem; }
+        .teacher-group-header .count-badge {
+            background: var(--green);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+        .slot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 10px;
+        }
+        @media (max-width: 480px) {
+            .slot-grid { grid-template-columns: 1fr; }
+        }
+        .slot-card .slot-actions {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .slot-card .slot-status {
+            font-size: 0.8rem;
+            color: var(--green);
+        }
+        .slot-card .slot-status i { margin-right: 4px; }
+
+        .booking-type-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .booking-type-btn {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        .booking-type-btn:hover { border-color: var(--primary-blue); background: #f5f7fa; }
+        .booking-type-btn.selected { border-color: var(--primary-blue); background: #e3f2fd; }
+        .booking-type-btn .type-label { font-weight: 600; display: block; }
+        .booking-type-btn .type-sub { font-size: 0.7rem; color: #999; }
     </style>
 </head>
 <body>
@@ -530,6 +638,20 @@
             <div class="stat-card credit-red"><div class="stat-icon"><i class="fas fa-hourglass-end"></i></div><div class="stat-number" id="remainingCredit">0</div><div class="stat-label" id="remainingCreditLabel">⏳ Restant</div></div>
         </div>
 
+        <!-- ===== 预约课程区域 ===== -->
+        <div class="booking-section">
+            <div class="section-header">
+                <h3><i class="fas fa-calendar-plus"></i> <span id="bookingTitle">📅 Réserver un cours</span></h3>
+                <button class="action-btn btn-refresh" id="refreshSlotsBtn">
+                    <i class="fas fa-sync"></i> <span id="refreshBtnText">Rafraîchir</span>
+                </button>
+            </div>
+            <div id="availableSlotsList">
+                <div class="empty-state" id="slotsLoading">Chargement des créneaux disponibles...</div>
+            </div>
+        </div>
+
+        <!-- ===== 课程列表 ===== -->
         <div class="courses-section">
             <div class="section-header">
                 <h3 id="myCoursesTitle"><i class="fas fa-calendar-day"></i> Mes cours</h3>
@@ -784,6 +906,85 @@
         </div>
     </div>
 
+    <!-- ===== 预约确认模态框 ===== -->
+    <div class="modal" id="bookingConfirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-calendar-check"></i> <span id="bookingConfirmTitle">Confirmer la réservation</span></h2>
+                <button class="close-modal" id="closeBookingConfirmBtn">&times;</button>
+            </div>
+            <div id="bookingConfirmInfo" style="margin-bottom: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px;">
+                <p><strong>👨‍🏫 Intervenant:</strong> <span id="bookingConfirmTeacher">-</span></p>
+                <p><strong>📅 Date:</strong> <span id="bookingConfirmDate">-</span></p>
+                <p><strong>⏰ Durée:</strong> <span id="bookingConfirmDuration">-</span> heures</p>
+                <p><strong>📚 Crédits disponibles:</strong> <span id="bookingConfirmCredit">-</span> heures</p>
+                <p style="color: var(--red); font-weight: 600; margin-top: 5px;">⚠️ Après réservation, <span id="bookingConfirmNewCredit">-</span> heures resteront.</p>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-book"></i> <span id="bookingTypeLabel">Type de cours</span></label>
+                <div class="booking-type-selector" id="bookingTypeSelector">
+                    <button type="button" class="booking-type-btn" data-type="ec">
+                        <span class="type-label">1️⃣ 公民考试</span>
+                        <span class="type-sub">Civique</span>
+                    </button>
+                    <button type="button" class="booking-type-btn" data-type="ec110">
+                        <span class="type-label">📚 十年卡全能班</span>
+                        <span class="type-sub">10 ans - Complet</span>
+                    </button>
+                    <button type="button" class="booking-type-btn" data-type="ec14">
+                        <span class="type-label">🎫 四年卡全能班</span>
+                        <span class="type-sub">4 ans - Complet</span>
+                    </button>
+                    <button type="button" class="booking-type-btn" data-type="ec1f">
+                        <span class="type-label">🛂 入籍全能班</span>
+                        <span class="type-sub">Nationalité - Complet</span>
+                    </button>
+                    <button type="button" class="booking-type-btn" data-type="ec210">
+                        <span class="type-label">📚 十年卡速成</span>
+                        <span class="type-sub">10 ans - Accéléré</span>
+                    </button>
+                    <button type="button" class="booking-type-btn" data-type="ec24">
+                        <span class="type-label">🎫 四年卡速成</span>
+                        <span class="type-sub">4 ans - Accéléré</span>
+                    </button>
+                    <button type="button" class="booking-type-btn" data-type="ec2f">
+                        <span class="type-label">🛂 入籍速成</span>
+                        <span class="type-sub">Nationalité - Accéléré</span>
+                    </button>
+                    <button type="button" class="booking-type-btn" data-type="ec310">
+                        <span class="type-label">📚 十年卡自选</span>
+                        <span class="type-sub">10 ans - Sur mesure</span>
+                    </button>
+                    <button type="button" class="booking-type-btn" data-type="ec34">
+                        <span class="type-label">🎫 四年卡自选</span>
+                        <span class="type-sub">4 ans - Sur mesure</span>
+                    </button>
+                    <button type="button" class="booking-type-btn" data-type="ec3f">
+                        <span class="type-label">🛂 入籍自选</span>
+                        <span class="type-sub">Nationalité - Sur mesure</span>
+                    </button>
+                    <button type="button" class="booking-type-btn" data-type="ex10">
+                        <span class="type-label">📝 十年卡模拟考试</span>
+                        <span class="type-sub">10 ans - Simulation</span>
+                    </button>
+                    <button type="button" class="booking-type-btn" data-type="ex4">
+                        <span class="type-label">📝 四年卡模拟考试</span>
+                        <span class="type-sub">4 ans - Simulation</span>
+                    </button>
+                    <button type="button" class="booking-type-btn" data-type="exf">
+                        <span class="type-label">📝 入籍模拟考试</span>
+                        <span class="type-sub">Nationalité - Simulation</span>
+                    </button>
+                </div>
+                <input type="hidden" id="bookingSelectedType">
+            </div>
+            <div class="form-actions">
+                <button type="button" class="cancel-btn" id="cancelBookingBtn"><span id="bookingCancelText">Annuler</span></button>
+                <button type="button" class="save-btn" id="confirmBookingBtn"><i class="fas fa-check"></i> <span id="bookingConfirmText">Confirmer la réservation</span></button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ============================================================
         // 翻译
@@ -856,20 +1057,37 @@
                 coursSuivis: "Cours suivis :",
                 partagez: "Partagez votre expérience pour nous aider à améliorer nos formations.",
                 vousAvezTermine: "Vous avez terminé tous vos cours !",
-                // 课程类型翻译
-                course_ec: "1️⃣ Civique",
-                course_ec110: "📚 10 ans - Complet",
-                course_ec14: "🎫 4 ans - Complet",
-                course_ec1f: "🛂 Nationalité - Complet",
-                course_ec210: "📚 10 ans - Accéléré",
-                course_ec24: "🎫 4 ans - Accéléré",
-                course_ec2f: "🛂 Nationalité - Accéléré",
-                course_ec310: "📚 10 ans - Sur mesure",
-                course_ec34: "🎫 4 ans - Sur mesure",
-                course_ec3f: "🛂 Nationalité - Sur mesure",
-                course_ex10: "📝 10 ans - Simulation",
-                course_ex4: "📝 4 ans - Simulation",
-                course_exf: "📝 Nationalité - Simulation"
+                // 预约
+                bookingTitle: "📅 Réserver un cours",
+                refreshBtnText: "Rafraîchir",
+                slotsLoading: "Chargement des créneaux disponibles...",
+                noSlotsAvailable: "📭 Aucun créneau disponible pour le moment",
+                bookingConfirmTitle: "Confirmer la réservation",
+                bookingTypeLabel: "Type de cours",
+                bookingConfirmText: "Confirmer la réservation",
+                bookingCancelText: "Annuler",
+                toastBookingSuccess: "✅ Cours réservé avec succès !",
+                toastBookingError: "❌ Erreur lors de la réservation",
+                toastInsufficientCredit: "❌ Crédits insuffisants",
+                toastSlotUnavailable: "❌ Ce créneau n'est plus disponible",
+                sourceTeacher: "📋 Créé par intervenant",
+                sourceStudent: "📋 Réservé par étudiant",
+                cancelBooking: "Annuler la réservation",
+                toastBookingCancelled: "✅ Réservation annulée, crédits restitués",
+                // 课程类型
+                course_ec: "1️⃣ 公民考试",
+                course_ec110: "📚 十年卡 - 全能班",
+                course_ec14: "🎫 四年卡 - 全能班",
+                course_ec1f: "🛂 入籍 - 全能班",
+                course_ec210: "📚 十年卡 - 速成",
+                course_ec24: "🎫 四年卡 - 速成",
+                course_ec2f: "🛂 入籍 - 速成",
+                course_ec310: "📚 十年卡 - 自选",
+                course_ec34: "🎫 四年卡 - 自选",
+                course_ec3f: "🛂 入籍 - 自选",
+                course_ex10: "📝 十年卡 - 模拟考试",
+                course_ex4: "📝 四年卡 - 模拟考试",
+                course_exf: "📝 入籍 - 模拟考试"
             },
             zh: {
                 pageTitle: "学生空间",
@@ -938,7 +1156,24 @@
                 coursSuivis: "已完成课程：",
                 partagez: "分享您的学习体验，帮助我们改进课程。",
                 vousAvezTermine: "您已完成所有课程！",
-                // 课程类型翻译
+                // 预约
+                bookingTitle: "📅 预约课程",
+                refreshBtnText: "刷新",
+                slotsLoading: "加载可用时间段...",
+                noSlotsAvailable: "📭 暂无可用时间段",
+                bookingConfirmTitle: "确认预约",
+                bookingTypeLabel: "课程类型",
+                bookingConfirmText: "确认预约",
+                bookingCancelText: "取消",
+                toastBookingSuccess: "✅ 预约成功！",
+                toastBookingError: "❌ 预约失败",
+                toastInsufficientCredit: "❌ 课时不足",
+                toastSlotUnavailable: "❌ 该时间段已被预约",
+                sourceTeacher: "📋 老师创建",
+                sourceStudent: "📋 学生预约",
+                cancelBooking: "取消预约",
+                toastBookingCancelled: "✅ 预约已取消，课时已返还",
+                // 课程类型
                 course_ec: "1️⃣ 公民考试",
                 course_ec110: "📚 十年卡 - 全能班",
                 course_ec14: "🎫 四年卡 - 全能班",
@@ -949,9 +1184,9 @@
                 course_ec310: "📚 十年卡 - 自选",
                 course_ec34: "🎫 四年卡 - 自选",
                 course_ec3f: "🛂 入籍 - 自选",
-                course_ex10: "📝 十年卡 - 模拟",
-                course_ex4: "📝 四年卡 - 模拟",
-                course_exf: "📝 入籍 - 模拟"
+                course_ex10: "📝 十年卡 - 模拟考试",
+                course_ex4: "📝 四年卡 - 模拟考试",
+                course_exf: "📝 入籍 - 模拟考试"
             }
         };
 
@@ -973,6 +1208,9 @@
             exam_prep: 0
         };
         let feedbackSubmitted = false;
+        let availableSlots = [];
+        let isBooking = false;
+        let pendingBookingSlot = null;
 
         // ============================================================
         // 工具函数
@@ -993,7 +1231,18 @@
             return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
         }
 
-        // 🔥 双语课程名称
+        function formatDateShort(dateStr) {
+            if (!dateStr) return '-';
+            let d = new Date(dateStr);
+            return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+        }
+
+        function formatTimeShort(dateStr) {
+            if (!dateStr) return '-';
+            let d = new Date(dateStr);
+            return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+        }
+
         function getCourseTypeText(courseType) {
             const t = translations[currentLang];
             const key = 'course_' + courseType;
@@ -1021,6 +1270,9 @@
             document.getElementById('langFrBtn').classList.toggle('active', lang === 'fr');
             document.getElementById('langZhBtn').classList.toggle('active', lang === 'zh');
             updateUIText();
+            renderCoursesList();
+            renderFeedbackEntry();
+            renderAvailableSlots();
         }
 
         function updateUIText() {
@@ -1035,7 +1287,9 @@
                 'cancelBtnText', 'confirmCancelBtnText', 'feedbackTitle', 'feedbackIntro',
                 'feedbackNameText', 'privacyNote', 'feedbackExamText', 'feedbackScoreText',
                 'feedbackCommentText', 'feedbackPublicText', 'feedbackCancelText', 'feedbackSubmitText',
-                'feedbackEntryTitle', 'ratingCriteriaTitle', 'totalScoreLabel'
+                'feedbackEntryTitle', 'ratingCriteriaTitle', 'totalScoreLabel',
+                'bookingTitle', 'refreshBtnText', 'bookingConfirmTitle', 'bookingTypeLabel',
+                'bookingConfirmText', 'bookingCancelText'
             ];
             ids.forEach(id => {
                 const el = document.getElementById(id);
@@ -1045,8 +1299,6 @@
             });
             document.getElementById('myCoursesTitle').innerHTML = `<i class="fas fa-calendar-day"></i> ${t.myCoursesTitle}`;
             document.getElementById('closeTeacherCommentModalBtn').textContent = "Fermer";
-            renderCoursesList();
-            renderFeedbackEntry();
         }
 
         // ============================================================
@@ -1064,7 +1316,7 @@
         }
 
         // ============================================================
-        // 数据加载
+        // 数据加载 - 课程
         // ============================================================
         async function loadMyCourses() {
             if (!window.supabaseAuth) {
@@ -1208,15 +1460,29 @@
                 const canCancel = c.status === 'scheduled' && !c.teacher_started && isMoreThan24HoursAhead(c.start_time);
                 const hasTeacherComment = c.teacher_comment && c.teacher_comment.trim() !== '';
                 const isCancelled = c.status === 'cancelled';
+                const isStudentBooking = c.source === 'student_booking';
 
-                // 🔥 使用双语课程名称
+                // 学生预约的课程可以取消（提前24小时）
+                const canCancelBooking = isStudentBooking && c.status === 'scheduled' && isMoreThan24HoursAhead(c.start_time);
+
                 const courseTypeDisplay = getCourseTypeText(c.course_type);
+
+                // 来源标签
+                let sourceBadge = '';
+                if (isStudentBooking) {
+                    sourceBadge = `<span class="source-badge student"><i class="fas fa-calendar-plus"></i> ${t.sourceStudent || 'Réservé'}</span>`;
+                } else {
+                    sourceBadge = `<span class="source-badge teacher"><i class="fas fa-chalkboard-user"></i> ${t.sourceTeacher || 'Créé par intervenant'}</span>`;
+                }
 
                 return `
                     <div class="course-card">
                         <div class="course-header">
                             <span class="course-title">${courseTypeDisplay} - ${timeDisplay}</span>
-                            <span class="status-badge ${statusClass}">${statusText}</span>
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                ${sourceBadge}
+                                <span class="status-badge ${statusClass}">${statusText}</span>
+                            </div>
                         </div>
                         <div class="course-details">
                             <div class="detail-item"><i class="fas fa-chalkboard-user"></i> Intervenant: ${escapeHtml(teacher?.name || 'N/A')}</div>
@@ -1225,6 +1491,7 @@
                             ${c.material_link ? `<div class="detail-item"><i class="fas fa-link"></i> <a href="${c.material_link}" target="_blank">Support</a></div>` : ''}
                             ${c.meeting_link ? `<div class="detail-item"><i class="fas fa-video"></i> <a href="${c.meeting_link}" target="_blank">Lien Meet</a></div>` : ''}
                             ${isCancelled && c.cancel_reason ? `<div class="detail-item"><i class="fas fa-ban"></i> Motif: ${escapeHtml(c.cancel_reason)}</div>` : ''}
+                            ${isStudentBooking ? `<div class="detail-item"><i class="fas fa-calendar-check"></i> Réservé via disponibilité</div>` : ''}
                         </div>
                         ${hasTeacherComment ? `
                             <div class="teacher-comment-area">
@@ -1236,6 +1503,7 @@
                             ${!isCancelled && canConfirm ? `<button class="action-btn btn-confirm" onclick="confirmCourse('${c.id}')"><i class="fas fa-check-circle"></i> ${t.confirmPresence}</button>` : ''}
                             ${!isCancelled && canRate ? `<button class="action-btn btn-rate" onclick="openRatingModal('${c.id}')"><i class="fas fa-star"></i> ${t.evaluate}</button>` : ''}
                             ${!isCancelled && canCancel ? `<button class="action-btn btn-cancel" onclick="openCancelModal('${c.id}','${c.start_time}','${escapeHtml(teacher?.name || '')}','${c.course_type}')"><i class="fas fa-trash-alt"></i> ${t.cancelCourse}</button>` : ''}
+                            ${!isCancelled && canCancelBooking ? `<button class="action-btn btn-cancel" onclick="cancelStudentBooking('${c.id}')"><i class="fas fa-undo"></i> ${t.cancelBooking || 'Annuler la réservation'}</button>` : ''}
                         </div>
                     </div>
                 `;
@@ -1243,39 +1511,371 @@
         }
 
         // ============================================================
-        // 教学评价入口
+        // 渲染可用时间段（预约功能）
         // ============================================================
-        function renderFeedbackEntry() {
-            const section = document.getElementById('feedbackEntrySection');
-            const content = document.getElementById('feedbackEntryContent');
+        async function loadAvailableSlots() {
+            const container = document.getElementById('availableSlotsList');
+            const t = translations[currentLang];
+            
+            container.innerHTML = `<div class="empty-state">🔄 ${t.slotsLoading || 'Chargement...'}</div>`;
+            
+            try {
+                const supabase = window.supabaseAuth.getSupabaseClient();
+                
+                const { data: slots, error } = await supabase
+                    .from('teacher_availabilities')
+                    .select(`
+                        *,
+                        teacher:teacher_id(id, name)
+                    `)
+                    .eq('status', 'available')
+                    .gt('start_time', new Date().toISOString())
+                    .order('start_time', { ascending: true });
+                
+                if (error) throw error;
+                
+                availableSlots = slots || [];
+                renderAvailableSlots();
+                
+            } catch (error) {
+                console.error('加载可用时间段失败:', error);
+                container.innerHTML = `<div class="empty-state">❌ Erreur de chargement</div>`;
+            }
+        }
+
+        function renderAvailableSlots() {
+            const container = document.getElementById('availableSlotsList');
             const t = translations[currentLang];
 
-            const hasCompletedCourses = myCourses.some(c => c.status === 'completed');
-            const canFeedback = studentCredit === 0 && hasCompletedCourses && !feedbackSubmitted;
-
-            if (!canFeedback) {
-                section.style.display = 'none';
+            if (availableSlots.length === 0) {
+                container.innerHTML = `<div class="empty-state">${t.noSlotsAvailable || '📭 Aucun créneau disponible pour le moment'}</div>`;
                 return;
             }
 
-            section.style.display = 'block';
+            // 按教师分组
+            const groupedSlots = {};
+            availableSlots.forEach(slot => {
+                const teacherId = slot.teacher_id;
+                if (!groupedSlots[teacherId]) {
+                    groupedSlots[teacherId] = {
+                        teacherName: slot.teacher?.name || 'Intervenant',
+                        teacherId: teacherId,
+                        slots: []
+                    };
+                }
+                groupedSlots[teacherId].slots.push(slot);
+            });
 
-            // 去重并用双语显示
-            const completedCourses = myCourses.filter(c => c.status === 'completed');
-            const uniqueCourseTypes = [...new Set(completedCourses.map(c => c.course_type))];
-            const courseNames = uniqueCourseTypes.map(t => getCourseTypeText(t)).join(', ');
+            let html = '';
+            for (const teacherId in groupedSlots) {
+                const group = groupedSlots[teacherId];
+                html += `
+                    <div class="teacher-group">
+                        <div class="teacher-group-header">
+                            <i class="fas fa-chalkboard-user"></i>
+                            <strong>${escapeHtml(group.teacherName)}</strong>
+                            <span class="count-badge">${group.slots.length} créneau(x)</span>
+                        </div>
+                        <div class="slot-grid">
+                            ${group.slots.map(slot => {
+                                const startDate = new Date(slot.start_time);
+                                const endDate = new Date(slot.end_time);
+                                const dateStr = formatDateShort(slot.start_time);
+                                const timeStr = `${formatTimeShort(slot.start_time)} - ${formatTimeShort(slot.end_time)}`;
+                                const duration = slot.duration || 2;
+                                const canBook = studentCredit >= duration;
 
-            content.innerHTML = `
-                <div style="text-align: center; padding: 20px 0;">
-                    <div style="font-size: 3rem; margin-bottom: 15px;">🎓</div>
-                    <h3 style="color: var(--primary-blue); margin-bottom: 10px;">${t.vousAvezTermine}</h3>
-                    <p style="color: var(--medium-gray); margin-bottom: 5px;">${t.coursSuivis} ${courseNames}</p>
-                    <p style="color: var(--medium-gray); margin-bottom: 20px;">${t.partagez}</p>
-                    <button class="action-btn btn-feedback" onclick="openFeedbackModal()" style="padding: 14px 40px; font-size: 1.1rem;">
-                        <i class="fas fa-comment-dots"></i> ${t.feedbackBtnText}
-                    </button>
-                </div>
-            `;
+                                return `
+                                    <div class="slot-card">
+                                        <div class="slot-time">
+                                            <i class="fas fa-calendar-day" style="color: var(--primary-blue);"></i> ${dateStr}
+                                            <br>
+                                            <i class="fas fa-clock" style="color: var(--primary-blue);"></i> ${timeStr}
+                                            <span class="slot-duration">${duration}h</span>
+                                        </div>
+                                        <div class="slot-actions">
+                                            <span class="slot-status"><i class="fas fa-check-circle"></i> Disponible</span>
+                                            ${canBook ? 
+                                                `<button class="action-btn btn-book" onclick="openBookingConfirm('${slot.id}', '${escapeHtml(group.teacherName)}', '${slot.start_time}', ${duration})">
+                                                    <i class="fas fa-hand-point-right"></i> Réserver
+                                                </button>` :
+                                                `<button class="action-btn btn-book" disabled style="background: #95a5a6; color: white; cursor: not-allowed;">
+                                                    <i class="fas fa-exclamation-triangle"></i> Crédits insuffisants
+                                                </button>`
+                                            }
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // 预约确认
+        // ============================================================
+        function openBookingConfirm(slotId, teacherName, startTime, duration) {
+            if (isBooking) return;
+            if (!currentStudent) return;
+            
+            const t = translations[currentLang];
+            
+            // 检查课时
+            if (studentCredit < duration) {
+                showToast(`${t.toastInsufficientCredit || '❌ Crédits insuffisants'}. Vous avez ${studentCredit}h, besoin de ${duration}h.`, 'error');
+                return;
+            }
+            
+            pendingBookingSlot = {
+                slotId: slotId,
+                teacherName: teacherName,
+                startTime: startTime,
+                duration: duration
+            };
+            
+            document.getElementById('bookingConfirmTeacher').textContent = teacherName;
+            document.getElementById('bookingConfirmDate').textContent = formatDateTime(startTime);
+            document.getElementById('bookingConfirmDuration').textContent = duration;
+            document.getElementById('bookingConfirmCredit').textContent = studentCredit;
+            document.getElementById('bookingConfirmNewCredit').textContent = studentCredit - duration;
+            
+            // 重置类型选择
+            document.querySelectorAll('.booking-type-btn').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById('bookingSelectedType').value = '';
+            
+            document.getElementById('bookingConfirmModal').style.display = 'flex';
+        }
+
+        function closeBookingConfirm() {
+            document.getElementById('bookingConfirmModal').style.display = 'none';
+            pendingBookingSlot = null;
+        }
+
+        // 初始化预约类型选择
+        function initBookingTypeSelector() {
+            document.querySelectorAll('.booking-type-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.booking-type-btn').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    document.getElementById('bookingSelectedType').value = this.dataset.type;
+                });
+            });
+        }
+
+        // 确认预约
+        async function confirmBooking() {
+            if (!pendingBookingSlot) return;
+            if (isBooking) return;
+            
+            const t = translations[currentLang];
+            const courseType = document.getElementById('bookingSelectedType').value;
+            
+            if (!courseType) {
+                showToast('Veuillez sélectionner un type de cours', 'error');
+                return;
+            }
+            
+            const { slotId, teacherName, startTime, duration } = pendingBookingSlot;
+            
+            // 再次检查课时
+            if (studentCredit < duration) {
+                showToast(`${t.toastInsufficientCredit || '❌ Crédits insuffisants'}`, 'error');
+                closeBookingConfirm();
+                return;
+            }
+            
+            isBooking = true;
+            
+            try {
+                const supabase = window.supabaseAuth.getSupabaseClient();
+                
+                // 1. 再次检查时间段是否仍然可用
+                const { data: slotCheck, error: checkError } = await supabase
+                    .from('teacher_availabilities')
+                    .select('status')
+                    .eq('id', slotId)
+                    .single();
+                
+                if (checkError) throw checkError;
+                
+                if (slotCheck.status !== 'available') {
+                    showToast(t.toastSlotUnavailable || '❌ Ce créneau n\'est plus disponible', 'error');
+                    closeBookingConfirm();
+                    await loadAvailableSlots();
+                    return;
+                }
+                
+                // 2. 获取教师ID
+                const { data: slotData, error: slotError } = await supabase
+                    .from('teacher_availabilities')
+                    .select('teacher_id')
+                    .eq('id', slotId)
+                    .single();
+                
+                if (slotError) throw slotError;
+                
+                // 3. 创建课程
+                const courseData = {
+                    student_id: currentStudent.userId,
+                    teacher_id: slotData.teacher_id,
+                    course_type: courseType,
+                    start_time: startTime,
+                    duration: duration,
+                    status: 'scheduled',
+                    source: 'student_booking',
+                    created_at: new Date().toISOString()
+                };
+                
+                const { data: course, error: courseError } = await supabase
+                    .from('courses')
+                    .insert([courseData])
+                    .select()
+                    .single();
+                
+                if (courseError) throw courseError;
+                
+                // 4. 扣减学生课时
+                const newCredit = studentCredit - duration;
+                const { error: updateCreditError } = await supabase
+                    .from('students')
+                    .update({ credit: newCredit })
+                    .eq('id', currentStudent.userId);
+                
+                if (updateCreditError) {
+                    // 回滚：删除课程
+                    await supabase.from('courses').delete().eq('id', course.id);
+                    throw updateCreditError;
+                }
+                
+                // 5. 更新空闲时间段
+                const { error: updateSlotError } = await supabase
+                    .from('teacher_availabilities')
+                    .update({
+                        status: 'booked',
+                        student_id: currentStudent.userId,
+                        student_name: currentStudent.name,
+                        course_id: course.id,
+                        booked_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', slotId)
+                    .eq('status', 'available');
+                
+                if (updateSlotError) {
+                    // 回滚：删除课程并返还课时
+                    await supabase.from('courses').delete().eq('id', course.id);
+                    await supabase.from('students').update({ credit: studentCredit }).eq('id', currentStudent.userId);
+                    throw updateSlotError;
+                }
+                
+                // 更新本地数据
+                studentCredit = newCredit;
+                closeBookingConfirm();
+                showToast(`${t.toastBookingSuccess || '✅ Cours réservé avec succès !'} ${duration}h consommées.`, 'success');
+                
+                // 刷新所有数据
+                await loadMyCourses();
+                await loadAvailableSlots();
+                updateCreditStats();
+                
+            } catch (error) {
+                console.error('预约失败:', error);
+                showToast(`${t.toastBookingError || '❌ Erreur lors de la réservation'}: ${error.message}`, 'error');
+            } finally {
+                isBooking = false;
+            }
+        }
+
+        // ============================================================
+        // 学生取消自己的预约
+        // ============================================================
+        async function cancelStudentBooking(courseId) {
+            const t = translations[currentLang];
+            
+            if (!confirm('Voulez-vous vraiment annuler ce cours réservé ? Les crédits vous seront restitués.')) return;
+            
+            try {
+                const supabase = window.supabaseAuth.getSupabaseClient();
+                
+                // 获取课程信息
+                const { data: course, error: courseError } = await supabase
+                    .from('courses')
+                    .select('*')
+                    .eq('id', courseId)
+                    .single();
+                
+                if (courseError) throw courseError;
+                
+                if (course.source !== 'student_booking') {
+                    showToast('Ce cours n\'a pas été réservé par un étudiant.', 'error');
+                    return;
+                }
+                
+                // 检查是否可取消（提前24小时）
+                if (!isMoreThan24HoursAhead(course.start_time)) {
+                    showToast(t.cannotCancel, 'error');
+                    return;
+                }
+                
+                // 返还课时
+                const { data: student, error: studentError } = await supabase
+                    .from('students')
+                    .select('credit')
+                    .eq('id', currentStudent.userId)
+                    .single();
+                
+                if (!studentError && student) {
+                    const newCredit = (student.credit || 0) + (course.duration || 2);
+                    await supabase
+                        .from('students')
+                        .update({ credit: newCredit })
+                        .eq('id', currentStudent.userId);
+                    studentCredit = newCredit;
+                }
+                
+                // 取消课程
+                await supabase
+                    .from('courses')
+                    .update({ 
+                        status: 'cancelled',
+                        cancel_reason: 'Annulé par l\'étudiant'
+                    })
+                    .eq('id', courseId);
+                
+                // 释放空闲时间段
+                const { data: slot } = await supabase
+                    .from('teacher_availabilities')
+                    .select('id')
+                    .eq('course_id', courseId)
+                    .single();
+                
+                if (slot) {
+                    await supabase
+                        .from('teacher_availabilities')
+                        .update({
+                            status: 'available',
+                            student_id: null,
+                            student_name: null,
+                            course_id: null,
+                            booked_at: null,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', slot.id);
+                }
+                
+                showToast(t.toastBookingCancelled || '✅ Réservation annulée, crédits restitués', 'success');
+                await loadMyCourses();
+                await loadAvailableSlots();
+                updateCreditStats();
+                
+            } catch (error) {
+                console.error('取消预约失败:', error);
+                showToast('❌ Erreur: ' + error.message, 'error');
+            }
         }
 
         // ============================================================
@@ -1319,7 +1919,7 @@
         }
 
         // ============================================================
-        // 取消课程
+        // 取消课程（原有功能）
         // ============================================================
         function openCancelModal(courseId, startTime, teacherName, courseType) {
             const t = translations[currentLang];
@@ -1399,6 +1999,38 @@
         // ============================================================
         // 教学评价
         // ============================================================
+        function renderFeedbackEntry() {
+            const section = document.getElementById('feedbackEntrySection');
+            const content = document.getElementById('feedbackEntryContent');
+            const t = translations[currentLang];
+
+            const hasCompletedCourses = myCourses.some(c => c.status === 'completed');
+            const canFeedback = studentCredit === 0 && hasCompletedCourses && !feedbackSubmitted;
+
+            if (!canFeedback) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+
+            const completedCourses = myCourses.filter(c => c.status === 'completed');
+            const uniqueCourseTypes = [...new Set(completedCourses.map(c => c.course_type))];
+            const courseNames = uniqueCourseTypes.map(t => getCourseTypeText(t)).join(', ');
+
+            content.innerHTML = `
+                <div style="text-align: center; padding: 20px 0;">
+                    <div style="font-size: 3rem; margin-bottom: 15px;">🎓</div>
+                    <h3 style="color: var(--primary-blue); margin-bottom: 10px;">${t.vousAvezTermine}</h3>
+                    <p style="color: var(--medium-gray); margin-bottom: 5px;">${t.coursSuivis} ${courseNames}</p>
+                    <p style="color: var(--medium-gray); margin-bottom: 20px;">${t.partagez}</p>
+                    <button class="action-btn btn-feedback" onclick="openFeedbackModal()" style="padding: 14px 40px; font-size: 1.1rem;">
+                        <i class="fas fa-comment-dots"></i> ${t.feedbackBtnText}
+                    </button>
+                </div>
+            `;
+        }
+
         function openFeedbackModal() {
             const t = translations[currentLang];
 
@@ -1622,13 +2254,27 @@
             };
             document.getElementById('feedbackForm').addEventListener('submit', submitFeedback);
 
-            initFeedbackStars();
+            // 预约确认模态框
+            document.getElementById('closeBookingConfirmBtn').onclick = closeBookingConfirm;
+            document.getElementById('cancelBookingBtn').onclick = closeBookingConfirm;
+            document.getElementById('bookingConfirmModal').onclick = (e) => {
+                if (e.target === document.getElementById('bookingConfirmModal')) closeBookingConfirm();
+            };
+            document.getElementById('confirmBookingBtn').onclick = confirmBooking;
 
+            // 初始化预约类型选择
+            initBookingTypeSelector();
+
+            // 语言切换
             document.getElementById('langFrBtn').onclick = () => switchLanguage('fr');
             document.getElementById('langZhBtn').onclick = () => switchLanguage('zh');
 
+            // 刷新预约按钮
+            document.getElementById('refreshSlotsBtn').onclick = loadAvailableSlots;
+
             initStars();
             initCancelReasons();
+            initFeedbackStars();
         }
 
         // ============================================================
@@ -1659,10 +2305,10 @@
             initFilters();
             updateUIText();
             await loadMyCourses();
+            await loadAvailableSlots();
         }
 
-        document.addEventListener('DOMContentLoaded', init);
-
+        // 暴露全局函数
         window.confirmCourse = confirmCourse;
         window.openRatingModal = openRatingModal;
         window.showTeacherComment = showTeacherComment;
@@ -1671,6 +2317,12 @@
         window.openFeedbackModal = openFeedbackModal;
         window.closeFeedbackModal = closeFeedbackModal;
         window.submitFeedback = submitFeedback;
+        window.openBookingConfirm = openBookingConfirm;
+        window.closeBookingConfirm = closeBookingConfirm;
+        window.confirmBooking = confirmBooking;
+        window.cancelStudentBooking = cancelStudentBooking;
+
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>

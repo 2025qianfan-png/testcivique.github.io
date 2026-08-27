@@ -2043,6 +2043,443 @@ async function getScoreStats(studentName) {
     }
 }
 // ============================================================
+// 教师空闲时间段管理（完整版：包含教师端 + 学生预约功能）
+// ============================================================
+
+/**
+ * 获取教师的所有空闲时间段
+ */
+async function getTeacherAvailabilities(teacherId, status = null) {
+    try {
+        const supabase = getSupabaseClient();
+        let query = supabase
+            .from('teacher_availabilities')
+            .select('*')
+            .eq('teacher_id', teacherId)
+            .order('start_time', { ascending: true });
+
+        if (status) {
+            query = query.eq('status', status);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('获取教师空闲时间失败:', error);
+        return [];
+    }
+}
+
+/**
+ * 获取所有可用的空闲时间段（供学生选择）
+ */
+async function getAllAvailableSlots(teacherId = null) {
+    try {
+        const supabase = getSupabaseClient();
+        let query = supabase
+            .from('teacher_availabilities')
+            .select('*')
+            .eq('status', 'available')
+            .gt('start_time', new Date().toISOString())
+            .order('start_time', { ascending: true });
+
+        if (teacherId) {
+            query = query.eq('teacher_id', teacherId);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        return data || [];
+    } catch (error) {
+        console.error('获取可用时间段失败:', error);
+        return [];
+    }
+}
+
+/**
+ * 获取所有教师的可用时间段（学生端使用，带教师信息）
+ */
+/**
+ * 获取所有教师的可用时间段（学生端使用，带教师信息）
+ */
+/**
+ * 获取所有教师的可用时间段（学生端使用，带教师信息）
+ */
+async function getAllTeachersAvailableSlots() {
+    try {
+        const supabase = getSupabaseClient();
+        
+        // 使用外键关联查询
+        const { data, error } = await supabase
+            .from('teacher_availabilities')
+            .select(`
+                *,
+                students!fk_teacher_availabilities_teacher_id(
+                    id, 
+                    name
+                )
+            `)
+            .eq('status', 'available')
+            .gt('start_time', new Date().toISOString())
+            .order('start_time', { ascending: true });
+
+        if (error) throw error;
+        
+        // 将 students 重命名为 teacher，保持前端代码兼容
+        return (data || []).map(slot => ({
+            ...slot,
+            teacher: slot.students || null
+        }));
+
+    } catch (error) {
+        console.error('获取所有教师可用时间段失败:', error);
+        return [];
+    }
+}
+/**
+ * 创建教师空闲时间段
+ */
+async function createTeacherAvailability(availabilityData) {
+    try {
+        const supabase = getSupabaseClient();
+        
+        const { data: existing, error: checkError } = await supabase
+            .from('teacher_availabilities')
+            .select('id, start_time, end_time')
+            .eq('teacher_id', availabilityData.teacher_id)
+            .in('status', ['available', 'booked'])
+            .or(`start_time.lt.${availabilityData.end_time},end_time.gt.${availabilityData.start_time}`);
+
+        if (checkError) throw checkError;
+
+        if (existing && existing.length > 0) {
+            for (const slot of existing) {
+                const slotStart = new Date(slot.start_time);
+                const slotEnd = new Date(slot.end_time);
+                const newStart = new Date(availabilityData.start_time);
+                const newEnd = new Date(availabilityData.end_time);
+                
+                if (newStart < slotEnd && newEnd > slotStart) {
+                    throw new Error('Ce créneau chevauche un créneau existant');
+                }
+            }
+        }
+
+        const { data, error } = await supabase
+            .from('teacher_availabilities')
+            .insert([{
+                ...availabilityData,
+                status: 'available',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }])
+            .select()
+            .single();
+
+        if (error) throw error;
+        console.log('✅ 空闲时间段创建成功:', data.id);
+        return data;
+    } catch (error) {
+        console.error('创建空闲时间段失败:', error);
+        throw error;
+    }
+}
+
+/**
+ * 删除教师空闲时间段
+ */
+async function deleteTeacherAvailability(id) {
+    try {
+        const supabase = getSupabaseClient();
+        
+        const { data: slot, error: checkError } = await supabase
+            .from('teacher_availabilities')
+            .select('status')
+            .eq('id', id)
+            .single();
+        
+        if (checkError) throw checkError;
+        
+        if (slot.status === 'booked') {
+            throw new Error('Impossible de supprimer un créneau déjà réservé');
+        }
+        
+        const { error } = await supabase
+            .from('teacher_availabilities')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+        return true;
+    } catch (error) {
+        console.error('删除空闲时间段失败:', error);
+        return false;
+    }
+}
+
+/**
+ * 学生预约时间段（仅更新空闲时间段状态）
+ */
+async function bookTeacherAvailability(slotId, studentId, studentName) {
+    try {
+        const supabase = getSupabaseClient();
+        
+        const { data: slot, error: slotError } = await supabase
+            .from('teacher_availabilities')
+            .select('*')
+            .eq('id', slotId)
+            .single();
+
+        if (slotError) throw slotError;
+        
+        if (slot.status !== 'available') {
+            throw new Error('Ce créneau n\'est plus disponible');
+        }
+
+        if (new Date(slot.start_time) < new Date()) {
+            throw new Error('Ce créneau a déjà expiré');
+        }
+
+        const { data, error } = await supabase
+            .from('teacher_availabilities')
+            .update({
+                status: 'booked',
+                student_id: studentId,
+                student_name: studentName,
+                booked_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', slotId)
+            .eq('status', 'available')
+            .select()
+            .single();
+
+        if (error) throw error;
+        console.log('✅ 学生预约成功:', data.id);
+        return data;
+    } catch (error) {
+        console.error('预约失败:', error);
+        throw error;
+    }
+}
+
+/**
+ * 取消预约（释放时间段）
+ */
+async function cancelBooking(slotId) {
+    try {
+        const supabase = getSupabaseClient();
+        
+        const { data, error } = await supabase
+            .from('teacher_availabilities')
+            .update({
+                status: 'available',
+                student_id: null,
+                student_name: null,
+                booked_at: null,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', slotId)
+            .eq('status', 'booked')
+            .select()
+            .single();
+
+        if (error) throw error;
+        console.log('✅ 预约取消成功:', data.id);
+        return data;
+    } catch (error) {
+        console.error('取消预约失败:', error);
+        return null;
+    }
+}
+
+/**
+ * 学生预约时间段（创建课程 + 更新空闲时间段）
+ * 这是最完整的学生预约流程
+ */
+async function bookSlotAndCreateCourse(slotId, studentId, studentName, courseType, duration = 2) {
+    try {
+        const supabase = getSupabaseClient();
+        
+        // 1. 检查时间段是否仍然可用
+        const { data: slot, error: slotError } = await supabase
+            .from('teacher_availabilities')
+            .select('*')
+            .eq('id', slotId)
+            .single();
+
+        if (slotError) throw slotError;
+        
+        if (slot.status !== 'available') {
+            throw new Error('Ce créneau n\'est plus disponible');
+        }
+
+        if (new Date(slot.start_time) < new Date()) {
+            throw new Error('Ce créneau a déjà expiré');
+        }
+
+        // 2. 检查学生课时是否足够
+        const { data: student, error: studentError } = await supabase
+            .from('students')
+            .select('credit')
+            .eq('id', studentId)
+            .single();
+        
+        if (studentError) throw studentError;
+        
+        const studentCredit = student?.credit || 0;
+        if (studentCredit < duration) {
+            throw new Error(`Crédits insuffisants. Vous avez ${studentCredit}h, besoin de ${duration}h.`);
+        }
+
+        // 3. 创建课程
+        const courseData = {
+            student_id: studentId,
+            teacher_id: slot.teacher_id,
+            course_type: courseType || 'ec',
+            start_time: slot.start_time,
+            duration: duration,
+            status: 'scheduled',
+            source: 'student_booking',
+            created_at: new Date().toISOString()
+        };
+
+        const { data: course, error: courseError } = await supabase
+            .from('courses')
+            .insert([courseData])
+            .select()
+            .single();
+
+        if (courseError) throw courseError;
+
+        // 4. 扣减学生课时
+        const newCredit = studentCredit - duration;
+        const { error: updateCreditError } = await supabase
+            .from('students')
+            .update({ credit: newCredit })
+            .eq('id', studentId);
+
+        if (updateCreditError) {
+            await supabase.from('courses').delete().eq('id', course.id);
+            throw updateCreditError;
+        }
+
+        // 5. 更新空闲时间段为已预约
+        const { data: updatedSlot, error: updateSlotError } = await supabase
+            .from('teacher_availabilities')
+            .update({
+                status: 'booked',
+                student_id: studentId,
+                student_name: studentName,
+                course_id: course.id,
+                booked_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', slotId)
+            .eq('status', 'available')
+            .select()
+            .single();
+
+        if (updateSlotError) {
+            await supabase.from('courses').delete().eq('id', course.id);
+            await supabase.from('students').update({ credit: studentCredit }).eq('id', studentId);
+            throw updateSlotError;
+        }
+
+        console.log('✅ 学生预约成功，课程已创建:', course.id);
+        return { course, slot: updatedSlot };
+
+    } catch (error) {
+        console.error('预约失败:', error);
+        throw error;
+    }
+}
+
+/**
+ * 取消学生预约的课程（同时释放空闲时间段）
+ */
+async function cancelStudentBooking(courseId) {
+    try {
+        const supabase = getSupabaseClient();
+        
+        const { data: course, error: courseError } = await supabase
+            .from('courses')
+            .select('*')
+            .eq('id', courseId)
+            .single();
+        
+        if (courseError) throw courseError;
+        
+        if (course.source !== 'student_booking') {
+            throw new Error('Ce cours n\'a pas été créé par une réservation étudiante');
+        }
+        
+        if (course.status === 'cancelled') {
+            throw new Error('Ce cours est déjà annulé');
+        }
+
+        const { data: slot, error: slotError } = await supabase
+            .from('teacher_availabilities')
+            .select('*')
+            .eq('course_id', courseId)
+            .single();
+        
+        if (slotError && slotError.code !== 'PGRST116') {
+            throw slotError;
+        }
+
+        // 返还课时
+        const { data: student, error: studentError } = await supabase
+            .from('students')
+            .select('credit')
+            .eq('id', course.student_id)
+            .single();
+        
+        if (!studentError && student) {
+            const newCredit = (student.credit || 0) + (course.duration || 2);
+            await supabase
+                .from('students')
+                .update({ credit: newCredit })
+                .eq('id', course.student_id);
+            console.log(`课时已返还: +${course.duration}h`);
+        }
+
+        // 取消课程
+        const { error: updateCourseError } = await supabase
+            .from('courses')
+            .update({ 
+                status: 'cancelled',
+                cancel_reason: 'Annulé par l\'étudiant'
+            })
+            .eq('id', courseId);
+        
+        if (updateCourseError) throw updateCourseError;
+
+        // 释放空闲时间段
+        if (slot) {
+            await supabase
+                .from('teacher_availabilities')
+                .update({
+                    status: 'available',
+                    student_id: null,
+                    student_name: null,
+                    course_id: null,
+                    booked_at: null,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', slot.id);
+            console.log('空闲时间段已释放');
+        }
+
+        return true;
+
+    } catch (error) {
+        console.error('取消预约失败:', error);
+        throw error;
+    }
+}
+// ============================================================
 // 导出所有功能
 // ============================================================
 window.supabaseAuth = {
@@ -2132,10 +2569,19 @@ window.supabaseAuth = {
     getListeningTexts: getListeningTexts,
     getListeningQuestions: getListeningQuestions,
     saveListeningProgress: saveListeningProgress,
-    getListeningProgress: getListeningProgress
+    getListeningProgress: getListeningProgress,
+ // ===== 教师空闲时间段管理 =====
+    getTeacherAvailabilities: getTeacherAvailabilities,
+    getAllAvailableSlots: getAllAvailableSlots,
+    getAllTeachersAvailableSlots: getAllTeachersAvailableSlots,
+    createTeacherAvailability: createTeacherAvailability,
+    deleteTeacherAvailability: deleteTeacherAvailability,
+    bookTeacherAvailability: bookTeacherAvailability,
+    cancelBooking: cancelBooking,
+    bookSlotAndCreateCourse: bookSlotAndCreateCourse,
+    cancelStudentBooking: cancelStudentBooking
 };
 
-console.log('✅ Supabase 配置已加载 (公民考试 + 法语 + 写作 + 语法 + 阅读 + 听力模块)');
+console.log('✅ Supabase 配置已加载 (公民考试 + 法语 + 写作 + 语法 + 阅读 + 听力 + 教师空闲时间)');
 console.log('📚 可用方法:', Object.keys(window.supabaseAuth));
 console.log('🤖 AI 服务: 优先 Mistral，备用 Gemini');
-
