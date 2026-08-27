@@ -249,7 +249,8 @@
         .action-btn:hover { transform: translateY(-2px); }
         .btn-confirm { background: var(--green); color: white; }
         .btn-rate { background: var(--orange); color: white; }
-        .btn-cancel { background: var(--red); color: white; }
+        .btn-cancel-course { background: var(--red); color: white; }
+        .btn-cancel-booking { background: var(--orange); color: white; }
         .btn-feedback { background: var(--purple); color: white; }
         .btn-feedback-done { background: var(--green); color: white; cursor: default; }
         .btn-refresh { background: var(--primary-blue); color: white; }
@@ -518,7 +519,6 @@
         .feedback-done-banner h3 { color: white; margin-bottom: 5px; }
         .feedback-done-banner p { opacity: 0.9; margin: 0; }
 
-        /* 预约时间段卡片 */
         .slot-card {
             border: 2px solid #e8f5e9;
             border-radius: var(--border-radius);
@@ -638,7 +638,6 @@
             <div class="stat-card credit-red"><div class="stat-icon"><i class="fas fa-hourglass-end"></i></div><div class="stat-number" id="remainingCredit">0</div><div class="stat-label" id="remainingCreditLabel">⏳ Restant</div></div>
         </div>
 
-        <!-- ===== 预约课程区域 ===== -->
         <div class="booking-section">
             <div class="section-header">
                 <h3><i class="fas fa-calendar-plus"></i> <span id="bookingTitle">📅 Réserver un cours</span></h3>
@@ -651,7 +650,6 @@
             </div>
         </div>
 
-        <!-- ===== 课程列表 ===== -->
         <div class="courses-section">
             <div class="section-header">
                 <h3 id="myCoursesTitle"><i class="fas fa-calendar-day"></i> Mes cours</h3>
@@ -709,7 +707,7 @@
         </div>
     </div>
 
-    <!-- ===== 取消课程模态框 ===== -->
+    <!-- ===== 取消课程模态框（老师创建的课） ===== -->
     <div class="modal" id="cancelCourseModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -752,6 +750,26 @@
             <div class="form-actions">
                 <button type="button" class="cancel-btn" id="cancelCancelBtn"><span id="cancelBtnText">Annuler</span></button>
                 <button type="button" class="save-btn" id="confirmCancelBtn"><span id="confirmCancelBtnText">Confirmer l'annulation</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 取消预约模态框（学生预约的课） ===== -->
+    <div class="modal" id="cancelBookingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-calendar-times"></i> <span id="cancelBookingModalTitle">Annuler la réservation</span></h2>
+                <button class="close-modal" id="closeCancelBookingModalBtn">&times;</button>
+            </div>
+            <div id="cancelBookingInfo" style="margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 8px;">
+                <p><strong>📚 Cours:</strong> <span id="cancelBookingCourseType">-</span></p>
+                <p><strong>👨‍🏫 Intervenant:</strong> <span id="cancelBookingTeacher">-</span></p>
+                <p><strong>📅 Date:</strong> <span id="cancelBookingDate">-</span></p>
+                <p style="color: var(--green); font-weight: 600; margin-top: 5px;">✅ Les crédits seront restitués.</p>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="cancel-btn" id="cancelBookingCancelBtn"><span id="cancelBookingCancelText">Annuler</span></button>
+                <button type="button" class="save-btn" id="confirmBookingCancelBtn"><i class="fas fa-undo"></i> <span id="confirmBookingCancelText">Confirmer l'annulation</span></button>
             </div>
         </div>
     </div>
@@ -1018,12 +1036,11 @@
                 toastRating: "Merci pour votre évaluation !",
                 toastCancelled: "Cours annulé, crédits restitués",
                 teacherCommentTitle: "Avis de l'intervenant",
-                teacherCommentLabel: "Avis du professeur:",
                 statusScheduled: "📅 Planifié",
                 statusInProgress: "🔄 En cours",
                 statusCompleted: "✅ Terminé",
                 statusCancelled: "❌ Annulé",
-                pendingConfirm: "En attente de confirmation",
+                pendingConfirm: "⏳ En attente de confirmation",
                 teacherCommentBtn: "Voir l'avis",
                 cancelModalTitle: "Annuler le cours",
                 cancelReasonLabel: "📝 Motif d'annulation",
@@ -1057,7 +1074,6 @@
                 coursSuivis: "Cours suivis :",
                 partagez: "Partagez votre expérience pour nous aider à améliorer nos formations.",
                 vousAvezTermine: "Vous avez terminé tous vos cours !",
-                // 预约
                 bookingTitle: "📅 Réserver un cours",
                 refreshBtnText: "Rafraîchir",
                 slotsLoading: "Chargement des créneaux disponibles...",
@@ -1087,7 +1103,53 @@
                 course_ec3f: "🛂 入籍 - 自选",
                 course_ex10: "📝 十年卡 - 模拟考试",
                 course_ex4: "📝 四年卡 - 模拟考试",
-                course_exf: "📝 入籍 - 模拟考试"
+                course_exf: "📝 入籍 - 模拟考试",
+                // 新增
+                noTeacher: "Intervenant inconnu",
+                locationToDefine: "À définir",
+                durationHours: "heures",
+                support: "Support",
+                meetLink: "Lien Meet",
+                cancelReason: "Motif",
+                bookedViaAvailability: "Réservé via disponibilité",
+                teacherCommentLabel: "Avis du professeur:",
+                viewComment: "Voir l'avis",
+                close: "Fermer",
+                selectReason: "Veuillez sélectionner un motif",
+                teacher: "Intervenant",
+                date: "Date",
+                duration: "Durée",
+                creditsAvailable: "Crédits disponibles",
+                afterReservation: "Après réservation",
+                hoursRemaining: "heures resteront",
+                courseType: "Type de cours",
+                confirmReservation: "Confirmer la réservation",
+                cancel: "Annuler",
+                reserve: "Réserver",
+                insufficientCredits: "Crédits insuffisants",
+                slotUnavailable: "Ce créneau n'est plus disponible",
+                bookingSuccess: "Cours réservé avec succès",
+                bookingError: "Erreur lors de la réservation",
+                bookingCancelled: "Réservation annulée, crédits restitués",
+                selectCourseType: "Veuillez sélectionner un type de cours",
+                refresh: "Rafraîchir",
+                loading: "Chargement...",
+                errorLoading: "Erreur de chargement",
+                available: "Disponible",
+                expired: "Expiré",
+                booked: "Réservé",
+                createdByTeacher: "Créé par intervenant",
+                reservedByStudent: "Réservé par étudiant",
+                cancelReservation: "Annuler la réservation",
+                confirmCancelBooking: "Voulez-vous vraiment annuler cette réservation ? Les crédits vous seront restitués.",
+                notStudentBooking: "Ce cours n'a pas été réservé par un étudiant.",
+                noRating: "Note 1-5",
+                cancelBookingModalTitle: "Annuler la réservation",
+                cancelBookingCancelText: "Annuler",
+                confirmBookingCancelText: "Confirmer l'annulation",
+                creditsRestored: "✅ Les crédits seront restitués.",
+                // 确认取消课程
+                confirmCancelCourse: "Voulez-vous vraiment annuler ce cours ? Les crédits vous seront restitués."
             },
             zh: {
                 pageTitle: "学生空间",
@@ -1117,12 +1179,11 @@
                 toastRating: "感谢您的评价！",
                 toastCancelled: "课程已取消，课时已返还",
                 teacherCommentTitle: "老师的评语",
-                teacherCommentLabel: "老师评语:",
                 statusScheduled: "📅 计划中",
                 statusInProgress: "🔄 进行中",
                 statusCompleted: "✅ 已完成",
                 statusCancelled: "❌ 已取消",
-                pendingConfirm: "等待您确认",
+                pendingConfirm: "⏳ 等待您确认",
                 teacherCommentBtn: "查看评语",
                 cancelModalTitle: "取消课程",
                 cancelReasonLabel: "📝 取消原因",
@@ -1156,7 +1217,6 @@
                 coursSuivis: "已完成课程：",
                 partagez: "分享您的学习体验，帮助我们改进课程。",
                 vousAvezTermine: "您已完成所有课程！",
-                // 预约
                 bookingTitle: "📅 预约课程",
                 refreshBtnText: "刷新",
                 slotsLoading: "加载可用时间段...",
@@ -1186,7 +1246,53 @@
                 course_ec3f: "🛂 入籍 - 自选",
                 course_ex10: "📝 十年卡 - 模拟考试",
                 course_ex4: "📝 四年卡 - 模拟考试",
-                course_exf: "📝 入籍 - 模拟考试"
+                course_exf: "📝 入籍 - 模拟考试",
+                // 新增
+                noTeacher: "未知老师",
+                locationToDefine: "待定",
+                durationHours: "小时",
+                support: "资料",
+                meetLink: "会议链接",
+                cancelReason: "原因",
+                bookedViaAvailability: "通过空闲时间预约",
+                teacherCommentLabel: "老师评语:",
+                viewComment: "查看评语",
+                close: "关闭",
+                selectReason: "请选择原因",
+                teacher: "老师",
+                date: "日期",
+                duration: "时长",
+                creditsAvailable: "可用课时",
+                afterReservation: "预约后",
+                hoursRemaining: "小时剩余",
+                courseType: "课程类型",
+                confirmReservation: "确认预约",
+                cancel: "取消",
+                reserve: "预约",
+                insufficientCredits: "课时不足",
+                slotUnavailable: "该时间段已被预约",
+                bookingSuccess: "预约成功",
+                bookingError: "预约失败",
+                bookingCancelled: "预约已取消，课时已返还",
+                selectCourseType: "请选择课程类型",
+                refresh: "刷新",
+                loading: "加载中...",
+                errorLoading: "加载失败",
+                available: "可用",
+                expired: "已过期",
+                booked: "已预约",
+                createdByTeacher: "老师创建",
+                reservedByStudent: "学生预约",
+                cancelReservation: "取消预约",
+                confirmCancelBooking: "确定要取消这个预约吗？课时将返还。",
+                notStudentBooking: "这个课程不是学生预约的。",
+                noRating: "请选择1-5分",
+                cancelBookingModalTitle: "取消预约",
+                cancelBookingCancelText: "取消",
+                confirmBookingCancelText: "确认取消",
+                creditsRestored: "✅ 课时将返还。",
+                // 确认取消课程
+                confirmCancelCourse: "确定要取消这个课程吗？课时将返还。"
             }
         };
 
@@ -1198,6 +1304,7 @@
         let myCourses = [];
         let studentCredit = 0;
         let pendingCancelCourse = null;
+        let pendingCancelBooking = null;
         let currentFilter = 'upcoming';
         let feedbackRatings = {
             quality: 0,
@@ -1289,7 +1396,8 @@
                 'feedbackCommentText', 'feedbackPublicText', 'feedbackCancelText', 'feedbackSubmitText',
                 'feedbackEntryTitle', 'ratingCriteriaTitle', 'totalScoreLabel',
                 'bookingTitle', 'refreshBtnText', 'bookingConfirmTitle', 'bookingTypeLabel',
-                'bookingConfirmText', 'bookingCancelText'
+                'bookingConfirmText', 'bookingCancelText',
+                'cancelBookingModalTitle', 'cancelBookingCancelText', 'confirmBookingCancelText'
             ];
             ids.forEach(id => {
                 const el = document.getElementById(id);
@@ -1298,7 +1406,7 @@
                 }
             });
             document.getElementById('myCoursesTitle').innerHTML = `<i class="fas fa-calendar-day"></i> ${t.myCoursesTitle}`;
-            document.getElementById('closeTeacherCommentModalBtn').textContent = "Fermer";
+            document.getElementById('closeTeacherCommentModalBtn').textContent = t.close || "Fermer";
         }
 
         // ============================================================
@@ -1382,7 +1490,7 @@
 
             } catch (error) {
                 console.error('加载课程失败:', error);
-                showToast('Erreur de chargement', 'error');
+                showToast(t.translations?.[currentLang]?.errorLoading || 'Erreur de chargement', 'error');
             }
         }
 
@@ -1405,7 +1513,7 @@
         }
 
         // ============================================================
-        // 渲染课程列表
+        // 渲染课程列表（区分预约和老师创建）
         // ============================================================
         function renderCoursesList() {
             const container = document.getElementById('coursesList');
@@ -1457,22 +1565,26 @@
 
                 const canConfirm = c.teacher_started && !c.student_confirmed && isNow;
                 const canRate = c.status === 'completed' && !c.student_rating;
-                const canCancel = c.status === 'scheduled' && !c.teacher_started && isMoreThan24HoursAhead(c.start_time);
-                const hasTeacherComment = c.teacher_comment && c.teacher_comment.trim() !== '';
                 const isCancelled = c.status === 'cancelled';
                 const isStudentBooking = c.source === 'student_booking';
-
-                // 学生预约的课程可以取消（提前24小时）
+                
+                // 🔥 关键区别：
+                // - 预约的课 (source = 'student_booking')：显示"取消预约"
+                // - 老师创建的课 (source = 'teacher' 或 null)：显示"取消课程"
                 const canCancelBooking = isStudentBooking && c.status === 'scheduled' && isMoreThan24HoursAhead(c.start_time);
+                const canCancelCourse = !isStudentBooking && c.status === 'scheduled' && !c.teacher_started && isMoreThan24HoursAhead(c.start_time);
 
+                const hasTeacherComment = c.teacher_comment && c.teacher_comment.trim() !== '';
                 const courseTypeDisplay = getCourseTypeText(c.course_type);
+                const teacherName = teacher?.name || t.noTeacher;
+                const locationDisplay = c.location || t.locationToDefine;
+                const durationDisplay = `${c.duration || 2} ${t.durationHours}`;
 
-                // 来源标签
                 let sourceBadge = '';
                 if (isStudentBooking) {
-                    sourceBadge = `<span class="source-badge student"><i class="fas fa-calendar-plus"></i> ${t.sourceStudent || 'Réservé'}</span>`;
+                    sourceBadge = `<span class="source-badge student"><i class="fas fa-calendar-plus"></i> ${t.sourceStudent}</span>`;
                 } else {
-                    sourceBadge = `<span class="source-badge teacher"><i class="fas fa-chalkboard-user"></i> ${t.sourceTeacher || 'Créé par intervenant'}</span>`;
+                    sourceBadge = `<span class="source-badge teacher"><i class="fas fa-chalkboard-user"></i> ${t.sourceTeacher}</span>`;
                 }
 
                 return `
@@ -1485,25 +1597,25 @@
                             </div>
                         </div>
                         <div class="course-details">
-                            <div class="detail-item"><i class="fas fa-chalkboard-user"></i> Intervenant: ${escapeHtml(teacher?.name || 'N/A')}</div>
-                            <div class="detail-item"><i class="fas fa-map-marker-alt"></i> ${c.location || 'À définir'}</div>
-                            <div class="detail-item"><i class="fas fa-clock"></i> Durée: ${c.duration || 2} heures</div>
-                            ${c.material_link ? `<div class="detail-item"><i class="fas fa-link"></i> <a href="${c.material_link}" target="_blank">Support</a></div>` : ''}
-                            ${c.meeting_link ? `<div class="detail-item"><i class="fas fa-video"></i> <a href="${c.meeting_link}" target="_blank">Lien Meet</a></div>` : ''}
-                            ${isCancelled && c.cancel_reason ? `<div class="detail-item"><i class="fas fa-ban"></i> Motif: ${escapeHtml(c.cancel_reason)}</div>` : ''}
-                            ${isStudentBooking ? `<div class="detail-item"><i class="fas fa-calendar-check"></i> Réservé via disponibilité</div>` : ''}
+                            <div class="detail-item"><i class="fas fa-chalkboard-user"></i> ${t.teacher}: ${escapeHtml(teacherName)}</div>
+                            <div class="detail-item"><i class="fas fa-map-marker-alt"></i> ${locationDisplay}</div>
+                            <div class="detail-item"><i class="fas fa-clock"></i> ${t.duration}: ${durationDisplay}</div>
+                            ${c.material_link ? `<div class="detail-item"><i class="fas fa-link"></i> <a href="${c.material_link}" target="_blank">${t.support}</a></div>` : ''}
+                            ${c.meeting_link ? `<div class="detail-item"><i class="fas fa-video"></i> <a href="${c.meeting_link}" target="_blank">${t.meetLink}</a></div>` : ''}
+                            ${isCancelled && c.cancel_reason ? `<div class="detail-item"><i class="fas fa-ban"></i> ${t.cancelReason}: ${escapeHtml(c.cancel_reason)}</div>` : ''}
+                            ${isStudentBooking ? `<div class="detail-item"><i class="fas fa-calendar-check"></i> ${t.bookedViaAvailability}</div>` : ''}
                         </div>
                         ${hasTeacherComment ? `
                             <div class="teacher-comment-area">
                                 <i class="fas fa-comment-dots"></i> <strong>${t.teacherCommentLabel}</strong>
-                                <button class="action-btn btn-rate" style="margin-top: 5px; padding: 4px 12px; font-size: 0.75rem;" onclick="showTeacherComment('${escapeHtml(c.teacher_comment)}')">${t.teacherCommentBtn}</button>
+                                <button class="action-btn btn-rate" style="margin-top: 5px; padding: 4px 12px; font-size: 0.75rem;" onclick="showTeacherComment('${escapeHtml(c.teacher_comment)}')">${t.viewComment}</button>
                             </div>
                         ` : ''}
                         <div class="course-actions">
                             ${!isCancelled && canConfirm ? `<button class="action-btn btn-confirm" onclick="confirmCourse('${c.id}')"><i class="fas fa-check-circle"></i> ${t.confirmPresence}</button>` : ''}
                             ${!isCancelled && canRate ? `<button class="action-btn btn-rate" onclick="openRatingModal('${c.id}')"><i class="fas fa-star"></i> ${t.evaluate}</button>` : ''}
-                            ${!isCancelled && canCancel ? `<button class="action-btn btn-cancel" onclick="openCancelModal('${c.id}','${c.start_time}','${escapeHtml(teacher?.name || '')}','${c.course_type}')"><i class="fas fa-trash-alt"></i> ${t.cancelCourse}</button>` : ''}
-                            ${!isCancelled && canCancelBooking ? `<button class="action-btn btn-cancel" onclick="cancelStudentBooking('${c.id}')"><i class="fas fa-undo"></i> ${t.cancelBooking || 'Annuler la réservation'}</button>` : ''}
+                            ${!isCancelled && canCancelCourse ? `<button class="action-btn btn-cancel-course" onclick="openCancelModal('${c.id}','${c.start_time}','${escapeHtml(teacherName)}','${c.course_type}')"><i class="fas fa-trash-alt"></i> ${t.cancelCourse}</button>` : ''}
+                            ${!isCancelled && canCancelBooking ? `<button class="action-btn btn-cancel-booking" onclick="openCancelBookingModal('${c.id}','${c.start_time}','${escapeHtml(teacherName)}','${c.course_type}')"><i class="fas fa-undo"></i> ${t.cancelReservation}</button>` : ''}
                         </div>
                     </div>
                 `;
@@ -1539,7 +1651,7 @@
                 
             } catch (error) {
                 console.error('加载可用时间段失败:', error);
-                container.innerHTML = `<div class="empty-state">❌ Erreur de chargement</div>`;
+                container.innerHTML = `<div class="empty-state">❌ ${t.errorLoading || 'Erreur de chargement'}</div>`;
             }
         }
 
@@ -1548,17 +1660,16 @@
             const t = translations[currentLang];
 
             if (availableSlots.length === 0) {
-                container.innerHTML = `<div class="empty-state">${t.noSlotsAvailable || '📭 Aucun créneau disponible pour le moment'}</div>`;
+                container.innerHTML = `<div class="empty-state">${t.noSlotsAvailable}</div>`;
                 return;
             }
 
-            // 按教师分组
             const groupedSlots = {};
             availableSlots.forEach(slot => {
                 const teacherId = slot.teacher_id;
                 if (!groupedSlots[teacherId]) {
                     groupedSlots[teacherId] = {
-                        teacherName: slot.teacher?.name || 'Intervenant',
+                        teacherName: slot.teacher?.name || t.noTeacher,
                         teacherId: teacherId,
                         slots: []
                     };
@@ -1584,6 +1695,25 @@
                                 const timeStr = `${formatTimeShort(slot.start_time)} - ${formatTimeShort(slot.end_time)}`;
                                 const duration = slot.duration || 2;
                                 const canBook = studentCredit >= duration;
+                                const isExpired = new Date(slot.end_time) < new Date();
+                                const isAvailable = slot.status === 'available' && !isExpired;
+
+                                let statusText = '';
+                                let statusIcon = '';
+                                let statusColor = '';
+                                if (isAvailable) {
+                                    statusText = t.available;
+                                    statusIcon = 'fa-check-circle';
+                                    statusColor = 'var(--green)';
+                                } else if (isExpired || slot.status === 'expired') {
+                                    statusText = t.expired;
+                                    statusIcon = 'fa-clock';
+                                    statusColor = 'var(--gray)';
+                                } else {
+                                    statusText = t.booked;
+                                    statusIcon = 'fa-book';
+                                    statusColor = 'var(--orange)';
+                                }
 
                                 return `
                                     <div class="slot-card">
@@ -1594,13 +1724,19 @@
                                             <span class="slot-duration">${duration}h</span>
                                         </div>
                                         <div class="slot-actions">
-                                            <span class="slot-status"><i class="fas fa-check-circle"></i> Disponible</span>
-                                            ${canBook ? 
+                                            <span class="slot-status" style="color: ${statusColor};">
+                                                <i class="fas ${statusIcon}"></i> ${statusText}
+                                            </span>
+                                            ${isAvailable && canBook ? 
                                                 `<button class="action-btn btn-book" onclick="openBookingConfirm('${slot.id}', '${escapeHtml(group.teacherName)}', '${slot.start_time}', ${duration})">
-                                                    <i class="fas fa-hand-point-right"></i> Réserver
+                                                    <i class="fas fa-hand-point-right"></i> ${t.reserve}
+                                                </button>` :
+                                                isAvailable && !canBook ?
+                                                `<button class="action-btn btn-book" disabled style="background: #95a5a6; color: white; cursor: not-allowed;">
+                                                    <i class="fas fa-exclamation-triangle"></i> ${t.insufficientCredits}
                                                 </button>` :
                                                 `<button class="action-btn btn-book" disabled style="background: #95a5a6; color: white; cursor: not-allowed;">
-                                                    <i class="fas fa-exclamation-triangle"></i> Crédits insuffisants
+                                                    <i class="fas fa-ban"></i> ${isExpired ? t.expired : t.booked}
                                                 </button>`
                                             }
                                         </div>
@@ -1624,9 +1760,8 @@
             
             const t = translations[currentLang];
             
-            // 检查课时
             if (studentCredit < duration) {
-                showToast(`${t.toastInsufficientCredit || '❌ Crédits insuffisants'}. Vous avez ${studentCredit}h, besoin de ${duration}h.`, 'error');
+                showToast(`${t.insufficientCredits}. Vous avez ${studentCredit}h, besoin de ${duration}h.`, 'error');
                 return;
             }
             
@@ -1643,7 +1778,6 @@
             document.getElementById('bookingConfirmCredit').textContent = studentCredit;
             document.getElementById('bookingConfirmNewCredit').textContent = studentCredit - duration;
             
-            // 重置类型选择
             document.querySelectorAll('.booking-type-btn').forEach(btn => btn.classList.remove('selected'));
             document.getElementById('bookingSelectedType').value = '';
             
@@ -1655,7 +1789,6 @@
             pendingBookingSlot = null;
         }
 
-        // 初始化预约类型选择
         function initBookingTypeSelector() {
             document.querySelectorAll('.booking-type-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -1666,7 +1799,6 @@
             });
         }
 
-        // 确认预约
         async function confirmBooking() {
             if (!pendingBookingSlot) return;
             if (isBooking) return;
@@ -1675,15 +1807,14 @@
             const courseType = document.getElementById('bookingSelectedType').value;
             
             if (!courseType) {
-                showToast('Veuillez sélectionner un type de cours', 'error');
+                showToast(t.selectCourseType, 'error');
                 return;
             }
             
             const { slotId, teacherName, startTime, duration } = pendingBookingSlot;
             
-            // 再次检查课时
             if (studentCredit < duration) {
-                showToast(`${t.toastInsufficientCredit || '❌ Crédits insuffisants'}`, 'error');
+                showToast(t.insufficientCredits, 'error');
                 closeBookingConfirm();
                 return;
             }
@@ -1693,7 +1824,6 @@
             try {
                 const supabase = window.supabaseAuth.getSupabaseClient();
                 
-                // 1. 再次检查时间段是否仍然可用
                 const { data: slotCheck, error: checkError } = await supabase
                     .from('teacher_availabilities')
                     .select('status')
@@ -1703,13 +1833,12 @@
                 if (checkError) throw checkError;
                 
                 if (slotCheck.status !== 'available') {
-                    showToast(t.toastSlotUnavailable || '❌ Ce créneau n\'est plus disponible', 'error');
+                    showToast(t.slotUnavailable, 'error');
                     closeBookingConfirm();
                     await loadAvailableSlots();
                     return;
                 }
                 
-                // 2. 获取教师ID
                 const { data: slotData, error: slotError } = await supabase
                     .from('teacher_availabilities')
                     .select('teacher_id')
@@ -1718,7 +1847,6 @@
                 
                 if (slotError) throw slotError;
                 
-                // 3. 创建课程
                 const courseData = {
                     student_id: currentStudent.userId,
                     teacher_id: slotData.teacher_id,
@@ -1738,7 +1866,6 @@
                 
                 if (courseError) throw courseError;
                 
-                // 4. 扣减学生课时
                 const newCredit = studentCredit - duration;
                 const { error: updateCreditError } = await supabase
                     .from('students')
@@ -1746,12 +1873,10 @@
                     .eq('id', currentStudent.userId);
                 
                 if (updateCreditError) {
-                    // 回滚：删除课程
                     await supabase.from('courses').delete().eq('id', course.id);
                     throw updateCreditError;
                 }
                 
-                // 5. 更新空闲时间段
                 const { error: updateSlotError } = await supabase
                     .from('teacher_availabilities')
                     .update({
@@ -1766,42 +1891,56 @@
                     .eq('status', 'available');
                 
                 if (updateSlotError) {
-                    // 回滚：删除课程并返还课时
                     await supabase.from('courses').delete().eq('id', course.id);
                     await supabase.from('students').update({ credit: studentCredit }).eq('id', currentStudent.userId);
                     throw updateSlotError;
                 }
                 
-                // 更新本地数据
                 studentCredit = newCredit;
                 closeBookingConfirm();
-                showToast(`${t.toastBookingSuccess || '✅ Cours réservé avec succès !'} ${duration}h consommées.`, 'success');
+                showToast(`${t.bookingSuccess} ${duration}h consommées.`, 'success');
                 
-                // 刷新所有数据
                 await loadMyCourses();
                 await loadAvailableSlots();
                 updateCreditStats();
                 
             } catch (error) {
                 console.error('预约失败:', error);
-                showToast(`${t.toastBookingError || '❌ Erreur lors de la réservation'}: ${error.message}`, 'error');
+                showToast(`${t.bookingError}: ${error.message}`, 'error');
             } finally {
                 isBooking = false;
             }
         }
 
         // ============================================================
-        // 学生取消自己的预约
+        // 取消预约（学生预约的课）
         // ============================================================
-        async function cancelStudentBooking(courseId) {
+        function openCancelBookingModal(courseId, startTime, teacherName, courseType) {
             const t = translations[currentLang];
-            
-            if (!confirm('Voulez-vous vraiment annuler ce cours réservé ? Les crédits vous seront restitués.')) return;
+            if (!isMoreThan24HoursAhead(startTime)) {
+                showToast(t.cannotCancel, 'error');
+                return;
+            }
+            pendingCancelBooking = { courseId, startTime, teacherName, courseType };
+            document.getElementById('cancelBookingCourseType').textContent = getCourseTypeText(courseType);
+            document.getElementById('cancelBookingTeacher').textContent = teacherName;
+            document.getElementById('cancelBookingDate').textContent = formatDateTime(startTime);
+            document.getElementById('cancelBookingModal').style.display = 'flex';
+        }
+
+        function closeCancelBookingModal() {
+            document.getElementById('cancelBookingModal').style.display = 'none';
+            pendingCancelBooking = null;
+        }
+
+        async function executeCancelBooking() {
+            if (!pendingCancelBooking) return;
+            const t = translations[currentLang];
+            const { courseId } = pendingCancelBooking;
             
             try {
                 const supabase = window.supabaseAuth.getSupabaseClient();
                 
-                // 获取课程信息
                 const { data: course, error: courseError } = await supabase
                     .from('courses')
                     .select('*')
@@ -1811,13 +1950,8 @@
                 if (courseError) throw courseError;
                 
                 if (course.source !== 'student_booking') {
-                    showToast('Ce cours n\'a pas été réservé par un étudiant.', 'error');
-                    return;
-                }
-                
-                // 检查是否可取消（提前24小时）
-                if (!isMoreThan24HoursAhead(course.start_time)) {
-                    showToast(t.cannotCancel, 'error');
+                    showToast(t.notStudentBooking, 'error');
+                    closeCancelBookingModal();
                     return;
                 }
                 
@@ -1842,7 +1976,7 @@
                     .from('courses')
                     .update({ 
                         status: 'cancelled',
-                        cancel_reason: 'Annulé par l\'étudiant'
+                        cancel_reason: 'Annulé par l\'étudiant (réservation)'
                     })
                     .eq('id', courseId);
                 
@@ -1867,59 +2001,20 @@
                         .eq('id', slot.id);
                 }
                 
-                showToast(t.toastBookingCancelled || '✅ Réservation annulée, crédits restitués', 'success');
+                closeCancelBookingModal();
+                showToast(t.bookingCancelled, 'success');
                 await loadMyCourses();
                 await loadAvailableSlots();
                 updateCreditStats();
                 
             } catch (error) {
                 console.error('取消预约失败:', error);
-                showToast('❌ Erreur: ' + error.message, 'error');
+                showToast('❌ ' + t.toastError + ': ' + error.message, 'error');
             }
         }
 
         // ============================================================
-        // 课程操作
-        // ============================================================
-        async function confirmCourse(courseId) {
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            const t = translations[currentLang];
-            const { error } = await supabase.from('courses').update({ student_confirmed: true, status: 'in_progress' }).eq('id', courseId);
-            if (error) { showToast(t.toastError, 'error'); return; }
-            showToast(t.toastConfirmed, 'success');
-            await loadMyCourses();
-        }
-
-        function openRatingModal(courseId) {
-            document.getElementById('ratingCourseId').value = courseId;
-            document.getElementById('studentRating').value = '';
-            document.getElementById('studentComment').value = '';
-            document.querySelectorAll('#ratingStars .star').forEach(s => s.classList.remove('active'));
-            document.getElementById('ratingModal').style.display = 'flex';
-        }
-
-        function showTeacherComment(comment) {
-            document.getElementById('teacherCommentContent').innerHTML = `<div style="padding: 15px; background: #f5f5f5; border-radius: 8px;">${escapeHtml(comment)}</div>`;
-            document.getElementById('teacherCommentModal').style.display = 'flex';
-        }
-
-        async function saveRating(e) {
-            e.preventDefault();
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            const t = translations[currentLang];
-            const courseId = document.getElementById('ratingCourseId').value;
-            const rating = parseInt(document.getElementById('studentRating').value);
-            const comment = document.getElementById('studentComment').value;
-            if (!rating || rating < 1 || rating > 5) { showToast('Note 1-5', 'error'); return; }
-            const { error } = await supabase.from('courses').update({ student_rating: rating, student_comment: comment || null }).eq('id', courseId);
-            if (error) { showToast(t.toastError, 'error'); return; }
-            document.getElementById('ratingModal').style.display = 'none';
-            showToast(t.toastRating, 'success');
-            await loadMyCourses();
-        }
-
-        // ============================================================
-        // 取消课程（原有功能）
+        // 取消课程（老师创建的课）
         // ============================================================
         function openCancelModal(courseId, startTime, teacherName, courseType) {
             const t = translations[currentLang];
@@ -1927,10 +2022,13 @@
                 showToast(t.cannotCancel, 'error');
                 return;
             }
+            if (!confirm(t.confirmCancelCourse)) return;
+            
             pendingCancelCourse = { courseId, startTime, teacherName, courseType };
             document.getElementById('cancelCourseType').textContent = getCourseTypeText(courseType);
             document.getElementById('cancelCourseTeacher').textContent = teacherName;
             document.getElementById('cancelCourseDate').textContent = formatDateTime(startTime);
+            
             document.querySelectorAll('input[name="cancelReason"]').forEach(r => r.checked = false);
             document.getElementById('customReason').value = '';
             document.getElementById('customReasonContainer').classList.remove('show');
@@ -1957,7 +2055,7 @@
                 if (custom) selectedReason = custom;
             }
             if (!selectedReason) {
-                showToast('Veuillez sélectionner un motif', 'error');
+                showToast(t.selectReason, 'error');
                 return;
             }
 
@@ -1965,35 +2063,83 @@
             const course = myCourses.find(c => c.id === courseId);
             if (!course) return;
 
-            const isConsuming = course.status === 'scheduled' || course.status === 'in_progress' || course.status === 'completed';
-            if (isConsuming) {
-                await refundStudentCredit(course.student_id, course.duration || 2);
+            // 返还课时
+            const { data: student, error: studentError } = await supabase
+                .from('students')
+                .select('credit')
+                .eq('id', currentStudent.userId)
+                .single();
+            
+            if (!studentError && student) {
+                const newCredit = (student.credit || 0) + (course.duration || 2);
+                await supabase
+                    .from('students')
+                    .update({ credit: newCredit })
+                    .eq('id', currentStudent.userId);
+                studentCredit = newCredit;
             }
 
-            const { error } = await supabase.from('courses').update({ status: 'cancelled', cancel_reason: selectedReason }).eq('id', courseId);
+            const { error } = await supabase.from('courses').update({ 
+                status: 'cancelled', 
+                cancel_reason: selectedReason 
+            }).eq('id', courseId);
+            
             if (error) {
                 showToast(t.cancelFail + ': ' + error.message, 'error');
                 return;
             }
 
-            document.getElementById('cancelCourseModal').style.display = 'none';
-            pendingCancelCourse = null;
+            closeCancelModal();
             showToast(t.cancelSuccess, 'success');
+            await loadMyCourses();
+            updateCreditStats();
+        }
+
+        // ============================================================
+        // 课程操作
+        // ============================================================
+        async function confirmCourse(courseId) {
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const t = translations[currentLang];
+            const { error } = await supabase.from('courses').update({ student_confirmed: true, status: 'in_progress' }).eq('id', courseId);
+            if (error) { showToast(t.toastError, 'error'); return; }
+            showToast(t.toastConfirmed, 'success');
             await loadMyCourses();
         }
 
-        async function refundStudentCredit(studentId, hours) {
-            if (!studentId || !hours || hours <= 0) return true;
+        function openRatingModal(courseId) {
+            const t = translations[currentLang];
+            document.getElementById('ratingTitle').textContent = t.ratingTitle;
+            document.getElementById('ratingLabel').textContent = t.ratingLabel;
+            document.getElementById('commentLabel').textContent = t.commentLabel;
+            document.getElementById('saveRatingText').textContent = t.saveRatingText;
+            document.getElementById('cancelRatingText').textContent = t.cancelRatingText;
+            
+            document.getElementById('ratingCourseId').value = courseId;
+            document.getElementById('studentRating').value = '';
+            document.getElementById('studentComment').value = '';
+            document.querySelectorAll('#ratingStars .star').forEach(s => s.classList.remove('active'));
+            document.getElementById('ratingModal').style.display = 'flex';
+        }
+
+        function showTeacherComment(comment) {
+            document.getElementById('teacherCommentContent').innerHTML = `<div style="padding: 15px; background: #f5f5f5; border-radius: 8px;">${escapeHtml(comment)}</div>`;
+            document.getElementById('teacherCommentModal').style.display = 'flex';
+        }
+
+        async function saveRating(e) {
+            e.preventDefault();
             const supabase = window.supabaseAuth.getSupabaseClient();
-            const { data: student } = await supabase.from('students').select('credit').eq('id', studentId).single();
-            if (!student) return true;
-            const newCredit = (student.credit || 0) + hours;
-            const { error } = await supabase.from('students').update({ credit: newCredit }).eq('id', studentId);
-            if (error) {
-                console.error('返还课时失败:', error);
-                return false;
-            }
-            return true;
+            const t = translations[currentLang];
+            const courseId = document.getElementById('ratingCourseId').value;
+            const rating = parseInt(document.getElementById('studentRating').value);
+            const comment = document.getElementById('studentComment').value;
+            if (!rating || rating < 1 || rating > 5) { showToast(t.noRating || 'Note 1-5', 'error'); return; }
+            const { error } = await supabase.from('courses').update({ student_rating: rating, student_comment: comment || null }).eq('id', courseId);
+            if (error) { showToast(t.toastError, 'error'); return; }
+            document.getElementById('ratingModal').style.display = 'none';
+            showToast(t.toastRating, 'success');
+            await loadMyCourses();
         }
 
         // ============================================================
@@ -2240,11 +2386,20 @@
                 if (e.target === document.getElementById('teacherCommentModal')) document.getElementById('teacherCommentModal').style.display = 'none';
             };
 
+            // 取消课程（老师创建）
             document.getElementById('confirmCancelBtn').onclick = executeCancelCourse;
             document.getElementById('closeCancelModalBtn').onclick = closeCancelModal;
             document.getElementById('cancelCancelBtn').onclick = closeCancelModal;
             document.getElementById('cancelCourseModal').onclick = (e) => {
                 if (e.target === document.getElementById('cancelCourseModal')) closeCancelModal();
+            };
+
+            // 取消预约（学生预约）
+            document.getElementById('confirmBookingCancelBtn').onclick = executeCancelBooking;
+            document.getElementById('closeCancelBookingModalBtn').onclick = closeCancelBookingModal;
+            document.getElementById('cancelBookingCancelBtn').onclick = closeCancelBookingModal;
+            document.getElementById('cancelBookingModal').onclick = (e) => {
+                if (e.target === document.getElementById('cancelBookingModal')) closeCancelBookingModal();
             };
 
             document.getElementById('closeFeedbackBtn').onclick = closeFeedbackModal;
@@ -2254,7 +2409,6 @@
             };
             document.getElementById('feedbackForm').addEventListener('submit', submitFeedback);
 
-            // 预约确认模态框
             document.getElementById('closeBookingConfirmBtn').onclick = closeBookingConfirm;
             document.getElementById('cancelBookingBtn').onclick = closeBookingConfirm;
             document.getElementById('bookingConfirmModal').onclick = (e) => {
@@ -2262,14 +2416,11 @@
             };
             document.getElementById('confirmBookingBtn').onclick = confirmBooking;
 
-            // 初始化预约类型选择
             initBookingTypeSelector();
 
-            // 语言切换
             document.getElementById('langFrBtn').onclick = () => switchLanguage('fr');
             document.getElementById('langZhBtn').onclick = () => switchLanguage('zh');
 
-            // 刷新预约按钮
             document.getElementById('refreshSlotsBtn').onclick = loadAvailableSlots;
 
             initStars();
@@ -2314,13 +2465,16 @@
         window.showTeacherComment = showTeacherComment;
         window.openCancelModal = openCancelModal;
         window.closeCancelModal = closeCancelModal;
+        window.openCancelBookingModal = openCancelBookingModal;
+        window.closeCancelBookingModal = closeCancelBookingModal;
+        window.executeCancelBooking = executeCancelBooking;
         window.openFeedbackModal = openFeedbackModal;
         window.closeFeedbackModal = closeFeedbackModal;
         window.submitFeedback = submitFeedback;
         window.openBookingConfirm = openBookingConfirm;
         window.closeBookingConfirm = closeBookingConfirm;
         window.confirmBooking = confirmBooking;
-        window.cancelStudentBooking = cancelStudentBooking;
+        window.cancelStudentBooking = openCancelBookingModal;
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
