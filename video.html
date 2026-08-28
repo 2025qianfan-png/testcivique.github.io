@@ -8,11 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.1/dist/peerjs.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* ===== 全局样式 ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --primary-blue: #004080;
             --primary-light-blue: #0066cc;
@@ -20,15 +17,11 @@
             --green: #27ae60;
             --red: #e74c3c;
             --gray: #95a5a6;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.15);
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
             --radius: 16px;
         }
-
-        html,
-        body {
-            height: 100%;
-        }
+        html, body { height: 100%; }
         body {
             font-family: 'Open Sans', sans-serif;
             background: #f0f2f5;
@@ -37,21 +30,16 @@
             flex-direction: column;
             min-height: 100vh;
         }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 20px;
-            width: 100%;
-        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; width: 100%; }
+        @media (max-width: 480px) { .container { padding: 0 12px; } }
 
         /* ===== 页眉 ===== */
         .header {
             background: linear-gradient(135deg, var(--primary-blue), var(--primary-light-blue));
             color: white;
-            padding: 16px 0;
+            padding: 14px 0;
             flex-shrink: 0;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
             transition: transform 0.3s ease;
             position: relative;
             z-index: 10;
@@ -61,72 +49,54 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
         }
-        .header .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .header .brand .logo-icon {
-            font-size: 1.8rem;
-            color: var(--primary-yellow);
-        }
-        .header .brand h1 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: white;
-        }
-        .header .brand .sub {
-            font-size: 0.65rem;
-            opacity: 0.8;
-            display: block;
-        }
-        .header .brand .sub span {
-            color: var(--primary-yellow);
-            font-weight: 600;
+        .header .brand { display: flex; align-items: center; gap: 10px; }
+        .header .brand .logo-icon { font-size: 1.6rem; color: var(--primary-yellow); }
+        .header .brand h1 { font-size: 1.2rem; font-weight: 700; color: white; }
+        .header .brand .sub { font-size: 0.6rem; opacity: 0.8; display: block; }
+        .header .brand .sub span { color: var(--primary-yellow); font-weight: 600; }
+        @media (max-width: 480px) {
+            .header .brand h1 { font-size: 0.95rem; }
+            .header .brand .logo-icon { font-size: 1.3rem; }
         }
         .header .info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             flex-wrap: wrap;
         }
         .header .info .room {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 4px 14px;
+            background: rgba(255,255,255,0.15);
+            padding: 3px 10px;
             border-radius: 30px;
-            font-size: 0.7rem;
+            font-size: 0.6rem;
         }
         .header .info .user {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 4px 14px;
+            background: rgba(255,255,255,0.2);
+            padding: 3px 10px;
             border-radius: 30px;
-            font-size: 0.7rem;
+            font-size: 0.6rem;
         }
         .header .info .user .tag {
-            background: rgba(255, 255, 255, 0.25);
-            padding: 1px 8px;
+            background: rgba(255,255,255,0.25);
+            padding: 1px 6px;
             border-radius: 20px;
-            font-size: 0.55rem;
+            font-size: 0.5rem;
             font-weight: 600;
         }
         .btn-exit {
             background: var(--red);
             color: white;
             border: none;
-            padding: 5px 14px;
+            padding: 4px 10px;
             border-radius: 30px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             transition: all 0.2s;
         }
-        .btn-exit:hover {
-            background: #c0392b;
-            transform: translateY(-2px);
-        }
-
+        .btn-exit:hover { background: #c0392b; transform: translateY(-2px); }
         .header.hidden-fs {
             transform: translateY(-100%);
             opacity: 0;
@@ -138,75 +108,54 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 24px 0 30px 0;
+            padding: 16px 0 24px 0;
         }
 
         /* ===== 加入面板 ===== */
         .join-panel {
-            max-width: 420px;
+            max-width: 400px;
             margin: auto;
             background: white;
             border-radius: var(--radius);
-            padding: 40px 32px;
+            padding: 32px 24px;
             box-shadow: var(--shadow-lg);
             text-align: center;
             width: 100%;
         }
-        .join-panel .icon {
-            font-size: 3rem;
-            color: var(--primary-yellow);
-            margin-bottom: 12px;
-        }
-        .join-panel h2 {
-            color: var(--primary-blue);
-            font-size: 1.3rem;
-            margin-bottom: 4px;
-        }
-        .join-panel p {
-            color: #888;
-            font-size: 0.85rem;
-            margin-bottom: 20px;
-        }
+        .join-panel .icon { font-size: 2.5rem; color: var(--primary-yellow); margin-bottom: 10px; }
+        .join-panel h2 { color: var(--primary-blue); font-size: 1.2rem; margin-bottom: 4px; }
+        .join-panel p { color: #888; font-size: 0.8rem; margin-bottom: 16px; }
         .join-panel input {
             width: 100%;
-            padding: 12px 16px;
+            padding: 10px 14px;
             border: 2px solid #e0e4e8;
             border-radius: 12px;
-            font-size: 0.95rem;
-            margin-bottom: 14px;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
             transition: all 0.2s;
         }
         .join-panel input:focus {
             outline: none;
             border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.08);
+            box-shadow: 0 0 0 3px rgba(0,64,128,0.08);
         }
         .join-panel .btn-join {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             background: linear-gradient(135deg, var(--primary-blue), var(--primary-light-blue));
             color: white;
             border: none;
             border-radius: 12px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
         }
-        .join-panel .btn-join:hover {
-            transform: scale(1.01);
-            filter: brightness(0.95);
-        }
-        .join-panel .hint {
-            margin-top: 14px;
-            color: #aaa;
-            font-size: 0.75rem;
-        }
-        .join-panel .hint i {
-            color: var(--primary-yellow);
-        }
+        .join-panel .btn-join:hover { transform: scale(1.01); filter: brightness(0.95); }
+        .join-panel .hint { margin-top: 12px; color: #aaa; font-size: 0.7rem; }
+        .join-panel .hint i { color: var(--primary-yellow); }
 
-        /* ===== 加载动画 ===== */
+        /* ===== 加载 ===== */
         .loading {
             display: flex;
             flex-direction: column;
@@ -216,33 +165,25 @@
             flex: 1;
         }
         .loading .spinner {
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             border: 4px solid #e8ecf1;
             border-top: 4px solid var(--primary-yellow);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        .loading p {
-            margin-top: 16px;
-            color: #999;
-            font-size: 0.9rem;
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading p { margin-top: 14px; color: #999; font-size: 0.85rem; }
 
         /* ===== 视频房间 ===== */
         #videoRoom {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
         }
 
-        /* ===== 主视频区 ===== */
+        /* ===== 主视频 ===== */
         .main-video {
             position: relative;
             background: #0f0f1a;
@@ -260,36 +201,15 @@
             object-fit: cover;
             display: block;
         }
-
         .main-video .label {
             position: absolute;
-            bottom: 14px;
-            left: 14px;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 4px 14px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            color: white;
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            z-index: 5;
-            pointer-events: none;
-        }
-        .main-video .label i {
-            color: var(--primary-yellow);
-        }
-
-        .main-video .status {
-            position: absolute;
-            top: 14px;
-            right: 14px;
-            background: rgba(0, 0, 0, 0.6);
+            bottom: 12px;
+            left: 12px;
+            background: rgba(0,0,0,0.6);
             padding: 3px 12px;
             border-radius: 30px;
-            font-size: 0.65rem;
-            color: #2ecc71;
+            font-size: 0.7rem;
+            color: white;
             backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
@@ -297,66 +217,39 @@
             z-index: 5;
             pointer-events: none;
         }
+        .main-video .label i { color: var(--primary-yellow); }
+        .main-video .status {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.6);
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            color: #2ecc71;
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            z-index: 5;
+            pointer-events: none;
+        }
         .main-video .status .dot {
             display: inline-block;
-            width: 7px;
-            height: 7px;
+            width: 6px;
+            height: 6px;
             background: #2ecc71;
             border-radius: 50%;
             animation: pulse 1.5s ease-in-out infinite;
         }
         @keyframes pulse {
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.4;
-                transform: scale(0.8);
-            }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
         }
-        .main-video .status.offline {
-            color: var(--gray);
-        }
-        .main-video .status.offline .dot {
-            background: var(--gray);
-        }
+        .main-video .status.offline { color: var(--gray); }
+        .main-video .status.offline .dot { background: var(--gray); }
 
-        /* ===== 全屏按钮（桌面 + 手机兼容） ===== */
-        .main-video .btn-fs {
-            position: absolute;
-            bottom: 14px;
-            right: 14px;
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            padding: 5px 12px;
-            font-size: 0.65rem;
-            cursor: pointer;
-            backdrop-filter: blur(4px);
-            z-index: 6;
-            opacity: 0.6;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .main-video .btn-fs:hover {
-            opacity: 1;
-            background: rgba(0, 0, 0, 0.7);
-        }
-
-        /* 全屏状态 */
-        .main-video:fullscreen .btn-fs,
-        .main-video:-webkit-full-screen .btn-fs {
-            display: none;
-        }
-        .main-video:fullscreen .btn-fs-exit,
-        .main-video:-webkit-full-screen .btn-fs-exit {
-            display: flex !important;
-        }
+        /* ===== 全屏状态 ===== */
         .main-video:fullscreen,
         .main-video:-webkit-full-screen {
             border-radius: 0 !important;
@@ -371,67 +264,33 @@
             z-index: 99999 !important;
         }
         .main-video:fullscreen video,
-        .main-video:-webkit-full-screen video {
-            object-fit: contain !important;
-        }
+        .main-video:-webkit-full-screen video { object-fit: contain !important; }
         .main-video:fullscreen .label,
-        .main-video:-webkit-full-screen .label {
-            font-size: 0.95rem;
-            padding: 8px 18px;
-        }
+        .main-video:-webkit-full-screen .label { font-size: 0.9rem; padding: 6px 16px; }
         .main-video:fullscreen .status,
-        .main-video:-webkit-full-screen .status {
-            font-size: 0.8rem;
-            padding: 5px 14px;
-        }
+        .main-video:-webkit-full-screen .status { font-size: 0.75rem; padding: 4px 12px; }
         .main-video:fullscreen .pip,
-        .main-video:-webkit-full-screen .pip {
-            width: 220px;
-            bottom: 28px;
-            right: 28px;
-        }
-
-        .main-video .btn-fs-exit {
-            display: none !important;
-            position: absolute;
-            top: 18px;
-            right: 18px;
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 30px;
-            padding: 7px 16px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            backdrop-filter: blur(8px);
-            z-index: 20;
-            align-items: center;
-            gap: 6px;
-        }
-        .main-video .btn-fs-exit:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
+        .main-video:-webkit-full-screen .pip { width: 200px; bottom: 24px; right: 24px; }
+        .main-video:fullscreen .fs-overlay-btn,
+        .main-video:-webkit-full-screen .fs-overlay-btn { display: none !important; }
 
         /* ===== 画中画 ===== */
         .pip {
             position: absolute;
-            bottom: 16px;
-            right: 16px;
-            width: 160px;
+            bottom: 14px;
+            right: 14px;
+            width: 140px;
             aspect-ratio: 4 / 3;
             border-radius: 10px;
             overflow: hidden;
             background: #1a1a2e;
-            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
-            border: 2px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.5);
+            border: 2px solid rgba(255,255,255,0.12);
             z-index: 10;
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        .pip:hover {
-            transform: scale(1.04);
-            border-color: var(--primary-yellow);
-        }
+        .pip:hover { transform: scale(1.04); border-color: var(--primary-yellow); }
         .pip video {
             width: 100%;
             height: 100%;
@@ -440,130 +299,91 @@
         }
         .pip .pip-label {
             position: absolute;
-            bottom: 6px;
-            left: 8px;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 2px 10px;
+            bottom: 4px;
+            left: 6px;
+            background: rgba(0,0,0,0.6);
+            padding: 1px 8px;
             border-radius: 20px;
-            font-size: 0.55rem;
+            font-size: 0.5rem;
             color: white;
             backdrop-filter: blur(4px);
             pointer-events: none;
         }
-        .pip .pip-label i {
-            color: var(--primary-yellow);
-            margin-right: 3px;
+        .pip .pip-label i { color: var(--primary-yellow); margin-right: 2px; }
+        @media (max-width: 480px) {
+            .pip { width: 90px; }
+            .main-video:fullscreen .pip,
+            .main-video:-webkit-full-screen .pip { width: 130px; }
         }
+
+        /* ===== 全屏按钮 — 现在放在控制栏里，不在视频上 ===== */
+        /* 视频上的小全屏按钮隐藏了，用控制栏的代替 */
 
         /* ===== 控制栏 ===== */
         .controls {
             background: white;
             border-radius: var(--radius);
-            padding: 14px 20px;
+            padding: 12px 16px;
             box-shadow: var(--shadow);
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
             flex-shrink: 0;
         }
-        .controls button {
-            padding: 8px 18px;
+        .controls .ctrl-btn {
+            padding: 8px 14px;
             border: none;
             border-radius: 30px;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             cursor: pointer;
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            min-width: 70px;
+            gap: 5px;
+            min-width: 60px;
             justify-content: center;
             background: #eef0f3;
             color: #333;
         }
-        .controls button:hover {
-            transform: translateY(-2px);
-            filter: brightness(0.95);
-        }
-        .controls .mic {
-            background: #eef0f3;
-            color: #333;
-        }
-        .controls .mic.muted {
-            background: #e74c3c;
-            color: white;
-        }
-        .controls .cam {
-            background: #eef0f3;
-            color: #333;
-        }
-        .controls .cam.off {
-            background: #e74c3c;
-            color: white;
-        }
-        .controls .screen {
-            background: var(--green);
-            color: white;
-        }
-        .controls .screen.active {
-            background: var(--red);
-            color: white;
-        }
-        .controls .hangup {
-            background: var(--red);
-            color: white;
-        }
-
+        .controls .ctrl-btn:hover { transform: translateY(-2px); filter: brightness(0.95); }
+        .controls .ctrl-btn.mic { background: #eef0f3; color: #333; }
+        .controls .ctrl-btn.mic.muted { background: #e74c3c; color: white; }
+        .controls .ctrl-btn.cam { background: #eef0f3; color: #333; }
+        .controls .ctrl-btn.cam.off { background: #e74c3c; color: white; }
+        .controls .ctrl-btn.screen { background: var(--green); color: white; }
+        .controls .ctrl-btn.screen.active { background: var(--red); color: white; }
+        .controls .ctrl-btn.fullscreen { background: #533483; color: white; }
+        .controls .ctrl-btn.fullscreen.active { background: #2c3e50; color: white; }
+        .controls .ctrl-btn.hangup { background: var(--red); color: white; }
         @media (max-width: 480px) {
-            .controls button {
-                padding: 6px 12px;
-                font-size: 0.65rem;
-                min-width: 50px;
-            }
-            .pip {
-                width: 100px;
-            }
-            .main-video:fullscreen .pip,
-            .main-video:-webkit-full-screen .pip {
-                width: 140px;
-            }
+            .controls .ctrl-btn { padding: 6px 10px; font-size: 0.65rem; min-width: 45px; }
         }
 
         /* ===== 状态栏 ===== */
         .status-bar {
             text-align: center;
-            padding: 8px 16px;
+            padding: 6px 14px;
             border-radius: var(--radius);
             background: white;
             box-shadow: var(--shadow);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #666;
             flex-shrink: 0;
         }
-        .status-bar .text {
-            font-weight: 500;
-        }
-        .status-bar .text.success {
-            color: var(--green);
-        }
-        .status-bar .text.warning {
-            color: #f39c12;
-        }
-        .status-bar .text.error {
-            color: var(--red);
-        }
-        .status-bar .text.info {
-            color: var(--primary-blue);
-        }
+        .status-bar .text { font-weight: 500; }
+        .status-bar .text.success { color: var(--green); }
+        .status-bar .text.warning { color: #f39c12; }
+        .status-bar .text.error { color: var(--red); }
+        .status-bar .text.info { color: var(--primary-blue); }
 
         /* ===== 页脚 ===== */
         .footer {
             background: var(--primary-blue);
             color: white;
             text-align: center;
-            padding: 14px 0;
+            padding: 12px 0;
             flex-shrink: 0;
             margin-top: auto;
         }
@@ -572,16 +392,17 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 8px;
-            font-size: 0.75rem;
+            gap: 6px;
+            font-size: 0.7rem;
         }
         .footer .container .brand-small {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
-        .footer .container .brand-small i {
-            color: var(--primary-yellow);
+        .footer .container .brand-small i { color: var(--primary-yellow); }
+        @media (max-width: 480px) {
+            .footer .container { flex-direction: column; text-align: center; font-size: 0.6rem; }
         }
 
         /* ===== Toast ===== */
@@ -589,51 +410,29 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 30px;
             color: white;
             font-weight: 600;
             z-index: 1100;
             animation: slideIn 0.3s ease;
             box-shadow: var(--shadow-lg);
-            max-width: 360px;
-            font-size: 0.85rem;
+            max-width: 320px;
+            font-size: 0.8rem;
         }
         @media (max-width: 480px) {
-            .toast {
-                bottom: 10px;
-                right: 10px;
-                left: 10px;
-                padding: 8px 14px;
-                font-size: 0.75rem;
-            }
+            .toast { bottom: 10px; right: 10px; left: 10px; padding: 6px 12px; font-size: 0.7rem; }
         }
-        .toast-success {
-            background: var(--green);
-        }
-        .toast-error {
-            background: var(--red);
-        }
-        .toast-warning {
-            background: #f39c12;
-        }
-        .toast-info {
-            background: var(--primary-blue);
-        }
+        .toast-success { background: var(--green); }
+        .toast-error { background: var(--red); }
+        .toast-warning { background: #f39c12; }
+        .toast-info { background: var(--primary-blue); }
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(100%);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -649,7 +448,7 @@
                 </div>
             </div>
             <div class="info">
-                <span class="room" id="roomDisplay"><i class="fas fa-door-open"></i> Salle: <strong>chargement...</strong></span>
+                <span class="room" id="roomDisplay"><i class="fas fa-door-open"></i> <strong id="roomName">chargement...</strong></span>
                 <span class="user hidden" id="userBadge">
                     <i class="fas fa-user-circle"></i>
                     <span id="userName">-</span>
@@ -663,7 +462,6 @@
     <!-- ===== MAIN ===== -->
     <main class="container">
 
-        <!-- 加入面板 -->
         <div id="joinPanel" class="join-panel">
             <div class="icon"><i class="fas fa-sailboat"></i></div>
             <h2>⛵ 千帆课堂</h2>
@@ -673,45 +471,39 @@
             <div class="hint"><i class="fas fa-info-circle"></i> Le premier entrant devient le professeur</div>
         </div>
 
-        <!-- 加载 -->
         <div id="loading" class="loading hidden">
             <div class="spinner"></div>
             <p id="loadingText">⏳ Connexion en cours...</p>
         </div>
 
-        <!-- 视频房间 -->
         <div id="videoRoom" class="hidden">
 
-            <!-- 主视频 -->
             <div class="main-video" id="mainVideo">
                 <video id="remoteVideo" autoplay playsinline></video>
-
                 <div class="label" id="remoteLabel">
                     <i class="fas fa-user"></i> En attente...
                 </div>
                 <div class="status offline" id="remoteStatus">
                     <span class="dot"></span> Déconnecté
                 </div>
-
-                <!-- 画中画 -->
                 <div class="pip" id="pipWrapper">
                     <video id="localVideo" autoplay muted playsinline></video>
                     <div class="pip-label"><i class="fas fa-user"></i> <span id="localLabel">Moi</span></div>
                 </div>
-
-                <button class="btn-fs" id="fsBtn"><i class="fas fa-expand"></i> Plein écran</button>
-                <button class="btn-fs-exit" id="fsExitBtn"><i class="fas fa-compress"></i> Quitter</button>
             </div>
 
-            <!-- 控制栏 -->
+            <!-- ===== 控制栏 — 全屏按钮在这里 ===== -->
             <div class="controls">
-                <button class="mic" id="micBtn"><i class="fas fa-microphone"></i> Micro</button>
-                <button class="cam" id="camBtn"><i class="fas fa-video"></i> Caméra</button>
-                <button class="screen" id="screenBtn"><i class="fas fa-desktop"></i> Écran</button>
-                <button class="hangup" id="hangupBtn"><i class="fas fa-phone-slash"></i> Raccrocher</button>
+                <button class="ctrl-btn mic" id="micBtn"><i class="fas fa-microphone"></i> Micro</button>
+                <button class="ctrl-btn cam" id="camBtn"><i class="fas fa-video"></i> Caméra</button>
+                <button class="ctrl-btn screen" id="screenBtn"><i class="fas fa-desktop"></i> Écran</button>
+                <!-- 🔥 全屏按钮放在这里，手机上也能看到 -->
+                <button class="ctrl-btn fullscreen" id="fsControlBtn">
+                    <i class="fas fa-expand"></i> Plein écran
+                </button>
+                <button class="ctrl-btn hangup" id="hangupBtn"><i class="fas fa-phone-slash"></i> Raccrocher</button>
             </div>
 
-            <!-- 状态栏 -->
             <div class="status-bar">
                 <span class="text info" id="statusText">Prêt</span>
             </div>
@@ -719,7 +511,6 @@
 
     </main>
 
-    <!-- ===== FOOTER ===== -->
     <footer class="footer">
         <div class="container">
             <span class="brand-small"><i class="fas fa-sailboat"></i> ⛵ 千帆课堂 · Association Mille Voiles</span>
@@ -740,18 +531,43 @@
             const ROOM_ID = 'mille-voiles-classroom';
 
             // ============================================================
-            //  Token 处理
+            //  PeerJS 配置 — 加入 TURN 服务器
             // ============================================================
-            function decodeToken() {
+            const PEER_CONFIG = {
+                debug: 0,
+                config: {
+                    iceServers: [
+                        { urls: 'stun:stun.voip.eutelia.it' },
+                        { urls: 'stun:stun.voiparound.com' },
+                        { urls: 'stun:stun.xten.com' },
+                        {
+                            urls: [
+                                'turn:openrelay.metered.ca:80',
+                                'turn:openrelay.metered.ca:443',
+                                'turn:openrelay.metered.ca:443?transport=tcp'
+                            ],
+                            username: 'openrelayproject',
+                            credential: 'openrelayproject'
+                        }
+                    ]
+                }
+            };
+
+            // ============================================================
+            //  URL 参数
+            // ============================================================
+            function getURLParam(name) {
                 const urlParams = new URLSearchParams(window.location.search);
-                const token = urlParams.get('token');
+                return urlParams.get(name);
+            }
+
+            function decodeToken() {
+                const token = getURLParam('token');
                 if (!token) return null;
                 try {
                     const jsonStr = decodeURIComponent(atob(token));
                     return JSON.parse(jsonStr);
-                } catch (e) {
-                    return null;
-                }
+                } catch (e) { return null; }
             }
 
             function getRole(token) {
@@ -792,10 +608,9 @@
             const micBtn = document.getElementById('micBtn');
             const camBtn = document.getElementById('camBtn');
             const screenBtn = document.getElementById('screenBtn');
+            const fsControlBtn = document.getElementById('fsControlBtn');
             const hangupBtn = document.getElementById('hangupBtn');
             const mainVideo = document.getElementById('mainVideo');
-            const fsBtn = document.getElementById('fsBtn');
-            const fsExitBtn = document.getElementById('fsExitBtn');
 
             // ============================================================
             //  状态
@@ -810,110 +625,104 @@
             let isConnected = false;
 
             // ============================================================
-            //  PeerJS 配置
-            // ============================================================
-            const PEER_CONFIG = {
-                debug: 0,
-                config: {
-                    iceServers: [
-                        { urls: 'stun:stun.voip.eutelia.it' },
-                        { urls: 'stun:stun.voiparound.com' },
-                        { urls: 'stun:stun.xten.com' }
-                    ]
-                }
-            };
-
-            // ============================================================
-            //  全屏 — 电脑 + 手机全兼容
+            //  全屏 — 支持电脑 + 手机
             // ============================================================
             const header = document.getElementById('mainHeader');
+            let isFullscreen = false;
 
             function toggleFullscreen() {
                 const el = mainVideo;
-                const isFullscreen = document.fullscreenElement ||
+                const isFS = document.fullscreenElement ||
                     document.webkitFullscreenElement ||
                     (el.webkitDisplayingFullscreen !== undefined && el.webkitDisplayingFullscreen);
 
-                if (!isFullscreen) {
-                    // 尝试进入全屏
+                if (!isFS) {
                     try {
-                        // 方法1: 标准 API
                         if (el.requestFullscreen) {
                             el.requestFullscreen().then(() => {
                                 header.classList.add('hidden-fs');
+                                updateFSButton(true);
                             }).catch(() => {});
-                        }
-                        // 方法2: webkit（Chrome/Safari）
-                        else if (el.webkitRequestFullscreen) {
+                        } else if (el.webkitRequestFullscreen) {
                             el.webkitRequestFullscreen();
                             header.classList.add('hidden-fs');
-                        }
-                        // 方法3: iOS Safari - 用 video 元素的全屏
-                        else {
+                            updateFSButton(true);
+                        } else {
                             const video = el.querySelector('video');
                             if (video && video.webkitEnterFullscreen) {
                                 video.webkitEnterFullscreen();
                                 header.classList.add('hidden-fs');
+                                updateFSButton(true);
                             } else {
                                 showToast('Votre navigateur ne supporte pas le plein écran', 'warning');
                             }
                         }
                     } catch (e) {
-                        // 最后的尝试：iOS
                         const video = el.querySelector('video');
                         if (video && video.webkitEnterFullscreen) {
                             video.webkitEnterFullscreen();
                             header.classList.add('hidden-fs');
+                            updateFSButton(true);
                         } else {
                             showToast('Erreur: ' + e.message, 'error');
                         }
                     }
                 } else {
-                    // 退出全屏
                     try {
-                        if (document.exitFullscreen) {
-                            document.exitFullscreen();
-                        } else if (document.webkitExitFullscreen) {
-                            document.webkitExitFullscreen();
-                        } else {
+                        if (document.exitFullscreen) document.exitFullscreen();
+                        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                        else {
                             const video = el.querySelector('video');
-                            if (video && video.webkitExitFullscreen) {
-                                video.webkitExitFullscreen();
-                            }
+                            if (video && video.webkitExitFullscreen) video.webkitExitFullscreen();
                         }
                         header.classList.remove('hidden-fs');
+                        updateFSButton(false);
                     } catch (e) {
                         header.classList.remove('hidden-fs');
+                        updateFSButton(false);
                     }
                 }
             }
 
-            // 监听全屏变化事件
+            function updateFSButton(isFS) {
+                isFullscreen = isFS;
+                if (isFS) {
+                    fsControlBtn.innerHTML = '<i class="fas fa-compress"></i> Quitter';
+                    fsControlBtn.classList.add('active');
+                } else {
+                    fsControlBtn.innerHTML = '<i class="fas fa-expand"></i> Plein écran';
+                    fsControlBtn.classList.remove('active');
+                }
+            }
+
             document.addEventListener('fullscreenchange', () => {
-                if (!document.fullscreenElement) header.classList.remove('hidden-fs');
+                if (!document.fullscreenElement) {
+                    header.classList.remove('hidden-fs');
+                    updateFSButton(false);
+                }
             });
             document.addEventListener('webkitfullscreenchange', () => {
-                if (!document.webkitFullscreenElement) header.classList.remove('hidden-fs');
+                if (!document.webkitFullscreenElement) {
+                    header.classList.remove('hidden-fs');
+                    updateFSButton(false);
+                }
             });
 
-            fsBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleFullscreen();
-            });
-            fsExitBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleFullscreen();
-            });
+            // 🔥 控制栏全屏按钮
+            fsControlBtn.addEventListener('click', toggleFullscreen);
+
+            // 双击视频全屏
             mainVideo.addEventListener('dblclick', toggleFullscreen);
 
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && (document.fullscreenElement || document.webkitFullscreenElement)) {
                     header.classList.remove('hidden-fs');
+                    updateFSButton(false);
                 }
             });
 
             // ============================================================
-            //  UI 辅助
+            //  UI
             // ============================================================
             function setStatus(text, type) {
                 statusText.textContent = text;
@@ -980,6 +789,18 @@
                         return;
                     }
                 }
+                const forceRole = getURLParam('role');
+                if (forceRole === 'teacher' || forceRole === 'student') {
+                    myRole = forceRole;
+                    myName = forceRole === 'teacher' ? 'Professeur' : 'Étudiant';
+                    joinPanel.classList.add('hidden');
+                    videoRoom.classList.remove('hidden');
+                    localLabel.textContent = myName;
+                    updateRoom();
+                    updateUser(myName, myRole);
+                    startPeer();
+                    return;
+                }
                 joinPanel.classList.remove('hidden');
                 loading.classList.add('hidden');
                 videoRoom.classList.add('hidden');
@@ -1009,7 +830,7 @@
             });
 
             // ============================================================
-            //  PeerJS 核心 — 方案一：老师用固定 ID
+            //  PeerJS
             // ============================================================
             function startPeer() {
                 const peerId = (myRole === 'teacher') ? ROOM_ID : undefined;
@@ -1067,10 +888,8 @@
                 });
             }
 
-            // ===== 学生：直接呼叫老师 =====
             function callTeacher() {
                 setStatus('📞 Appel du professeur...', 'info');
-
                 navigator.mediaDevices.getUserMedia({ video: true, audio: true })
                     .then(stream => {
                         localStream = stream;
@@ -1085,7 +904,6 @@
                     });
             }
 
-            // ===== 老师：等待学生 =====
             function waitForStudents() {
                 navigator.mediaDevices.getUserMedia({ video: true, audio: true })
                     .then(stream => {
@@ -1148,7 +966,6 @@
             // ============================================================
             //  控制
             // ============================================================
-
             micBtn.addEventListener('click', () => {
                 if (!localStream) return;
                 const track = localStream.getAudioTracks()[0];
@@ -1157,7 +974,7 @@
                     micBtn.innerHTML = track.enabled ?
                         '<i class="fas fa-microphone"></i> Micro' :
                         '<i class="fas fa-microphone-slash"></i> Muet';
-                    micBtn.className = track.enabled ? 'mic' : 'mic muted';
+                    micBtn.className = track.enabled ? 'ctrl-btn mic' : 'ctrl-btn mic muted';
                 }
             });
 
@@ -1169,7 +986,7 @@
                     camBtn.innerHTML = track.enabled ?
                         '<i class="fas fa-video"></i> Caméra' :
                         '<i class="fas fa-video-slash"></i> Off';
-                    camBtn.className = track.enabled ? 'cam' : 'cam off';
+                    camBtn.className = track.enabled ? 'ctrl-btn cam' : 'ctrl-btn cam off';
                 }
             });
 
@@ -1179,25 +996,21 @@
                         const newStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                         const oldAudio = localStream.getAudioTracks()[0];
                         if (oldAudio) oldAudio.stop();
-
                         localStream = newStream;
                         localVideo.srcObject = newStream;
-
                         if (call) {
                             const sender = call.peerConnection.getSenders().find(s => s.track?.kind === 'video');
                             if (sender) sender.replaceTrack(newStream.getVideoTracks()[0]);
                         }
-
                         isScreenSharing = false;
                         this.innerHTML = '<i class="fas fa-desktop"></i> Écran';
-                        this.className = 'screen';
+                        this.className = 'ctrl-btn screen';
                         showToast('Partage d\'écran arrêté', 'info');
                     } catch (e) {
                         showToast('Erreur lors du retour à la caméra', 'error');
                     }
                     return;
                 }
-
                 try {
                     const screenStream = await navigator.mediaDevices.getDisplayMedia({
                         video: {
@@ -1207,10 +1020,8 @@
                         },
                         audio: true
                     });
-
                     const audioTrack = localStream.getAudioTracks()[0];
                     if (audioTrack) screenStream.addTrack(audioTrack);
-
                     if (call) {
                         const sender = call.peerConnection.getSenders().find(s => s.track?.kind === 'video');
                         if (sender) {
@@ -1221,19 +1032,13 @@
                             await sender.setParameters(params);
                         }
                     }
-
                     localStream = screenStream;
                     localVideo.srcObject = screenStream;
                     isScreenSharing = true;
                     this.innerHTML = '<i class="fas fa-stop"></i> Arrêter écran';
-                    this.className = 'screen active';
-
-                    screenStream.getVideoTracks()[0].onended = () => {
-                        screenBtn.click();
-                    };
-
+                    this.className = 'ctrl-btn screen active';
+                    screenStream.getVideoTracks()[0].onended = () => { screenBtn.click(); };
                     showToast('🖥️ Partage d\'écran activé', 'success');
-
                 } catch (e) {
                     console.error('Screen sharing error:', e);
                     if (e.message.includes('not allowed')) {
@@ -1262,7 +1067,7 @@
                 setStatus('📴 Déconnecté', 'warning');
                 showToast('Vous avez quitté la classe', 'info');
                 screenBtn.innerHTML = '<i class="fas fa-desktop"></i> Écran';
-                screenBtn.className = 'screen';
+                screenBtn.className = 'ctrl-btn screen';
                 isScreenSharing = false;
             }
 
