@@ -1,1 +1,1302 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>⛵ 千帆课堂 - Salle de classe virtuelle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.1/dist/peerjs.min.js"></script>
+    <style>
+        /* ===== 全局样式 ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary-blue: #004080;
+            --primary-light-blue: #0066cc;
+            --primary-yellow: #ffd633;
+            --green: #27ae60;
+            --red: #e74c3c;
+            --orange: #f39c12;
+            --gray: #95a5a6;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --shadow-lg: 0 20px 40px rgba(0,0,0,0.2);
+            --border-radius: 12px;
+        }
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+        @media (max-width: 768px) { .container { padding: 0 15px; } }
 
+        .header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-light-blue));
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 10;
+            transition: transform 0.3s ease;
+        }
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header .brand .logo-icon {
+            font-size: 2rem;
+            color: var(--primary-yellow);
+        }
+        .header .brand h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+        .header .brand .subtitle {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            font-weight: 300;
+            display: block;
+        }
+        .header .brand .subtitle span {
+            color: var(--primary-yellow);
+            font-weight: 600;
+        }
+        @media (max-width: 768px) {
+            .header .brand h1 { font-size: 1.2rem; }
+            .header .brand .logo-icon { font-size: 1.5rem; }
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .header-actions .room-info {
+            background: rgba(255,255,255,0.15);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .header-actions .room-info i {
+            color: var(--primary-yellow);
+        }
+        .header-actions .user-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .header-actions .user-badge i {
+            color: var(--primary-yellow);
+        }
+        .header-actions .user-badge .role-tag {
+            background: rgba(255,255,255,0.2);
+            padding: 1px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        .btn-exit {
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-exit:hover { background: #c0392b; transform: translateY(-2px); }
+
+        main { padding: 30px 0; }
+
+        /* ===== 视频网格 ===== */
+        .video-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 768px) {
+            .video-grid { grid-template-columns: 1fr; gap: 16px; }
+        }
+
+        /* ===== 视频包装器（支持全屏） ===== */
+        .video-wrapper {
+            background: #1a1a2e;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16 / 10;
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .video-wrapper:hover {
+            box-shadow: var(--shadow-lg);
+        }
+        .video-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+        }
+
+        /* ===== 全屏模式 ===== */
+        .video-wrapper:fullscreen {
+            border-radius: 0;
+            aspect-ratio: auto;
+            min-height: 100vh;
+            background: #000;
+            cursor: default;
+        }
+        .video-wrapper:fullscreen video {
+            object-fit: contain;
+        }
+        .video-wrapper:fullscreen .video-label {
+            font-size: 1rem;
+            padding: 8px 20px;
+            background: rgba(0,0,0,0.7);
+        }
+        .video-wrapper:fullscreen .video-status {
+            font-size: 0.85rem;
+            padding: 6px 16px;
+        }
+        .video-wrapper:fullscreen .fullscreen-btn {
+            display: none;
+        }
+        /* 全屏时退出按钮 */
+        .video-wrapper:fullscreen .exit-fullscreen-btn {
+            display: flex !important;
+        }
+
+        /* ===== 全屏按钮 ===== */
+        .fullscreen-btn {
+            position: absolute;
+            bottom: 14px;
+            right: 14px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 5;
+            opacity: 0.7;
+        }
+        .fullscreen-btn:hover {
+            opacity: 1;
+            background: rgba(0,0,0,0.8);
+            transform: scale(1.05);
+        }
+        .fullscreen-btn i {
+            font-size: 0.9rem;
+        }
+
+        .exit-fullscreen-btn {
+            display: none !important;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 30px;
+            padding: 10px 18px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(8px);
+            z-index: 20;
+            align-items: center;
+            gap: 8px;
+        }
+        .exit-fullscreen-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+        .exit-fullscreen-btn i {
+            font-size: 1rem;
+        }
+
+        /* ===== 标签 ===== */
+        .video-wrapper .video-label {
+            position: absolute;
+            bottom: 14px;
+            left: 14px;
+            background: rgba(0,0,0,0.65);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: white;
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 5;
+            pointer-events: none;
+        }
+        .video-wrapper .video-label i {
+            color: var(--primary-yellow);
+        }
+        .video-wrapper .video-status {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: rgba(0,0,0,0.6);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: #2ecc71;
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 5;
+            pointer-events: none;
+        }
+        .video-wrapper .video-status .pulse {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #2ecc71;
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+        .video-wrapper .video-status.offline {
+            color: var(--gray);
+        }
+        .video-wrapper .video-status.offline .pulse {
+            background: var(--gray);
+        }
+
+        .video-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            height: 100%;
+            min-height: 280px;
+            gap: 16px;
+            background: #1a1a2e;
+        }
+        .video-placeholder i {
+            font-size: 3.5rem;
+            color: #444;
+        }
+        .video-placeholder p {
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        /* ===== 控制栏 ===== */
+        .controls-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            .controls-section { padding: 16px; }
+        }
+        .controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .controls .ctrl-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 100px;
+            justify-content: center;
+        }
+        .controls .ctrl-btn:hover { transform: translateY(-2px); filter: brightness(0.95); }
+        .controls .ctrl-btn.primary { background: var(--primary-blue); color: white; }
+        .controls .ctrl-btn.primary:hover { background: var(--primary-light-blue); }
+        .controls .ctrl-btn.success { background: var(--green); color: white; }
+        .controls .ctrl-btn.danger { background: var(--red); color: white; }
+        .controls .ctrl-btn.warning { background: var(--orange); color: white; }
+        .controls .ctrl-btn.secondary { background: #e8ecf1; color: #333; }
+        .controls .ctrl-btn.secondary:hover { background: #d5dbe3; }
+        @media (max-width: 480px) {
+            .controls .ctrl-btn { padding: 10px 16px; font-size: 0.75rem; min-width: 70px; }
+        }
+
+        .status-bar {
+            text-align: center;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            background: white;
+            box-shadow: var(--shadow);
+            font-size: 0.9rem;
+            color: #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .status-bar .status-icon {
+            font-size: 1.2rem;
+        }
+        .status-bar .status-text {
+            font-weight: 500;
+        }
+        .status-bar .status-text.success { color: var(--green); }
+        .status-bar .status-text.warning { color: var(--orange); }
+        .status-bar .status-text.error { color: var(--red); }
+        .status-bar .status-text.info { color: var(--primary-blue); }
+
+        /* ===== JOIN PANEL ===== */
+        .join-panel {
+            max-width: 480px;
+            margin: 40px auto;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 40px 32px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+        @media (max-width: 480px) {
+            .join-panel { padding: 28px 20px; margin: 20px auto; }
+        }
+        .join-panel .join-icon {
+            font-size: 3.5rem;
+            color: var(--primary-yellow);
+            margin-bottom: 12px;
+        }
+        .join-panel h2 {
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+        .join-panel .join-sub {
+            color: #888;
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+        }
+        .join-panel input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 2px solid #e8ecf1;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s;
+            margin-bottom: 16px;
+        }
+        .join-panel input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0,64,128,0.1);
+        }
+        .join-panel .btn-join {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-light-blue));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .join-panel .btn-join:hover { transform: scale(1.02); filter: brightness(0.95); }
+        .join-panel .hint {
+            margin-top: 16px;
+            color: #999;
+            font-size: 0.8rem;
+        }
+        .join-panel .hint i {
+            color: var(--primary-yellow);
+        }
+
+        .footer {
+            background: var(--primary-blue);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+        .footer .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .footer .container .brand-small {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .footer .container .brand-small i {
+            color: var(--primary-yellow);
+        }
+        @media (max-width: 768px) {
+            .footer .container { flex-direction: column; text-align: center; }
+            .footer { padding: 16px; font-size: 0.8rem; }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 24px;
+            border-radius: 30px;
+            color: white;
+            font-weight: 600;
+            z-index: 1100;
+            animation: slideInRight 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            max-width: 400px;
+        }
+        @media (max-width: 480px) {
+            .toast { bottom: 12px; right: 12px; left: 12px; padding: 12px 16px; font-size: 0.85rem; }
+        }
+        .toast-success { background: var(--green); }
+        .toast-error { background: var(--red); }
+        .toast-warning { background: var(--orange); }
+        .toast-info { background: var(--primary-blue); }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 480px) {
+            .video-wrapper { min-height: 200px; aspect-ratio: 4/3; }
+            .video-wrapper .video-label { font-size: 0.65rem; padding: 3px 10px; }
+            .status-bar { font-size: 0.75rem; padding: 10px 14px; }
+        }
+
+        .auto-join-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            gap: 20px;
+        }
+        .auto-join-loading .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e8ecf1;
+            border-top: 4px solid var(--primary-yellow);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .auto-join-loading p {
+            color: #888;
+            font-size: 1rem;
+        }
+
+        /* ===== 全屏时隐藏头部 ===== */
+        .header.hidden-fullscreen {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header" id="mainHeader">
+    <div class="container">
+        <div class="brand">
+            <span class="logo-icon"><i class="fas fa-sailboat"></i></span>
+            <div>
+                <h1>⛵ 千帆课堂 <span style="font-size:0.5rem; opacity:0.6; font-weight:300;">·</span> <span style="font-size:0.8rem; font-weight:300;">Salle de classe virtuelle</span></h1>
+                <span class="subtitle">Association <span>Mille Voiles</span> · Cours en ligne</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="room-info">
+                <i class="fas fa-door-open"></i>
+                <span id="roomDisplay">Salle: <strong>chargement...</strong></span>
+            </div>
+            <div class="user-badge hidden" id="userBadge">
+                <i class="fas fa-user-circle"></i>
+                <span id="userNameDisplay">-</span>
+                <span class="role-tag" id="userRoleTag">-</span>
+            </div>
+            <button class="btn-exit" id="exitBtn">
+                <i class="fas fa-sign-out-alt"></i> Quitter
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main class="container">
+
+    <!-- ===== JOIN PANEL ===== -->
+    <div id="joinPanel" class="join-panel">
+        <div class="join-icon"><i class="fas fa-sailboat"></i></div>
+        <h2>⛵ 千帆课堂</h2>
+        <p class="join-sub">Entrez votre nom pour rejoindre la classe virtuelle</p>
+        <input type="text" id="nameInput" placeholder="Votre nom (ex: Jean Dupont)" maxlength="30">
+        <button class="btn-join" id="joinBtn">
+            <i class="fas fa-video"></i> Entrer en classe
+        </button>
+        <div class="hint">
+            <i class="fas fa-info-circle"></i> Le premier entrant devient le professeur
+        </div>
+    </div>
+
+    <!-- ===== AUTO-JOIN LOADING ===== -->
+    <div id="autoJoinLoading" class="hidden auto-join-loading">
+        <div class="spinner"></div>
+        <p id="autoJoinStatus">⏳ Authentification en cours...</p>
+    </div>
+
+    <!-- ===== VIDEO ROOM ===== -->
+    <div id="videoRoom" class="hidden">
+
+        <!-- Video Grid -->
+        <div class="video-grid">
+            <div class="video-wrapper" id="localWrapper">
+                <video id="localVideo" autoplay muted playsinline></video>
+                <div class="video-label">
+                    <i class="fas fa-user"></i>
+                    <span id="localLabel">Moi</span>
+                </div>
+                <div class="video-status" id="localStatus">
+                    <span class="pulse"></span> Connecté
+                </div>
+                <!-- 全屏按钮 -->
+                <button class="fullscreen-btn" data-fullscreen-target="localWrapper" title="Plein écran">
+                    <i class="fas fa-expand"></i> Plein écran
+                </button>
+                <button class="exit-fullscreen-btn" id="exitFullscreenLocal" title="Quitter le plein écran">
+                    <i class="fas fa-compress"></i> Quitter
+                </button>
+            </div>
+            <div class="video-wrapper" id="remoteWrapper">
+                <video id="remoteVideo" autoplay playsinline></video>
+                <div class="video-label">
+                    <i class="fas fa-user"></i>
+                    <span id="remoteLabel">En attente...</span>
+                </div>
+                <div class="video-status offline" id="remoteStatus">
+                    <span class="pulse"></span> Déconnecté
+                </div>
+                <!-- 全屏按钮 -->
+                <button class="fullscreen-btn" data-fullscreen-target="remoteWrapper" title="Plein écran">
+                    <i class="fas fa-expand"></i> Plein écran
+                </button>
+                <button class="exit-fullscreen-btn" id="exitFullscreenRemote" title="Quitter le plein écran">
+                    <i class="fas fa-compress"></i> Quitter
+                </button>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-section">
+            <div class="controls">
+                <button class="ctrl-btn secondary" id="toggleMicBtn">
+                    <i class="fas fa-microphone"></i> Micro
+                </button>
+                <button class="ctrl-btn secondary" id="toggleCamBtn">
+                    <i class="fas fa-video"></i> Caméra
+                </button>
+                <button class="ctrl-btn success" id="shareScreenBtn">
+                    <i class="fas fa-desktop"></i> Partager l'écran
+                </button>
+                <button class="ctrl-btn danger" id="hangupBtn">
+                    <i class="fas fa-phone-slash"></i> Raccrocher
+                </button>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar" id="statusBar">
+            <span class="status-icon"><i class="fas fa-circle" style="color:var(--orange);"></i></span>
+            <span class="status-text info" id="statusText">Initialisation...</span>
+        </div>
+    </div>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+    <div class="container">
+        <div class="brand-small">
+            <i class="fas fa-sailboat"></i>
+            <span>⛵ 千帆课堂 · Association Mille Voiles</span>
+        </div>
+        <span>&copy; 2025 Tous droits réservés</span>
+    </div>
+</footer>
+
+<!-- ============================================================ -->
+<!-- ===== JAVASCRIPT ===== -->
+<!-- ============================================================ -->
+<script>
+    (function() {
+        'use strict';
+
+        // ============================================================
+        //  1. CONFIGURATION
+        // ============================================================
+        const ROOM_ID = 'mille-voiles-classroom';
+
+        // ============================================================
+        //  2. TOKEN DECODING
+        // ============================================================
+        function decodeToken() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            if (!token) return null;
+            try {
+                const jsonStr = decodeURIComponent(atob(token));
+                return JSON.parse(jsonStr);
+            } catch (e) {
+                console.warn('Token 解码失败:', e);
+                return null;
+            }
+        }
+
+        function getRoleFromToken(tokenData) {
+            if (!tokenData) return null;
+            if (tokenData.role === 'teacher' || tokenData.role === 'student') return tokenData.role;
+            if (tokenData.teacherId || tokenData.teacher_id) return 'teacher';
+            if (tokenData.studentId || tokenData.student_id || tokenData.userId) return 'student';
+            return null;
+        }
+
+        function getNameFromToken(tokenData) {
+            if (!tokenData) return null;
+            return tokenData.name || tokenData.userName || tokenData.studentName || 'Utilisateur';
+        }
+
+        // ============================================================
+        //  3. DOM ELEMENTS
+        // ============================================================
+        const joinPanel = document.getElementById('joinPanel');
+        const autoJoinLoading = document.getElementById('autoJoinLoading');
+        const videoRoom = document.getElementById('videoRoom');
+        const nameInput = document.getElementById('nameInput');
+        const joinBtn = document.getElementById('joinBtn');
+        const roomDisplay = document.getElementById('roomDisplay');
+        const exitBtn = document.getElementById('exitBtn');
+        const userBadge = document.getElementById('userBadge');
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const userRoleTag = document.getElementById('userRoleTag');
+        const autoJoinStatus = document.getElementById('autoJoinStatus');
+
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const localLabel = document.getElementById('localLabel');
+        const remoteLabel = document.getElementById('remoteLabel');
+        const localStatus = document.getElementById('localStatus');
+        const remoteStatus = document.getElementById('remoteStatus');
+        const statusText = document.getElementById('statusText');
+
+        const toggleMicBtn = document.getElementById('toggleMicBtn');
+        const toggleCamBtn = document.getElementById('toggleCamBtn');
+        const shareScreenBtn = document.getElementById('shareScreenBtn');
+        const hangupBtn = document.getElementById('hangupBtn');
+
+        // ============================================================
+        //  4. STATE
+        // ============================================================
+        let peer = null;
+        let currentCall = null;
+        let localStream = null;
+        let isScreenSharing = false;
+        let myRole = 'student';
+        let myName = '';
+        let isConnected = false;
+        let isAutoJoining = false;
+
+        // ============================================================
+        //  5. PEER CONFIG
+        // ============================================================
+        const PEER_CONFIG = {
+            debug: 0,
+            config: {
+                iceServers: [
+                    { urls: 'stun:stun.voip.eutelia.it' },
+                    { urls: 'stun:stun.voiparound.com' },
+                    { urls: 'stun:stun.xten.com' }
+                ]
+            }
+        };
+
+        // ============================================================
+        //  6. FULLSCREEN FUNCTIONS
+        // ============================================================
+        const header = document.getElementById('mainHeader');
+
+        function toggleFullscreen(wrapperId) {
+            const wrapper = document.getElementById(wrapperId);
+            if (!wrapper) return;
+
+            if (!document.fullscreenElement) {
+                // 进入全屏
+                wrapper.requestFullscreen?.() || wrapper.webkitRequestFullscreen?.();
+                // 隐藏头部
+                header.classList.add('hidden-fullscreen');
+                showToast('⛶ Plein écran activé (ESC pour quitter)', 'info');
+            } else {
+                // 退出全屏
+                document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+                header.classList.remove('hidden-fullscreen');
+            }
+        }
+
+        // 监听全屏变化事件
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                header.classList.remove('hidden-fullscreen');
+            }
+        });
+        document.addEventListener('webkitfullscreenchange', () => {
+            if (!document.webkitFullscreenElement) {
+                header.classList.remove('hidden-fullscreen');
+            }
+        });
+
+        // ============================================================
+        //  7. UI HELPERS
+        // ============================================================
+        function setStatus(text, type) {
+            const el = statusText;
+            el.textContent = text;
+            el.className = 'status-text ' + (type || 'info');
+            const icon = document.querySelector('#statusBar .status-icon i');
+            if (icon) {
+                icon.style.color = type === 'success' ? '#27ae60' :
+                                   type === 'error' ? '#e74c3c' :
+                                   type === 'warning' ? '#f39c12' : '#004080';
+            }
+        }
+
+        function setRemoteStatus(online) {
+            if (online) {
+                remoteStatus.className = 'video-status';
+                remoteStatus.innerHTML = '<span class="pulse"></span> Connecté';
+            } else {
+                remoteStatus.className = 'video-status offline';
+                remoteStatus.innerHTML = '<span class="pulse"></span> Déconnecté';
+            }
+        }
+
+        function setLocalStatus(online) {
+            if (online) {
+                localStatus.className = 'video-status';
+                localStatus.innerHTML = '<span class="pulse"></span> Connecté';
+            } else {
+                localStatus.className = 'video-status offline';
+                localStatus.innerHTML = '<span class="pulse"></span> Déconnecté';
+            }
+        }
+
+        function showToast(msg, type) {
+            const t = document.createElement('div');
+            t.className = 'toast toast-' + (type || 'info');
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            t.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${msg}`;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3500);
+        }
+
+        function updateRoomDisplay() {
+            roomDisplay.innerHTML = `Salle: <strong>${ROOM_ID}</strong>`;
+        }
+
+        function updateUserBadge(name, role) {
+            userBadge.classList.remove('hidden');
+            userNameDisplay.textContent = name;
+            const roleLabels = {
+                'teacher': '👨‍🏫 Professeur',
+                'student': '🎓 Étudiant',
+                'auto': '🔄 Détection...'
+            };
+            userRoleTag.textContent = roleLabels[role] || role;
+            userRoleTag.style.background = role === 'teacher' ? 'rgba(255,214,51,0.3)' :
+                                           role === 'student' ? 'rgba(46,204,113,0.3)' :
+                                           'rgba(255,255,255,0.2)';
+        }
+
+        // ============================================================
+        //  8. FULLSCREEN EVENT BINDING
+        // ============================================================
+        // 点击全屏按钮
+        document.querySelectorAll('.fullscreen-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const targetId = btn.dataset.fullscreenTarget;
+                toggleFullscreen(targetId);
+            });
+        });
+
+        // 点击退出全屏按钮
+        document.getElementById('exitFullscreenLocal').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (document.fullscreenElement) document.exitFullscreen?.();
+        });
+        document.getElementById('exitFullscreenRemote').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (document.fullscreenElement) document.exitFullscreen?.();
+        });
+
+        // 双击视频进入全屏
+        document.querySelectorAll('.video-wrapper').forEach(wrapper => {
+            wrapper.addEventListener('dblclick', () => {
+                toggleFullscreen(wrapper.id);
+            });
+        });
+
+        // ESC 退出全屏（由浏览器自动处理，我们只监听事件）
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.fullscreenElement) {
+                header.classList.remove('hidden-fullscreen');
+            }
+        });
+
+        // ============================================================
+        //  9. JOIN LOGIC
+        // ============================================================
+        function initJoin() {
+            const tokenData = decodeToken();
+
+            if (tokenData) {
+                const role = getRoleFromToken(tokenData);
+                const name = getNameFromToken(tokenData);
+
+                if (role && name) {
+                    console.log('✅ Token 验证通过:', { name, role });
+                    autoJoinLoading.classList.remove('hidden');
+                    joinPanel.classList.add('hidden');
+                    autoJoinStatus.textContent = `⏳ Authentification ${role === 'teacher' ? 'professeur' : 'étudiant'}...`;
+
+                    updateUserBadge(name, role);
+                    myName = name;
+                    myRole = role;
+
+                    setTimeout(() => {
+                        autoJoinLoading.classList.add('hidden');
+                        videoRoom.classList.remove('hidden');
+                        localLabel.textContent = myName;
+                        updateRoomDisplay();
+                        startPeer();
+                    }, 600);
+                    return;
+                } else {
+                    showToast('Token invalide, veuillez entrer votre nom', 'warning');
+                }
+            }
+
+            joinPanel.classList.remove('hidden');
+            autoJoinLoading.classList.add('hidden');
+            videoRoom.classList.add('hidden');
+            userBadge.classList.add('hidden');
+        }
+
+        joinBtn.addEventListener('click', () => {
+            const name = nameInput.value.trim();
+            if (!name) {
+                showToast('Veuillez entrer votre nom', 'warning');
+                return;
+            }
+            myName = name;
+            myRole = 'auto';
+            joinPanel.classList.add('hidden');
+            videoRoom.classList.remove('hidden');
+            localLabel.textContent = myName;
+            updateRoomDisplay();
+            updateUserBadge(myName, 'auto');
+            startPeer();
+        });
+
+        nameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') joinBtn.click();
+        });
+
+        exitBtn.addEventListener('click', () => {
+            if (confirm('Voulez-vous vraiment quitter la classe ?')) {
+                hangup();
+                window.location.href = window.location.pathname;
+            }
+        });
+
+        // ============================================================
+        //  10. PEERJS LOGIC (不变，与之前相同)
+        // ============================================================
+        function startPeer() {
+            const peerId = (myRole === 'teacher') ? ROOM_ID : undefined;
+            setStatus('Connexion au serveur...', 'info');
+            peer = new Peer(peerId, PEER_CONFIG);
+
+            peer.on('open', (id) => {
+                console.log('✅ Peer ouvert, ID:', id);
+                if (myRole === 'teacher') {
+                    setStatus('👨‍🏫 Professeur en ligne, attente étudiant...', 'info');
+                    remoteLabel.textContent = 'En attente...';
+                    setRemoteStatus(false);
+                    waitForStudents();
+                } else if (myRole === 'student') {
+                    setStatus('Recherche du professeur...', 'info');
+                    checkTeacher();
+                } else {
+                    checkTeacher();
+                }
+            });
+
+            peer.on('error', (err) => {
+                console.error('Peer error:', err);
+                if (err.type === 'peer-unavailable') {
+                    if (myRole === 'student') {
+                        setStatus('Professeur absent, attente...', 'warning');
+                        setTimeout(checkTeacher, 3000);
+                    } else {
+                        setStatus('Erreur: ' + err.message, 'error');
+                    }
+                } else if (err.type === 'unavailable-id') {
+                    if (myRole === 'teacher') {
+                        console.log('⚠️ ID déjà pris, passage en mode étudiant');
+                        myRole = 'student';
+                        setStatus('Un professeur est déjà présent. Connexion en tant qu\'étudiant...', 'info');
+                        peer.destroy();
+                        peer = new Peer(undefined, PEER_CONFIG);
+                        peer.on('open', () => { checkTeacher(); });
+                        peer.on('error', (e2) => { setStatus('Erreur: ' + e2.message, 'error'); });
+                        return;
+                    }
+                    setStatus('Erreur: ID non disponible', 'error');
+                } else {
+                    setStatus('Erreur: ' + err.message, 'error');
+                    showToast('Erreur de connexion: ' + err.message, 'error');
+                }
+            });
+        }
+
+        let isChecking = false;
+
+        function checkTeacher() {
+            if (isChecking) return;
+            isChecking = true;
+            const teacherId = ROOM_ID;
+            const conn = peer.connect(teacherId);
+
+            conn.on('open', () => {
+                console.log('📞 Professeur trouvé, je suis étudiant');
+                myRole = 'student';
+                isChecking = false;
+                conn.close();
+                updateUserBadge(myName, 'student');
+                callTeacher(teacherId);
+            });
+
+            conn.on('error', () => {
+                console.log('👨‍🏫 Aucun professeur, je deviens professeur');
+                myRole = 'teacher';
+                isChecking = false;
+                conn.close();
+                updateUserBadge(myName, 'teacher');
+                peer.destroy();
+                peer = new Peer(ROOM_ID, PEER_CONFIG);
+                peer.on('open', () => {
+                    setStatus('👨‍🏫 Professeur en ligne, attente étudiant...', 'info');
+                    remoteLabel.textContent = 'En attente...';
+                    setRemoteStatus(false);
+                    waitForStudents();
+                });
+                peer.on('error', (err) => {
+                    if (err.type === 'unavailable-id') {
+                        myRole = 'student';
+                        updateUserBadge(myName, 'student');
+                        peer.destroy();
+                        peer = new Peer(undefined, PEER_CONFIG);
+                        peer.on('open', () => { checkTeacher(); });
+                    }
+                });
+            });
+
+            setTimeout(() => {
+                if (isChecking) {
+                    console.log('⏰ Délai écoulé, je deviens professeur');
+                    myRole = 'teacher';
+                    isChecking = false;
+                    conn.close();
+                    updateUserBadge(myName, 'teacher');
+                    peer.destroy();
+                    peer = new Peer(ROOM_ID, PEER_CONFIG);
+                    peer.on('open', () => {
+                        setStatus('👨‍🏫 Professeur en ligne, attente étudiant...', 'info');
+                        remoteLabel.textContent = 'En attente...';
+                        setRemoteStatus(false);
+                        waitForStudents();
+                    });
+                }
+            }, 5000);
+        }
+
+        function callTeacher(teacherId) {
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                .then(stream => {
+                    localStream = stream;
+                    localVideo.srcObject = stream;
+                    setLocalStatus(true);
+                    setStatus('Appel du professeur...', 'info');
+                    const call = peer.call(teacherId, stream);
+                    setupCall(call, 'student');
+                    currentCall = call;
+                })
+                .catch(err => {
+                    console.error('getUserMedia error:', err);
+                    setStatus('Impossible d\'accéder à la caméra/micro', 'error');
+                    showToast('Veuillez autoriser la caméra et le micro', 'error');
+                });
+        }
+
+        function waitForStudents() {
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                .then(stream => {
+                    localStream = stream;
+                    localVideo.srcObject = stream;
+                    setLocalStatus(true);
+                })
+                .catch(err => {
+                    console.error('getUserMedia error:', err);
+                    setStatus('Impossible d\'accéder à la caméra/micro', 'error');
+                    showToast('Veuillez autoriser la caméra et le micro', 'error');
+                });
+
+            peer.on('call', (incomingCall) => {
+                console.log('📞 Appel entrant d\'un étudiant !');
+                remoteLabel.textContent = 'Étudiant';
+                setRemoteStatus(true);
+                setStatus('✅ Connecté avec l\'étudiant', 'success');
+                showToast('🎓 Un étudiant a rejoint la classe !', 'success');
+                if (localStream) {
+                    incomingCall.answer(localStream);
+                    setupCall(incomingCall, 'teacher');
+                    currentCall = incomingCall;
+                }
+            });
+        }
+
+        function setupCall(call, role) {
+            call.on('stream', (remoteStream) => {
+                console.log('📺 Flux distant reçu');
+                remoteVideo.srcObject = remoteStream;
+                setRemoteStatus(true);
+                remoteLabel.textContent = role === 'teacher' ? 'Étudiant' : 'Professeur';
+                setStatus('✅ Connecté !', 'success');
+                isConnected = true;
+                showToast('📹 Connexion établie !', 'success');
+            });
+
+            call.on('close', () => {
+                console.log('📴 Appel terminé');
+                remoteVideo.srcObject = null;
+                setRemoteStatus(false);
+                remoteLabel.textContent = 'Déconnecté';
+                isConnected = false;
+                if (myRole === 'teacher') {
+                    setStatus('👨‍🏫 En attente d\'un étudiant...', 'info');
+                    remoteLabel.textContent = 'En attente...';
+                } else {
+                    setStatus('📴 Appel terminé', 'warning');
+                }
+                showToast('L\'autre participant a quitté', 'warning');
+            });
+
+            call.on('error', (err) => {
+                console.error('Call error:', err);
+                setStatus('Erreur: ' + err.message, 'error');
+            });
+        }
+
+        // ============================================================
+        //  11. CONTROLS
+        // ============================================================
+        toggleMicBtn.addEventListener('click', () => {
+            if (!localStream) return;
+            const track = localStream.getAudioTracks()[0];
+            if (track) {
+                track.enabled = !track.enabled;
+                toggleMicBtn.innerHTML = track.enabled ?
+                    '<i class="fas fa-microphone"></i> Micro' :
+                    '<i class="fas fa-microphone-slash"></i> Muet';
+                toggleMicBtn.style.opacity = track.enabled ? '1' : '0.6';
+            }
+        });
+
+        toggleCamBtn.addEventListener('click', () => {
+            if (!localStream) return;
+            const track = localStream.getVideoTracks()[0];
+            if (track) {
+                track.enabled = !track.enabled;
+                toggleCamBtn.innerHTML = track.enabled ?
+                    '<i class="fas fa-video"></i> Caméra' :
+                    '<i class="fas fa-video-slash"></i> Caméra off';
+                toggleCamBtn.style.opacity = track.enabled ? '1' : '0.6';
+            }
+        });
+
+        shareScreenBtn.addEventListener('click', async function() {
+            if (isScreenSharing) {
+                try {
+                    const newStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    const audioTrack = newStream.getAudioTracks()[0];
+                    if (audioTrack) {
+                        const oldAudio = localStream.getAudioTracks()[0];
+                        if (oldAudio) oldAudio.stop();
+                    }
+                    localStream = newStream;
+                    localVideo.srcObject = newStream;
+                    if (currentCall) {
+                        const sender = currentCall.peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
+                        if (sender) sender.replaceTrack(newStream.getVideoTracks()[0]);
+                    }
+                    isScreenSharing = false;
+                    this.innerHTML = '<i class="fas fa-desktop"></i> Partager l\'écran';
+                    this.className = 'ctrl-btn success';
+                    showToast('Partage d\'écran arrêté', 'info');
+                } catch (e) {
+                    console.error('Switch back error:', e);
+                    showToast('Erreur lors du retour à la caméra', 'error');
+                }
+                return;
+            }
+
+            try {
+                const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: true,
+                    audio: true
+                });
+
+                const audioTrack = localStream.getAudioTracks()[0];
+                if (audioTrack) screenStream.addTrack(audioTrack);
+
+                if (currentCall) {
+                    const sender = currentCall.peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
+                    if (sender) sender.replaceTrack(screenStream.getVideoTracks()[0]);
+                }
+
+                localStream = screenStream;
+                localVideo.srcObject = screenStream;
+                isScreenSharing = true;
+                this.innerHTML = '<i class="fas fa-stop"></i> Arrêter le partage';
+                this.className = 'ctrl-btn danger';
+
+                screenStream.getVideoTracks()[0].onended = () => {
+                    shareScreenBtn.click();
+                };
+
+                showToast('🖥️ Partage d\'écran activé', 'success');
+
+            } catch (e) {
+                console.error('Screen sharing error:', e);
+                if (e.message.includes('not allowed')) {
+                    showToast('Partage d\'écran refusé', 'warning');
+                } else {
+                    showToast('Erreur: ' + e.message, 'error');
+                }
+            }
+        });
+
+        hangupBtn.addEventListener('click', hangup);
+
+        function hangup() {
+            if (currentCall) { currentCall.close(); currentCall = null; }
+            if (peer) { peer.destroy(); peer = null; }
+            if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+            isConnected = false;
+            setRemoteStatus(false);
+            setLocalStatus(false);
+            remoteVideo.srcObject = null;
+            localVideo.srcObject = null;
+            setStatus('📴 Déconnecté', 'warning');
+            showToast('Vous avez quitté la classe', 'info');
+        }
+
+        // ============================================================
+        //  12. INIT
+        // ============================================================
+        updateRoomDisplay();
+        setStatus('Prêt à rejoindre', 'info');
+
+        console.log('⛵ 千帆课堂 - Salle de classe virtuelle avec plein écran');
+        console.log('📚 ROOM_ID:', ROOM_ID);
+        console.log('📍 Double-cliquez sur une vidéo pour passer en plein écran');
+
+        window.addEventListener('beforeunload', () => {
+            if (localStream) localStream.getTracks().forEach(t => t.stop());
+            if (peer) peer.destroy();
+        });
+
+        // 启动
+        initJoin();
+
+    })();
+</script>
+
+</body>
+</html>
