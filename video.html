@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.1/dist/peerjs.min.js"></script>
     <style>
-        /* ===== 全局重置 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -53,6 +52,9 @@
             padding: 16px 0;
             flex-shrink: 0;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 10;
         }
         .header .container {
             display: flex;
@@ -123,6 +125,12 @@
         .btn-exit:hover {
             background: #c0392b;
             transform: translateY(-2px);
+        }
+
+        .header.hidden-fs {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
         }
 
         /* ===== 主内容 ===== */
@@ -234,7 +242,7 @@
             gap: 16px;
         }
 
-        /* 主视频区 */
+        /* ===== 主视频区 ===== */
         .main-video {
             position: relative;
             background: #0f0f1a;
@@ -253,7 +261,6 @@
             display: block;
         }
 
-        /* 主视频标签 */
         .main-video .label {
             position: absolute;
             bottom: 14px;
@@ -273,6 +280,7 @@
         .main-video .label i {
             color: var(--primary-yellow);
         }
+
         .main-video .status {
             position: absolute;
             top: 14px;
@@ -315,7 +323,7 @@
             background: var(--gray);
         }
 
-        /* 全屏按钮 */
+        /* ===== 全屏按钮（桌面 + 手机兼容） ===== */
         .main-video .btn-fs {
             position: absolute;
             bottom: 14px;
@@ -331,13 +339,60 @@
             z-index: 6;
             opacity: 0.6;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         .main-video .btn-fs:hover {
             opacity: 1;
             background: rgba(0, 0, 0, 0.7);
         }
-        .main-video .btn-fs-exit {
+
+        /* 全屏状态 */
+        .main-video:fullscreen .btn-fs,
+        .main-video:-webkit-full-screen .btn-fs {
             display: none;
+        }
+        .main-video:fullscreen .btn-fs-exit,
+        .main-video:-webkit-full-screen .btn-fs-exit {
+            display: flex !important;
+        }
+        .main-video:fullscreen,
+        .main-video:-webkit-full-screen {
+            border-radius: 0 !important;
+            aspect-ratio: auto !important;
+            height: 100vh !important;
+            width: 100vw !important;
+            background: #000 !important;
+            cursor: default !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            z-index: 99999 !important;
+        }
+        .main-video:fullscreen video,
+        .main-video:-webkit-full-screen video {
+            object-fit: contain !important;
+        }
+        .main-video:fullscreen .label,
+        .main-video:-webkit-full-screen .label {
+            font-size: 0.95rem;
+            padding: 8px 18px;
+        }
+        .main-video:fullscreen .status,
+        .main-video:-webkit-full-screen .status {
+            font-size: 0.8rem;
+            padding: 5px 14px;
+        }
+        .main-video:fullscreen .pip,
+        .main-video:-webkit-full-screen .pip {
+            width: 220px;
+            bottom: 28px;
+            right: 28px;
+        }
+
+        .main-video .btn-fs-exit {
+            display: none !important;
             position: absolute;
             top: 18px;
             right: 18px;
@@ -357,33 +412,7 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
-        .main-video:fullscreen .btn-fs {
-            display: none;
-        }
-        .main-video:fullscreen .btn-fs-exit {
-            display: flex !important;
-        }
-        .main-video:fullscreen {
-            border-radius: 0;
-            aspect-ratio: auto;
-            height: 100vh;
-            width: 100vw;
-            background: #000;
-            cursor: default;
-        }
-        .main-video:fullscreen video {
-            object-fit: contain;
-        }
-        .main-video:fullscreen .label {
-            font-size: 0.95rem;
-            padding: 8px 18px;
-        }
-        .main-video:fullscreen .status {
-            font-size: 0.8rem;
-            padding: 5px 14px;
-        }
-
-        /* ===== 画中画（自己的摄像头） ===== */
+        /* ===== 画中画 ===== */
         .pip {
             position: absolute;
             bottom: 16px;
@@ -424,16 +453,6 @@
         .pip .pip-label i {
             color: var(--primary-yellow);
             margin-right: 3px;
-        }
-
-        .main-video:fullscreen .pip {
-            width: 220px;
-            bottom: 28px;
-            right: 28px;
-        }
-        .main-video:fullscreen .pip .pip-label {
-            font-size: 0.7rem;
-            padding: 3px 12px;
         }
 
         /* ===== 控制栏 ===== */
@@ -506,7 +525,8 @@
             .pip {
                 width: 100px;
             }
-            .main-video:fullscreen .pip {
+            .main-video:fullscreen .pip,
+            .main-video:-webkit-full-screen .pip {
                 width: 140px;
             }
         }
@@ -613,12 +633,6 @@
 
         .hidden {
             display: none !important;
-        }
-        .header.hidden-fs {
-            transform: translateY(-100%);
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s ease;
         }
     </style>
 </head>
@@ -810,21 +824,71 @@
             };
 
             // ============================================================
-            //  全屏
+            //  全屏 — 电脑 + 手机全兼容
             // ============================================================
             const header = document.getElementById('mainHeader');
 
             function toggleFullscreen() {
-                if (!document.fullscreenElement) {
-                    mainVideo.requestFullscreen?.() || mainVideo.webkitRequestFullscreen?.();
-                    header.classList.add('hidden-fs');
-                    showToast('⛶ Plein écran activé (ESC pour quitter)', 'info');
+                const el = mainVideo;
+                const isFullscreen = document.fullscreenElement ||
+                    document.webkitFullscreenElement ||
+                    (el.webkitDisplayingFullscreen !== undefined && el.webkitDisplayingFullscreen);
+
+                if (!isFullscreen) {
+                    // 尝试进入全屏
+                    try {
+                        // 方法1: 标准 API
+                        if (el.requestFullscreen) {
+                            el.requestFullscreen().then(() => {
+                                header.classList.add('hidden-fs');
+                            }).catch(() => {});
+                        }
+                        // 方法2: webkit（Chrome/Safari）
+                        else if (el.webkitRequestFullscreen) {
+                            el.webkitRequestFullscreen();
+                            header.classList.add('hidden-fs');
+                        }
+                        // 方法3: iOS Safari - 用 video 元素的全屏
+                        else {
+                            const video = el.querySelector('video');
+                            if (video && video.webkitEnterFullscreen) {
+                                video.webkitEnterFullscreen();
+                                header.classList.add('hidden-fs');
+                            } else {
+                                showToast('Votre navigateur ne supporte pas le plein écran', 'warning');
+                            }
+                        }
+                    } catch (e) {
+                        // 最后的尝试：iOS
+                        const video = el.querySelector('video');
+                        if (video && video.webkitEnterFullscreen) {
+                            video.webkitEnterFullscreen();
+                            header.classList.add('hidden-fs');
+                        } else {
+                            showToast('Erreur: ' + e.message, 'error');
+                        }
+                    }
                 } else {
-                    document.exitFullscreen?.() || document.webkitExitFullscreen?.();
-                    header.classList.remove('hidden-fs');
+                    // 退出全屏
+                    try {
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                        } else if (document.webkitExitFullscreen) {
+                            document.webkitExitFullscreen();
+                        } else {
+                            const video = el.querySelector('video');
+                            if (video && video.webkitExitFullscreen) {
+                                video.webkitExitFullscreen();
+                            }
+                        }
+                        header.classList.remove('hidden-fs');
+                    } catch (e) {
+                        header.classList.remove('hidden-fs');
+                    }
                 }
             }
 
+            // 监听全屏变化事件
             document.addEventListener('fullscreenchange', () => {
                 if (!document.fullscreenElement) header.classList.remove('hidden-fs');
             });
@@ -832,12 +896,18 @@
                 if (!document.webkitFullscreenElement) header.classList.remove('hidden-fs');
             });
 
-            fsBtn.addEventListener('click', toggleFullscreen);
-            fsExitBtn.addEventListener('click', toggleFullscreen);
+            fsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleFullscreen();
+            });
+            fsExitBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleFullscreen();
+            });
             mainVideo.addEventListener('dblclick', toggleFullscreen);
 
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && document.fullscreenElement) {
+                if (e.key === 'Escape' && (document.fullscreenElement || document.webkitFullscreenElement)) {
                     header.classList.remove('hidden-fs');
                 }
             });
@@ -939,14 +1009,15 @@
             });
 
             // ============================================================
-            //  PeerJS 核心
+            //  PeerJS 核心 — 方案一：老师用固定 ID
             // ============================================================
             function startPeer() {
-                const id = (myRole === 'teacher') ? ROOM_ID : undefined;
+                const peerId = (myRole === 'teacher') ? ROOM_ID : undefined;
                 setStatus('Connexion au serveur...', 'info');
-                peer = new Peer(id, PEER_CONFIG);
+                peer = new Peer(peerId, PEER_CONFIG);
 
-                peer.on('open', () => {
+                peer.on('open', (id) => {
+                    console.log('✅ Peer ouvert, ID:', id, 'Rôle:', myRole);
                     if (myRole === 'teacher') {
                         setStatus('👨‍🏫 Professeur en ligne, attente étudiant...', 'info');
                         remoteLabel.innerHTML = '<i class="fas fa-user"></i> En attente...';
@@ -954,28 +1025,41 @@
                         waitForStudents();
                     } else if (myRole === 'student') {
                         setStatus('Recherche du professeur...', 'info');
-                        checkTeacher();
+                        callTeacher();
                     } else {
-                        checkTeacher();
+                        myRole = 'student';
+                        updateUser(myName, 'student');
+                        callTeacher();
                     }
                 });
 
                 peer.on('error', (err) => {
                     console.error('Peer error:', err);
                     if (err.type === 'peer-unavailable') {
-                        if (myRole === 'student') {
-                            setStatus('Professeur absent, attente...', 'warning');
-                            setTimeout(checkTeacher, 3000);
+                        if (myRole === 'student' || myRole === 'auto') {
+                            myRole = 'teacher';
+                            updateUser(myName, 'teacher');
+                            setStatus('👨‍🏫 Aucun professeur trouvé, passage en mode professeur...', 'info');
+                            showToast('Aucun professeur trouvé, vous devenez le professeur', 'info');
+                            peer.destroy();
+                            peer = new Peer(ROOM_ID, PEER_CONFIG);
+                            peer.on('open', () => {
+                                setStatus('👨‍🏫 Professeur en ligne, attente étudiant...', 'info');
+                                remoteLabel.innerHTML = '<i class="fas fa-user"></i> En attente...';
+                                setRemoteOnline(false);
+                                waitForStudents();
+                            });
+                            peer.on('error', (e2) => {
+                                if (e2.type === 'unavailable-id') {
+                                    setStatus('⚠️ Un professeur est déjà présent. Rafraîchissez la page.',
+                                    'error');
+                                    showToast('Un professeur est déjà dans la classe', 'error');
+                                }
+                            });
                         }
                     } else if (err.type === 'unavailable-id') {
-                        if (myRole === 'teacher') {
-                            myRole = 'student';
-                            setStatus('Professeur déjà présent, connexion en tant qu\'étudiant...', 'info');
-                            peer.destroy();
-                            peer = new Peer(undefined, PEER_CONFIG);
-                            peer.on('open', () => checkTeacher());
-                            peer.on('error', (e) => setStatus('Erreur: ' + e.message, 'error'));
-                        }
+                        setStatus('⚠️ Ce nom de salle est déjà utilisé. Rafraîchissez.', 'error');
+                        showToast('Cette salle est déjà occupée', 'error');
                     } else {
                         setStatus('Erreur: ' + err.message, 'error');
                         showToast('Erreur: ' + err.message, 'error');
@@ -983,60 +1067,14 @@
                 });
             }
 
-            let checking = false;
-
-            function checkTeacher() {
-                if (checking) return;
-                checking = true;
-                const conn = peer.connect(ROOM_ID);
-
-                conn.on('open', () => {
-                    myRole = 'student';
-                    checking = false;
-                    conn.close();
-                    updateUser(myName, 'student');
-                    callTeacher();
-                });
-
-                conn.on('error', () => {
-                    myRole = 'teacher';
-                    checking = false;
-                    conn.close();
-                    updateUser(myName, 'teacher');
-                    peer.destroy();
-                    peer = new Peer(ROOM_ID, PEER_CONFIG);
-                    peer.on('open', () => {
-                        setStatus('👨‍🏫 Professeur en ligne, attente étudiant...', 'info');
-                        remoteLabel.innerHTML = '<i class="fas fa-user"></i> En attente...';
-                        setRemoteOnline(false);
-                        waitForStudents();
-                    });
-                });
-
-                setTimeout(() => {
-                    if (checking) {
-                        myRole = 'teacher';
-                        checking = false;
-                        conn.close();
-                        updateUser(myName, 'teacher');
-                        peer.destroy();
-                        peer = new Peer(ROOM_ID, PEER_CONFIG);
-                        peer.on('open', () => {
-                            setStatus('👨‍🏫 Professeur en ligne, attente étudiant...', 'info');
-                            remoteLabel.innerHTML = '<i class="fas fa-user"></i> En attente...';
-                            setRemoteOnline(false);
-                            waitForStudents();
-                        });
-                    }
-                }, 5000);
-            }
-
+            // ===== 学生：直接呼叫老师 =====
             function callTeacher() {
+                setStatus('📞 Appel du professeur...', 'info');
+
                 navigator.mediaDevices.getUserMedia({ video: true, audio: true })
                     .then(stream => {
                         localStream = stream;
                         localVideo.srcObject = stream;
-                        setStatus('Appel du professeur...', 'info');
                         const c = peer.call(ROOM_ID, stream);
                         setupCall(c);
                         call = c;
@@ -1047,6 +1085,7 @@
                     });
             }
 
+            // ===== 老师：等待学生 =====
             function waitForStudents() {
                 navigator.mediaDevices.getUserMedia({ video: true, audio: true })
                     .then(stream => {
@@ -1059,6 +1098,7 @@
                     });
 
                 peer.on('call', (incoming) => {
+                    console.log('📞 Appel entrant reçu !');
                     remoteLabel.innerHTML = '<i class="fas fa-user"></i> Étudiant';
                     setRemoteOnline(true);
                     setStatus('✅ Connecté avec l\'étudiant', 'success');
@@ -1073,6 +1113,7 @@
 
             function setupCall(c) {
                 c.on('stream', (stream) => {
+                    console.log('📺 Flux distant reçu');
                     remoteStream = stream;
                     remoteVideo.srcObject = stream;
                     setRemoteOnline(true);
@@ -1083,6 +1124,7 @@
                 });
 
                 c.on('close', () => {
+                    console.log('📴 Appel terminé');
                     remoteVideo.srcObject = null;
                     remoteStream = null;
                     setRemoteOnline(false);
@@ -1098,6 +1140,7 @@
                 });
 
                 c.on('error', (err) => {
+                    console.error('Call error:', err);
                     setStatus('Erreur: ' + err.message, 'error');
                 });
             }
@@ -1106,7 +1149,6 @@
             //  控制
             // ============================================================
 
-            // 麦克风
             micBtn.addEventListener('click', () => {
                 if (!localStream) return;
                 const track = localStream.getAudioTracks()[0];
@@ -1119,7 +1161,6 @@
                 }
             });
 
-            // 摄像头
             camBtn.addEventListener('click', () => {
                 if (!localStream) return;
                 const track = localStream.getVideoTracks()[0];
@@ -1132,7 +1173,6 @@
                 }
             });
 
-            // 屏幕共享 — 限制码率防止卡顿
             screenBtn.addEventListener('click', async function() {
                 if (isScreenSharing) {
                     try {
@@ -1159,7 +1199,6 @@
                 }
 
                 try {
-                    // 🔥 限制屏幕共享的分辨率和帧率，防止卡顿
                     const screenStream = await navigator.mediaDevices.getDisplayMedia({
                         video: {
                             width: { ideal: 1280, max: 1920 },
@@ -1176,7 +1215,6 @@
                         const sender = call.peerConnection.getSenders().find(s => s.track?.kind === 'video');
                         if (sender) {
                             sender.replaceTrack(screenStream.getVideoTracks()[0]);
-                            // 🔥 限制码率为 1.5 Mbps
                             const params = sender.getParameters();
                             if (!params.encodings) params.encodings = [{}];
                             params.encodings[0].maxBitrate = 1500000;
@@ -1206,7 +1244,6 @@
                 }
             });
 
-            // 挂断
             hangupBtn.addEventListener('click', hangup);
 
             function hangup() {
