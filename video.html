@@ -729,26 +729,53 @@
             // ============================================================
             //  PeerJS 配置 — 加入 TURN 服务器
             // ============================================================
-            const PEER_CONFIG = {
-                debug: 0,
-                config: {
-                    iceServers: [
-                        { urls: 'stun:stun.voip.eutelia.it' },
-                        { urls: 'stun:stun.voiparound.com' },
-                        { urls: 'stun:stun.xten.com' },
-                        {
-                            urls: [
-                                'turn:openrelay.metered.ca:80',
-                                'turn:openrelay.metered.ca:443',
-                                'turn:openrelay.metered.ca:443?transport=tcp'
-                            ],
-                            username: 'openrelayproject',
-                            credential: 'openrelayproject'
-                        }
-                    ]
-                }
-            };
-
+             const PEER_CONFIG = {
+                    debug: 2,
+                    config: {
+                        iceServers: [
+                            // ===== STUN 服务器（打洞用） =====
+                            { urls: 'stun:stun.voip.eutelia.it' },
+                            { urls: 'stun:stun.voiparound.com' },
+                            { urls: 'stun:stun.xten.com' },
+                            { urls: 'stun:stun.l.google.com:19302' },
+                
+                            // ===== TURN 服务器（打洞失败时中转） =====
+                
+                            // 1. Cloudflare TURN（推荐！全球节点，欧洲接入快）
+                            {
+                                urls: [
+                                    'turn:turn.cloudflare.com:3478?transport=udp',
+                                    'turn:turn.cloudflare.com:3478?transport=tcp',
+                                    'turn:turn.cloudflare.com:443?transport=tcp'
+                                ],
+                                username: 'any',
+                                credential: 'any'
+                            },
+                
+                            // 2. Metered TURN（备用）
+                            {
+                                urls: [
+                                    'turn:openrelay.metered.ca:80',
+                                    'turn:openrelay.metered.ca:443',
+                                    'turn:openrelay.metered.ca:443?transport=tcp'
+                                ],
+                                username: 'openrelayproject',
+                                credential: 'openrelayproject'
+                            },
+                
+                            // 3. Twilio TURN（备用，欧洲节点）
+                            {
+                                urls: [
+                                    'turn:global.turn.twilio.com:3478?transport=udp',
+                                    'turn:global.turn.twilio.com:3478?transport=tcp',
+                                    'turn:global.turn.twilio.com:443?transport=tcp'
+                                ],
+                                username: 'f3f5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5',
+                                credential: 'f3f5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5'
+                            }
+                        ]
+                    }
+                };
             // ============================================================
             //  URL 参数
             // ============================================================
