@@ -950,6 +950,17 @@ h1, h2, h3, h4, h5 {
 .feedback-card-score .stars {
     color: #f1c40f;
     letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* 部分填充星星的样式 */
+.feedback-card-score .stars .star-partial {
+    background: linear-gradient(90deg, #f1c40f 50%, #ddd 50%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
 }
 
 .feedback-card-meta {
@@ -2304,7 +2315,7 @@ h1, h2, h3, h4, h5 {
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
-        z-index: 1;
+        z-index: 1002;
         order: 2;
     }
 

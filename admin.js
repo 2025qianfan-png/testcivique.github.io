@@ -363,7 +363,7 @@ function renderUsersTable() {
     if (filteredUsers.length === 0) {
         usersTableBody.innerHTML = `
             <tr>
-                <td colspan="8" style="text-align: center; padding: 40px;">
+                <td colspan="9" style="text-align: center; padding: 40px;">
                     <i class="fas fa-users" style="font-size: 3rem; color: #ddd; margin-bottom: 15px;"></i>
                     <p style="color: var(--medium-gray);">Aucun utilisateur trouvé</p>
                 </td>
@@ -419,6 +419,7 @@ function renderUsersTable() {
             <td>${createdAt}</td>
             <td class="${timerClass}">${timerInfo}</td>
             <td class="credit-cell">${renderCreditCell(user)}</td>
+            <td>${user.email || '-'}</td>
             <td>
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span style="font-family: monospace; background: #f0f0f0; padding: 4px 8px; border-radius: 4px;">${user.password || '—'}</span>
@@ -522,6 +523,7 @@ function openEditUserModal(userId) {
     
     document.getElementById('editUserId').value = user.id;
     document.getElementById('editUserName').value = user.name;
+    document.getElementById('editUserEmail').value = user.email || '';
     document.getElementById('editUserType').value = user.type || 'n';
     document.getElementById('editUserRole').value = user.role || '';
     
@@ -563,13 +565,18 @@ async function handleEditUser(e) {
     const userType = document.getElementById('editUserType').value;
     const userRole = document.getElementById('editUserRole').value;
     const timer = document.getElementById('editUserTimer').value;
+    const email = document.getElementById('editUserEmail').value.trim();
     
     if (!username || !userType) {
         showToast('Veuillez remplir tous les champs obligatoires', 'error');
         return;
     }
     
-    const updateData = { name: username, type: userType };
+    const updateData = { 
+        name: username, 
+        type: userType,
+        email: email || null
+    };
     if (password.trim()) updateData.password = password;
     if (userRole) updateData.role = userRole;
     else updateData.role = null;
@@ -608,7 +615,6 @@ async function handleEditUser(e) {
         showToast(errorMessage, 'error');
     }
 }
-
 // ==============================
 // 添加用户功能
 // ==============================
@@ -629,6 +635,7 @@ async function handleAddUser(e) {
     const userType = document.getElementById('addUserType').value;
     const userRole = document.getElementById('addUserRole').value;
     const timer = document.getElementById('addUserTimer').value;
+    const email = document.getElementById('addUserEmail').value.trim();
     
     if (!username || !password || !userType) {
         showToast('Veuillez remplir tous les champs obligatoires', 'error');
@@ -651,6 +658,7 @@ async function handleAddUser(e) {
         name: username,
         password: password,
         type: userType,
+        email: email || null,
         created_at: new Date().toISOString()
     };
     
@@ -685,7 +693,6 @@ async function handleAddUser(e) {
         showToast('Erreur technique lors de la création', 'error');
     }
 }
-
 // ==============================
 // 删除用户功能
 // ==============================
@@ -771,7 +778,7 @@ function renderPreRegTable() {
     if (!allPreRegs || allPreRegs.length === 0) {
         preRegTableBody.innerHTML = `
             <tr>
-                <td colspan="10" style="text-align: center; padding: 40px;">
+                <td colspan="11" style="text-align: center; padding: 40px;">
                     <i class="fas fa-user-plus" style="font-size: 3rem; color: #ddd; margin-bottom: 15px;"></i>
                     <p style="color: var(--medium-gray);">Aucune pré-inscription trouvée</p>
                 </td>
@@ -815,7 +822,6 @@ function renderPreRegTable() {
         
         const credit = reg.credit || 0;
         
-        // 付款方式显示
         let paymentDisplay = '-';
         if (reg.payment_method) {
             const paymentMap = {
@@ -829,6 +835,9 @@ function renderPreRegTable() {
         
         const orderNumber = reg.order_number || '-';
         
+        // 判断是否可编辑（只有 pending 状态可编辑）
+        const isEditable = reg.status === 'pending';
+        
         row.innerHTML = `
             <td><strong>${escapeHtml(reg.name)}</strong></td>
             <td><span class="user-type">${typeText}</span></td>
@@ -841,6 +850,9 @@ function renderPreRegTable() {
             <td><span class="pre-reg-badge ${statusClass}">${statusText}</span></td>
             <td>
                 <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                    ${isEditable ? `
+                        <button class="action-btn-edit-pre" data-id="${reg.id}"><i class="fas fa-pen"></i> Modifier</button>
+                    ` : ''}
                     ${reg.status === 'pending' ? `
                         <button class="action-btn-validate" data-id="${reg.id}"><i class="fas fa-check"></i> Valider</button>
                         <button class="action-btn-reject" data-id="${reg.id}"><i class="fas fa-times"></i> Rejeter</button>
@@ -852,7 +864,15 @@ function renderPreRegTable() {
         preRegTableBody.appendChild(row);
     });
     
-    // 事件绑定
+    // 事件绑定：编辑按钮
+    document.querySelectorAll('.action-btn-edit-pre').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = parseInt(this.dataset.id);
+            openEditPreRegModal(id);
+        });
+    });
+    
+    // 事件绑定：验证按钮
     document.querySelectorAll('.action-btn-validate').forEach(btn => {
         btn.addEventListener('click', function() {
             const id = parseInt(this.dataset.id);
@@ -860,6 +880,7 @@ function renderPreRegTable() {
         });
     });
     
+    // 事件绑定：拒绝按钮
     document.querySelectorAll('.action-btn-reject').forEach(btn => {
         btn.addEventListener('click', function() {
             const id = parseInt(this.dataset.id);
@@ -867,12 +888,142 @@ function renderPreRegTable() {
         });
     });
     
+    // 事件绑定：详情按钮
     document.querySelectorAll('.action-btn-detail').forEach(btn => {
         btn.addEventListener('click', function() {
             const id = parseInt(this.dataset.id);
             showPreRegistrationDetail(id);
         });
     });
+}
+function openEditPreRegModal(id) {
+    const reg = allPreRegs.find(r => r.id === id);
+    if (!reg) {
+        showToast('Erreur', 'Pré-inscription non trouvée', 'error');
+        return;
+    }
+    
+    if (reg.status !== 'pending') {
+        showToast('Impossible', 'Cette pré-inscription a déjà été traitée', 'warning');
+        return;
+    }
+    
+    document.getElementById('editPreRegId').value = reg.id;
+    document.getElementById('editPreRegName').value = reg.name || '';
+    document.getElementById('editPreRegEmail').value = reg.email || '';
+    document.getElementById('editPreRegPassword').value = '';
+    document.getElementById('editPreRegType').value = reg.type || 'n';
+    document.getElementById('editPreRegRole').value = reg.role || '';
+    document.getElementById('editPreRegCredit').value = reg.credit || 0;
+    document.getElementById('editPreRegPrice').value = reg.estimated_price || 0;
+    document.getElementById('editPreRegOrderNumber').value = reg.order_number || '';
+    document.getElementById('editPreRegPaymentMethod').value = reg.payment_method || '';
+    document.getElementById('editPreRegPhone').value = reg.phone || '';
+    document.getElementById('editPreRegPack').value = reg.pack_hours ? `${reg.pack_hours}h` : '';
+    document.getElementById('editPreRegAddress').value = reg.address || '';
+    document.getElementById('editPreRegBirth').value = reg.birth_date || '';
+    document.getElementById('editPreRegBirthPlace').value = reg.birth_place || '';
+    
+    if (reg.timer) {
+        const timerDate = new Date(reg.timer);
+        const localDate = new Date(timerDate.getTime() - (timerDate.getTimezoneOffset() * 60000))
+            .toISOString().slice(0, 16);
+        document.getElementById('editPreRegTimer').value = localDate;
+    } else {
+        document.getElementById('editPreRegTimer').value = '';
+    }
+    
+    editPreRegModal.style.display = 'flex';
+}
+async function handleEditPreRegistration(e) {
+    e.preventDefault();
+    
+    const id = parseInt(document.getElementById('editPreRegId').value);
+    const name = document.getElementById('editPreRegName').value.trim();
+    const email = document.getElementById('editPreRegEmail').value.trim();
+    const password = document.getElementById('editPreRegPassword').value.trim();
+    const type = document.getElementById('editPreRegType').value;
+    const role = document.getElementById('editPreRegRole').value;
+    const timer = document.getElementById('editPreRegTimer').value;
+    const credit = parseInt(document.getElementById('editPreRegCredit').value) || 0;
+    const price = parseInt(document.getElementById('editPreRegPrice').value) || 0;
+    const orderNumber = document.getElementById('editPreRegOrderNumber').value.trim();
+    const paymentMethod = document.getElementById('editPreRegPaymentMethod').value;
+    const phone = document.getElementById('editPreRegPhone').value.trim();
+    const pack = document.getElementById('editPreRegPack').value.trim();
+    const address = document.getElementById('editPreRegAddress').value.trim();
+    const birth = document.getElementById('editPreRegBirth').value;
+    const birthPlace = document.getElementById('editPreRegBirthPlace').value.trim();
+    
+    if (!name || !type) {
+        showToast('Veuillez remplir tous les champs obligatoires', 'error');
+        return;
+    }
+    
+    // 检查是否已被处理
+    const reg = allPreRegs.find(r => r.id === id);
+    if (!reg || reg.status !== 'pending') {
+        showToast('Impossible', 'Cette pré-inscription a déjà été traitée', 'warning');
+        closeModal(editPreRegModal);
+        return;
+    }
+    
+    const updateData = {
+        name: name,
+        email: email || null,
+        type: type,
+        role: role || null,
+        credit: credit,
+        estimated_price: price,
+        order_number: orderNumber || null,
+        payment_method: paymentMethod || null,
+        phone: phone || null,
+        address: address || null,
+        birth_date: birth || null,
+        birth_place: birthPlace || null,
+        updated_at: new Date().toISOString()
+    };
+    
+    // 提取 pack_hours
+    if (pack) {
+        const hoursMatch = pack.match(/\d+/);
+        updateData.pack_hours = hoursMatch ? parseInt(hoursMatch[0]) : null;
+    } else {
+        updateData.pack_hours = null;
+    }
+    
+    // 如果填写了密码，更新密码
+    if (password) {
+        updateData.password = password;
+    }
+    
+    if (timer) {
+        try {
+            const date = new Date(timer);
+            if (!isNaN(date.getTime())) updateData.timer = date.toISOString();
+        } catch (error) { console.warn('日期格式错误'); }
+    } else {
+        updateData.timer = null;
+    }
+    
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        
+        const { error } = await supabase
+            .from('pre_registrations')
+            .update(updateData)
+            .eq('id', id);
+        
+        if (error) throw error;
+        
+        closeModal(editPreRegModal);
+        await loadPreRegistrations();
+        showToast('✅ Pré-inscription modifiée avec succès', 'success');
+        
+    } catch (error) {
+        console.error('❌ Erreur modification:', error);
+        showToast('Erreur lors de la modification: ' + error.message, 'error');
+    }
 }
 function updatePreRegCount() {
     const pending = allPreRegs ? allPreRegs.filter(r => r.status === 'pending').length : 0;
@@ -972,12 +1123,13 @@ async function validatePreRegistration(id) {
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         
-        // 1. Copier dans students
+        // 1. Copier dans students (包括邮箱)
         const studentData = {
             name: reg.name,
             password: reg.password,
             type: reg.type,
             role: reg.role,
+            email: reg.email || null,
             created_at: reg.created_at || new Date().toISOString(),
             timer: reg.timer || null,
             credit: reg.credit || 0
@@ -998,7 +1150,7 @@ async function validatePreRegistration(id) {
             throw insertError;
         }
         
-        console.log('✅ Utilisateur ajouté à students');
+        console.log('✅ Utilisateur ajouté à students avec email:', reg.email);
         
         // 2. Mettre à jour le statut
         const { error: updateError } = await supabase
@@ -1017,9 +1169,7 @@ async function validatePreRegistration(id) {
         
         console.log('✅ Statut pré-inscription mis à jour');
         
-        // ============================================================
-        // 3. 🆕 ENVOYER L'EMAIL D'ACTIVATION
-        // ============================================================
+        // 3. Envoyer l'email d'activation
         if (reg.email) {
             try {
                 const emailResult = await sendActivationEmail(
@@ -1073,7 +1223,6 @@ async function validatePreRegistration(id) {
         showToast('Erreur', 'Une erreur est survenue lors de la validation: ' + error.message, 'error');
     }
 }
-
 async function rejectPreRegistration(id) {
     const reg = allPreRegs.find(r => r.id === id);
     if (!reg) {

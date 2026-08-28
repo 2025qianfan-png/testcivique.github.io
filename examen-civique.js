@@ -122,6 +122,16 @@ async function updateStudentPassword(userId, currentPassword, newPassword) {
     }
 }
 
+// ==================== 【新增】更新学生邮箱 ====================
+async function updateStudentEmailWrapper(userId, currentPassword, newEmail) {
+    try {
+        return await window.supabaseAuth.updateStudentEmail(userId, currentPassword, newEmail);
+    } catch (error) {
+        console.error('更新邮箱失败:', error);
+        return { success: false, message: 'Erreur de connexion' };
+    }
+}
+
 // ==================== 检查访问权限 ====================
 function checkAccess(student) {
     if (!student.timer) {
@@ -158,8 +168,8 @@ let isStandalone = window.matchMedia('(display-mode: standalone)').matches || wi
 
 // ==================== 教学评价变量 ====================
 let allFeedbacks = [];
-let feedbackDisplayCount = 3;
-const FEEDBACK_INCREMENT = 3;
+let feedbackDisplayCount = 5;
+const FEEDBACK_INCREMENT = 5;
 
 // ==================== Toast 通知 ====================
 function showToast(title, message, type = 'warning') {
@@ -301,16 +311,20 @@ const translations = {
         errorMessage: "Nom d'utilisateur ou mot de passe incorrect",
         profileModalTitle: "Mon Profil",
         infoSectionTitle: "Informations du compte",
-        editSectionTitle: "Modifier mon mot de passe",
+        editSectionTitle: "Modifier mes informations",
         typeLabel: "Type",
         expiryLabel: "Accès jusqu'au",
         usernameLabel: "Nom d'utilisateur",
+        currentEmailLabel: "Email actuel",
         currentPasswordLabel: "Mot de passe actuel",
+        newEmailLabel: "Nouvel email",
         newPasswordLabel: "Nouveau mot de passe",
         confirmPasswordLabel: "Confirmer le mot de passe",
+        newEmailHelp: "Laissez vide pour ne pas modifier",
+        newPasswordHelp: "Minimum 6 caractères - Laissez vide pour ne pas modifier",
         updateBtnText: "Mettre à jour",
         cancelBtnText: "Annuler",
-        profileSuccessMessage: "Mot de passe mis à jour avec succès",
+        profileSuccessMessage: "Informations mises à jour avec succès",
         passwordMismatch: "Les mots de passe ne correspondent pas",
         currentPasswordError: "Mot de passe actuel incorrect",
         loginRequired: "Connexion requise",
@@ -405,7 +419,6 @@ const translations = {
         preRegisterDesc: "Inscrivez-vous dès maintenant pour réserver votre place dans nos formations civiques et bénéficier d'un suivi personnalisé.",
         preRegisterBtnText: "Je m'inscris maintenant",
         footerSituationLink: "Mises en situation",
-        // 教学评价
         feedbackTitle: "⭐ Avis des étudiants",
         feedbackCountLabel: "avis",
         loadMoreText: "Voir plus d'avis",
@@ -419,7 +432,7 @@ const translations = {
     },
     zh: {
         feedbackShowcaseTitle: "⭐ 学生评价",
-feedbackShowcaseSubtitle: "我们的学生怎么说",
+        feedbackShowcaseSubtitle: "我们的学生怎么说",
         mainTitle: "法国公民考试",
         mainSubtitle: "千帆协会 - 2026年强制性公民考试准备",
         logoText: "千帆协会",
@@ -530,16 +543,20 @@ feedbackShowcaseSubtitle: "我们的学生怎么说",
         errorMessage: "用户名或密码错误",
         profileModalTitle: "我的资料",
         infoSectionTitle: "账户信息",
-        editSectionTitle: "修改密码",
+        editSectionTitle: "修改我的信息",
         typeLabel: "类型",
         expiryLabel: "访问有效期至",
         usernameLabel: "用户名",
+        currentEmailLabel: "当前邮箱",
         currentPasswordLabel: "当前密码",
+        newEmailLabel: "新邮箱",
         newPasswordLabel: "新密码",
         confirmPasswordLabel: "确认新密码",
+        newEmailHelp: "留空则不修改",
+        newPasswordHelp: "最少6个字符 - 留空则不修改",
         updateBtnText: "更新",
         cancelBtnText: "取消",
-        profileSuccessMessage: "密码更新成功",
+        profileSuccessMessage: "信息更新成功",
         passwordMismatch: "两次输入的密码不匹配",
         currentPasswordError: "当前密码错误",
         loginRequired: "需要登录",
@@ -634,7 +651,6 @@ feedbackShowcaseSubtitle: "我们的学生怎么说",
         preRegisterDesc: "立即注册，预定您在公民培训课程中的名额，享受个性化跟踪指导。",
         preRegisterBtnText: "立即注册",
         footerSituationLink: "情景题专项",
-        // 教学评价
         feedbackTitle: "⭐ 学生评价",
         feedbackCountLabel: "条评价",
         loadMoreText: "查看更多评价",
@@ -709,6 +725,7 @@ async function loginUser(name, password) {
             type: student.type || 'etudiant',
             role: student.role || 'user',
             expiryDate: student.timer,
+            email: student.email || '',  // 【新增】保存邮箱
             accessValid: accessCheck.valid,
             daysLeft: accessCheck.daysLeft
         };
@@ -934,6 +951,7 @@ async function handleLogin(event) {
             type: student.type || 'etudiant',
             role: student.role || 'user',
             expiryDate: student.timer,
+            email: student.email || '',  // 【新增】保存邮箱
             accessValid: accessCheck.valid,
             daysLeft: accessCheck.daysLeft
         };
@@ -957,14 +975,17 @@ async function handleLogin(event) {
     }
 }
 
+// ==================== 【修改】显示个人资料模态框 ====================
 function showProfileModal() {
     const user = getCurrentUser();
     if (!user) return;
+    
     document.getElementById('profileType').value = user.type;
     document.getElementById('profileExpiry').value = user.expiryDate ? 
         new Date(user.expiryDate).toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'zh-CN') : 
         (currentLang === 'fr' ? 'Illimité' : '无限期');
     document.getElementById('profileUsername').value = user.name;
+    document.getElementById('profileEmail').value = user.email || '';  // 【新增】显示邮箱
     document.getElementById('profileModal').classList.add('show');
     document.getElementById('userDropdown').classList.remove('show');
 }
@@ -976,39 +997,121 @@ function closeProfileModal() {
     document.getElementById('profileSuccess').style.display = 'none';
 }
 
+// ==================== 【修改】更新个人资料 ====================
 async function updateProfile(event) {
     event.preventDefault();
     const user = getCurrentUser();
     if (!user) return;
+    
     const currentPassword = document.getElementById('currentPassword').value;
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
+    const newEmail = document.getElementById('newEmail').value.trim();
+    
     const errorDiv = document.getElementById('profileError');
     const errorMessage = document.getElementById('profileErrorMessage');
     const successDiv = document.getElementById('profileSuccess');
-    if (newPassword.length < 6) {
+    
+    errorDiv.style.display = 'none';
+    successDiv.style.display = 'none';
+    
+    // 检查是否至少修改一项
+    if (!newPassword && !newEmail) {
+        errorDiv.style.display = 'flex';
+        errorMessage.textContent = currentLang === 'fr' ? 
+            'Veuillez modifier au moins un champ' : 
+            '请至少修改一项';
+        return;
+    }
+    
+    // 验证邮箱格式
+    if (newEmail) {
+        const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+        if (!emailRegex.test(newEmail)) {
+            errorDiv.style.display = 'flex';
+            errorMessage.textContent = currentLang === 'fr' ? 
+                'Veuillez entrer une adresse email valide' : 
+                '请输入有效的邮箱地址';
+            return;
+        }
+    }
+    
+    // 验证密码
+    if (newPassword && newPassword.length < 6) {
         errorDiv.style.display = 'flex';
         errorMessage.textContent = currentLang === 'fr' ? 
             'Le mot de passe doit contenir au moins 6 caractères' : 
             '密码至少需要6个字符';
         return;
     }
-    if (newPassword !== confirmPassword) {
+    
+    if (newPassword && newPassword !== confirmPassword) {
         errorDiv.style.display = 'flex';
         errorMessage.textContent = translations[currentLang].passwordMismatch;
         return;
     }
-    const result = await updateStudentPassword(user.id, currentPassword, newPassword);
-    if (result.success) {
-        successDiv.style.display = 'flex';
-        errorDiv.style.display = 'none';
-        setTimeout(() => {
-            closeProfileModal();
-        }, 1500);
-    } else {
+    
+    const updateBtn = document.getElementById('updateProfileBtn');
+    updateBtn.disabled = true;
+    updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (currentLang === 'fr' ? 'Mise à jour...' : '更新中...');
+    
+    try {
+        let hasError = false;
+        let errorMsg = '';
+        
+        // 1. 更新邮箱
+        if (newEmail && newEmail !== user.email) {
+            const emailResult = await updateStudentEmailWrapper(user.id, currentPassword, newEmail);
+            if (!emailResult.success) {
+                hasError = true;
+                errorMsg = emailResult.message;
+            } else {
+                user.email = newEmail;
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+            }
+        }
+        
+        // 2. 更新密码
+        if (newPassword && !hasError) {
+            const pwdResult = await updateStudentPassword(user.id, currentPassword, newPassword);
+            if (!pwdResult.success) {
+                hasError = true;
+                errorMsg = pwdResult.message;
+            }
+        }
+        
+        if (hasError) {
+            errorDiv.style.display = 'flex';
+            errorMessage.textContent = errorMsg;
+        } else {
+            successDiv.style.display = 'flex';
+            const successMsg = document.getElementById('profileSuccessMessage');
+            if (newPassword && newEmail) {
+                successMsg.textContent = currentLang === 'fr' ? 
+                    'Mot de passe et email mis à jour' : 
+                    '密码和邮箱已更新';
+            } else if (newPassword) {
+                successMsg.textContent = translations[currentLang].profileSuccessMessage;
+            } else if (newEmail) {
+                successMsg.textContent = currentLang === 'fr' ? 
+                    'Email mis à jour' : 
+                    '邮箱已更新';
+            }
+            
+            initAuthUI();
+            
+            setTimeout(() => {
+                closeProfileModal();
+            }, 1500);
+        }
+    } catch (error) {
         errorDiv.style.display = 'flex';
-        errorMessage.textContent = result.message === 'Mot de passe actuel incorrect' ?
-            translations[currentLang].currentPasswordError : result.message;
+        errorMessage.textContent = currentLang === 'fr' ? 
+            'Une erreur est survenue' : 
+            '发生错误';
+    } finally {
+        updateBtn.disabled = false;
+        updateBtn.innerHTML = '<i class="fas fa-save"></i> ' + translations[currentLang].updateBtnText;
     }
 }
 
@@ -1132,15 +1235,16 @@ function switchLanguage(lang) {
             }
         });
     }
-            // 更新教学评价标题
-        const feedbackTitle = document.getElementById('feedbackShowcaseTitle');
-        if (feedbackTitle) {
-            feedbackTitle.textContent = data.feedbackShowcaseTitle || '⭐ Avis des étudiants';
-        }
-        const feedbackSubtitle = document.getElementById('feedbackShowcaseSubtitle');
-        if (feedbackSubtitle) {
-            feedbackSubtitle.textContent = data.feedbackShowcaseSubtitle || 'Ce que nos étudiants pensent de nos formations';
-        }
+    
+    // 更新教学评价标题
+    const feedbackTitle = document.getElementById('feedbackShowcaseTitle');
+    if (feedbackTitle) {
+        feedbackTitle.textContent = data.feedbackShowcaseTitle || '⭐ Avis des étudiants';
+    }
+    const feedbackSubtitle = document.getElementById('feedbackShowcaseSubtitle');
+    if (feedbackSubtitle) {
+        feedbackSubtitle.textContent = data.feedbackShowcaseSubtitle || 'Ce que nos étudiants pensent de nos formations';
+    }
     
     // 更新登录按钮
     const navLogin = document.getElementById('navLogin');
@@ -1232,7 +1336,7 @@ async function loadFeedbacks() {
         if (error) throw error;
         
         allFeedbacks = data || [];
-        feedbackDisplayCount = 3;
+        feedbackDisplayCount = 5;
         renderFeedbacks();
         updateFeedbackCount();
         
@@ -1272,11 +1376,8 @@ function renderFeedbacks() {
     let html = '';
     displayFeedbacks.forEach(fb => {
         const avg = fb.total_score || 0;
-        
-        // 🔥 精确星星显示：根据分数计算每颗星的填充
         const starsHtml = renderPreciseStars(avg);
         
-        // 考试类型标签
         let examLabel = fb.exam_type || '';
         let examClass = '';
         if (examLabel === 'carte_resident_10ans') {
@@ -1322,7 +1423,6 @@ function renderFeedbacks() {
     
     listContainer.innerHTML = html;
     
-    // 显示/隐藏加载更多按钮
     if (loadMoreBtn) {
         if (feedbackDisplayCount < allFeedbacks.length) {
             loadMoreBtn.style.display = 'block';
@@ -1336,30 +1436,21 @@ function renderFeedbacks() {
     }
 }
 
-// ==================== 精确星星渲染函数 ====================
-// ==================== 精确星星渲染函数（半星方案） ====================
 function renderPreciseStars(score) {
-    // 限制分数在 0-5 之间
     const clampedScore = Math.max(0, Math.min(5, score));
-    
-    // 计算实心星数量（整数部分）
     const fullStars = Math.floor(clampedScore);
-    // 计算小数部分
     const decimalPart = clampedScore - fullStars;
     
     let starsHtml = '';
     
-    // 1. 渲染实心星 ★
     for (let i = 0; i < fullStars; i++) {
         starsHtml += '★';
     }
     
-    // 2. 🔥 只要不是满分（5分），并且还有星星剩余，就显示半星 ⯨
     if (clampedScore < 5 && fullStars < 5) {
         starsHtml += '⯨';
     }
     
-    // 3. 渲染剩余空心星 ☆
     const remaining = 5 - fullStars - (clampedScore < 5 && fullStars < 5 ? 1 : 0);
     for (let i = 0; i < remaining; i++) {
         starsHtml += '☆';
@@ -1367,6 +1458,7 @@ function renderPreciseStars(score) {
     
     return starsHtml;
 }
+
 function loadMoreFeedback() {
     feedbackDisplayCount += FEEDBACK_INCREMENT;
     renderFeedbacks();
@@ -1496,18 +1588,15 @@ async function loadStats() {
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         
-        // 获取所有用户总数
         const { count: totalCount, error: totalError } = await supabase
             .from('students')
             .select('*', { count: 'exact', head: true });
         if (totalError) throw totalError;
         
-        // 一次性通过率 = (学生总数 - 2) / 学生总数 * 100
         const studentCount = totalCount || 0;
         const passRate = studentCount > 0 ? ((studentCount - 2) / studentCount * 100) : 0;
         const passRateDisplay = Math.round(passRate);
         
-        // 获取评价平均分
         let avgScore = 0;
         try {
             const { data: feedbackData, error: feedbackError } = await supabase
@@ -1521,7 +1610,6 @@ async function loadStats() {
             console.log('评价数据加载跳过');
         }
         
-        // 更新 KPI
         const studentNumberEl = document.getElementById('statStudentNumber');
         const successRateEl = document.getElementById('statSuccessRate');
         const avgScoreEl = document.getElementById('fbAvgScoreStat');

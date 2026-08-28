@@ -115,6 +115,20 @@
         }
         .action-btn-detail:hover { background: var(--primary-blue); transform: scale(1.02); }
 
+        .action-btn-edit-pre {
+            background: var(--primary-light-blue);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-right: 4px;
+        }
+        .action-btn-edit-pre:hover { background: var(--primary-blue); transform: scale(1.02); }
+
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -148,10 +162,27 @@
         .payment-xiaohongshu { background: rgba(255,36,66,0.15); color: #ff2442; }
         .payment-cb { background: rgba(26,115,232,0.15); color: #1a73e8; }
 
+        /* ===== CREDIT STYLES ===== */
+        .credit-normal { color: var(--green); font-weight: 600; }
+        .credit-low { color: var(--orange); font-weight: 600; }
+        .credit-zero { color: var(--red); font-weight: 600; }
+        .credit-na { color: var(--medium-gray); }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .detail-grid { grid-template-columns: 1fr; }
             .admin-tabs button { padding: 10px 16px; font-size: 0.8rem; }
+        }
+
+        /* ===== EDIT PRE-REG MODAL ===== */
+        .edit-prereg-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 20px;
+        }
+        .edit-prereg-full { grid-column: 1 / -1; }
+        @media (max-width: 768px) {
+            .edit-prereg-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -271,9 +302,15 @@
                     <div class="table-wrapper">
                         <table class="users-table">
                             <thead>
-                                <th>Nom</th><th>Type</th><th>Rôle</th>
-                                <th>Date de création</th><th>Date d'expiration</th>
-                                <th>📚 Crédits</th><th>Mot de passe</th><th>Actions</th>
+                                <th>Nom</th>
+                                <th>Type</th>
+                                <th>Rôle</th>
+                                <th>Date de création</th>
+                                <th>Date d'expiration</th>
+                                <th>📚 Crédits</th>
+                                <th>📧 Email</th>
+                                <th>Mot de passe</th>
+                                <th>Actions</th>
                             </thead>
                             <tbody id="usersTableBody"></tbody>
                         </table>
@@ -361,6 +398,102 @@
         </div>
     </div>
 
+    <!-- ===== MODAL ÉDITION PRÉ-INSCRIPTION ===== -->
+    <div class="modal" id="editPreRegModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">✏️ Modifier la pré-inscription</h2>
+                <button class="close-btn" id="closeEditPreRegBtn">&times;</button>
+            </div>
+            <form id="editPreRegForm">
+                <input type="hidden" id="editPreRegId">
+                <div class="edit-prereg-grid">
+                    <div class="form-group">
+                        <label for="editPreRegName">Nom d'utilisateur *</label>
+                        <input type="text" id="editPreRegName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPreRegEmail">📧 Email</label>
+                        <input type="email" id="editPreRegEmail" placeholder="exemple@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPreRegPassword">Mot de passe</label>
+                        <input type="text" id="editPreRegPassword" placeholder="Nouveau mot de passe">
+                        <small style="color: #666; font-size: 0.75rem;">Laissez vide pour garder le mot de passe actuel</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPreRegType">Type *</label>
+                        <select id="editPreRegType" required>
+                            <option value="n">Type N (Naturalisation)</option>
+                            <option value="r">Type R (Carte 10 ans)</option>
+                            <option value="m">Type M (Pluriannuelle)</option>
+                            <option value="t">Type T (TCF IRN)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPreRegRole">Rôle</label>
+                        <select id="editPreRegRole">
+                            <option value="">Aucun rôle</option>
+                            <option value="user">Membre</option>
+                            <option value="stu">Élève</option>
+                            <option value="teacher">Intervenant</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPreRegTimer">Date d'expiration</label>
+                        <input type="datetime-local" id="editPreRegTimer">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPreRegCredit">📚 Crédits (heures)</label>
+                        <input type="number" id="editPreRegCredit" min="0" step="1" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPreRegPrice">💰 Prix estimé (€)</label>
+                        <input type="number" id="editPreRegPrice" min="0" step="1" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPreRegOrderNumber">📦 Numéro de commande</label>
+                        <input type="text" id="editPreRegOrderNumber" placeholder="Ex: #CMD-2025-001">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPreRegPaymentMethod">💳 Moyen de paiement</label>
+                        <select id="editPreRegPaymentMethod">
+                            <option value="">Sélectionner</option>
+                            <option value="wechat">WeChat 微信</option>
+                            <option value="alipay">Alipay 支付宝</option>
+                            <option value="xiaohongshu">Xiaohongshu 小红书</option>
+                            <option value="cb">CB 银行卡</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPreRegPhone">📱 Téléphone</label>
+                        <input type="text" id="editPreRegPhone" placeholder="06 12 34 56 78">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPreRegPack">📦 Forfait</label>
+                        <input type="text" id="editPreRegPack" placeholder="Ex: 20h, 10h...">
+                    </div>
+                    <div class="form-group edit-prereg-full">
+                        <label for="editPreRegAddress">📍 Adresse</label>
+                        <input type="text" id="editPreRegAddress" placeholder="Adresse complète">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPreRegBirth">📅 Date de naissance</label>
+                        <input type="date" id="editPreRegBirth">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPreRegBirthPlace">📍 Lieu de naissance</label>
+                        <input type="text" id="editPreRegBirthPlace" placeholder="Ville, pays">
+                    </div>
+                </div>
+                <div class="form-actions" style="margin-top: 25px;">
+                    <button type="button" class="cancel-btn" id="cancelEditPreRegBtn">Annuler</button>
+                    <button type="submit" class="save-btn"><i class="fas fa-save"></i> Enregistrer les modifications</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- ===== MODAL ÉDITION UTILISATEUR ===== -->
     <div class="modal" id="editUserModal">
         <div class="modal-content">
@@ -376,11 +509,15 @@
                         <input type="text" id="editUserName" required>
                     </div>
                     <div class="form-group">
-                        <label for="editUserPassword">Mot de passe (laisser vide pour ne pas changer)</label>
-                        <input type="password" id="editUserPassword" placeholder="Nouveau mot de passe">
+                        <label for="editUserEmail">📧 Email</label>
+                        <input type="email" id="editUserEmail" placeholder="exemple@email.com">
                     </div>
                 </div>
                 <div class="form-row">
+                    <div class="form-group">
+                        <label for="editUserPassword">Mot de passe (laisser vide pour ne pas changer)</label>
+                        <input type="password" id="editUserPassword" placeholder="Nouveau mot de passe">
+                    </div>
                     <div class="form-group">
                         <label for="editUserType">Type d'utilisateur</label>
                         <select id="editUserType" required>
@@ -390,6 +527,8 @@
                             <option value="t">Type T</option>
                         </select>
                     </div>
+                </div>
+                <div class="form-row">
                     <div class="form-group">
                         <label for="editUserRole">Rôle</label>
                         <select id="editUserRole">
@@ -400,10 +539,10 @@
                             <option value="admin">Administrateur</option>
                         </select>
                     </div>
-                </div>
-                <div class="form-group form-full">
-                    <label>Date de création</label>
-                    <div style="padding: 15px; background: var(--light-gray); border-radius: 8px;" id="editUserCreatedAt">Chargement...</div>
+                    <div class="form-group">
+                        <label>Date de création</label>
+                        <div style="padding: 15px; background: var(--light-gray); border-radius: 8px;" id="editUserCreatedAt">Chargement...</div>
+                    </div>
                 </div>
                 <div class="form-group form-full">
                     <label>Date d'expiration (facultatif)</label>
@@ -436,11 +575,15 @@
                         <input type="text" id="addUserName" required>
                     </div>
                     <div class="form-group">
-                        <label for="addUserPassword">Mot de passe</label>
-                        <input type="password" id="addUserPassword" required>
+                        <label for="addUserEmail">📧 Email</label>
+                        <input type="email" id="addUserEmail" placeholder="exemple@email.com">
                     </div>
                 </div>
                 <div class="form-row">
+                    <div class="form-group">
+                        <label for="addUserPassword">Mot de passe</label>
+                        <input type="password" id="addUserPassword" required>
+                    </div>
                     <div class="form-group">
                         <label for="addUserType">Type d'utilisateur</label>
                         <select id="addUserType" required>
@@ -450,6 +593,8 @@
                             <option value="t">Type T</option>
                         </select>
                     </div>
+                </div>
+                <div class="form-row">
                     <div class="form-group">
                         <label for="addUserRole">Rôle (facultatif)</label>
                         <select id="addUserRole">
@@ -460,10 +605,10 @@
                             <option value="admin">Administrateur</option>
                         </select>
                     </div>
-                </div>
-                <div class="form-group form-full">
-                    <label>Date d'expiration (facultatif)</label>
-                    <input type="datetime-local" id="addUserTimer">
+                    <div class="form-group">
+                        <label>Date d'expiration (facultatif)</label>
+                        <input type="datetime-local" id="addUserTimer">
+                    </div>
                 </div>
                 <div class="form-group form-full" id="addCreditGroup" style="display: none;">
                     <label for="addUserCredit">📚 Crédits (heures de cours)</label>
@@ -497,7 +642,7 @@
             </div>
         </div>
     </footer>
-
+  
     <script src="admin.js"></script>
 </body>
 </html>

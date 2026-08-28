@@ -2480,6 +2480,72 @@ async function cancelStudentBooking(courseId) {
     }
 }
 // ============================================================
+// 公民考试模块 - 更新学生邮箱
+// ============================================================
+
+async function updateStudentEmail(userId, currentPassword, newEmail) {
+    try {
+        console.log(`📧 更新邮箱: userId=${userId}, newEmail=${newEmail}`);
+        const supabase = getSupabaseClient();
+        
+        // 1. 验证当前密码并获取用户信息
+        const { data: user, error: fetchError } = await supabase
+            .from('students')
+            .select('password, email, name')
+            .eq('id', userId)
+            .single();
+            
+        if (fetchError || !user) {
+            console.error('❌ 用户不存在:', fetchError);
+            return { success: false, message: 'Utilisateur non trouvé' };
+        }
+        
+        // 验证密码
+        if (user.password !== currentPassword) {
+            console.warn('⚠️ 密码错误');
+            return { success: false, message: 'Mot de passe actuel incorrect' };
+        }
+        
+        // 如果新邮箱和当前邮箱相同，直接返回成功
+        if (user.email === newEmail) {
+            return { success: true, data: user, message: 'Email inchangé' };
+        }
+        
+        // 2. 检查新邮箱是否已被其他用户使用
+        const { data: existingUser, error: checkError } = await supabase
+            .from('students')
+            .select('id, email, name')
+            .eq('email', newEmail)
+            .neq('id', userId)
+            .maybeSingle();
+            
+        if (existingUser) {
+            console.warn('⚠️ 邮箱已被使用:', existingUser.name);
+            return { success: false, message: 'Cet email est déjà utilisé par un autre compte' };
+        }
+        
+        // 3. 更新邮箱
+        const { data, error } = await supabase
+            .from('students')
+            .update({ email: newEmail })
+            .eq('id', userId)
+            .select()
+            .single();
+            
+        if (error) {
+            console.error('❌ 更新邮箱失败:', error);
+            return { success: false, message: 'Erreur lors de la mise à jour de l\'email' };
+        }
+        
+        console.log('✅ 邮箱更新成功:', data.email);
+        return { success: true, data };
+        
+    } catch (error) {
+        console.error('❌ 更新邮箱异常:', error);
+        return { success: false, message: 'Erreur de connexion' };
+    }
+}
+// ============================================================
 // 导出所有功能
 // ============================================================
 window.supabaseAuth = {
@@ -2487,7 +2553,7 @@ window.supabaseAuth = {
     getSupabaseClient: getSupabaseClient,
     getTypeLabel: getTypeLabel,
     getTypeClass: getTypeClass,
-
+    updateStudentEmail: updateStudentEmail,  // 添加这一行
     // ===== 公民考试模块 =====
     validateStudent: validateStudent,
     checkAccess: checkAccess,

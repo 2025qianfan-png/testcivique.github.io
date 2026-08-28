@@ -6,6 +6,7 @@
     <title>Gestion des cours - Association Mille Voiles</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <style>
@@ -261,6 +262,7 @@
         }
         .toast-success { background: var(--green); }
         .toast-error { background: var(--red); }
+        .toast-info { background: var(--primary-blue); }
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -320,7 +322,6 @@
         .btn-confirm-cancel { padding: 10px 24px; background: var(--light-gray); border: none; border-radius: 30px; cursor: pointer; }
         .btn-confirm-delete { padding: 10px 24px; background: var(--red); color: white; border: none; border-radius: 30px; cursor: pointer; }
         
-        /* 三级菜单样式 */
         .course-type-container {
             border: 1px solid #ddd;
             border-radius: 10px;
@@ -394,7 +395,6 @@
             font-weight: 600;
         }
         
-        /* 取消原因样式 */
         .cancel-reason-group {
             display: flex;
             flex-direction: column;
@@ -576,7 +576,343 @@
     </div>
 
     <script>
-        // ========== 课程类型三级菜单配置 ==========
+        // ============================================================
+        // EMAILJS 配置 - 课程邮件
+        // ============================================================
+        const EMAILJS_COURSE = {
+            PUBLIC_KEY: 'c2dTn19suzx4VxUu6',
+            SERVICE_ID: 'service_64o8j3r',
+            TEACHER_TEMPLATE_ID: 'template_m97muhh',
+            STUDENT_TEMPLATE_ID: 'template_f6nsc21'
+        };
+
+        // ============================================================
+        // 课程名称映射（完整名称）
+        // ============================================================
+        function getTypeDisplayText(code) {
+            if (!code) return '';
+            const typeMap = {
+                'ec': '1️⃣ 公民考试',
+                'ec110': '十年卡全能班',
+                'ec14': '四年卡全能班',
+                'ec1f': '入籍全能班',
+                'ec210': '十年卡速成',
+                'ec24': '四年卡速成',
+                'ec2f': '入籍速成',
+                'ec310': '十年卡自选',
+                'ec34': '四年卡自选',
+                'ec3f': '入籍自选',
+                'ex4': '四年卡模拟考试',
+                'ex10': '十年卡模拟考试',
+                'exf': '入籍模拟考试'
+            };
+            return typeMap[code] || code;
+        }
+
+        // ============================================================
+        // 格式化日期（简单格式，避免乱码）
+        // ============================================================
+        function formatDateSimple(dateStr) {
+            if (!dateStr) return { date: 'Date non définie', time: 'Heure non définie' };
+            try {
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) {
+                    return { date: 'Date non définie', time: 'Heure non définie' };
+                }
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return {
+                    date: `${day}/${month}/${year}`,
+                    time: `${hours}:${minutes}`
+                };
+            } catch (e) {
+                return { date: 'Date non définie', time: 'Heure non définie' };
+            }
+        }
+
+        // ============================================================
+        // 发送课程通知邮件
+        // ============================================================
+        // ============================================================
+// 发送课程通知邮件
+// ============================================================
+async function getUpcomingCoursesForUser(userId, userType, excludeCourseId = null) {
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        if (!supabase) return [];
+
+        const now = new Date().toISOString();
+        let query = supabase
+            .from('courses')
+            .select(`
+                *,
+                teacher:teacher_id(id, name, email),
+                student:student_id(id, name, email)
+            `)
+            .eq('status', 'scheduled')
+            .gte('start_time', now)
+            .order('start_time', { ascending: true });
+
+        if (userType === 'teacher') {
+            query = query.eq('teacher_id', userId);
+        } else if (userType === 'student') {
+            query = query.eq('student_id', userId);
+        }
+
+        // 排除当前课程（修改/删除/取消时使用）
+        if (excludeCourseId) {
+            query = query.neq('id', excludeCourseId);
+        }
+
+        const { data, error } = await query;
+        if (error) return [];
+        return data || [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function formatUpcomingCoursesForEmail(courses, userType) {
+    if (!courses || courses.length === 0) {
+        return '✅ Aucun cours à venir.';
+    }
+
+    let formatted = '';
+    courses.forEach((course, index) => {
+        const { date, time } = formatDateSimple(course.start_time);
+        const teacherName = course.teacher?.name || 'À déterminer';
+        const studentName = course.student?.name || 'À déterminer';
+        const courseTypeName = getTypeDisplayText(course.course_type);
+
+        formatted += `${index + 1}. ${date} à ${time} `;
+        formatted += `| ${courseTypeName} `;
+        formatted += `| ${course.duration || 2}h`;
+
+        if (userType === 'teacher') {
+            formatted += ` | Élève: ${studentName}`;
+        } else if (userType === 'student') {
+            formatted += ` | Enseignant: ${teacherName}`;
+        }
+        formatted += '\n';
+    });
+    return formatted;
+}
+async function sendCourseEmailNotification(courseId, action) {
+    try {
+        // ============================================================
+        // 1. 检查 EmailJS 是否可用
+        // ============================================================
+        if (typeof emailjs === 'undefined') {
+            console.warn('⚠️ EmailJS non disponible');
+            return { success: true, message: 'EmailJS non disponible, envoi ignoré', skipped: true };
+        }
+
+        try {
+            emailjs.init(EMAILJS_COURSE.PUBLIC_KEY);
+            console.log('✅ EmailJS (Cours) initialisé');
+        } catch (e) {
+            console.log('ℹ️ EmailJS déjà initialisé pour les cours');
+        }
+
+        // ============================================================
+        // 2. 获取 Supabase 客户端
+        // ============================================================
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        if (!supabase) {
+            console.warn('⚠️ Supabase non disponible');
+            return { success: true, message: 'Supabase non disponible, envoi ignoré', skipped: true };
+        }
+
+        // ============================================================
+        // 3. 获取课程详情（含老师和学生信息）
+        // ============================================================
+        const { data: course, error } = await supabase
+            .from('courses')
+            .select(`
+                *,
+                teacher:teacher_id(id, name, email),
+                student:student_id(id, name, email)
+            `)
+            .eq('id', courseId)
+            .single();
+
+        if (error) {
+            console.error('❌ Erreur récupération cours:', error.message);
+            return { success: true, message: 'Erreur récupération cours, envoi ignoré', skipped: true };
+        }
+
+        if (!course) {
+            console.warn('⚠️ Cours non trouvé');
+            return { success: true, message: 'Cours non trouvé, envoi ignoré', skipped: true };
+        }
+
+        // ============================================================
+        // 4. 检查是否有邮箱
+        // ============================================================
+        const teacher = course.teacher || null;
+        const student = course.student || null;
+
+        const hasTeacherEmail = teacher && teacher.email && teacher.email.trim() !== '';
+        const hasStudentEmail = student && student.email && student.email.trim() !== '';
+
+        // 🔥 如果老师和学生都没有邮箱，直接跳过
+        if (!hasTeacherEmail && !hasStudentEmail) {
+            console.log('ℹ️ 老师和学生都没有邮箱，跳过邮件发送 (courseId: ' + courseId + ')');
+            return { success: true, message: 'Aucun email disponible, envoi ignoré', skipped: true };
+        }
+
+        // ============================================================
+        // 5. 准备邮件数据
+        // ============================================================
+        const actionLabels = {
+            'create': 'créé',
+            'update': 'modifié',
+            'cancel': 'annulé',
+            'complete': 'terminé'
+        };
+        const actionLabel = actionLabels[action] || action || 'modifié';
+
+        const { date, time } = formatDateSimple(course.start_time);
+        const courseTypeName = getTypeDisplayText(course.course_type);
+
+        // 根据 action 决定是否排除当前课程
+        // create 时不排除（新建的课程要显示在列表里）
+        // update/cancel/complete 时排除（修改/删除的课程不显示在列表里）
+        const shouldExclude = (action !== 'create');
+
+        // ============================================================
+        // 6. 获取老师和学生的课程列表
+        // ============================================================
+        let teacherCoursesFormatted = '✅ Aucun cours à venir.';
+        let studentCoursesFormatted = '✅ Aucun cours à venir.';
+
+        if (teacher && teacher.id) {
+            try {
+                const teacherCourses = await getUpcomingCoursesForUser(teacher.id, 'teacher', shouldExclude ? courseId : null);
+                teacherCoursesFormatted = formatUpcomingCoursesForEmail(teacherCourses, 'teacher');
+            } catch (e) {
+                console.warn('⚠️ 获取老师课程列表失败:', e.message);
+            }
+        }
+
+        if (student && student.id) {
+            try {
+                const studentCourses = await getUpcomingCoursesForUser(student.id, 'student', shouldExclude ? courseId : null);
+                studentCoursesFormatted = formatUpcomingCoursesForEmail(studentCourses, 'student');
+            } catch (e) {
+                console.warn('⚠️ 获取学生课程列表失败:', e.message);
+            }
+        }
+
+        // ============================================================
+        // 7. 发送邮件
+        // ============================================================
+        let sentCount = 0;
+        const errors = [];
+
+        // 7.1 发送给老师
+        if (hasTeacherEmail) {
+            const teacherParams = {
+                to_email: teacher.email,
+                to_name: teacher.name || 'Enseignant',
+                teacher_name: teacher.name || 'Enseignant',
+                action: actionLabel,
+                course_type: courseTypeName,
+                date: date,
+                time: time,
+                duration: course.duration || 2,
+                student_name: student?.name || '-',
+                student_email: student?.email || '-',
+                upcoming_courses: teacherCoursesFormatted,
+                subject: `📚 [Enseignant] Mise à jour planning - ${date}`
+            };
+
+            try {
+                await emailjs.send(
+                    EMAILJS_COURSE.SERVICE_ID,
+                    EMAILJS_COURSE.TEACHER_TEMPLATE_ID,
+                    teacherParams,
+                    EMAILJS_COURSE.PUBLIC_KEY
+                );
+                console.log(`✅ [Cours] Email envoyé à l'enseignant: ${teacher.email}`);
+                sentCount++;
+            } catch (e) {
+                console.error(`❌ [Cours] Échec envoi à l'enseignant ${teacher.email}:`, e.message);
+                errors.push(`Enseignant: ${e.message}`);
+            }
+        }
+
+        // 7.2 发送给学生
+        if (hasStudentEmail) {
+            const studentParams = {
+                to_email: student.email,
+                to_name: student.name || 'Élève',
+                student_name: student.name || 'Élève',
+                action: actionLabel,
+                course_type: courseTypeName,
+                date: date,
+                time: time,
+                duration: course.duration || 2,
+                teacher_name: teacher?.name || '-',
+                teacher_email: teacher?.email || '-',
+                upcoming_courses: studentCoursesFormatted,
+                subject: `📚 [Élève] Mise à jour planning - ${date}`
+            };
+
+            try {
+                await emailjs.send(
+                    EMAILJS_COURSE.SERVICE_ID,
+                    EMAILJS_COURSE.STUDENT_TEMPLATE_ID,
+                    studentParams,
+                    EMAILJS_COURSE.PUBLIC_KEY
+                );
+                console.log(`✅ [Cours] Email envoyé à l'élève: ${student.email}`);
+                sentCount++;
+            } catch (e) {
+                console.error(`❌ [Cours] Échec envoi à l'élève ${student.email}:`, e.message);
+                errors.push(`Élève: ${e.message}`);
+            }
+        }
+
+        // ============================================================
+        // 8. 返回结果
+        // ============================================================
+        if (sentCount === 0 && errors.length === 0) {
+            // 理论上不会到这里，因为前面已经检查了邮箱
+            return { success: true, message: 'Aucun email envoyé', sentCount: 0 };
+        }
+
+        if (sentCount > 0) {
+            console.log(`✅ [Cours] ${sentCount} email(s) envoyé(s) pour le cours ${courseId}`);
+        }
+
+        return {
+            success: true,
+            sentCount: sentCount,
+            message: `${sentCount} email(s) envoyé(s)`,
+            errors: errors.length > 0 ? errors : null
+        };
+
+    } catch (error) {
+        // ============================================================
+        // 9. 任何异常都不影响课程操作
+        // ============================================================
+        console.error('❌ [Cours] Erreur inattendue dans sendCourseEmailNotification:', error);
+        return { 
+            success: true, 
+            message: 'Erreur inattendue, envoi ignoré', 
+            error: error.message,
+            skipped: true 
+        };
+    }
+}
+// ============================================================
+        // 课程管理核心代码
+        // ============================================================
+        
         const courseTypeConfig = {
             rootCode: 'ec',
             rootName: '1️⃣ 公民考试',
@@ -603,22 +939,9 @@
             ]
         };
 
-        // 默认会议链接
         const DEFAULT_MEETING_LINK = 'https://meet.google.com/bof-kzvo-ndh';
         const HE_TEACHER_LINK = 'https://meet.google.com/gkv-cirp-iqo';
         const ZHOU_TEACHER_LINK = 'https://meet.google.com/bof-kzvo-ndh';
-        
-        function getTypeDisplayText(code) {
-            if (!code) return '';
-            if (code === 'ec') return '1️⃣ 公民考试';
-            for (const group of courseTypeConfig.children) {
-                if (group.code === code) return group.name;
-                for (const child of group.children) {
-                    if (child.code === code) return child.name;
-                }
-            }
-            return code;
-        }
 
         function getAllTypeCodes() {
             const codes = ['ec'];
@@ -710,7 +1033,6 @@
             }
         }
 
-        // ========== 全局变量 ==========
         let allCourses = [];
         let allStudents = [];
         let allTeachers = [];
@@ -718,7 +1040,6 @@
         let showOnlyUpcoming = true;
         let pendingCancelData = null;
 
-        // DOM 元素
         const totalCoursesEl = document.getElementById('totalCourses');
         const monthCoursesEl = document.getElementById('monthCourses');
         const completedRateEl = document.getElementById('completedRate');
@@ -736,12 +1057,11 @@
         function showToast(msg, type) {
             let t = document.createElement('div');
             t.className = `toast toast-${type || 'success'}`;
-            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'info' ? 'fa-info-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
             document.body.appendChild(t);
             setTimeout(() => t.remove(), 3000);
         }
 
-        // 扣减学生课时
         async function deductStudentCredit(studentId, hours) {
             if (!studentId || !hours || hours <= 0) return true;
             const supabase = window.supabaseAuth.getSupabaseClient();
@@ -763,7 +1083,6 @@
             return true;
         }
 
-        // 返还学生课时
         async function refundStudentCredit(studentId, hours) {
             if (!studentId || !hours || hours <= 0) return true;
             const supabase = window.supabaseAuth.getSupabaseClient();
@@ -942,8 +1261,8 @@
                 
                 const [coursesRes, studentsRes, teachersRes] = await Promise.all([
                     supabase.from('courses').select('*').order('start_time'),
-                    supabase.from('students').select('id, name, credit, role').eq('role', 'stu'),
-                    supabase.from('students').select('id, name').eq('role', 'teacher')
+                    supabase.from('students').select('id, name, email, credit, role').eq('role', 'stu'),
+                    supabase.from('students').select('id, name, email').eq('role', 'teacher')
                 ]);
                 
                 if (coursesRes.error) throw coursesRes.error;
@@ -1072,6 +1391,133 @@
             document.getElementById('cancelReasonModal').style.display = 'flex';
         }
 
+        // ============================================================
+        // SAVE COURSE - 只发一次邮件
+        // ============================================================
+        async function saveCourse(e) {
+            e.preventDefault();
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const id = document.getElementById('courseId').value;
+            const teacherId = document.getElementById('teacherId').value;
+            const studentId = document.getElementById('studentId').value;
+            const startTimeLocal = document.getElementById('startTime').value;
+            const duration = parseFloat(document.getElementById('duration').value) || 2;
+            const courseType = document.getElementById('courseTypeValue').value;
+            const newStatus = document.getElementById('status').value;
+            
+            if (!startTimeLocal) {
+                showToast('Veuillez sélectionner une date et heure', 'error');
+                return;
+            }
+            if (!courseType) {
+                showToast('Veuillez sélectionner un type de cours', 'error');
+                return;
+            }
+            
+            const [datePart, timePart] = startTimeLocal.split('T');
+            const startTimeStr = `${datePart} ${timePart}:00`;
+            
+            if (checkConflict(teacherId, startTimeStr, id || null, duration)) {
+                showToast('Conflit horaire avec un autre cours !', 'error');
+                return;
+            }
+            
+            const data = {
+                student_id: studentId,
+                teacher_id: teacherId,
+                course_type: courseType,
+                start_time: startTimeStr,
+                duration: duration,
+                location: document.getElementById('location').value || null,
+                material_link: document.getElementById('materialLink').value || null,
+                meeting_link: document.getElementById('meetingLink').value || null,
+                notes: document.getElementById('notes').value || null,
+                status: newStatus
+            };
+            
+            if (!data.student_id || !data.teacher_id) {
+                showToast('Veuillez sélectionner un élève et un intervenant', 'error');
+                return;
+            }
+            
+            // 如果状态变为 cancelled，弹出模态框选择取消原因
+            if (newStatus === 'cancelled') {
+                pendingCancelData = { id, data, oldCourse: id ? allCourses.find(c => c.id === id) : null };
+                openCancelReasonModal();
+                return;
+            }
+            
+            try {
+                const isNewCourse = !id;
+                let newCourseId = id;
+                
+                if (isNewCourse) {
+                    if (newStatus === 'scheduled' || newStatus === 'completed') {
+                        const canDeduct = await deductStudentCredit(studentId, duration);
+                        if (!canDeduct) return;
+                    }
+                    const { data: inserted, error } = await supabase.from('courses').insert([data]).select();
+                    if (error) throw error;
+                    newCourseId = inserted[0].id;
+                    
+                    // 只发一次：创建课程
+                    await sendCourseEmailNotification(newCourseId, 'create');
+                } else {
+                    const oldCourse = allCourses.find(c => c.id === id);
+                    if (!oldCourse) throw new Error('Cours non trouvé');
+                    
+                    const oldStatus = oldCourse.status;
+                    const oldDuration = oldCourse.duration || 2;
+                    const oldStudentId = oldCourse.student_id;
+                    
+                    const isConsumingStatus = (status) => status === 'scheduled' || status === 'in_progress' || status === 'completed';
+                    const oldConsumes = isConsumingStatus(oldStatus);
+                    const newConsumes = isConsumingStatus(newStatus);
+                    
+                    if (oldStudentId !== studentId) {
+                        if (oldConsumes) await refundStudentCredit(oldStudentId, oldDuration);
+                        if (newConsumes) {
+                            const canDeduct = await deductStudentCredit(studentId, duration);
+                            if (!canDeduct) return;
+                        }
+                    } else {
+                        if (oldConsumes && !newConsumes) {
+                            await refundStudentCredit(studentId, oldDuration);
+                        } else if (!oldConsumes && newConsumes) {
+                            const canDeduct = await deductStudentCredit(studentId, duration);
+                            if (!canDeduct) return;
+                        } else if (oldConsumes && newConsumes) {
+                            const diff = duration - oldDuration;
+                            if (diff > 0) {
+                                const canDeduct = await deductStudentCredit(studentId, diff);
+                                if (!canDeduct) return;
+                            } else if (diff < 0) {
+                                await refundStudentCredit(studentId, -diff);
+                            }
+                        }
+                    }
+                    
+                    const { error } = await supabase.from('courses').update(data).eq('id', id);
+                    if (error) throw error;
+                    
+                    // 只发一次：修改课程（非取消状态）
+                    if (newStatus !== 'cancelled') {
+                        await sendCourseEmailNotification(id, 'update');
+                    }
+                }
+                
+                closeModal(courseModal);
+                await loadData();
+                showToast(id ? 'Cours modifié' : 'Cours créé', 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Erreur: ' + (err.message || 'Vérifiez la console'), 'error');
+            }
+        }
+
+        // ============================================================
+        // EXECUTE SAVE WITH CANCEL REASON - 只发一次取消邮件
+        // ============================================================
         async function executeSaveCourseWithCancelReason(selectedReason) {
             const { id, data, oldCourse } = pendingCancelData;
             const supabase = window.supabaseAuth.getSupabaseClient();
@@ -1080,8 +1526,10 @@
                 const isNewCourse = !id;
                 
                 if (isNewCourse) {
-                    const { error } = await supabase.from('courses').insert([{ ...data, cancel_reason: selectedReason }]);
+                    const { data: inserted, error } = await supabase.from('courses').insert([{ ...data, cancel_reason: selectedReason }]).select();
                     if (error) throw error;
+                    // 创建课程但状态是取消，发取消通知
+                    await sendCourseEmailNotification(inserted[0].id, 'cancel');
                 } else {
                     const oldStatus = oldCourse.status;
                     const oldDuration = oldCourse.duration || 2;
@@ -1096,6 +1544,9 @@
                     
                     const { error } = await supabase.from('courses').update({ ...data, cancel_reason: selectedReason }).eq('id', id);
                     if (error) throw error;
+                    
+                    // 只发一次：取消课程
+                    await sendCourseEmailNotification(id, 'cancel');
                 }
                 
                 closeModal(courseModal);
@@ -1160,117 +1611,6 @@
             };
         }
 
-        async function saveCourse(e) {
-            e.preventDefault();
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            const id = document.getElementById('courseId').value;
-            const teacherId = document.getElementById('teacherId').value;
-            const studentId = document.getElementById('studentId').value;
-            const startTimeLocal = document.getElementById('startTime').value;
-            const duration = parseFloat(document.getElementById('duration').value) || 2;
-            const courseType = document.getElementById('courseTypeValue').value;
-            const newStatus = document.getElementById('status').value;
-            
-            if (!startTimeLocal) {
-                showToast('Veuillez sélectionner une date et heure', 'error');
-                return;
-            }
-            if (!courseType) {
-                showToast('Veuillez sélectionner un type de cours', 'error');
-                return;
-            }
-            
-            const [datePart, timePart] = startTimeLocal.split('T');
-            const startTimeStr = `${datePart} ${timePart}:00`;
-            
-            if (checkConflict(teacherId, startTimeStr, id || null, duration)) {
-                showToast('Conflit horaire avec un autre cours !', 'error');
-                return;
-            }
-            
-            const data = {
-                student_id: studentId,
-                teacher_id: teacherId,
-                course_type: courseType,
-                start_time: startTimeStr,
-                duration: duration,
-                location: document.getElementById('location').value || null,
-                material_link: document.getElementById('materialLink').value || null,
-                meeting_link: document.getElementById('meetingLink').value || null,
-                notes: document.getElementById('notes').value || null,
-                status: newStatus
-            };
-            
-            if (!data.student_id || !data.teacher_id) {
-                showToast('Veuillez sélectionner un élève et un intervenant', 'error');
-                return;
-            }
-            
-            // 如果状态变为 cancelled，弹出模态框选择取消原因
-            if (newStatus === 'cancelled') {
-                pendingCancelData = { id, data, oldCourse: id ? allCourses.find(c => c.id === id) : null };
-                openCancelReasonModal();
-                return;
-            }
-            
-            try {
-                const isNewCourse = !id;
-                
-                if (isNewCourse) {
-                    if (newStatus === 'scheduled' || newStatus === 'completed') {
-                        const canDeduct = await deductStudentCredit(studentId, duration);
-                        if (!canDeduct) return;
-                    }
-                    const { error } = await supabase.from('courses').insert([data]);
-                    if (error) throw error;
-                } else {
-                    const oldCourse = allCourses.find(c => c.id === id);
-                    if (!oldCourse) throw new Error('Cours non trouvé');
-                    
-                    const oldStatus = oldCourse.status;
-                    const oldDuration = oldCourse.duration || 2;
-                    const oldStudentId = oldCourse.student_id;
-                    
-                    const isConsumingStatus = (status) => status === 'scheduled' || status === 'in_progress' || status === 'completed';
-                    const oldConsumes = isConsumingStatus(oldStatus);
-                    const newConsumes = isConsumingStatus(newStatus);
-                    
-                    if (oldStudentId !== studentId) {
-                        if (oldConsumes) await refundStudentCredit(oldStudentId, oldDuration);
-                        if (newConsumes) {
-                            const canDeduct = await deductStudentCredit(studentId, duration);
-                            if (!canDeduct) return;
-                        }
-                    } else {
-                        if (oldConsumes && !newConsumes) {
-                            await refundStudentCredit(studentId, oldDuration);
-                        } else if (!oldConsumes && newConsumes) {
-                            const canDeduct = await deductStudentCredit(studentId, duration);
-                            if (!canDeduct) return;
-                        } else if (oldConsumes && newConsumes) {
-                            const diff = duration - oldDuration;
-                            if (diff > 0) {
-                                const canDeduct = await deductStudentCredit(studentId, diff);
-                                if (!canDeduct) return;
-                            } else if (diff < 0) {
-                                await refundStudentCredit(studentId, -diff);
-                            }
-                        }
-                    }
-                    
-                    const { error } = await supabase.from('courses').update(data).eq('id', id);
-                    if (error) throw error;
-                }
-                
-                closeModal(courseModal);
-                await loadData();
-                showToast(id ? 'Cours modifié' : 'Cours créé', 'success');
-            } catch (err) {
-                console.error(err);
-                showToast('Erreur: ' + (err.message || 'Vérifiez la console'), 'error');
-            }
-        }
-
         function showDeleteConfirm(courseId) {
             const course = allCourses.find(c => c.id === courseId);
             if (!course) return;
@@ -1297,6 +1637,9 @@
                 if (courseToDelete && (courseToDelete.status === 'scheduled' || courseToDelete.status === 'in_progress' || courseToDelete.status === 'completed')) {
                     await refundStudentCredit(courseToDelete.student_id, courseToDelete.duration || 2);
                 }
+                
+                // 只发一次：删除/取消课程
+                await sendCourseEmailNotification(pendingDeleteCourseId, 'cancel');
                 
                 const { error } = await supabase.from('courses').delete().eq('id', pendingDeleteCourseId);
                 if (error) throw error;

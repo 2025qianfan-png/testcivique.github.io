@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -1540,9 +1541,232 @@
             }
         };
 
+
+
         // ============================================================
+// EMAILJS 配置 - 课程邮件
+// ============================================================
+const EMAILJS_COURSE = {
+    PUBLIC_KEY: 'c2dTn19suzx4VxUu6',
+    SERVICE_ID: 'service_64o8j3r',
+    TEACHER_TEMPLATE_ID: 'template_m97muhh',
+    STUDENT_TEMPLATE_ID: 'template_f6nsc21'
+};
+
+// ============================================================
+// 发送课程通知邮件
+// ============================================================
+function formatDateSimpleForEmail(dateStr) {
+    if (!dateStr) return { date: 'Date non définie', time: 'Heure non définie' };
+    try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) {
+            return { date: 'Date non définie', time: 'Heure non définie' };
+        }
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return {
+            date: `${day}/${month}/${year}`,
+            time: `${hours}:${minutes}`
+        };
+    } catch (e) {
+        return { date: 'Date non définie', time: 'Heure non définie' };
+    }
+}
+
+async function getUpcomingCoursesForTeacher(teacherId, excludeCourseId = null) {
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        if (!supabase) return [];
+
+        const now = new Date().toISOString();
+        let query = supabase
+            .from('courses')
+            .select(`
+                *,
+                teacher:teacher_id(id, name, email),
+                student:student_id(id, name, email)
+            `)
+            .eq('teacher_id', teacherId)
+            .eq('status', 'scheduled')
+            .gte('start_time', now)
+            .order('start_time', { ascending: true });
+
+        // 🔥 排除当前课程（取消预约/取消课程时使用）
+        if (excludeCourseId) {
+            query = query.neq('id', excludeCourseId);
+        }
+
+        const { data, error } = await query;
+        if (error) return [];
+        return data || [];
+    } catch (error) {
+        return [];
+    }
+}
+function formatUpcomingCoursesForTeacherEmail(courses) {
+    if (!courses || courses.length === 0) {
+        return '✅ Aucun cours à venir.';
+    }
+
+    let formatted = '';
+    courses.forEach((course, index) => {
+        const { date, time } = formatDateSimpleForEmail(course.start_time);
+        const teacherName = course.teacher?.name || 'À déterminer';
+        const studentName = course.student?.name || 'À déterminer';
+        const courseTypeName = getCourseTypeText(course.course_type);
+
+        formatted += `${index + 1}. ${date} à ${time} `;
+        formatted += `| ${courseTypeName} `;
+        formatted += `| ${course.duration || 2}h`;
+        formatted += ` | Élève: ${studentName}`;
+        formatted += '\n';
+    });
+    return formatted;
+}
+async function sendCourseEmailNotificationToTeacher(courseId, action, studentName) {
+    try {
+        // ============================================================
+        // 1. 检查 EmailJS 是否可用
+        // ============================================================
+        if (typeof emailjs === 'undefined') {
+            console.warn('⚠️ EmailJS non disponible');
+            return { success: true, message: 'EmailJS non disponible, envoi ignoré', skipped: true };
+        }
+
+        try {
+            emailjs.init(EMAILJS_COURSE.PUBLIC_KEY);
+            console.log('✅ EmailJS (Cours) initialisé');
+        } catch (e) {
+            console.log('ℹ️ EmailJS déjà initialisé pour les cours');
+        }
+
+        // ============================================================
+        // 2. 获取 Supabase 客户端
+        // ============================================================
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        if (!supabase) {
+            console.warn('⚠️ Supabase non disponible');
+            return { success: true, message: 'Supabase non disponible, envoi ignoré', skipped: true };
+        }
+
+        // ============================================================
+        // 3. 获取课程详情
+        // ============================================================
+        const { data: course, error } = await supabase
+            .from('courses')
+            .select(`
+                *,
+                teacher:teacher_id(id, name, email),
+                student:student_id(id, name, email)
+            `)
+            .eq('id', courseId)
+            .single();
+
+        if (error) {
+            console.error('❌ Erreur récupération cours:', error.message);
+            return { success: true, message: 'Erreur récupération cours, envoi ignoré', skipped: true };
+        }
+
+        if (!course) {
+            console.warn('⚠️ Cours non trouvé');
+            return { success: true, message: 'Cours non trouvé, envoi ignoré', skipped: true };
+        }
+
+        // ============================================================
+        // 4. 检查老师是否有邮箱
+        // ============================================================
+        const teacher = course.teacher || null;
+        const student = course.student || null;
+
+        // 🔥 如果老师没有邮箱，直接跳过，不报错
+        if (!teacher || !teacher.email || teacher.email.trim() === '') {
+            console.log('ℹ️ 老师没有邮箱，跳过邮件发送 (courseId: ' + courseId + ')');
+            return { success: true, message: 'Email enseignant manquant, envoi ignoré', skipped: true };
+        }
+
+        // ============================================================
+        // 5. 准备邮件数据
+        // ============================================================
+        const actionLabels = {
+            'booking': 'réservé par un étudiant',
+            'cancel_booking': 'annulé par un étudiant',
+            'cancel_course': 'annulé par un étudiant'
+        };
+        const actionLabel = actionLabels[action] || action || 'modifié';
+
+        const { date, time } = formatDateSimpleForEmail(course.start_time);
+        // 🔥 使用 getCourseTypeText 获取完整课程名称
+        const courseTypeName = getCourseTypeText(course.course_type);
+
+        // 只有取消操作才排除当前课程，预约操作不排除
+        const shouldExclude = (action === 'cancel_booking' || action === 'cancel_course');
+
+        // ============================================================
+        // 6. 获取老师的课程列表
+        // ============================================================
+        let formattedCourses = '✅ Aucun cours à venir.';
+        try {
+            const upcomingCourses = await getUpcomingCoursesForTeacher(teacher.id, shouldExclude ? courseId : null);
+            formattedCourses = formatUpcomingCoursesForTeacherEmail(upcomingCourses);
+        } catch (e) {
+            console.warn('⚠️ 获取老师课程列表失败:', e.message);
+        }
+
+        // ============================================================
+        // 7. 发送邮件
+        // ============================================================
+        const params = {
+            to_email: teacher.email,
+            to_name: teacher.name || 'Enseignant',
+            teacher_name: teacher.name || 'Enseignant',
+            action: actionLabel,
+            course_type: courseTypeName,
+            date: date,
+            time: time,
+            duration: course.duration || 2,
+            student_name: student?.name || studentName || '-',
+            student_email: student?.email || '-',
+            upcoming_courses: formattedCourses,
+            subject: `📚 [Enseignant] Cours ${actionLabel} - ${date}`
+        };
+
+        await emailjs.send(
+            EMAILJS_COURSE.SERVICE_ID,
+            EMAILJS_COURSE.TEACHER_TEMPLATE_ID,
+            params,
+            EMAILJS_COURSE.PUBLIC_KEY
+        );
+
+        console.log(`✅ [Cours] Email envoyé à l'enseignant: ${teacher.email}`);
+        return { success: true, message: 'Email envoyé' };
+
+    } catch (error) {
+        // ============================================================
+        // 8. 任何异常都不影响操作
+        // ============================================================
+        console.error('❌ [Cours] Erreur inattendue dans sendCourseEmailNotificationToTeacher:', error);
+        return { 
+            success: true, 
+            message: 'Erreur inattendue, envoi ignoré', 
+            error: error.message,
+            skipped: true 
+        };
+    }
+}
+
+// ============================================================
         // 全局变量
         // ============================================================
+
+
+
+
+
+
         let currentLang = 'fr';
         let currentStudent = null;
         let myCourses = [];
@@ -2166,120 +2390,156 @@
             });
         }
 
-        async function confirmBooking() {
-            if (!pendingBookingSlot) return;
-            if (isBooking) return;
-            
-            const t = translations[currentLang];
-            const courseType = document.getElementById('bookingSelectedType').value;
-            
-            if (!courseType) {
-                showToast(t.selectCourseType, 'error');
-                return;
-            }
-            
-            const { slotId, teacherName, startTime, duration } = pendingBookingSlot;
-            
-            if (studentCredit < duration) {
-                showToast(t.insufficientCredits, 'error');
-                closeBookingConfirm();
-                return;
-            }
-            
-            isBooking = true;
-            
-            try {
-                const supabase = window.supabaseAuth.getSupabaseClient();
-                
-                const { data: slotCheck, error: checkError } = await supabase
-                    .from('teacher_availabilities')
-                    .select('status')
-                    .eq('id', slotId)
-                    .single();
-                
-                if (checkError) throw checkError;
-                
-                if (slotCheck.status !== 'available') {
-                    showToast(t.slotUnavailable, 'error');
-                    closeBookingConfirm();
-                    await loadAvailableSlots();
-                    return;
-                }
-                
-                const { data: slotData, error: slotError } = await supabase
-                    .from('teacher_availabilities')
-                    .select('teacher_id')
-                    .eq('id', slotId)
-                    .single();
-                
-                if (slotError) throw slotError;
-                
-                const courseData = {
-                    student_id: currentStudent.userId,
-                    teacher_id: slotData.teacher_id,
-                    course_type: courseType,
-                    start_time: startTime,
-                    duration: duration,
-                    status: 'scheduled',
-                    source: 'student_booking',
-                    created_at: new Date().toISOString()
-                };
-                
-                const { data: course, error: courseError } = await supabase
-                    .from('courses')
-                    .insert([courseData])
-                    .select()
-                    .single();
-                
-                if (courseError) throw courseError;
-                
-                const newCredit = studentCredit - duration;
-                const { error: updateCreditError } = await supabase
-                    .from('students')
-                    .update({ credit: newCredit })
-                    .eq('id', currentStudent.userId);
-                
-                if (updateCreditError) {
-                    await supabase.from('courses').delete().eq('id', course.id);
-                    throw updateCreditError;
-                }
-                
-                const { error: updateSlotError } = await supabase
-                    .from('teacher_availabilities')
-                    .update({
-                        status: 'booked',
-                        student_id: currentStudent.userId,
-                        student_name: currentStudent.name,
-                        course_id: course.id,
-                        booked_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
-                    })
-                    .eq('id', slotId)
-                    .eq('status', 'available');
-                
-                if (updateSlotError) {
-                    await supabase.from('courses').delete().eq('id', course.id);
-                    await supabase.from('students').update({ credit: studentCredit }).eq('id', currentStudent.userId);
-                    throw updateSlotError;
-                }
-                
-                studentCredit = newCredit;
-                closeBookingConfirm();
-                showToast(`${t.bookingSuccess} ${duration}h consommées.`, 'success');
-                
-                await loadMyCourses();
-                await loadAvailableSlots();
-                updateCreditStats();
-                
-            } catch (error) {
-                console.error('预约失败:', error);
-                showToast(`${t.bookingError}: ${error.message}`, 'error');
-            } finally {
-                isBooking = false;
-            }
+       async function confirmBooking() {
+    if (!pendingBookingSlot) return;
+    if (isBooking) return;
+    
+    const t = translations[currentLang];
+    const courseType = document.getElementById('bookingSelectedType').value;
+    
+    if (!courseType) {
+        showToast(t.selectCourseType, 'error');
+        return;
+    }
+    
+    const { slotId, teacherName, startTime, duration } = pendingBookingSlot;
+    
+    if (studentCredit < duration) {
+        showToast(t.insufficientCredits, 'error');
+        closeBookingConfirm();
+        return;
+    }
+    
+    isBooking = true;
+    
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        
+        // 1. 检查时间段是否仍然可用
+        const { data: slotCheck, error: checkError } = await supabase
+            .from('teacher_availabilities')
+            .select('status')
+            .eq('id', slotId)
+            .single();
+        
+        if (checkError) throw checkError;
+        
+        if (slotCheck.status !== 'available') {
+            showToast(t.slotUnavailable, 'error');
+            closeBookingConfirm();
+            await loadAvailableSlots();
+            return;
         }
-
-        // ============================================================
+        
+        // 2. 获取老师信息
+        const { data: slotData, error: slotError } = await supabase
+            .from('teacher_availabilities')
+            .select('teacher_id')
+            .eq('id', slotId)
+            .single();
+        
+        if (slotError) throw slotError;
+        
+        // 3. 获取老师姓名来确定会议链接
+        const { data: teacherData, error: teacherError } = await supabase
+            .from('students')
+            .select('name')
+            .eq('id', slotData.teacher_id)
+            .single();
+        
+        if (teacherError) throw teacherError;
+        
+        // 4. 根据老师名称设置会议链接
+        const DEFAULT_MEETING_LINK = 'https://meet.google.com/bof-kzvo-ndh';
+        const HE_TEACHER_LINK = 'https://meet.google.com/gkv-cirp-iqo';
+        const ZHOU_TEACHER_LINK = 'https://meet.google.com/bof-kzvo-ndh';
+        
+        let meetingLink = DEFAULT_MEETING_LINK;
+        const teacherNameFromDb = teacherData?.name || '';
+        if (teacherNameFromDb === 'HE') {
+            meetingLink = HE_TEACHER_LINK;
+        } else if (teacherNameFromDb === 'ZHOU') {
+            meetingLink = ZHOU_TEACHER_LINK;
+        }
+        
+        // 5. 创建课程
+        const courseData = {
+            student_id: currentStudent.userId,
+            teacher_id: slotData.teacher_id,
+            course_type: courseType,
+            start_time: startTime,
+            duration: duration,
+            status: 'scheduled',
+            source: 'student_booking',
+            meeting_link: meetingLink,
+            created_at: new Date().toISOString()
+        };
+        
+        const { data: course, error: courseError } = await supabase
+            .from('courses')
+            .insert([courseData])
+            .select()
+            .single();
+        
+        if (courseError) throw courseError;
+        
+        // 6. 扣减学生课时
+        const newCredit = studentCredit - duration;
+        const { error: updateCreditError } = await supabase
+            .from('students')
+            .update({ credit: newCredit })
+            .eq('id', currentStudent.userId);
+        
+        if (updateCreditError) {
+            await supabase.from('courses').delete().eq('id', course.id);
+            throw updateCreditError;
+        }
+        
+        // 7. 更新空闲时间段为已预约
+        const { error: updateSlotError } = await supabase
+            .from('teacher_availabilities')
+            .update({
+                status: 'booked',
+                student_id: currentStudent.userId,
+                student_name: currentStudent.name,
+                course_id: course.id,
+                booked_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', slotId)
+            .eq('status', 'available');
+        
+        if (updateSlotError) {
+            await supabase.from('courses').delete().eq('id', course.id);
+            await supabase.from('students').update({ credit: studentCredit }).eq('id', currentStudent.userId);
+            throw updateSlotError;
+        }
+        
+        studentCredit = newCredit;
+        closeBookingConfirm();
+        showToast(`${t.bookingSuccess} ${duration}h consommées.`, 'success');
+        
+        // 8. 🔥 发送邮件通知老师（延迟300ms确保数据库事务提交）
+        try {
+            await new Promise(resolve => setTimeout(resolve, 300));
+            await sendCourseEmailNotificationToTeacher(course.id, 'booking', currentStudent.name);
+        } catch (emailError) {
+            // 邮件发送失败不影响预约成功
+            console.warn('⚠️ 邮件发送失败（不影响预约）:', emailError.message);
+        }
+        
+        await loadMyCourses();
+        await loadAvailableSlots();
+        updateCreditStats();
+        
+    } catch (error) {
+        console.error('预约失败:', error);
+        showToast(`${t.bookingError}: ${error.message}`, 'error');
+    } finally {
+        isBooking = false;
+    }
+}
+// ============================================================
         // 取消预约（学生预约的课）
         // ============================================================
         function openCancelBookingModal(courseId, startTime, teacherName, courseType) {
@@ -2299,87 +2559,89 @@
             document.getElementById('cancelBookingModal').style.display = 'none';
             pendingCancelBooking = null;
         }
-
         async function executeCancelBooking() {
-            if (!pendingCancelBooking) return;
-            const t = translations[currentLang];
-            const { courseId } = pendingCancelBooking;
-            
-            try {
-                const supabase = window.supabaseAuth.getSupabaseClient();
-                
-                const { data: course, error: courseError } = await supabase
-                    .from('courses')
-                    .select('*')
-                    .eq('id', courseId)
-                    .single();
-                
-                if (courseError) throw courseError;
-                
-                if (course.source !== 'student_booking') {
-                    showToast(t.notStudentBooking, 'error');
-                    closeCancelBookingModal();
-                    return;
-                }
-                
-                // 返还课时
-                const { data: student, error: studentError } = await supabase
-                    .from('students')
-                    .select('credit')
-                    .eq('id', currentStudent.userId)
-                    .single();
-                
-                if (!studentError && student) {
-                    const newCredit = (student.credit || 0) + (course.duration || 2);
-                    await supabase
-                        .from('students')
-                        .update({ credit: newCredit })
-                        .eq('id', currentStudent.userId);
-                    studentCredit = newCredit;
-                }
-                
-                // 取消课程
-                await supabase
-                    .from('courses')
-                    .update({ 
-                        status: 'cancelled',
-                        cancel_reason: 'Annulé par l\'étudiant (réservation)'
-                    })
-                    .eq('id', courseId);
-                
-                // 释放空闲时间段
-                const { data: slot } = await supabase
-                    .from('teacher_availabilities')
-                    .select('id')
-                    .eq('course_id', courseId)
-                    .single();
-                
-                if (slot) {
-                    await supabase
-                        .from('teacher_availabilities')
-                        .update({
-                            status: 'available',
-                            student_id: null,
-                            student_name: null,
-                            course_id: null,
-                            booked_at: null,
-                            updated_at: new Date().toISOString()
-                        })
-                        .eq('id', slot.id);
-                }
-                
-                closeCancelBookingModal();
-                showToast(t.bookingCancelled, 'success');
-                await loadMyCourses();
-                await loadAvailableSlots();
-                updateCreditStats();
-                
-            } catch (error) {
-                console.error('取消预约失败:', error);
-                showToast('❌ ' + t.toastError + ': ' + error.message, 'error');
-            }
+    if (!pendingCancelBooking) return;
+    const t = translations[currentLang];
+    const { courseId } = pendingCancelBooking;
+    
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        
+        const { data: course, error: courseError } = await supabase
+            .from('courses')
+            .select('*')
+            .eq('id', courseId)
+            .single();
+        
+        if (courseError) throw courseError;
+        
+        if (course.source !== 'student_booking') {
+            showToast(t.notStudentBooking, 'error');
+            closeCancelBookingModal();
+            return;
         }
-
+        
+        // 返还课时
+        const { data: student, error: studentError } = await supabase
+            .from('students')
+            .select('credit')
+            .eq('id', currentStudent.userId)
+            .single();
+        
+        if (!studentError && student) {
+            const newCredit = (student.credit || 0) + (course.duration || 2);
+            await supabase
+                .from('students')
+                .update({ credit: newCredit })
+                .eq('id', currentStudent.userId);
+            studentCredit = newCredit;
+        }
+        
+        // 取消课程
+        await supabase
+            .from('courses')
+            .update({ 
+                status: 'cancelled',
+                cancel_reason: 'Annulé par l\'étudiant (réservation)'
+            })
+            .eq('id', courseId);
+        
+        // 释放空闲时间段
+        const { data: slot } = await supabase
+            .from('teacher_availabilities')
+            .select('id')
+            .eq('course_id', courseId)
+            .single();
+        
+        if (slot) {
+            await supabase
+                .from('teacher_availabilities')
+                .update({
+                    status: 'available',
+                    student_id: null,
+                    student_name: null,
+                    course_id: null,
+                    booked_at: null,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', slot.id);
+        }
+        
+        closeCancelBookingModal();
+        showToast(t.bookingCancelled, 'success');
+        
+        // 🔥 发送邮件通知老师 - 学生取消了预约
+        await sendCourseEmailNotificationToTeacher(courseId, 'cancel_booking', currentStudent.name);
+        
+        await loadMyCourses();
+        await loadAvailableSlots();
+        updateCreditStats();
+        
+    } catch (error) {
+        console.error('取消预约失败:', error);
+        showToast('❌ ' + t.toastError + ': ' + error.message, 'error');
+    }
+}
         // ============================================================
         // 取消课程（老师创建的课）
         // ============================================================
@@ -2408,60 +2670,63 @@
             pendingCancelCourse = null;
         }
 
-        async function executeCancelCourse() {
-            if (!pendingCancelCourse) return;
-            const t = translations[currentLang];
-            const { courseId } = pendingCancelCourse;
+       async function executeCancelCourse() {
+    if (!pendingCancelCourse) return;
+    const t = translations[currentLang];
+    const { courseId } = pendingCancelCourse;
 
-            let selectedReason = null;
-            document.querySelectorAll('input[name="cancelReason"]').forEach(r => {
-                if (r.checked) selectedReason = r.value;
-            });
-            if (selectedReason === '其他') {
-                const custom = document.getElementById('customReason').value.trim();
-                if (custom) selectedReason = custom;
-            }
-            if (!selectedReason) {
-                showToast(t.selectReason, 'error');
-                return;
-            }
+    let selectedReason = null;
+    document.querySelectorAll('input[name="cancelReason"]').forEach(r => {
+        if (r.checked) selectedReason = r.value;
+    });
+    if (selectedReason === '其他') {
+        const custom = document.getElementById('customReason').value.trim();
+        if (custom) selectedReason = custom;
+    }
+    if (!selectedReason) {
+        showToast(t.selectReason, 'error');
+        return;
+    }
 
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            const course = myCourses.find(c => c.id === courseId);
-            if (!course) return;
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const course = myCourses.find(c => c.id === courseId);
+    if (!course) return;
 
-            // 返还课时
-            const { data: student, error: studentError } = await supabase
-                .from('students')
-                .select('credit')
-                .eq('id', currentStudent.userId)
-                .single();
-            
-            if (!studentError && student) {
-                const newCredit = (student.credit || 0) + (course.duration || 2);
-                await supabase
-                    .from('students')
-                    .update({ credit: newCredit })
-                    .eq('id', currentStudent.userId);
-                studentCredit = newCredit;
-            }
+    // 返还课时
+    const { data: student, error: studentError } = await supabase
+        .from('students')
+        .select('credit')
+        .eq('id', currentStudent.userId)
+        .single();
+    
+    if (!studentError && student) {
+        const newCredit = (student.credit || 0) + (course.duration || 2);
+        await supabase
+            .from('students')
+            .update({ credit: newCredit })
+            .eq('id', currentStudent.userId);
+        studentCredit = newCredit;
+    }
 
-            const { error } = await supabase.from('courses').update({ 
-                status: 'cancelled', 
-                cancel_reason: selectedReason 
-            }).eq('id', courseId);
-            
-            if (error) {
-                showToast(t.cancelFail + ': ' + error.message, 'error');
-                return;
-            }
+    const { error } = await supabase.from('courses').update({ 
+        status: 'cancelled', 
+        cancel_reason: selectedReason 
+    }).eq('id', courseId);
+    
+    if (error) {
+        showToast(t.cancelFail + ': ' + error.message, 'error');
+        return;
+    }
 
-            closeCancelModal();
-            showToast(t.cancelSuccess, 'success');
-            await loadMyCourses();
-            updateCreditStats();
-        }
-
+    closeCancelModal();
+    showToast(t.cancelSuccess, 'success');
+    
+    // 🔥 发送邮件通知老师 - 学生取消了课程
+    await sendCourseEmailNotificationToTeacher(courseId, 'cancel_course', currentStudent.name);
+    
+    await loadMyCourses();
+    updateCreditStats();
+}
         // ============================================================
         // 课程操作
         // ============================================================
