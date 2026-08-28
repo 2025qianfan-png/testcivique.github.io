@@ -8,8 +8,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.1/dist/peerjs.min.js"></script>
     <style>
-        /* ===== 全局样式 ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ===== 全局重置 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         :root {
             --primary-blue: #004080;
             --primary-light-blue: #0066cc;
@@ -17,11 +21,15 @@
             --green: #27ae60;
             --red: #e74c3c;
             --gray: #95a5a6;
-            --shadow: 0 10px 30px rgba(0,0,0,0.08);
-            --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.15);
             --radius: 16px;
         }
-        html, body { height: 100%; }
+
+        html,
+        body {
+            height: 100%;
+        }
         body {
             font-family: 'Open Sans', sans-serif;
             background: #f0f2f5;
@@ -30,8 +38,19 @@
             flex-direction: column;
             min-height: 100vh;
         }
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; width: 100%; }
-        @media (max-width: 480px) { .container { padding: 0 12px; } }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 12px;
+            }
+        }
 
         /* ===== 页眉 ===== */
         .header {
@@ -39,7 +58,7 @@
             color: white;
             padding: 14px 0;
             flex-shrink: 0;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
             transition: transform 0.3s ease;
             position: relative;
             z-index: 10;
@@ -51,15 +70,39 @@
             flex-wrap: wrap;
             gap: 8px;
         }
-        .header .brand { display: flex; align-items: center; gap: 10px; }
-        .header .brand .logo-icon { font-size: 1.6rem; color: var(--primary-yellow); }
-        .header .brand h1 { font-size: 1.2rem; font-weight: 700; color: white; }
-        .header .brand .sub { font-size: 0.6rem; opacity: 0.8; display: block; }
-        .header .brand .sub span { color: var(--primary-yellow); font-weight: 600; }
-        @media (max-width: 480px) {
-            .header .brand h1 { font-size: 0.95rem; }
-            .header .brand .logo-icon { font-size: 1.3rem; }
+        .header .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
+        .header .brand .logo-icon {
+            font-size: 1.6rem;
+            color: var(--primary-yellow);
+        }
+        .header .brand h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+        }
+        .header .brand .sub {
+            font-size: 0.6rem;
+            opacity: 0.8;
+            display: block;
+        }
+        .header .brand .sub span {
+            color: var(--primary-yellow);
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .header .brand h1 {
+                font-size: 0.95rem;
+            }
+            .header .brand .logo-icon {
+                font-size: 1.3rem;
+            }
+        }
+
         .header .info {
             display: flex;
             align-items: center;
@@ -67,24 +110,25 @@
             flex-wrap: wrap;
         }
         .header .info .room {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255, 255, 255, 0.15);
             padding: 3px 10px;
             border-radius: 30px;
             font-size: 0.6rem;
         }
         .header .info .user {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             padding: 3px 10px;
             border-radius: 30px;
             font-size: 0.6rem;
         }
         .header .info .user .tag {
-            background: rgba(255,255,255,0.25);
+            background: rgba(255, 255, 255, 0.25);
             padding: 1px 6px;
             border-radius: 20px;
             font-size: 0.5rem;
             font-weight: 600;
         }
+
         .btn-exit {
             background: var(--red);
             color: white;
@@ -96,7 +140,11 @@
             font-size: 0.6rem;
             transition: all 0.2s;
         }
-        .btn-exit:hover { background: #c0392b; transform: translateY(-2px); }
+        .btn-exit:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
         .header.hidden-fs {
             transform: translateY(-100%);
             opacity: 0;
@@ -122,9 +170,21 @@
             text-align: center;
             width: 100%;
         }
-        .join-panel .icon { font-size: 2.5rem; color: var(--primary-yellow); margin-bottom: 10px; }
-        .join-panel h2 { color: var(--primary-blue); font-size: 1.2rem; margin-bottom: 4px; }
-        .join-panel p { color: #888; font-size: 0.8rem; margin-bottom: 16px; }
+        .join-panel .icon {
+            font-size: 2.5rem;
+            color: var(--primary-yellow);
+            margin-bottom: 10px;
+        }
+        .join-panel h2 {
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+        .join-panel p {
+            color: #888;
+            font-size: 0.8rem;
+            margin-bottom: 16px;
+        }
         .join-panel input {
             width: 100%;
             padding: 10px 14px;
@@ -137,7 +197,7 @@
         .join-panel input:focus {
             outline: none;
             border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(0,64,128,0.08);
+            box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.08);
         }
         .join-panel .btn-join {
             width: 100%;
@@ -151,9 +211,18 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        .join-panel .btn-join:hover { transform: scale(1.01); filter: brightness(0.95); }
-        .join-panel .hint { margin-top: 12px; color: #aaa; font-size: 0.7rem; }
-        .join-panel .hint i { color: var(--primary-yellow); }
+        .join-panel .btn-join:hover {
+            transform: scale(1.01);
+            filter: brightness(0.95);
+        }
+        .join-panel .hint {
+            margin-top: 12px;
+            color: #aaa;
+            font-size: 0.7rem;
+        }
+        .join-panel .hint i {
+            color: var(--primary-yellow);
+        }
 
         /* ===== 加载 ===== */
         .loading {
@@ -172,8 +241,16 @@
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading p { margin-top: 14px; color: #999; font-size: 0.85rem; }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .loading p {
+            margin-top: 14px;
+            color: #999;
+            font-size: 0.85rem;
+        }
 
         /* ===== 视频房间 ===== */
         #videoRoom {
@@ -205,7 +282,7 @@
             position: absolute;
             bottom: 12px;
             left: 12px;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
             padding: 3px 12px;
             border-radius: 30px;
             font-size: 0.7rem;
@@ -217,12 +294,14 @@
             z-index: 5;
             pointer-events: none;
         }
-        .main-video .label i { color: var(--primary-yellow); }
+        .main-video .label i {
+            color: var(--primary-yellow);
+        }
         .main-video .status {
             position: absolute;
             top: 12px;
             right: 12px;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
             padding: 2px 10px;
             border-radius: 30px;
             font-size: 0.6rem;
@@ -243,11 +322,22 @@
             animation: pulse 1.5s ease-in-out infinite;
         }
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.8); }
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.4;
+                transform: scale(0.8);
+            }
         }
-        .main-video .status.offline { color: var(--gray); }
-        .main-video .status.offline .dot { background: var(--gray); }
+        .main-video .status.offline {
+            color: var(--gray);
+        }
+        .main-video .status.offline .dot {
+            background: var(--gray);
+        }
 
         /* ===== 全屏状态 ===== */
         .main-video:fullscreen,
@@ -264,15 +354,25 @@
             z-index: 99999 !important;
         }
         .main-video:fullscreen video,
-        .main-video:-webkit-full-screen video { object-fit: contain !important; }
+        .main-video:-webkit-full-screen video {
+            object-fit: contain !important;
+        }
         .main-video:fullscreen .label,
-        .main-video:-webkit-full-screen .label { font-size: 0.9rem; padding: 6px 16px; }
+        .main-video:-webkit-full-screen .label {
+            font-size: 0.9rem;
+            padding: 6px 16px;
+        }
         .main-video:fullscreen .status,
-        .main-video:-webkit-full-screen .status { font-size: 0.75rem; padding: 4px 12px; }
+        .main-video:-webkit-full-screen .status {
+            font-size: 0.75rem;
+            padding: 4px 12px;
+        }
         .main-video:fullscreen .pip,
-        .main-video:-webkit-full-screen .pip { width: 200px; bottom: 24px; right: 24px; }
-        .main-video:fullscreen .fs-overlay-btn,
-        .main-video:-webkit-full-screen .fs-overlay-btn { display: none !important; }
+        .main-video:-webkit-full-screen .pip {
+            width: 200px;
+            bottom: 24px;
+            right: 24px;
+        }
 
         /* ===== 画中画 ===== */
         .pip {
@@ -284,13 +384,16 @@
             border-radius: 10px;
             overflow: hidden;
             background: #1a1a2e;
-            box-shadow: 0 8px 28px rgba(0,0,0,0.5);
-            border: 2px solid rgba(255,255,255,0.12);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.12);
             z-index: 10;
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        .pip:hover { transform: scale(1.04); border-color: var(--primary-yellow); }
+        .pip:hover {
+            transform: scale(1.04);
+            border-color: var(--primary-yellow);
+        }
         .pip video {
             width: 100%;
             height: 100%;
@@ -301,7 +404,7 @@
             position: absolute;
             bottom: 4px;
             left: 6px;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
             padding: 1px 8px;
             border-radius: 20px;
             font-size: 0.5rem;
@@ -309,15 +412,20 @@
             backdrop-filter: blur(4px);
             pointer-events: none;
         }
-        .pip .pip-label i { color: var(--primary-yellow); margin-right: 2px; }
-        @media (max-width: 480px) {
-            .pip { width: 90px; }
-            .main-video:fullscreen .pip,
-            .main-video:-webkit-full-screen .pip { width: 130px; }
+        .pip .pip-label i {
+            color: var(--primary-yellow);
+            margin-right: 2px;
         }
 
-        /* ===== 全屏按钮 — 现在放在控制栏里，不在视频上 ===== */
-        /* 视频上的小全屏按钮隐藏了，用控制栏的代替 */
+        @media (max-width: 480px) {
+            .pip {
+                width: 90px;
+            }
+            .main-video:fullscreen .pip,
+            .main-video:-webkit-full-screen .pip {
+                width: 130px;
+            }
+        }
 
         /* ===== 控制栏 ===== */
         .controls {
@@ -347,18 +455,57 @@
             background: #eef0f3;
             color: #333;
         }
-        .controls .ctrl-btn:hover { transform: translateY(-2px); filter: brightness(0.95); }
-        .controls .ctrl-btn.mic { background: #eef0f3; color: #333; }
-        .controls .ctrl-btn.mic.muted { background: #e74c3c; color: white; }
-        .controls .ctrl-btn.cam { background: #eef0f3; color: #333; }
-        .controls .ctrl-btn.cam.off { background: #e74c3c; color: white; }
-        .controls .ctrl-btn.screen { background: var(--green); color: white; }
-        .controls .ctrl-btn.screen.active { background: var(--red); color: white; }
-        .controls .ctrl-btn.fullscreen { background: #533483; color: white; }
-        .controls .ctrl-btn.fullscreen.active { background: #2c3e50; color: white; }
-        .controls .ctrl-btn.hangup { background: var(--red); color: white; }
+        .controls .ctrl-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(0.95);
+        }
+
+        .controls .ctrl-btn.mic {
+            background: #eef0f3;
+            color: #333;
+        }
+        .controls .ctrl-btn.mic.muted {
+            background: #e74c3c;
+            color: white;
+        }
+        .controls .ctrl-btn.cam {
+            background: #eef0f3;
+            color: #333;
+        }
+        .controls .ctrl-btn.cam.off {
+            background: #e74c3c;
+            color: white;
+        }
+        .controls .ctrl-btn.screen {
+            background: var(--green);
+            color: white;
+        }
+        .controls .ctrl-btn.screen.active {
+            background: var(--red);
+            color: white;
+        }
+
+        /* 🔥 全屏按钮 — 显眼紫色 */
+        .controls .ctrl-btn.fullscreen {
+            background: #533483;
+            color: white;
+        }
+        .controls .ctrl-btn.fullscreen.active {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .controls .ctrl-btn.hangup {
+            background: var(--red);
+            color: white;
+        }
+
         @media (max-width: 480px) {
-            .controls .ctrl-btn { padding: 6px 10px; font-size: 0.65rem; min-width: 45px; }
+            .controls .ctrl-btn {
+                padding: 6px 10px;
+                font-size: 0.65rem;
+                min-width: 45px;
+            }
         }
 
         /* ===== 状态栏 ===== */
@@ -372,11 +519,21 @@
             color: #666;
             flex-shrink: 0;
         }
-        .status-bar .text { font-weight: 500; }
-        .status-bar .text.success { color: var(--green); }
-        .status-bar .text.warning { color: #f39c12; }
-        .status-bar .text.error { color: var(--red); }
-        .status-bar .text.info { color: var(--primary-blue); }
+        .status-bar .text {
+            font-weight: 500;
+        }
+        .status-bar .text.success {
+            color: var(--green);
+        }
+        .status-bar .text.warning {
+            color: #f39c12;
+        }
+        .status-bar .text.error {
+            color: var(--red);
+        }
+        .status-bar .text.info {
+            color: var(--primary-blue);
+        }
 
         /* ===== 页脚 ===== */
         .footer {
@@ -400,9 +557,16 @@
             align-items: center;
             gap: 5px;
         }
-        .footer .container .brand-small i { color: var(--primary-yellow); }
+        .footer .container .brand-small i {
+            color: var(--primary-yellow);
+        }
+
         @media (max-width: 480px) {
-            .footer .container { flex-direction: column; text-align: center; font-size: 0.6rem; }
+            .footer .container {
+                flex-direction: column;
+                text-align: center;
+                font-size: 0.6rem;
+            }
         }
 
         /* ===== Toast ===== */
@@ -421,18 +585,40 @@
             font-size: 0.8rem;
         }
         @media (max-width: 480px) {
-            .toast { bottom: 10px; right: 10px; left: 10px; padding: 6px 12px; font-size: 0.7rem; }
+            .toast {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                padding: 6px 12px;
+                font-size: 0.7rem;
+            }
         }
-        .toast-success { background: var(--green); }
-        .toast-error { background: var(--red); }
-        .toast-warning { background: #f39c12; }
-        .toast-info { background: var(--primary-blue); }
+        .toast-success {
+            background: var(--green);
+        }
+        .toast-error {
+            background: var(--red);
+        }
+        .toast-warning {
+            background: #f39c12;
+        }
+        .toast-info {
+            background: var(--primary-blue);
+        }
         @keyframes slideIn {
-            from { opacity: 0; transform: translateX(100%); }
-            to { opacity: 1; transform: translateX(0); }
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
-        .hidden { display: none !important; }
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -462,6 +648,7 @@
     <!-- ===== MAIN ===== -->
     <main class="container">
 
+        <!-- ===== 加入面板 ===== -->
         <div id="joinPanel" class="join-panel">
             <div class="icon"><i class="fas fa-sailboat"></i></div>
             <h2>⛵ 千帆课堂</h2>
@@ -471,13 +658,16 @@
             <div class="hint"><i class="fas fa-info-circle"></i> Le premier entrant devient le professeur</div>
         </div>
 
+        <!-- ===== 加载 ===== -->
         <div id="loading" class="loading hidden">
             <div class="spinner"></div>
             <p id="loadingText">⏳ Connexion en cours...</p>
         </div>
 
+        <!-- ===== 视频房间 ===== -->
         <div id="videoRoom" class="hidden">
 
+            <!-- 主视频 -->
             <div class="main-video" id="mainVideo">
                 <video id="remoteVideo" autoplay playsinline></video>
                 <div class="label" id="remoteLabel">
@@ -486,6 +676,8 @@
                 <div class="status offline" id="remoteStatus">
                     <span class="dot"></span> Déconnecté
                 </div>
+
+                <!-- 画中画 -->
                 <div class="pip" id="pipWrapper">
                     <video id="localVideo" autoplay muted playsinline></video>
                     <div class="pip-label"><i class="fas fa-user"></i> <span id="localLabel">Moi</span></div>
@@ -497,13 +689,16 @@
                 <button class="ctrl-btn mic" id="micBtn"><i class="fas fa-microphone"></i> Micro</button>
                 <button class="ctrl-btn cam" id="camBtn"><i class="fas fa-video"></i> Caméra</button>
                 <button class="ctrl-btn screen" id="screenBtn"><i class="fas fa-desktop"></i> Écran</button>
-                <!-- 🔥 全屏按钮放在这里，手机上也能看到 -->
+
+                <!-- 🔥 全屏按钮 — 紫色，显眼 -->
                 <button class="ctrl-btn fullscreen" id="fsControlBtn">
                     <i class="fas fa-expand"></i> Plein écran
                 </button>
+
                 <button class="ctrl-btn hangup" id="hangupBtn"><i class="fas fa-phone-slash"></i> Raccrocher</button>
             </div>
 
+            <!-- 状态栏 -->
             <div class="status-bar">
                 <span class="text info" id="statusText">Prêt</span>
             </div>
@@ -511,6 +706,7 @@
 
     </main>
 
+    <!-- ===== FOOTER ===== -->
     <footer class="footer">
         <div class="container">
             <span class="brand-small"><i class="fas fa-sailboat"></i> ⛵ 千帆课堂 · Association Mille Voiles</span>
