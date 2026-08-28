@@ -22,12 +22,20 @@
             --shadow-lg: 0 20px 40px rgba(0,0,0,0.2);
             --border-radius: 12px;
         }
+
+        /* ===== 页面容器 — 让页脚贴底 ===== */
+        html, body {
+            height: 100%;
+        }
         body {
             font-family: 'Open Sans', sans-serif;
             background: #f5f7fa;
             color: #333;
+            display: flex;
+            flex-direction: column;
             min-height: 100vh;
         }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -36,6 +44,7 @@
         }
         @media (max-width: 768px) { .container { padding: 0 15px; } }
 
+        /* ===== HEADER ===== */
         .header {
             background: linear-gradient(135deg, var(--primary-blue), var(--primary-light-blue));
             color: white;
@@ -44,6 +53,7 @@
             position: relative;
             z-index: 10;
             transition: transform 0.3s ease;
+            flex-shrink: 0;
         }
         .header .container {
             display: flex;
@@ -133,7 +143,13 @@
         }
         .btn-exit:hover { background: #c0392b; transform: translateY(-2px); }
 
-        main { padding: 30px 0; }
+        /* ===== 主内容 — 自动撑满，并给页眉留间距 ===== */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 0 30px 0;  /* 上边距 30px，让视频框和页眉保持距离 */
+        }
 
         /* ===== 视频网格 ===== */
         .video-grid {
@@ -398,18 +414,19 @@
         .status-bar .status-text.error { color: var(--red); }
         .status-bar .status-text.info { color: var(--primary-blue); }
 
-        /* ===== JOIN PANEL ===== */
+        /* ===== JOIN PANEL — 垂直居中 ===== */
         .join-panel {
             max-width: 480px;
-            margin: 40px auto;
+            margin: auto;
             background: white;
             border-radius: var(--border-radius);
             padding: 40px 32px;
             box-shadow: var(--shadow-lg);
             text-align: center;
+            width: 100%;
         }
         @media (max-width: 480px) {
-            .join-panel { padding: 28px 20px; margin: 20px auto; }
+            .join-panel { padding: 28px 20px; margin: auto; }
         }
         .join-panel .join-icon {
             font-size: 3.5rem;
@@ -463,12 +480,14 @@
             color: var(--primary-yellow);
         }
 
+        /* ===== FOOTER — 永远贴底 ===== */
         .footer {
             background: var(--primary-blue);
             color: white;
             text-align: center;
-            padding: 20px;
-            margin-top: 40px;
+            padding: 20px 0;
+            flex-shrink: 0;
+            margin-top: auto;
         }
         .footer .container {
             display: flex;
@@ -487,9 +506,10 @@
         }
         @media (max-width: 768px) {
             .footer .container { flex-direction: column; text-align: center; }
-            .footer { padding: 16px; font-size: 0.8rem; }
+            .footer { padding: 16px 0; font-size: 0.8rem; }
         }
 
+        /* ===== Toast ===== */
         .toast {
             position: fixed;
             bottom: 24px;
@@ -530,6 +550,7 @@
             justify-content: center;
             padding: 60px 20px;
             gap: 20px;
+            flex: 1;
         }
         .auto-join-loading .spinner {
             width: 48px;
