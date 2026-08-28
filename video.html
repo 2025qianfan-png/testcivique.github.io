@@ -23,7 +23,6 @@
             --border-radius: 12px;
         }
 
-        /* ===== 页面容器 — 让页脚贴底 ===== */
         html, body {
             height: 100%;
         }
@@ -141,12 +140,12 @@
         }
         .btn-exit:hover { background: #c0392b; transform: translateY(-2px); }
 
-        /* ===== 主内容 — 自动撑满，给页眉留间距 ===== */
+        /* ===== 主内容 — 给页眉留间距 ===== */
         main {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 20px 0 30px 0;
+            padding: 30px 0 30px 0;
         }
 
         /* ===== 视频网格 ===== */
@@ -160,15 +159,15 @@
             .video-grid { grid-template-columns: 1fr; gap: 16px; }
         }
 
-        /* ===== 视频包装器（支持全屏） ===== */
+        /* ===== 视频包装器 ===== */
         .video-wrapper {
             background: #1a1a2e;
             border-radius: var(--border-radius);
             overflow: hidden;
             position: relative;
             aspect-ratio: 16 / 10;
-            min-height: 200px;
-            max-height: 70vh;
+            min-height: 240px;
+            max-height: 65vh;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -187,25 +186,48 @@
             pointer-events: none;
         }
 
+        /* 手机上视频框调整 — 距离页眉更远 */
+        @media (max-width: 768px) {
+            main {
+                padding: 20px 0 30px 0;
+            }
+            .video-wrapper {
+                min-height: 200px;
+                max-height: 50vh;
+                margin-top: 8px;
+            }
+        }
+        @media (max-width: 480px) {
+            main {
+                padding: 16px 0 30px 0;
+            }
+            .video-wrapper {
+                min-height: 160px;
+                max-height: 45vh;
+                margin-top: 4px;
+            }
+        }
+
         /* ===== 全屏模式 ===== */
         .video-wrapper:fullscreen,
         .video-wrapper:-webkit-full-screen {
-            border-radius: 0;
-            aspect-ratio: auto;
-            min-height: 100vh;
-            max-height: 100vh;
+            border-radius: 0 !important;
+            aspect-ratio: auto !important;
+            min-height: 100vh !important;
+            max-height: 100vh !important;
             height: 100vh !important;
             width: 100vw !important;
-            background: #000;
-            cursor: default;
+            background: #000 !important;
+            cursor: default !important;
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
             z-index: 99999 !important;
+            margin-top: 0 !important;
         }
         .video-wrapper:fullscreen video,
         .video-wrapper:-webkit-full-screen video {
-            object-fit: contain;
+            object-fit: contain !important;
         }
         .video-wrapper:fullscreen .video-label,
         .video-wrapper:-webkit-full-screen .video-label {
@@ -220,7 +242,7 @@
         }
         .video-wrapper:fullscreen .fullscreen-btn,
         .video-wrapper:-webkit-full-screen .fullscreen-btn {
-            display: none;
+            display: none !important;
         }
         .video-wrapper:fullscreen .exit-fullscreen-btn,
         .video-wrapper:-webkit-full-screen .exit-fullscreen-btn {
@@ -550,13 +572,6 @@
 
         .hidden { display: none !important; }
 
-        @media (max-width: 480px) {
-            .video-wrapper { min-height: 160px; }
-            .video-wrapper .video-label { font-size: 0.6rem; padding: 3px 10px; bottom: 10px; left: 10px; }
-            .video-wrapper .video-status { font-size: 0.55rem; padding: 2px 8px; top: 10px; right: 10px; }
-            .fullscreen-btn { padding: 4px 10px; font-size: 0.6rem; bottom: 10px; right: 10px; }
-        }
-
         .auto-join-loading {
             display: flex;
             flex-direction: column;
@@ -657,7 +672,6 @@
                 <div class="video-status" id="localStatus">
                     <span class="pulse"></span> Connecté
                 </div>
-                <!-- 全屏按钮 -->
                 <button class="fullscreen-btn" data-fullscreen-target="localWrapper" title="Plein écran">
                     <i class="fas fa-expand"></i> Plein écran
                 </button>
@@ -674,7 +688,6 @@
                 <div class="video-status offline" id="remoteStatus">
                     <span class="pulse"></span> Déconnecté
                 </div>
-                <!-- 全屏按钮 -->
                 <button class="fullscreen-btn" data-fullscreen-target="remoteWrapper" title="Plein écran">
                     <i class="fas fa-expand"></i> Plein écran
                 </button>
@@ -818,7 +831,7 @@
         };
 
         // ============================================================
-        //  6. FULLSCREEN FUNCTIONS — 手机兼容
+        //  6. FULLSCREEN FUNCTIONS — 全平台兼容
         // ============================================================
         const header = document.getElementById('mainHeader');
 
@@ -826,42 +839,70 @@
             const wrapper = document.getElementById(wrapperId);
             if (!wrapper) return;
 
+            // 获取 wrapper 里的 video 元素（用于 iOS）
+            const video = wrapper.querySelector('video');
+
             // 检查是否已经在全屏
-            const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+            const isFullscreen = document.fullscreenElement ||
+                                 document.webkitFullscreenElement ||
+                                 (video && video.webkitDisplayingFullscreen);
 
             if (!isFullscreen) {
-                // 🔥 手机端全屏（iOS Safari 用 webkitEnterFullscreen）
-                if (wrapper.webkitEnterFullscreen) {
-                    // iOS Safari 视频元素专用全屏
-                    const video = wrapper.querySelector('video');
-                    if (video && video.webkitEnterFullscreen) {
+                // ===== 方法1: iOS Safari (webkitEnterFullscreen) =====
+                if (video && video.webkitEnterFullscreen && typeof video.webkitEnterFullscreen === 'function') {
+                    try {
                         video.webkitEnterFullscreen();
                         header.classList.add('hidden-fullscreen');
                         showToast('⛶ Plein écran activé', 'info');
                         return;
+                    } catch (e) {
+                        console.warn('webkitEnterFullscreen 失败:', e);
                     }
                 }
 
-                // 标准全屏 API
+                // ===== 方法2: Android / 标准浏览器 =====
                 try {
-                    const requestMethod = wrapper.requestFullscreen || wrapper.webkitRequestFullscreen;
+                    const requestMethod = wrapper.requestFullscreen ||
+                                         wrapper.webkitRequestFullscreen ||
+                                         wrapper.mozRequestFullScreen ||
+                                         wrapper.msRequestFullscreen;
+
                     if (requestMethod) {
                         requestMethod.call(wrapper);
                         header.classList.add('hidden-fullscreen');
-                        showToast('⛶ Plein écran activé (ESC pour quitter)', 'info');
+                        showToast('⛶ Plein écran activé', 'info');
                     } else {
                         showToast('Votre navigateur ne supporte pas le plein écran', 'warning');
                     }
                 } catch (e) {
-                    console.warn('全屏失败:', e);
-                    showToast('全屏失败: ' + e.message, 'error');
+                    console.warn('全屏请求失败:', e);
+                    // 如果标准 API 失败，尝试 iOS 的备用方法
+                    if (video && video.webkitEnterFullscreen) {
+                        try {
+                            video.webkitEnterFullscreen();
+                            header.classList.add('hidden-fullscreen');
+                            showToast('⛶ Plein écran activé', 'info');
+                        } catch (e2) {
+                            showToast('全屏失败: ' + e2.message, 'error');
+                        }
+                    } else {
+                        showToast('全屏失败: ' + e.message, 'error');
+                    }
                 }
             } else {
-                // 退出全屏
+                // ===== 退出全屏 =====
                 try {
-                    const exitMethod = document.exitFullscreen || document.webkitExitFullscreen;
+                    // 先尝试标准退出
+                    const exitMethod = document.exitFullscreen ||
+                                      document.webkitExitFullscreen ||
+                                      document.mozCancelFullScreen ||
+                                      document.msExitFullscreen;
                     if (exitMethod) {
                         exitMethod.call(document);
+                        header.classList.remove('hidden-fullscreen');
+                    } else if (video && video.webkitExitFullscreen) {
+                        // iOS 退出
+                        video.webkitExitFullscreen();
                         header.classList.remove('hidden-fullscreen');
                     }
                 } catch (e) {
@@ -918,7 +959,6 @@
         }
 
         function showToast(msg, type) {
-            // 移除旧 toast
             const old = document.querySelector('.toast');
             if (old) old.remove();
 
