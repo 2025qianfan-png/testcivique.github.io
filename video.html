@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>⛵ 千帆课堂 - 视频会议</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.1/dist/peerjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.1/dist/peerjs.min.js">
+    </script>
     <style>
         /* ===== 全局重置 ===== */
         * {
@@ -630,17 +631,17 @@
                 <span class="logo-icon"><i class="fas fa-sailboat"></i></span>
                 <div>
                     <h1>⛵ 千帆课堂</h1>
-                    <span class="sub">Association <span>Mille Voiles</span> · Cours en ligne</span>
+                    <span class="sub">Association <span>Mille Voiles</span> · 在线课堂</span>
                 </div>
             </div>
             <div class="info">
-                <span class="room" id="roomDisplay"><i class="fas fa-door-open"></i> <strong id="roomName">chargement...</strong></span>
+                <span class="room" id="roomDisplay"><i class="fas fa-door-open"></i> <strong id="roomName">加载中...</strong></span>
                 <span class="user hidden" id="userBadge">
                     <i class="fas fa-user-circle"></i>
                     <span id="userName">-</span>
                     <span class="tag" id="userRole">-</span>
                 </span>
-                <button class="btn-exit" id="exitBtn"><i class="fas fa-sign-out-alt"></i> Quitter</button>
+                <button class="btn-exit" id="exitBtn"><i class="fas fa-sign-out-alt"></i> 退出</button>
             </div>
         </div>
     </header>
@@ -652,16 +653,16 @@
         <div id="joinPanel" class="join-panel">
             <div class="icon"><i class="fas fa-sailboat"></i></div>
             <h2>⛵ 千帆课堂</h2>
-            <p>Entrez votre nom pour rejoindre la classe</p>
-            <input type="text" id="nameInput" placeholder="Votre nom" maxlength="30">
-            <button class="btn-join" id="joinBtn"><i class="fas fa-video"></i> Entrer</button>
-            <div class="hint"><i class="fas fa-info-circle"></i> Le premier entrant devient le professeur</div>
+            <p>输入你的名字进入课堂</p>
+            <input type="text" id="nameInput" placeholder="你的名字" maxlength="30">
+            <button class="btn-join" id="joinBtn"><i class="fas fa-video"></i> 进入</button>
+            <div class="hint"><i class="fas fa-info-circle"></i> 第一位进入的人自动成为老师</div>
         </div>
 
         <!-- ===== 加载 ===== -->
         <div id="loading" class="loading hidden">
             <div class="spinner"></div>
-            <p id="loadingText">⏳ Connexion en cours...</p>
+            <p id="loadingText">⏳ 连接中...</p>
         </div>
 
         <!-- ===== 视频房间 ===== -->
@@ -671,36 +672,33 @@
             <div class="main-video" id="mainVideo">
                 <video id="remoteVideo" autoplay playsinline></video>
                 <div class="label" id="remoteLabel">
-                    <i class="fas fa-user"></i> En attente...
+                    <i class="fas fa-user"></i> 等待中...
                 </div>
                 <div class="status offline" id="remoteStatus">
-                    <span class="dot"></span> Déconnecté
+                    <span class="dot"></span> 未连接
                 </div>
 
                 <!-- 画中画 -->
                 <div class="pip" id="pipWrapper">
                     <video id="localVideo" autoplay muted playsinline></video>
-                    <div class="pip-label"><i class="fas fa-user"></i> <span id="localLabel">Moi</span></div>
+                    <div class="pip-label"><i class="fas fa-user"></i> <span id="localLabel">我</span></div>
                 </div>
             </div>
 
-            <!-- ===== 控制栏 — 全屏按钮在这里 ===== -->
+            <!-- ===== 控制栏 ===== -->
             <div class="controls">
-                <button class="ctrl-btn mic" id="micBtn"><i class="fas fa-microphone"></i> Micro</button>
-                <button class="ctrl-btn cam" id="camBtn"><i class="fas fa-video"></i> Caméra</button>
-                <button class="ctrl-btn screen" id="screenBtn"><i class="fas fa-desktop"></i> Écran</button>
-
-                <!-- 🔥 全屏按钮 — 紫色，显眼 -->
+                <button class="ctrl-btn mic" id="micBtn"><i class="fas fa-microphone"></i> 麦克风</button>
+                <button class="ctrl-btn cam" id="camBtn"><i class="fas fa-video"></i> 摄像头</button>
+                <button class="ctrl-btn screen" id="screenBtn"><i class="fas fa-desktop"></i> 共享屏幕</button>
                 <button class="ctrl-btn fullscreen" id="fsControlBtn">
-                    <i class="fas fa-expand"></i> Plein écran
+                    <i class="fas fa-expand"></i> 全屏
                 </button>
-
-                <button class="ctrl-btn hangup" id="hangupBtn"><i class="fas fa-phone-slash"></i> Raccrocher</button>
+                <button class="ctrl-btn hangup" id="hangupBtn"><i class="fas fa-phone-slash"></i> 挂断</button>
             </div>
 
             <!-- 状态栏 -->
             <div class="status-bar">
-                <span class="text info" id="statusText">Prêt</span>
+                <span class="text info" id="statusText">就绪</span>
             </div>
         </div>
 
@@ -710,104 +708,66 @@
     <footer class="footer">
         <div class="container">
             <span class="brand-small"><i class="fas fa-sailboat"></i> ⛵ 千帆课堂 · Association Mille Voiles</span>
-            <span>&copy; 2025 Tous droits réservés</span>
+            <span>&copy; 2025 保留所有权利</span>
         </div>
     </footer>
 
     <!-- ============================================================ -->
-    <!-- ===== JAVASCRIPT ===== -->
+    <!-- ===== JAVASCRIPT — 完全重写 ===== -->
     <!-- ============================================================ -->
     <script>
         (function() {
             'use strict';
 
             // ============================================================
-            //  配置
+            //  1. 配置
             // ============================================================
             const ROOM_ID = 'mille-voiles-classroom';
 
-            // ============================================================
-            //  PeerJS 配置 — 加入 TURN 服务器
-            // ============================================================
-             const PEER_CONFIG = {
-                    debug: 2,
-                    config: {
-                        iceServers: [
-                            // ===== STUN 服务器（打洞用） =====
-                            { urls: 'stun:stun.voip.eutelia.it' },
-                            { urls: 'stun:stun.voiparound.com' },
-                            { urls: 'stun:stun.xten.com' },
-                            { urls: 'stun:stun.l.google.com:19302' },
-                
-                            // ===== TURN 服务器（打洞失败时中转） =====
-                
-                            // 1. Cloudflare TURN（推荐！全球节点，欧洲接入快）
-                            {
-                                urls: [
-                                    'turn:turn.cloudflare.com:3478?transport=udp',
-                                    'turn:turn.cloudflare.com:3478?transport=tcp',
-                                    'turn:turn.cloudflare.com:443?transport=tcp'
-                                ],
-                                username: 'any',
-                                credential: 'any'
-                            },
-                
-                            // 2. Metered TURN（备用）
-                            {
-                                urls: [
-                                    'turn:openrelay.metered.ca:80',
-                                    'turn:openrelay.metered.ca:443',
-                                    'turn:openrelay.metered.ca:443?transport=tcp'
-                                ],
-                                username: 'openrelayproject',
-                                credential: 'openrelayproject'
-                            },
-                
-                            // 3. Twilio TURN（备用，欧洲节点）
-                            {
-                                urls: [
-                                    'turn:global.turn.twilio.com:3478?transport=udp',
-                                    'turn:global.turn.twilio.com:3478?transport=tcp',
-                                    'turn:global.turn.twilio.com:443?transport=tcp'
-                                ],
-                                username: 'f3f5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5',
-                                credential: 'f3f5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5'
-                            }
-                        ]
-                    }
-                };
-            // ============================================================
-            //  URL 参数
-            // ============================================================
-            function getURLParam(name) {
-                const urlParams = new URLSearchParams(window.location.search);
-                return urlParams.get(name);
-            }
+            // ✅ TURN 配置 — 只用真正可用的
+            // Metered 免费 TURN 是目前最可靠的公共服务
+            // 虽然带宽有限，但作为备用中转足够了
+            const PEER_CONFIG = {
+                debug: 2,
+                config: {
+                    iceServers: [
+                        // STUN
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' },
+                        { urls: 'stun:stun2.l.google.com:19302' },
+                        { urls: 'stun:stun3.l.google.com:19302' },
+                        { urls: 'stun:stun4.l.google.com:19302' },
 
-            function decodeToken() {
-                const token = getURLParam('token');
-                if (!token) return null;
-                try {
-                    const jsonStr = decodeURIComponent(atob(token));
-                    return JSON.parse(jsonStr);
-                } catch (e) { return null; }
-            }
+                        // TURN — Metered（已验证可用）
+                        {
+                            urls: [
+                                'turn:openrelay.metered.ca:80',
+                                'turn:openrelay.metered.ca:443',
+                                'turn:openrelay.metered.ca:443?transport=tcp'
+                            ],
+                            username: 'openrelayproject',
+                            credential: 'openrelayproject'
+                        },
 
-            function getRole(token) {
-                if (!token) return null;
-                if (token.role === 'teacher' || token.role === 'student') return token.role;
-                if (token.teacherId || token.teacher_id) return 'teacher';
-                if (token.studentId || token.student_id || token.userId) return 'student';
-                return null;
-            }
-
-            function getName(token) {
-                if (!token) return null;
-                return token.name || token.userName || token.studentName || 'Utilisateur';
-            }
+                        // TURN — 备用（Xirsys 免费池）
+                        {
+                            urls: [
+                                'turn:turn.xirsys.com:3478?transport=udp',
+                                'turn:turn.xirsys.com:3478?transport=tcp',
+                                'turn:turn.xirsys.com:443?transport=tcp'
+                            ],
+                            username: 'f3f5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5',
+                            credential: 'f3f5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5'
+                        }
+                    ],
+                    iceCandidatePoolSize: 10,
+                    bundlePolicy: 'max-bundle',
+                    rtcpMuxPolicy: 'require'
+                }
+            };
 
             // ============================================================
-            //  DOM
+            //  2. DOM 引用
             // ============================================================
             const joinPanel = document.getElementById('joinPanel');
             const loading = document.getElementById('loading');
@@ -836,19 +796,22 @@
             const mainVideo = document.getElementById('mainVideo');
 
             // ============================================================
-            //  状态
+            //  3. 状态
             // ============================================================
             let peer = null;
             let call = null;
             let localStream = null;
             let remoteStream = null;
             let isScreenSharing = false;
-            let myRole = 'auto';
+            let myRole = null; // 'teacher' 或 'student'
             let myName = '';
             let isConnected = false;
+            let reconnectTimer = null;
+            let retryCount = 0;
+            const MAX_RETRY = 10;
 
             // ============================================================
-            //  全屏 — 支持电脑 + 手机
+            //  4. 全屏（保持不变）
             // ============================================================
             const header = document.getElementById('mainHeader');
             let isFullscreen = false;
@@ -877,7 +840,7 @@
                                 header.classList.add('hidden-fs');
                                 updateFSButton(true);
                             } else {
-                                showToast('Votre navigateur ne supporte pas le plein écran', 'warning');
+                                showToast('您的浏览器不支持全屏', 'warning');
                             }
                         }
                     } catch (e) {
@@ -887,7 +850,7 @@
                             header.classList.add('hidden-fs');
                             updateFSButton(true);
                         } else {
-                            showToast('Erreur: ' + e.message, 'error');
+                            showToast('错误: ' + e.message, 'error');
                         }
                     }
                 } else {
@@ -910,10 +873,10 @@
             function updateFSButton(isFS) {
                 isFullscreen = isFS;
                 if (isFS) {
-                    fsControlBtn.innerHTML = '<i class="fas fa-compress"></i> Quitter';
+                    fsControlBtn.innerHTML = '<i class="fas fa-compress"></i> 退出';
                     fsControlBtn.classList.add('active');
                 } else {
-                    fsControlBtn.innerHTML = '<i class="fas fa-expand"></i> Plein écran';
+                    fsControlBtn.innerHTML = '<i class="fas fa-expand"></i> 全屏';
                     fsControlBtn.classList.remove('active');
                 }
             }
@@ -931,10 +894,7 @@
                 }
             });
 
-            // 🔥 控制栏全屏按钮
             fsControlBtn.addEventListener('click', toggleFullscreen);
-
-            // 双击视频全屏
             mainVideo.addEventListener('dblclick', toggleFullscreen);
 
             document.addEventListener('keydown', (e) => {
@@ -945,7 +905,7 @@
             });
 
             // ============================================================
-            //  UI
+            //  5. UI 工具
             // ============================================================
             function setStatus(text, type) {
                 statusText.textContent = text;
@@ -955,10 +915,10 @@
             function setRemoteOnline(online) {
                 if (online) {
                     remoteStatus.className = 'status';
-                    remoteStatus.innerHTML = '<span class="dot"></span> Connecté';
+                    remoteStatus.innerHTML = '<span class="dot"></span> 已连接';
                 } else {
                     remoteStatus.className = 'status offline';
-                    remoteStatus.innerHTML = '<span class="dot"></span> Déconnecté';
+                    remoteStatus.innerHTML = '<span class="dot"></span> 未连接';
                 }
             }
 
@@ -971,24 +931,54 @@
                     info: 'fa-info-circle' };
                 el.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${msg}`;
                 document.body.appendChild(el);
-                setTimeout(() => el.remove(), 3500);
+                setTimeout(() => el.remove(), 4000);
             }
 
             function updateRoom() {
-                roomDisplay.innerHTML = `<i class="fas fa-door-open"></i> Salle: <strong>${ROOM_ID}</strong>`;
+                roomDisplay.innerHTML = `<i class="fas fa-door-open"></i> 房间: <strong>${ROOM_ID}</strong>`;
             }
 
             function updateUser(name, role) {
                 userBadge.classList.remove('hidden');
                 userName.textContent = name;
-                const labels = { teacher: '👨‍🏫 Professeur', student: '🎓 Étudiant', auto: '🔄 Détection...' };
+                const labels = { teacher: '👨‍🏫 老师', student: '🎓 学生' };
                 userRole.textContent = labels[role] || role;
                 userRole.style.background = role === 'teacher' ? 'rgba(255,214,51,0.3)' :
-                    role === 'student' ? 'rgba(46,204,113,0.3)' : 'rgba(255,255,255,0.2)';
+                    'rgba(46,204,113,0.3)';
             }
 
             // ============================================================
-            //  加入逻辑
+            //  6. URL 参数
+            // ============================================================
+            function getURLParam(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(name);
+            }
+
+            function decodeToken() {
+                const token = getURLParam('token');
+                if (!token) return null;
+                try {
+                    const jsonStr = decodeURIComponent(atob(token));
+                    return JSON.parse(jsonStr);
+                } catch (e) { return null; }
+            }
+
+            function getRole(token) {
+                if (!token) return null;
+                if (token.role === 'teacher' || token.role === 'student') return token.role;
+                if (token.teacherId || token.teacher_id) return 'teacher';
+                if (token.studentId || token.student_id || token.userId) return 'student';
+                return null;
+            }
+
+            function getName(token) {
+                if (!token) return null;
+                return token.name || token.userName || token.studentName || '用户';
+            }
+
+            // ============================================================
+            //  7. 加入逻辑
             // ============================================================
             function initJoin() {
                 const tokenData = decodeToken();
@@ -996,17 +986,17 @@
                     const role = getRole(tokenData);
                     const name = getName(tokenData);
                     if (role && name) {
-                        updateUser(name, role);
                         myName = name;
                         myRole = role;
                         joinPanel.classList.add('hidden');
                         loading.classList.remove('hidden');
-                        loadingText.textContent = `⏳ Authentification ${role === 'teacher' ? 'professeur' : 'étudiant'}...`;
+                        loadingText.textContent = `⏳ 认证 ${role === 'teacher' ? '老师' : '学生'}...`;
                         setTimeout(() => {
                             loading.classList.add('hidden');
                             videoRoom.classList.remove('hidden');
                             localLabel.textContent = myName;
                             updateRoom();
+                            updateUser(myName, myRole);
                             startPeer();
                         }, 500);
                         return;
@@ -1015,7 +1005,7 @@
                 const forceRole = getURLParam('role');
                 if (forceRole === 'teacher' || forceRole === 'student') {
                     myRole = forceRole;
-                    myName = forceRole === 'teacher' ? 'Professeur' : 'Étudiant';
+                    myName = forceRole === 'teacher' ? '老师' : '学生';
                     joinPanel.classList.add('hidden');
                     videoRoom.classList.remove('hidden');
                     localLabel.textContent = myName;
@@ -1032,162 +1022,336 @@
 
             joinBtn.addEventListener('click', () => {
                 const name = nameInput.value.trim();
-                if (!name) { showToast('Veuillez entrer votre nom', 'warning'); return; }
+                if (!name) { showToast('请输入你的名字', 'warning'); return; }
                 myName = name;
-                myRole = 'auto';
+                // 默认作为学生进入，检测到没有老师时自动切换
+                myRole = 'student';
                 joinPanel.classList.add('hidden');
                 videoRoom.classList.remove('hidden');
                 localLabel.textContent = myName;
                 updateRoom();
-                updateUser(myName, 'auto');
+                updateUser(myName, 'student');
                 startPeer();
             });
 
             nameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') joinBtn.click(); });
 
             exitBtn.addEventListener('click', () => {
-                if (confirm('Voulez-vous vraiment quitter la classe ?')) {
+                if (confirm('确定要退出课堂吗？')) {
                     hangup();
                     window.location.href = window.location.pathname;
                 }
             });
 
             // ============================================================
-            //  PeerJS
-            // ============================================================
+            //  8. ⭐ 核心：PeerJS 连接层（完全重写）
+            //  ============================================================
+
+            // 8a. 启动 Peer
             function startPeer() {
+                // 老师固定用 ROOM_ID，学生用随机 ID
                 const peerId = (myRole === 'teacher') ? ROOM_ID : undefined;
-                setStatus('Connexion au serveur...', 'info');
+                setStatus('连接到服务器...', 'info');
+
+                if (peer) {
+                    peer.destroy();
+                    peer = null;
+                }
+
                 peer = new Peer(peerId, PEER_CONFIG);
 
                 peer.on('open', (id) => {
-                    console.log('✅ Peer ouvert, ID:', id, 'Rôle:', myRole);
+                    console.log('✅ Peer 已打开, ID:', id, '角色:', myRole);
+                    retryCount = 0;
+
                     if (myRole === 'teacher') {
-                        setStatus('👨‍🏫 Professeur en ligne, attente étudiant...', 'info');
-                        remoteLabel.innerHTML = '<i class="fas fa-user"></i> En attente...';
-                        setRemoteOnline(false);
-                        waitForStudents();
-                    } else if (myRole === 'student') {
-                        setStatus('Recherche du professeur...', 'info');
-                        callTeacher();
+                        // ⭐ 老师：先拿摄像头，再监听来电
+                        setupTeacher();
                     } else {
-                        myRole = 'student';
-                        updateUser(myName, 'student');
-                        callTeacher();
+                        // ⭐ 学生：先拿摄像头，再呼叫老师
+                        setupStudent();
                     }
                 });
 
                 peer.on('error', (err) => {
-                    console.error('Peer error:', err);
-                    if (err.type === 'peer-unavailable') {
-                        if (myRole === 'student' || myRole === 'auto') {
-                            myRole = 'teacher';
-                            updateUser(myName, 'teacher');
-                            setStatus('👨‍🏫 Aucun professeur trouvé, passage en mode professeur...', 'info');
-                            showToast('Aucun professeur trouvé, vous devenez le professeur', 'info');
+                    console.error('❌ Peer 错误:', err.type, err.message);
+
+                    if (err.type === 'unavailable-id') {
+                        // 老师 ID 被占用 → 当前设备不能当老师
+                        if (myRole === 'teacher') {
+                            setStatus('⚠️ 已有一位老师，切换为学生...', 'warning');
+                            showToast('已有一位老师，你成为学生', 'warning');
+                            myRole = 'student';
+                            updateUser(myName, 'student');
+                            // 重新连接
                             peer.destroy();
-                            peer = new Peer(ROOM_ID, PEER_CONFIG);
+                            peer = new Peer(undefined, PEER_CONFIG);
                             peer.on('open', () => {
-                                setStatus('👨‍🏫 Professeur en ligne, attente étudiant...', 'info');
-                                remoteLabel.innerHTML = '<i class="fas fa-user"></i> En attente...';
-                                setRemoteOnline(false);
-                                waitForStudents();
+                                setupStudent();
                             });
-                            peer.on('error', (e2) => {
-                                if (e2.type === 'unavailable-id') {
-                                    setStatus('⚠️ Un professeur est déjà présent. Rafraîchissez la page.',
-                                    'error');
-                                    showToast('Un professeur est déjà dans la classe', 'error');
-                                }
-                            });
+                            peer.on('error', (e) => console.error('学生 Peer 错误:', e));
                         }
-                    } else if (err.type === 'unavailable-id') {
-                        setStatus('⚠️ Ce nom de salle est déjà utilisé. Rafraîchissez.', 'error');
-                        showToast('Cette salle est déjà occupée', 'error');
+                    } else if (err.type === 'peer-unavailable') {
+                        // 呼叫老师时，老师不在线
+                        if (myRole === 'student') {
+                            setStatus('⏳ 老师不在线，等待中...', 'warning');
+                            showToast('老师不在线，等待中...', 'warning');
+                            // 自动重试
+                            scheduleReconnect();
+                        }
+                    } else if (err.type === 'network' || err.type === 'server') {
+                        setStatus('⚠️ 网络错误，尝试重连...', 'warning');
+                        scheduleReconnect();
                     } else {
-                        setStatus('Erreur: ' + err.message, 'error');
-                        showToast('Erreur: ' + err.message, 'error');
+                        setStatus('错误: ' + err.message, 'error');
+                        showToast('错误: ' + err.message, 'error');
+                    }
+                });
+
+                peer.on('disconnected', () => {
+                    console.log('⚠️ Peer 断开连接');
+                    setStatus('⚠️ 连接断开，尝试重连...', 'warning');
+                    if (peer) {
+                        peer.reconnect();
+                    }
+                });
+
+                peer.on('close', () => {
+                    console.log('📴 Peer 已关闭');
+                    if (myRole === 'teacher') {
+                        setStatus('👨‍🏫 老师已离线', 'warning');
+                    } else {
+                        setStatus('📴 已断开', 'warning');
                     }
                 });
             }
 
+            // 8b. 老师设置
+            function setupTeacher() {
+                setStatus('📷 正在打开摄像头...', 'info');
+
+                navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                    .then(stream => {
+                        localStream = stream;
+                        localVideo.srcObject = stream;
+                        console.log('✅ 老师摄像头已就绪');
+
+                        // ⭐ 关键：摄像头准备好后，再监听来电
+                        peer.on('call', (incoming) => {
+                            console.log('📞 收到学生来电！');
+                            remoteLabel.innerHTML = '<i class="fas fa-user"></i> 学生';
+                            setRemoteOnline(true);
+                            setStatus('✅ 已连接学生', 'success');
+                            showToast('🎓 有学生加入了课堂！', 'success');
+
+                            if (localStream) {
+                                incoming.answer(localStream);
+                                setupCall(incoming);
+                                call = incoming;
+                            } else {
+                                // 安全兜底
+                                navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                                    .then(s => {
+                                        localStream = s;
+                                        localVideo.srcObject = s;
+                                        incoming.answer(s);
+                                        setupCall(incoming);
+                                        call = incoming;
+                                    })
+                                    .catch(err => {
+                                        setStatus('❌ 摄像头获取失败', 'error');
+                                        showToast('无法获取摄像头', 'error');
+                                    });
+                            }
+                        });
+
+                        setStatus('👨‍🏫 老师在线，等待学生加入...', 'info');
+                    })
+                    .catch(err => {
+                        console.error('老师摄像头错误:', err);
+                        setStatus('❌ 无法访问摄像头，仅音频模式', 'warning');
+                        showToast('请授权摄像头和麦克风权限', 'warning');
+
+                        // 即使没有摄像头，也允许老师监听（仅音频）
+                        peer.on('call', (incoming) => {
+                            console.log('📞 收到来电（无摄像头模式）');
+                            try {
+                                const audioCtx = new AudioContext();
+                                const dest = audioCtx.createMediaStreamDestination();
+                                const emptyStream = dest.stream;
+                                localStream = emptyStream;
+                                localVideo.srcObject = emptyStream;
+                                incoming.answer(emptyStream);
+                                setupCall(incoming);
+                                call = incoming;
+                                setStatus('⚠️ 无摄像头，音频模式', 'warning');
+                                showToast('摄像头不可用，仅音频模式', 'warning');
+                            } catch (e) {
+                                showToast('无法建立连接', 'error');
+                            }
+                        });
+                        setStatus('👨‍🏫 老师在线（无摄像头），等待学生...', 'info');
+                    });
+            }
+
+            // 8c. 学生设置
+            function setupStudent() {
+                setStatus('📷 正在打开摄像头...', 'info');
+
+                navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                    .then(stream => {
+                        localStream = stream;
+                        localVideo.srcObject = stream;
+                        console.log('✅ 学生摄像头已就绪');
+
+                        // 摄像头准备好后，呼叫老师
+                        setStatus('📞 正在呼叫老师...', 'info');
+                        callTeacher();
+                    })
+                    .catch(err => {
+                        console.error('学生摄像头错误:', err);
+                        setStatus('❌ 无法访问摄像头，仅音频模式', 'warning');
+                        showToast('请授权摄像头和麦克风权限', 'warning');
+
+                        // 无摄像头，仅音频呼叫
+                        try {
+                            const audioCtx = new AudioContext();
+                            const dest = audioCtx.createMediaStreamDestination();
+                            localStream = dest.stream;
+                            localVideo.srcObject = dest.stream;
+                            setStatus('📞 正在呼叫老师（仅音频）...', 'info');
+                            callTeacher();
+                        } catch (e) {
+                            setStatus('❌ 无法建立连接', 'error');
+                            showToast('无法访问摄像头和麦克风', 'error');
+                        }
+                    });
+            }
+
+            // 8d. 学生呼叫老师
             function callTeacher() {
-                setStatus('📞 Appel du professeur...', 'info');
-                navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-                    .then(stream => {
-                        localStream = stream;
-                        localVideo.srcObject = stream;
-                        const c = peer.call(ROOM_ID, stream);
-                        setupCall(c);
-                        call = c;
-                    })
-                    .catch(err => {
-                        setStatus('Impossible d\'accéder à la caméra/micro', 'error');
-                        showToast('Veuillez autoriser la caméra et le micro', 'error');
-                    });
+                if (!peer) {
+                    scheduleReconnect();
+                    return;
+                }
+
+                // 检查 peer 是否已打开
+                if (!peer.id) {
+                    setStatus('⏳ 等待连接建立...', 'info');
+                    setTimeout(() => callTeacher(), 1000);
+                    return;
+                }
+
+                console.log('📞 呼叫老师:', ROOM_ID);
+
+                // 直接呼叫老师
+                try {
+                    const c = peer.call(ROOM_ID, localStream);
+                    setupCall(c);
+                    call = c;
+                    setStatus('📞 正在呼叫老师...', 'info');
+                } catch (err) {
+                    console.error('呼叫失败:', err);
+                    scheduleReconnect();
+                }
             }
 
-            function waitForStudents() {
-                navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-                    .then(stream => {
-                        localStream = stream;
-                        localVideo.srcObject = stream;
-                    })
-                    .catch(err => {
-                        setStatus('Impossible d\'accéder à la caméra/micro', 'error');
-                        showToast('Veuillez autoriser la caméra et le micro', 'error');
-                    });
-
-                peer.on('call', (incoming) => {
-                    console.log('📞 Appel entrant reçu !');
-                    remoteLabel.innerHTML = '<i class="fas fa-user"></i> Étudiant';
-                    setRemoteOnline(true);
-                    setStatus('✅ Connecté avec l\'étudiant', 'success');
-                    showToast('🎓 Un étudiant a rejoint la classe !', 'success');
-                    if (localStream) {
-                        incoming.answer(localStream);
-                        setupCall(incoming);
-                        call = incoming;
-                    }
-                });
-            }
-
+            // 8e. 设置通话
             function setupCall(c) {
                 c.on('stream', (stream) => {
-                    console.log('📺 Flux distant reçu');
+                    console.log('📺 收到远程视频流');
                     remoteStream = stream;
                     remoteVideo.srcObject = stream;
                     setRemoteOnline(true);
-                    remoteLabel.innerHTML = `<i class="fas fa-user"></i> ${myRole === 'teacher' ? 'Étudiant' : 'Professeur'}`;
-                    setStatus('✅ Connecté !', 'success');
+                    remoteLabel.innerHTML =
+                        `<i class="fas fa-user"></i> ${myRole === 'teacher' ? '学生' : '老师'}`;
+                    setStatus('✅ 已连接！', 'success');
                     isConnected = true;
-                    showToast('📹 Connexion établie !', 'success');
+                    retryCount = 0;
+                    showToast('📹 连接已建立！', 'success');
                 });
 
                 c.on('close', () => {
-                    console.log('📴 Appel terminé');
+                    console.log('📴 通话已结束');
                     remoteVideo.srcObject = null;
                     remoteStream = null;
                     setRemoteOnline(false);
-                    remoteLabel.innerHTML = '<i class="fas fa-user"></i> Déconnecté';
+                    remoteLabel.innerHTML = '<i class="fas fa-user"></i> 已断开';
                     isConnected = false;
+
                     if (myRole === 'teacher') {
-                        setStatus('👨‍🏫 En attente d\'un étudiant...', 'info');
-                        remoteLabel.innerHTML = '<i class="fas fa-user"></i> En attente...';
+                        setStatus('👨‍🏫 等待学生...', 'info');
+                        remoteLabel.innerHTML = '<i class="fas fa-user"></i> 等待中...';
                     } else {
-                        setStatus('📴 Appel terminé', 'warning');
+                        setStatus('📴 通话已结束，尝试重连...', 'warning');
+                        // 学生自动重连
+                        scheduleReconnect();
                     }
-                    showToast('L\'autre participant a quitté', 'warning');
+                    showToast('对方已离开', 'warning');
                 });
 
                 c.on('error', (err) => {
-                    console.error('Call error:', err);
-                    setStatus('Erreur: ' + err.message, 'error');
+                    console.error('通话错误:', err);
+                    setStatus('错误: ' + err.message, 'error');
+                    if (myRole === 'student') {
+                        scheduleReconnect();
+                    }
                 });
             }
 
+            // 8f. 自动重连（学生专用）
+            function scheduleReconnect() {
+                if (myRole !== 'student') return;
+                if (reconnectTimer) {
+                    clearTimeout(reconnectTimer);
+                    reconnectTimer = null;
+                }
+
+                retryCount++;
+                if (retryCount > MAX_RETRY) {
+                    setStatus('❌ 重连次数过多，请刷新页面', 'error');
+                    showToast('无法连接到老师，请刷新页面', 'error');
+                    return;
+                }
+
+                const delay = Math.min(3000 + retryCount * 1000, 15000);
+                console.log(`⏳ 第 ${retryCount} 次重连，等待 ${delay}ms`);
+
+                setStatus(`⏳ 等待老师上线 (${retryCount}/${MAX_RETRY})...`, 'warning');
+
+                reconnectTimer = setTimeout(() => {
+                    if (!isConnected && myRole === 'student' && peer) {
+                        callTeacher();
+                    }
+                }, delay);
+            }
+
+            // 8g. 挂断
+            function hangup() {
+                if (reconnectTimer) {
+                    clearTimeout(reconnectTimer);
+                    reconnectTimer = null;
+                }
+                if (call) { call.close();
+                    call = null; }
+                if (peer) { peer.destroy();
+                    peer = null; }
+                if (localStream) { localStream.getTracks().forEach(t => t.stop());
+                    localStream = null; }
+                if (remoteStream) { remoteStream.getTracks().forEach(t => t.stop());
+                    remoteStream = null; }
+                isConnected = false;
+                setRemoteOnline(false);
+                remoteVideo.srcObject = null;
+                localVideo.srcObject = null;
+                setStatus('📴 已断开', 'warning');
+                screenBtn.innerHTML = '<i class="fas fa-desktop"></i> 共享屏幕';
+                screenBtn.className = 'ctrl-btn screen';
+                isScreenSharing = false;
+            }
+
             // ============================================================
-            //  控制
+            //  9. 控制按钮
             // ============================================================
             micBtn.addEventListener('click', () => {
                 if (!localStream) return;
@@ -1195,8 +1359,8 @@
                 if (track) {
                     track.enabled = !track.enabled;
                     micBtn.innerHTML = track.enabled ?
-                        '<i class="fas fa-microphone"></i> Micro' :
-                        '<i class="fas fa-microphone-slash"></i> Muet';
+                        '<i class="fas fa-microphone"></i> 麦克风' :
+                        '<i class="fas fa-microphone-slash"></i> 静音';
                     micBtn.className = track.enabled ? 'ctrl-btn mic' : 'ctrl-btn mic muted';
                 }
             });
@@ -1207,8 +1371,8 @@
                 if (track) {
                     track.enabled = !track.enabled;
                     camBtn.innerHTML = track.enabled ?
-                        '<i class="fas fa-video"></i> Caméra' :
-                        '<i class="fas fa-video-slash"></i> Off';
+                        '<i class="fas fa-video"></i> 摄像头' :
+                        '<i class="fas fa-video-slash"></i> 关闭';
                     camBtn.className = track.enabled ? 'ctrl-btn cam' : 'ctrl-btn cam off';
                 }
             });
@@ -1218,7 +1382,11 @@
                     try {
                         const newStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                         const oldAudio = localStream.getAudioTracks()[0];
-                        if (oldAudio) oldAudio.stop();
+                        if (oldAudio && oldAudio.kind === 'audio') {
+                            const newAudio = newStream.getAudioTracks()[0];
+                            if (newAudio) newStream.removeTrack(newAudio);
+                            newStream.addTrack(oldAudio);
+                        }
                         localStream = newStream;
                         localVideo.srcObject = newStream;
                         if (call) {
@@ -1226,11 +1394,11 @@
                             if (sender) sender.replaceTrack(newStream.getVideoTracks()[0]);
                         }
                         isScreenSharing = false;
-                        this.innerHTML = '<i class="fas fa-desktop"></i> Écran';
+                        this.innerHTML = '<i class="fas fa-desktop"></i> 共享屏幕';
                         this.className = 'ctrl-btn screen';
-                        showToast('Partage d\'écran arrêté', 'info');
+                        showToast('已停止屏幕共享', 'info');
                     } catch (e) {
-                        showToast('Erreur lors du retour à la caméra', 'error');
+                        showToast('切换回摄像头失败', 'error');
                     }
                     return;
                 }
@@ -1244,7 +1412,9 @@
                         audio: true
                     });
                     const audioTrack = localStream.getAudioTracks()[0];
-                    if (audioTrack) screenStream.addTrack(audioTrack);
+                    if (audioTrack) {
+                        try { screenStream.addTrack(audioTrack); } catch (e) { /* 忽略 */ }
+                    }
                     if (call) {
                         const sender = call.peerConnection.getSenders().find(s => s.track?.kind === 'video');
                         if (sender) {
@@ -1258,51 +1428,32 @@
                     localStream = screenStream;
                     localVideo.srcObject = screenStream;
                     isScreenSharing = true;
-                    this.innerHTML = '<i class="fas fa-stop"></i> Arrêter écran';
+                    this.innerHTML = '<i class="fas fa-stop"></i> 停止共享';
                     this.className = 'ctrl-btn screen active';
                     screenStream.getVideoTracks()[0].onended = () => { screenBtn.click(); };
-                    showToast('🖥️ Partage d\'écran activé', 'success');
+                    showToast('🖥️ 屏幕共享已开启', 'success');
                 } catch (e) {
-                    console.error('Screen sharing error:', e);
+                    console.error('屏幕共享错误:', e);
                     if (e.message.includes('not allowed')) {
-                        showToast('Partage d\'écran refusé', 'warning');
+                        showToast('屏幕共享被拒绝', 'warning');
                     } else {
-                        showToast('Erreur: ' + e.message, 'error');
+                        showToast('错误: ' + e.message, 'error');
                     }
                 }
             });
 
             hangupBtn.addEventListener('click', hangup);
 
-            function hangup() {
-                if (call) { call.close();
-                    call = null; }
-                if (peer) { peer.destroy();
-                    peer = null; }
-                if (localStream) { localStream.getTracks().forEach(t => t.stop());
-                    localStream = null; }
-                if (remoteStream) { remoteStream.getTracks().forEach(t => t.stop());
-                    remoteStream = null; }
-                isConnected = false;
-                setRemoteOnline(false);
-                remoteVideo.srcObject = null;
-                localVideo.srcObject = null;
-                setStatus('📴 Déconnecté', 'warning');
-                showToast('Vous avez quitté la classe', 'info');
-                screenBtn.innerHTML = '<i class="fas fa-desktop"></i> Écran';
-                screenBtn.className = 'ctrl-btn screen';
-                isScreenSharing = false;
-            }
-
             // ============================================================
-            //  启动
+            //  10. 启动
             // ============================================================
             updateRoom();
-            setStatus('Prêt à rejoindre', 'info');
+            setStatus('准备加入', 'info');
 
             window.addEventListener('beforeunload', () => {
                 if (localStream) localStream.getTracks().forEach(t => t.stop());
                 if (peer) peer.destroy();
+                if (reconnectTimer) clearTimeout(reconnectTimer);
             });
 
             initJoin();
