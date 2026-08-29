@@ -9,8 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.1/dist/peerjs.min.js">
     </script>
     <style>
-        /* ===== 样式表（和之前完全一样，省略以节省篇幅） ===== */
-        /* 完整样式请使用之前的版本，此处为完整代码保留 */
+        /* ===== 样式表（与之前相同，省略节省篇幅） ===== */
         * {
             margin: 0;
             padding: 0;
@@ -27,7 +26,6 @@
             --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.15);
             --radius: 16px;
         }
-
         html,
         body {
             height: 100%;
@@ -40,20 +38,17 @@
             flex-direction: column;
             min-height: 100vh;
         }
-
         .container {
             max-width: 1100px;
             margin: 0 auto;
             padding: 0 20px;
             width: 100%;
         }
-
         @media (max-width: 480px) {
             .container {
                 padding: 0 12px;
             }
         }
-
         .header {
             background: linear-gradient(135deg, var(--primary-blue), var(--primary-light-blue));
             color: white;
@@ -94,7 +89,6 @@
             color: var(--primary-yellow);
             font-weight: 600;
         }
-
         @media (max-width: 480px) {
             .header .brand h1 {
                 font-size: 0.95rem;
@@ -103,7 +97,6 @@
                 font-size: 1.3rem;
             }
         }
-
         .header .info {
             display: flex;
             align-items: center;
@@ -129,7 +122,6 @@
             font-size: 0.5rem;
             font-weight: 600;
         }
-
         .btn-exit {
             background: var(--red);
             color: white;
@@ -145,20 +137,17 @@
             background: #c0392b;
             transform: translateY(-2px);
         }
-
         .header.hidden-fs {
             transform: translateY(-100%);
             opacity: 0;
             pointer-events: none;
         }
-
         main {
             flex: 1;
             display: flex;
             flex-direction: column;
             padding: 16px 0 24px 0;
         }
-
         .join-panel {
             max-width: 400px;
             margin: auto;
@@ -231,7 +220,6 @@
             display: inline-block;
             margin-top: 4px;
         }
-
         .loading {
             display: flex;
             flex-direction: column;
@@ -258,14 +246,12 @@
             color: #999;
             font-size: 0.85rem;
         }
-
         #videoRoom {
             flex: 1;
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
-
         .main-video {
             position: relative;
             background: #0f0f1a;
@@ -282,6 +268,7 @@
             height: 100%;
             object-fit: cover;
             display: block;
+            background: #1a1a2e;
         }
         .main-video .label {
             position: absolute;
@@ -343,7 +330,6 @@
         .main-video .status.offline .dot {
             background: var(--gray);
         }
-
         .main-video:fullscreen,
         .main-video:-webkit-full-screen {
             border-radius: 0 !important;
@@ -377,7 +363,6 @@
             bottom: 24px;
             right: 24px;
         }
-
         .pip {
             position: absolute;
             bottom: 14px;
@@ -402,6 +387,7 @@
             height: 100%;
             object-fit: cover;
             display: block;
+            background: #1a1a2e;
         }
         .pip .pip-label {
             position: absolute;
@@ -419,7 +405,6 @@
             color: var(--primary-yellow);
             margin-right: 2px;
         }
-
         @media (max-width: 480px) {
             .pip {
                 width: 90px;
@@ -429,7 +414,6 @@
                 width: 130px;
             }
         }
-
         .controls {
             background: white;
             border-radius: var(--radius);
@@ -461,7 +445,6 @@
             transform: translateY(-2px);
             filter: brightness(0.95);
         }
-
         .controls .ctrl-btn.mic {
             background: #eef0f3;
             color: #333;
@@ -486,7 +469,6 @@
             background: var(--red);
             color: white;
         }
-
         .controls .ctrl-btn.fullscreen {
             background: #533483;
             color: white;
@@ -495,12 +477,10 @@
             background: #2c3e50;
             color: white;
         }
-
         .controls .ctrl-btn.hangup {
             background: var(--red);
             color: white;
         }
-
         @media (max-width: 480px) {
             .controls .ctrl-btn {
                 padding: 6px 10px;
@@ -508,7 +488,6 @@
                 min-width: 45px;
             }
         }
-
         .status-bar {
             text-align: center;
             padding: 6px 14px;
@@ -534,7 +513,6 @@
         .status-bar .text.info {
             color: var(--primary-blue);
         }
-
         .footer {
             background: var(--primary-blue);
             color: white;
@@ -559,7 +537,6 @@
         .footer .container .brand-small i {
             color: var(--primary-yellow);
         }
-
         @media (max-width: 480px) {
             .footer .container {
                 flex-direction: column;
@@ -567,7 +544,6 @@
                 font-size: 0.6rem;
             }
         }
-
         .toast {
             position: fixed;
             bottom: 20px;
@@ -613,7 +589,6 @@
                 transform: translateX(0);
             }
         }
-
         .hidden {
             display: none !important;
         }
@@ -646,7 +621,6 @@
     <!-- ===== MAIN ===== -->
     <main class="container">
 
-        <!-- ===== 加入面板 ===== -->
         <div id="joinPanel" class="join-panel">
             <div class="icon"><i class="fas fa-sailboat"></i></div>
             <h2>⛵ 千帆课堂</h2>
@@ -654,21 +628,18 @@
             <input type="text" id="nameInput" placeholder="你的名字" maxlength="30">
             <button class="btn-join" id="joinBtn"><i class="fas fa-video"></i> 进入</button>
             <div class="hint">
-                <i class="fas fa-info-circle"></i> 
+                <i class="fas fa-info-circle"></i>
                 输入 <span class="teacher-hint">millevoiles</span> 成为老师，其他名字为学生
             </div>
         </div>
 
-        <!-- ===== 加载 ===== -->
         <div id="loading" class="loading hidden">
             <div class="spinner"></div>
             <p id="loadingText">⏳ 连接中...</p>
         </div>
 
-        <!-- ===== 视频房间 ===== -->
         <div id="videoRoom" class="hidden">
 
-            <!-- 主视频 -->
             <div class="main-video" id="mainVideo">
                 <video id="remoteVideo" autoplay playsinline></video>
                 <div class="label" id="remoteLabel">
@@ -678,14 +649,12 @@
                     <span class="dot"></span> 未连接
                 </div>
 
-                <!-- 画中画 -->
                 <div class="pip" id="pipWrapper">
                     <video id="localVideo" autoplay muted playsinline></video>
                     <div class="pip-label"><i class="fas fa-user"></i> <span id="localLabel">我</span></div>
                 </div>
             </div>
 
-            <!-- ===== 控制栏 ===== -->
             <div class="controls">
                 <button class="ctrl-btn mic" id="micBtn"><i class="fas fa-microphone"></i> 麦克风</button>
                 <button class="ctrl-btn cam" id="camBtn"><i class="fas fa-video"></i> 摄像头</button>
@@ -696,7 +665,6 @@
                 <button class="ctrl-btn hangup" id="hangupBtn"><i class="fas fa-phone-slash"></i> 挂断</button>
             </div>
 
-            <!-- 状态栏 -->
             <div class="status-bar">
                 <span class="text info" id="statusText">就绪</span>
             </div>
@@ -704,7 +672,6 @@
 
     </main>
 
-    <!-- ===== FOOTER ===== -->
     <footer class="footer">
         <div class="container">
             <span class="brand-small"><i class="fas fa-sailboat"></i> ⛵ 千帆课堂 · Association Mille Voiles</span>
@@ -723,11 +690,8 @@
             //  1. 配置
             // ============================================================
             const ROOM_ID = 'mille-voiles-classroom';
-
-            // ⭐ 老师密码（通过名字判断）
             const TEACHER_NAME = 'millevoiles';
 
-            // TURN 配置
             const PEER_CONFIG = {
                 debug: 2,
                 config: {
@@ -737,7 +701,6 @@
                         { urls: 'stun:stun2.l.google.com:19302' },
                         { urls: 'stun:stun3.l.google.com:19302' },
                         { urls: 'stun:stun4.l.google.com:19302' },
-
                         {
                             urls: [
                                 'turn:openrelay.metered.ca:80',
@@ -747,7 +710,6 @@
                             username: 'openrelayproject',
                             credential: 'openrelayproject'
                         },
-
                         {
                             urls: [
                                 'turn:turn.xirsys.com:3478?transport=udp',
@@ -801,7 +763,7 @@
             let localStream = null;
             let remoteStream = null;
             let isScreenSharing = false;
-            let myRole = null; // 'teacher' 或 'student'
+            let myRole = null;
             let myName = '';
             let isConnected = false;
             let reconnectTimer = null;
@@ -946,7 +908,7 @@
             }
 
             // ============================================================
-            //  6. URL 参数（保留兼容）
+            //  6. URL 参数
             // ============================================================
             function getURLParam(name) {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -976,8 +938,8 @@
             }
 
             // ============================================================
-            //  7. ⭐ 加入逻辑 — 根据名字判断角色
-            //  ============================================================
+            //  7. 加入逻辑
+            // ============================================================
             function initJoin() {
                 const tokenData = decodeToken();
                 if (tokenData) {
@@ -1001,7 +963,6 @@
                     }
                 }
 
-                // URL 强制指定角色（兼容旧方式）
                 const forceRole = getURLParam('role');
                 if (forceRole === 'teacher' || forceRole === 'student') {
                     myRole = forceRole;
@@ -1015,14 +976,12 @@
                     return;
                 }
 
-                // 显示加入面板
                 joinPanel.classList.remove('hidden');
                 loading.classList.add('hidden');
                 videoRoom.classList.add('hidden');
                 userBadge.classList.add('hidden');
             }
 
-            // ⭐ 关键：点击加入时判断名字
             joinBtn.addEventListener('click', () => {
                 const name = nameInput.value.trim();
                 if (!name) {
@@ -1032,7 +991,6 @@
 
                 myName = name;
 
-                // ⭐⭐⭐ 根据名字判断角色
                 if (name.toLowerCase() === TEACHER_NAME.toLowerCase()) {
                     myRole = 'teacher';
                 } else {
@@ -1045,7 +1003,6 @@
                 updateRoom();
                 updateUser(myName, myRole);
 
-                // 显示角色提示
                 if (myRole === 'teacher') {
                     showToast('👨‍🏫 欢迎老师！', 'success');
                     setStatus('👨‍🏫 以老师身份进入...', 'info');
@@ -1069,11 +1026,9 @@
             });
 
             // ============================================================
-            //  8. PeerJS 连接层
-            //  ============================================================
-
+            //  8. PeerJS
+            // ============================================================
             function startPeer() {
-                // 老师固定用 ROOM_ID，学生用随机 ID
                 const peerId = (myRole === 'teacher') ? ROOM_ID : undefined;
                 setStatus('连接到服务器...', 'info');
 
@@ -1099,11 +1054,9 @@
                     console.error('❌ Peer 错误:', err.type, err.message);
 
                     if (err.type === 'unavailable-id') {
-                        // 老师 ID 被占用 → 说明已有老师
                         if (myRole === 'teacher') {
                             setStatus('⚠️ 已有一位老师，请用其他名字作为学生进入', 'error');
                             showToast('老师已在线，请用其他名字作为学生进入', 'error');
-                            // 不自动切换，让用户手动刷新重试
                         }
                     } else if (err.type === 'peer-unavailable') {
                         if (myRole === 'student') {
@@ -1130,17 +1083,12 @@
 
                 peer.on('close', () => {
                     console.log('📴 Peer 已关闭');
-                    if (myRole === 'teacher') {
-                        setStatus('👨‍🏫 老师已离线', 'warning');
-                    } else {
-                        setStatus('📴 已断开', 'warning');
-                    }
                 });
             }
 
             // ============================================================
-            //  9. 老师设置
-            //  ============================================================
+            //  9. ⭐ 老师设置（修复版）
+            // ============================================================
             function setupTeacher() {
                 setStatus('📷 正在打开摄像头...', 'info');
 
@@ -1148,24 +1096,40 @@
                     .then(stream => {
                         localStream = stream;
                         localVideo.srcObject = stream;
-                        console.log('✅ 老师摄像头已就绪');
+                        // ⭐ 强制播放本地视频
+                        localVideo.play().catch(e => console.warn('本地视频播放:', e));
+                        console.log('✅ 老师摄像头已就绪, 视频轨道:', stream.getVideoTracks().length);
 
+                        // ⭐ 关键：监听来电，但只处理一次，避免重复
                         peer.on('call', (incoming) => {
-                            console.log('📞 收到学生来电！');
+                            console.log('📞 收到学生来电！', incoming);
+
+                            // ⭐ 如果有旧通话，先关闭
+                            if (call) {
+                                console.log('⚠️ 关闭旧通话');
+                                call.close();
+                                call = null;
+                            }
+
                             remoteLabel.innerHTML = '<i class="fas fa-user"></i> 学生';
                             setRemoteOnline(true);
                             setStatus('✅ 已连接学生', 'success');
                             showToast('🎓 有学生加入了课堂！', 'success');
 
                             if (localStream) {
+                                // ⭐ 回答呼叫
                                 incoming.answer(localStream);
+
+                                // ⭐ 设置通话
                                 setupCall(incoming);
                                 call = incoming;
                             } else {
+                                // 安全兜底
                                 navigator.mediaDevices.getUserMedia({ video: true, audio: true })
                                     .then(s => {
                                         localStream = s;
                                         localVideo.srcObject = s;
+                                        localVideo.play().catch(e => console.warn('本地视频播放:', e));
                                         incoming.answer(s);
                                         setupCall(incoming);
                                         call = incoming;
@@ -1184,8 +1148,15 @@
                         setStatus('❌ 无法访问摄像头，仅音频模式', 'warning');
                         showToast('请授权摄像头和麦克风权限', 'warning');
 
+                        // 无摄像头降级
                         peer.on('call', (incoming) => {
                             console.log('📞 收到来电（无摄像头模式）');
+
+                            if (call) {
+                                call.close();
+                                call = null;
+                            }
+
                             try {
                                 const audioCtx = new AudioContext();
                                 const dest = audioCtx.createMediaStreamDestination();
@@ -1207,7 +1178,7 @@
 
             // ============================================================
             //  10. 学生设置
-            //  ============================================================
+            // ============================================================
             function setupStudent() {
                 setStatus('📷 正在打开摄像头...', 'info');
 
@@ -1215,7 +1186,8 @@
                     .then(stream => {
                         localStream = stream;
                         localVideo.srcObject = stream;
-                        console.log('✅ 学生摄像头已就绪');
+                        localVideo.play().catch(e => console.warn('本地视频播放:', e));
+                        console.log('✅ 学生摄像头已就绪, 视频轨道:', stream.getVideoTracks().length);
 
                         setStatus('📞 正在呼叫老师...', 'info');
                         callTeacher();
@@ -1241,7 +1213,7 @@
 
             // ============================================================
             //  11. 学生呼叫老师
-            //  ============================================================
+            // ============================================================
             function callTeacher() {
                 if (!peer) {
                     scheduleReconnect();
@@ -1257,6 +1229,12 @@
                 console.log('📞 呼叫老师:', ROOM_ID);
 
                 try {
+                    // ⭐ 如果有旧通话，先关闭
+                    if (call) {
+                        call.close();
+                        call = null;
+                    }
+
                     const c = peer.call(ROOM_ID, localStream);
                     setupCall(c);
                     call = c;
@@ -1268,13 +1246,34 @@
             }
 
             // ============================================================
-            //  12. 设置通话
-            //  ============================================================
+            //  12. ⭐ 设置通话（修复版 — 确保视频显示）
+            // ============================================================
             function setupCall(c) {
                 c.on('stream', (stream) => {
                     console.log('📺 收到远程视频流');
+                    console.log('   - 视频轨道数:', stream.getVideoTracks().length);
+                    console.log('   - 音频轨道数:', stream.getAudioTracks().length);
+
                     remoteStream = stream;
+
+                    // ⭐ 关键：确保 srcObject 被正确设置
                     remoteVideo.srcObject = stream;
+
+                    // ⭐ 强制播放远程视频
+                    remoteVideo.play()
+                        .then(() => {
+                            console.log('✅ 远程视频播放成功');
+                        })
+                        .catch(err => {
+                            console.warn('⚠️ 远程视频自动播放被阻止，需要用户交互:', err);
+                            // 在用户点击时触发播放
+                            mainVideo.addEventListener('click', function playOnClick() {
+                                remoteVideo.play().catch(e => console.warn('点击播放:', e));
+                                mainVideo.removeEventListener('click', playOnClick);
+                            }, { once: true });
+                            showToast('点击视频区域播放', 'info');
+                        });
+
                     setRemoteOnline(true);
                     remoteLabel.innerHTML =
                         `<i class="fas fa-user"></i> ${myRole === 'teacher' ? '学生' : '老师'}`;
@@ -1313,7 +1312,7 @@
 
             // ============================================================
             //  13. 自动重连
-            //  ============================================================
+            // ============================================================
             function scheduleReconnect() {
                 if (myRole !== 'student') return;
                 if (reconnectTimer) {
@@ -1342,7 +1341,7 @@
 
             // ============================================================
             //  14. 挂断
-            //  ============================================================
+            // ============================================================
             function hangup() {
                 if (reconnectTimer) {
                     clearTimeout(reconnectTimer);
@@ -1368,7 +1367,7 @@
 
             // ============================================================
             //  15. 控制按钮
-            //  ============================================================
+            // ============================================================
             micBtn.addEventListener('click', () => {
                 if (!localStream) return;
                 const track = localStream.getAudioTracks()[0];
@@ -1405,6 +1404,7 @@
                         }
                         localStream = newStream;
                         localVideo.srcObject = newStream;
+                        localVideo.play().catch(e => console.warn('本地视频播放:', e));
                         if (call) {
                             const sender = call.peerConnection.getSenders().find(s => s.track?.kind === 'video');
                             if (sender) sender.replaceTrack(newStream.getVideoTracks()[0]);
@@ -1443,6 +1443,7 @@
                     }
                     localStream = screenStream;
                     localVideo.srcObject = screenStream;
+                    localVideo.play().catch(e => console.warn('本地视频播放:', e));
                     isScreenSharing = true;
                     this.innerHTML = '<i class="fas fa-stop"></i> 停止共享';
                     this.className = 'ctrl-btn screen active';
@@ -1462,7 +1463,7 @@
 
             // ============================================================
             //  16. 启动
-            //  ============================================================
+            // ============================================================
             updateRoom();
             setStatus('准备加入', 'info');
 
