@@ -778,10 +778,10 @@ async function sendCourseEmailNotification(courseId, action) {
         const { date, time } = formatDateSimple(course.start_time);
         const courseTypeName = getTypeDisplayText(course.course_type);
 
-        // 根据 action 决定是否排除当前课程
-        // create 时不排除（新建的课程要显示在列表里）
-        // update/cancel/complete 时排除（修改/删除的课程不显示在列表里）
-        const shouldExclude = (action !== 'create');
+        // 🔥 根据 action 决定是否排除当前课程
+        // create 和 update 时不排除（显示所有课程）
+        // cancel 和 complete 时排除（取消/完成的课程不显示）
+        const shouldExclude = (action === 'cancel' || action === 'complete');
 
         // ============================================================
         // 6. 获取老师和学生的课程列表
@@ -881,7 +881,6 @@ async function sendCourseEmailNotification(courseId, action) {
         // 8. 返回结果
         // ============================================================
         if (sentCount === 0 && errors.length === 0) {
-            // 理论上不会到这里，因为前面已经检查了邮箱
             return { success: true, message: 'Aucun email envoyé', sentCount: 0 };
         }
 
@@ -897,9 +896,6 @@ async function sendCourseEmailNotification(courseId, action) {
         };
 
     } catch (error) {
-        // ============================================================
-        // 9. 任何异常都不影响课程操作
-        // ============================================================
         console.error('❌ [Cours] Erreur inattendue dans sendCourseEmailNotification:', error);
         return { 
             success: true, 
