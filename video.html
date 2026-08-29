@@ -1255,116 +1255,194 @@
             // ============================================================
             //  12. ⭐ 设置通话（稳健版）
             // ============================================================
-            function setupCall(c) {
-                // 重置远程流接收标志
-                State.remoteStreamReceived = false;
+           // ============================================================
+//  12. ⭐ 诊断版 setupCall — 加入 ICE 状态监控
+// ============================================================
+function setupCall(c) {
+    // 重置远程流接收标志
+    State.remoteStreamReceived = false;
 
-                c.on('stream', (stream) => {
-                    // 防止重复处理
-                    if (State.remoteStreamReceived) {
-                        console.log('⚠️ 忽略重复的远程视频流');
-                        return;
-                    }
-                    State.remoteStreamReceived = true;
+    // ============================================================
+    //  🔍 ICE / WebRTC 诊断
+    // ============================================================
+    const pc = c.peerConnection;
 
-                    console.log('📺 收到远程视频流');
-                    console.log('   - 视频轨道数:', stream.getVideoTracks().length);
-                    console.log('   - 音频轨道数:', stream.getAudioTracks().length);
+    // 1. ICE 连接状态变化
+    pc.addEventListener('iceconnectionstatechange', () => {
+        const state = pc.iceConnectionState;
+        console.log('🔍 ICE state:', state);
+        
+        if (state === 'failed') {
+            setStatus('❌ ICE 连接失败，尝试 TURN 中...', 'error');
+            showToast('网络穿透失败，正在尝试中继服务器...', 'warning');
+        } else if (state === 'connected') {
+            console.log('✅ ICE 连接成功（可能是 P2P 或 TURN）');
+            setStatus('✅ 媒体通道已建立', 'success');
+        } else if (state === 'checking') {
+            setStatus('⏳ 正在检测网络穿透...', 'info');
+        } else if (state === 'disconnected') {
+            setStatus('⚠️ ICE 连接断开', 'warning');
+        }
+    });
 
-                    State.remoteStream = stream;
+    // 2. 整体连接状态变化
+    pc.addEventListener('connectionstatechange', () => {
+        console.log('🔍 Connection state:', pc.connectionState);
+        
+        if (pc.connectionState === 'failed') {
+            setStatus('❌ WebRTC 连接失败', 'error');
+            showToast('连接失败，请检查网络', 'error');
+        } else if (pc.connectionState === 'connected') {
+            console.log('✅ WebRTC 连接已建立');
+        }
+    });
 
-                    // ⭐ 关键：重置视频元素状态
-                    DOM.remoteVideo.pause();
-                    DOM.remoteVideo.srcObject = null;
+    // 3. ICE 候选收集状态
+    pc.addEventListener('icegatheringstatechange', () => {
+        console.log('🔍 ICE gathering:', pc.iceGatheringState);
+    });
 
-                    // 使用 requestAnimationFrame 确保 DOM 更新
-                    requestAnimationFrame(() => {
-                        DOM.remoteVideo.srcObject = stream;
-
-                        // 处理播放
-                        const playPromise = DOM.remoteVideo.play();
-
-                        if (playPromise !== undefined) {
-                            playPromise
-                                .then(() => {
-                                    console.log('✅ 远程视频播放成功');
-                                    setRemoteOnline(true);
-                                    DOM.remoteLabel.innerHTML =
-                                        `<i class="fas fa-user"></i> ${State.role === 'teacher' ? '学生' : '老师'}`;
-                                    setStatus('✅ 已连接！', 'success');
-                                    State.isConnected = true;
-                                    State.isCalling = false;
-                                    State.retryCount = 0;
-                                    showToast('📹 连接已建立！', 'success');
-                                })
-                                .catch(error => {
-                                    console.warn('⚠️ 远程视频播放被阻止:', error.name, error.message);
-
-                                    if (error.name === 'AbortError') {
-                                        console.log('ℹ️ 播放请求被中断，视频将在稍后恢复');
-                                        setTimeout(() => {
-                                            DOM.remoteVideo.play().catch(e => console.warn(
-                                            '重试播放失败:', e));
-                                        }, 500);
-                                        return;
-                                    }
-
-                                    // 其他错误：提示用户点击播放
-                                    setRemoteOnline(true);
-                                    setStatus('⚠️ 点击视频区域以播放', 'warning');
-                                    showToast('点击视频画面开始播放', 'info');
-
-                                    const playOnClick = () => {
-                                        DOM.remoteVideo.play()
-                                            .then(() => {
-                                                console.log('✅ 用户点击后播放成功');
-                                                setStatus('✅ 已连接！', 'success');
-                                            })
-                                            .catch(e => console.warn('用户点击后播放仍失败:', e));
-                                        DOM.mainVideo.removeEventListener('click', playOnClick);
-                                    };
-                                    DOM.mainVideo.addEventListener('click', playOnClick, { once: true });
-                                });
-                        }
-                    });
-
-                    // 更新 UI
-                    setRemoteOnline(true);
-                    DOM.remoteLabel.innerHTML =
-                        `<i class="fas fa-user"></i> ${State.role === 'teacher' ? '学生' : '老师'}`;
-                });
-
-                c.on('close', () => {
-                    console.log('📴 通话已结束');
-                    State.remoteStreamReceived = false;
-                    DOM.remoteVideo.srcObject = null;
-                    State.remoteStream = null;
-                    setRemoteOnline(false);
-                    DOM.remoteLabel.innerHTML = '<i class="fas fa-user"></i> 已断开';
-                    State.isConnected = false;
-                    State.isCalling = false;
-
-                    if (State.role === 'teacher') {
-                        setStatus('👨‍🏫 等待学生...', 'info');
-                        DOM.remoteLabel.innerHTML = '<i class="fas fa-user"></i> 等待中...';
-                    } else {
-                        setStatus('📴 通话已结束，尝试重连...', 'warning');
-                        scheduleReconnect();
-                    }
-                    showToast('对方已离开', 'warning');
-                });
-
-                c.on('error', (err) => {
-                    console.error('通话错误:', err);
-                    State.remoteStreamReceived = false;
-                    State.isCalling = false;
-                    setStatus('错误: ' + err.message, 'error');
-                    if (State.role === 'student') {
-                        scheduleReconnect();
-                    }
-                });
+    // 4. 监听 ICE 候选（看有没有 relay 候选）
+    pc.addEventListener('icecandidate', (event) => {
+        if (event.candidate) {
+            const candidate = event.candidate;
+            console.log('🔍 ICE candidate:', {
+                type: candidate.type,        // host / srflx / relay
+                protocol: candidate.protocol,
+                address: candidate.address,
+                port: candidate.port
+            });
+            
+            // ⭐ 关键：看有没有 relay 类型的候选
+            if (candidate.type === 'relay') {
+                console.log('✅✅✅ TURN relay 候选已生成！');
+            } else if (candidate.type === 'srflx') {
+                console.log('✅ 公网地址候选 (srflx) 已生成');
+            } else if (candidate.type === 'host') {
+                console.log('ℹ️ 本地地址候选 (host) 已生成');
             }
+        }
+    });
 
+    // 5. 定期打印状态（每 5 秒）
+    const statusInterval = setInterval(() => {
+        if (!State.call || State.call !== c) {
+            clearInterval(statusInterval);
+            return;
+        }
+        
+        console.log('📊 WebRTC 状态:', {
+            ice: pc.iceConnectionState,
+            connection: pc.connectionState,
+            gathering: pc.iceGatheringState,
+            'local描述': pc.localDescription ? '✅' : '❌',
+            '远程描述': pc.remoteDescription ? '✅' : '❌',
+        });
+    }, 5000);
+
+    // ============================================================
+    //  原有的 stream / close / error 处理
+    // ============================================================
+    c.on('stream', (stream) => {
+        if (State.remoteStreamReceived) {
+            console.log('⚠️ 忽略重复的远程视频流');
+            return;
+        }
+        State.remoteStreamReceived = true;
+
+        console.log('📺 收到远程视频流');
+        console.log('   - 视频轨道数:', stream.getVideoTracks().length);
+        console.log('   - 音频轨道数:', stream.getAudioTracks().length);
+
+        State.remoteStream = stream;
+
+        DOM.remoteVideo.pause();
+        DOM.remoteVideo.srcObject = null;
+
+        requestAnimationFrame(() => {
+            DOM.remoteVideo.srcObject = stream;
+
+            const playPromise = DOM.remoteVideo.play();
+
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        console.log('✅ 远程视频播放成功');
+                        setRemoteOnline(true);
+                        DOM.remoteLabel.innerHTML =
+                            `<i class="fas fa-user"></i> ${State.role === 'teacher' ? '学生' : '老师'}`;
+                        setStatus('✅ 已连接！', 'success');
+                        State.isConnected = true;
+                        State.isCalling = false;
+                        State.retryCount = 0;
+                        showToast('📹 连接已建立！', 'success');
+                    })
+                    .catch(error => {
+                        console.warn('⚠️ 远程视频播放被阻止:', error.name, error.message);
+
+                        if (error.name === 'AbortError') {
+                            console.log('ℹ️ 播放请求被中断，视频将在稍后恢复');
+                            setTimeout(() => {
+                                DOM.remoteVideo.play().catch(e => console.warn('重试播放失败:', e));
+                            }, 500);
+                            return;
+                        }
+
+                        setRemoteOnline(true);
+                        setStatus('⚠️ 点击视频区域以播放', 'warning');
+                        showToast('点击视频画面开始播放', 'info');
+
+                        const playOnClick = () => {
+                            DOM.remoteVideo.play()
+                                .then(() => {
+                                    console.log('✅ 用户点击后播放成功');
+                                    setStatus('✅ 已连接！', 'success');
+                                })
+                                .catch(e => console.warn('用户点击后播放仍失败:', e));
+                            DOM.mainVideo.removeEventListener('click', playOnClick);
+                        };
+                        DOM.mainVideo.addEventListener('click', playOnClick, { once: true });
+                    });
+            }
+        });
+
+        setRemoteOnline(true);
+        DOM.remoteLabel.innerHTML =
+            `<i class="fas fa-user"></i> ${State.role === 'teacher' ? '学生' : '老师'}`;
+    });
+
+    c.on('close', () => {
+        console.log('📴 通话已结束');
+        clearInterval(statusInterval);
+        State.remoteStreamReceived = false;
+        DOM.remoteVideo.srcObject = null;
+        State.remoteStream = null;
+        setRemoteOnline(false);
+        DOM.remoteLabel.innerHTML = '<i class="fas fa-user"></i> 已断开';
+        State.isConnected = false;
+        State.isCalling = false;
+
+        if (State.role === 'teacher') {
+            setStatus('👨‍🏫 等待学生...', 'info');
+            DOM.remoteLabel.innerHTML = '<i class="fas fa-user"></i> 等待中...';
+        } else {
+            setStatus('📴 通话已结束，尝试重连...', 'warning');
+            scheduleReconnect();
+        }
+        showToast('对方已离开', 'warning');
+    });
+
+    c.on('error', (err) => {
+        console.error('通话错误:', err);
+        clearInterval(statusInterval);
+        State.remoteStreamReceived = false;
+        State.isCalling = false;
+        setStatus('错误: ' + err.message, 'error');
+        if (State.role === 'student') {
+            scheduleReconnect();
+        }
+    });
+}
             // ============================================================
             //  13. 自动重连
             // ============================================================
