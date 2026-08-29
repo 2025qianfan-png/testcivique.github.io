@@ -8,9 +8,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.1/dist/peerjs.min.js">
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
     <style>
         /* ============================================================
-               CSS 样式 — 完整保留
+               CSS 样式
                ============================================================ */
         * {
             margin: 0;
@@ -150,78 +152,91 @@
             flex-direction: column;
             padding: 16px 0 24px 0;
         }
-        .join-panel {
-            max-width: 400px;
+
+        /* ===== 登录面板 ===== */
+        .login-panel {
+            max-width: 420px;
             margin: auto;
             background: white;
             border-radius: var(--radius);
-            padding: 32px 24px;
+            padding: 40px 28px;
             box-shadow: var(--shadow-lg);
             text-align: center;
             width: 100%;
         }
-        .join-panel .icon {
-            font-size: 2.5rem;
+        .login-panel .icon {
+            font-size: 2.8rem;
             color: var(--primary-yellow);
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
-        .join-panel h2 {
+        .login-panel h2 {
             color: var(--primary-blue);
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             margin-bottom: 4px;
         }
-        .join-panel p {
+        .login-panel .subtitle {
             color: #888;
             font-size: 0.8rem;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
-        .join-panel input {
+        .login-panel .form-group {
+            text-align: left;
+            margin-bottom: 14px;
+        }
+        .login-panel .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 4px;
+        }
+        .login-panel .form-group input {
             width: 100%;
             padding: 10px 14px;
             border: 2px solid #e0e4e8;
             border-radius: 12px;
-            font-size: 0.9rem;
-            margin-bottom: 12px;
+            font-size: 0.95rem;
             transition: all 0.2s;
         }
-        .join-panel input:focus {
+        .login-panel .form-group input:focus {
             outline: none;
             border-color: var(--primary-blue);
             box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.08);
         }
-        .join-panel .btn-join {
+        .login-panel .btn-login {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background: linear-gradient(135deg, var(--primary-blue), var(--primary-light-blue));
             color: white;
             border: none;
             border-radius: 12px;
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            margin-top: 6px;
         }
-        .join-panel .btn-join:hover {
+        .login-panel .btn-login:hover {
             transform: scale(1.01);
             filter: brightness(0.95);
         }
-        .join-panel .hint {
-            margin-top: 12px;
+        .login-panel .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .login-panel .error-msg {
+            color: var(--red);
+            font-size: 0.8rem;
+            margin-top: 10px;
+            min-height: 20px;
+        }
+        .login-panel .hint {
+            margin-top: 14px;
             color: #aaa;
             font-size: 0.7rem;
         }
-        .join-panel .hint i {
-            color: var(--primary-yellow);
-        }
-        .join-panel .hint .teacher-hint {
-            color: var(--primary-yellow);
-            font-weight: 600;
-            background: rgba(255, 214, 51, 0.15);
-            padding: 2px 10px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 4px;
-        }
+
+        /* ===== 加载 ===== */
         .loading {
             display: flex;
             flex-direction: column;
@@ -248,6 +263,8 @@
             color: #999;
             font-size: 0.85rem;
         }
+
+        /* ===== 视频房间 ===== */
         #videoRoom {
             flex: 1;
             display: flex;
@@ -483,6 +500,13 @@
             background: var(--red);
             color: white;
         }
+        .controls .ctrl-btn.reconnect {
+            background: var(--primary-blue);
+            color: white;
+        }
+        .controls .ctrl-btn.reconnect:hover {
+            background: var(--primary-light-blue);
+        }
         @media (max-width: 480px) {
             .controls .ctrl-btn {
                 padding: 6px 10px;
@@ -594,6 +618,20 @@
         .hidden {
             display: none !important;
         }
+
+        /* 角色标签颜色 */
+        .role-teacher {
+            background: #ffd633 !important;
+            color: #004080 !important;
+        }
+        .role-student {
+            background: #27ae60 !important;
+            color: white !important;
+        }
+        .role-unknown {
+            background: #e74c3c !important;
+            color: white !important;
+        }
     </style>
 </head>
 <body>
@@ -623,26 +661,36 @@
     <!-- ===== MAIN ===== -->
     <main class="container">
 
-        <!-- 加入面板 -->
-        <div id="joinPanel" class="join-panel">
+        <!-- ===== 登录面板 ===== -->
+        <div id="loginPanel" class="login-panel">
             <div class="icon"><i class="fas fa-sailboat"></i></div>
             <h2>⛵ 千帆课堂</h2>
-            <p>输入你的名字进入课堂</p>
-            <input type="text" id="nameInput" placeholder="你的名字" maxlength="30">
-            <button class="btn-join" id="joinBtn"><i class="fas fa-video"></i> 进入</button>
+            <p class="subtitle">输入用户名和密码登录</p>
+
+            <div class="form-group">
+                <label for="loginName"><i class="fas fa-user"></i> 用户名</label>
+                <input type="text" id="loginName" placeholder="请输入用户名" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword"><i class="fas fa-lock"></i> 密码</label>
+                <input type="password" id="loginPassword" placeholder="请输入密码" autocomplete="current-password">
+            </div>
+
+            <button class="btn-login" id="loginBtn"><i class="fas fa-sign-in-alt"></i> 登录</button>
+            <div class="error-msg" id="loginError"></div>
             <div class="hint">
                 <i class="fas fa-info-circle"></i>
-                输入 <span class="teacher-hint">millevoiles</span> 成为老师，其他名字为学生
+                仅限已注册的老师和学生进入
             </div>
         </div>
 
-        <!-- 加载 -->
+        <!-- ===== 加载 ===== -->
         <div id="loading" class="loading hidden">
             <div class="spinner"></div>
             <p id="loadingText">⏳ 连接中...</p>
         </div>
 
-        <!-- 视频房间 -->
+        <!-- ===== 视频房间 ===== -->
         <div id="videoRoom" class="hidden">
 
             <div class="main-video" id="mainVideo">
@@ -668,6 +716,7 @@
                     <i class="fas fa-expand"></i> 全屏
                 </button>
                 <button class="ctrl-btn hangup" id="hangupBtn"><i class="fas fa-phone-slash"></i> 挂断</button>
+                <button class="ctrl-btn reconnect hidden" id="reconnectBtn"><i class="fas fa-sync"></i> 重新连接</button>
             </div>
 
             <div class="status-bar">
@@ -686,18 +735,23 @@
     </footer>
 
     <!-- ============================================================ -->
-    <!-- ===== JAVASCRIPT — 完整重写 ===== -->
+    <!-- ===== JAVASCRIPT ===== -->
     <!-- ============================================================ -->
     <script>
         (function() {
             'use strict';
 
             // ============================================================
-            //  1. 配置常量
+            //  1. Supabase 配置
+            // ============================================================
+            const SUPABASE_URL = 'https://pokwxlbntoxoxogptned.supabase.co';
+            const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_pu4aBS3wXF2e3ckgENTt4g_9_HvSG_v';
+
+            // ============================================================
+            //  2. 视频会议配置
             // ============================================================
             const CONFIG = {
                 ROOM_ID: 'mille-voiles-classroom',
-                TEACHER_NAME: 'millevoiles',
                 MAX_RETRY: 10,
                 PEER: {
                     debug: 2,
@@ -735,58 +789,228 @@
             };
 
             // ============================================================
-            //  2. DOM 引用
+            //  3. DOM 引用
             // ============================================================
             const $ = (id) => document.getElementById(id);
 
             const DOM = {
-                joinPanel: $('joinPanel'),
+                // 登录
+                loginPanel: $('loginPanel'),
+                loginName: $('loginName'),
+                loginPassword: $('loginPassword'),
+                loginBtn: $('loginBtn'),
+                loginError: $('loginError'),
+
+                // 通用
                 loading: $('loading'),
                 loadingText: $('loadingText'),
                 videoRoom: $('videoRoom'),
-                nameInput: $('nameInput'),
-                joinBtn: $('joinBtn'),
                 roomDisplay: $('roomDisplay'),
                 exitBtn: $('exitBtn'),
                 userBadge: $('userBadge'),
                 userName: $('userName'),
                 userRole: $('userRole'),
+
+                // 视频
                 localVideo: $('localVideo'),
                 remoteVideo: $('remoteVideo'),
                 localLabel: $('localLabel'),
                 remoteLabel: $('remoteLabel'),
                 remoteStatus: $('remoteStatus'),
                 statusText: $('statusText'),
+
+                // 控制
                 micBtn: $('micBtn'),
                 camBtn: $('camBtn'),
                 screenBtn: $('screenBtn'),
                 fsControlBtn: $('fsControlBtn'),
                 hangupBtn: $('hangupBtn'),
+                reconnectBtn: $('reconnectBtn'),
                 mainVideo: $('mainVideo'),
                 mainHeader: $('mainHeader'),
             };
 
             // ============================================================
-            //  3. 状态管理
+            //  4. 状态管理
             // ============================================================
             const State = {
+                // 用户信息
+                user: null, // 从 Supabase 获取的用户对象
+                role: null, // 'teacher' | 'stu'
+                name: '',
+
+                // 视频会议
                 peer: null,
                 call: null,
                 localStream: null,
                 remoteStream: null,
                 isScreenSharing: false,
-                role: null, // 'teacher' | 'student'
-                name: '',
                 isConnected: false,
                 isCalling: false,
                 reconnectTimer: null,
                 retryCount: 0,
                 isFullscreen: false,
-                remoteStreamReceived: false, // 防止重复处理 stream 事件
+                remoteStreamReceived: false,
+                isHangup: false, // 是否主动挂断
             };
 
             // ============================================================
-            //  4. UI 工具函数
+            //  5. Supabase 客户端
+            // ============================================================
+            let supabaseClient = null;
+
+            function getSupabaseClient() {
+                if (!supabaseClient) {
+                    supabaseClient = window.supabase.createClient(
+                        SUPABASE_URL,
+                        SUPABASE_PUBLISHABLE_KEY, {
+                            auth: {
+                                persistSession: false,
+                                autoRefreshToken: false,
+                                detectSessionInUrl: false
+                            }
+                        }
+                    );
+                    console.log('✅ Supabase 客户端已创建');
+                }
+                return supabaseClient;
+            }
+
+            // ============================================================
+            //  6. ⭐ 登录验证（基于 students 表的 role）
+            // ============================================================
+            async function validateStudent(name, password) {
+                try {
+                    console.log(`🔍 验证用户: ${name}`);
+                    const supabase = getSupabaseClient();
+
+                    const { data, error } = await supabase
+                        .from('students')
+                        .select('*')
+                        .eq('name', name)
+                        .single();
+
+                    if (error) {
+                        console.error('查询用户失败:', error.message);
+                        return { success: false, message: '用户不存在或查询失败' };
+                    }
+
+                    if (!data) {
+                        console.log('用户不存在');
+                        return { success: false, message: '用户名或密码错误' };
+                    }
+
+                    if (data.password !== password) {
+                        console.log('密码不匹配');
+                        return { success: false, message: '用户名或密码错误' };
+                    }
+
+                    // ⭐ 检查 role 字段
+                    const role = data.role || data.type; // 兼容旧字段
+                    if (role !== 'teacher' && role !== 'stu') {
+                        console.log('角色不允许:', role);
+                        return {
+                            success: false,
+                            message: '您没有权限访问视频会议，仅限老师和学生'
+                        };
+                    }
+
+                    console.log('✅ 用户验证成功:', data.name, '角色:', role);
+                    return { success: true, user: data, role: role };
+
+                } catch (error) {
+                    console.error('验证异常:', error);
+                    return { success: false, message: '连接失败，请重试' };
+                }
+            }
+
+            // ============================================================
+            //  7. 登录流程
+            // ============================================================
+            DOM.loginBtn.addEventListener('click', handleLogin);
+            DOM.loginName.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') DOM.loginPassword.focus();
+            });
+            DOM.loginPassword.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') handleLogin();
+            });
+
+            async function handleLogin() {
+                const name = DOM.loginName.value.trim();
+                const password = DOM.loginPassword.value.trim();
+
+                if (!name) {
+                    DOM.loginError.textContent = '请输入用户名';
+                    return;
+                }
+                if (!password) {
+                    DOM.loginError.textContent = '请输入密码';
+                    return;
+                }
+
+                DOM.loginBtn.disabled = true;
+                DOM.loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 验证中...';
+                DOM.loginError.textContent = '';
+
+                try {
+                    const result = await validateStudent(name, password);
+
+                    if (!result.success) {
+                        DOM.loginError.textContent = result.message;
+                        DOM.loginBtn.disabled = false;
+                        DOM.loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 登录';
+                        return;
+                    }
+
+                    // ✅ 登录成功
+                    State.user = result.user;
+                    State.role = result.role;
+                    State.name = result.user.name;
+
+                    console.log('✅ 登录成功:', State.name, '角色:', State.role);
+
+                    // 进入视频房间
+                    enterVideoRoom();
+
+                } catch (error) {
+                    console.error('登录错误:', error);
+                    DOM.loginError.textContent = '登录失败，请重试';
+                    DOM.loginBtn.disabled = false;
+                    DOM.loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 登录';
+                }
+            }
+
+            // ============================================================
+            //  8. 进入视频房间
+            // ============================================================
+            function enterVideoRoom() {
+                // 隐藏登录面板，显示视频房间
+                DOM.loginPanel.classList.add('hidden');
+                DOM.videoRoom.classList.remove('hidden');
+
+                // 更新用户信息
+                DOM.localLabel.textContent = State.name;
+                updateUserBadge(State.name, State.role);
+                updateRoom();
+
+                // 显示角色提示
+                if (State.role === 'teacher') {
+                    showToast('👨‍🏫 欢迎老师 ' + State.name + '！', 'success');
+                    setStatus('👨‍🏫 以老师身份进入...', 'info');
+                } else {
+                    showToast('🎓 欢迎同学 ' + State.name + '！', 'info');
+                    setStatus('🎓 以学生身份进入...', 'info');
+                }
+
+                // 显示重连按钮（初始隐藏）
+                DOM.reconnectBtn.classList.add('hidden');
+
+                // 启动 PeerJS
+                startPeer();
+            }
+
+            // ============================================================
+            //  9. UI 工具函数
             // ============================================================
             function setStatus(text, type) {
                 DOM.statusText.textContent = text;
@@ -824,17 +1048,17 @@
                     `<i class="fas fa-door-open"></i> 房间: <strong>${CONFIG.ROOM_ID}</strong>`;
             }
 
-            function updateUser(name, role) {
+            function updateUserBadge(name, role) {
                 DOM.userBadge.classList.remove('hidden');
                 DOM.userName.textContent = name;
-                const labels = { teacher: '👨‍🏫 老师', student: '🎓 学生' };
+                const labels = { teacher: '👨‍🏫 老师', stu: '🎓 学生' };
                 DOM.userRole.textContent = labels[role] || role;
-                DOM.userRole.style.background = role === 'teacher' ? 'rgba(255,214,51,0.3)' :
-                    'rgba(46,204,113,0.3)';
+                DOM.userRole.className = 'tag role-' + (role === 'teacher' ? 'teacher' : role === 'stu' ? 'student' :
+                    'unknown');
             }
 
             // ============================================================
-            //  5. 全屏功能
+            //  10. 全屏功能
             // ============================================================
             function toggleFullscreen() {
                 const el = DOM.mainVideo;
@@ -925,110 +1149,87 @@
             });
 
             // ============================================================
-            //  6. URL 参数处理
+            //  11. 退出
             // ============================================================
-            function getURLParam(name) {
-                return new URLSearchParams(window.location.search).get(name);
-            }
-
-            function decodeToken() {
-                const token = getURLParam('token');
-                if (!token) return null;
-                try {
-                    return JSON.parse(decodeURIComponent(atob(token)));
-                } catch (e) { return null; }
-            }
-
-            function getRoleFromToken(token) {
-                if (!token) return null;
-                if (token.role === 'teacher' || token.role === 'student') return token.role;
-                if (token.teacherId || token.teacher_id) return 'teacher';
-                if (token.studentId || token.student_id || token.userId) return 'student';
-                return null;
-            }
-
-            function getNameFromToken(token) {
-                if (!token) return null;
-                return token.name || token.userName || token.studentName || '用户';
-            }
-
+        DOM.exitBtn.addEventListener('click', () => {
+    if (confirm('确定要退出课堂吗？')) {
+        // 挂断视频
+        hangup();
+        
+        // ⭐ 清空所有界面显示
+        // 房间名称
+        DOM.roomDisplay.innerHTML = `<i class="fas fa-door-open"></i> 房间: <strong>---</strong>`;
+        
+        // 用户徽章
+        DOM.userBadge.classList.add('hidden');
+        DOM.userName.textContent = '-';
+        DOM.userRole.textContent = '-';
+        DOM.userRole.className = 'tag';
+        
+        // 状态
+        setStatus('已退出，请重新登录', 'info');
+        
+        // 隐藏视频房间，显示登录面板
+        DOM.videoRoom.classList.add('hidden');
+        DOM.loginPanel.classList.remove('hidden');
+        
+        // 重置登录按钮
+        DOM.loginBtn.disabled = false;
+        DOM.loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 登录';
+        DOM.loginError.textContent = '';
+        DOM.loginPassword.value = '';
+        
+        // 清空用户状态
+        State.user = null;
+        State.role = null;
+        State.name = '';
+        
+        // 隐藏重连按钮
+        DOM.reconnectBtn.classList.add('hidden');
+        
+        // 清空视频画面
+        DOM.remoteVideo.srcObject = null;
+        DOM.localVideo.srcObject = null;
+        DOM.remoteLabel.innerHTML = '<i class="fas fa-user"></i> 等待中...';
+        setRemoteOnline(false);
+        
+        console.log('✅ 已退出，界面已清空');
+    }
+});
             // ============================================================
-            //  7. 加入逻辑
+            //  12. ⭐ 重新连接按钮
             // ============================================================
-            function initJoin() {
-                // 优先处理 token
-                const tokenData = decodeToken();
-                if (tokenData) {
-                    const role = getRoleFromToken(tokenData);
-                    const name = getNameFromToken(tokenData);
-                    if (role && name) {
-                        State.name = name;
-                        State.role = role;
-                        enterRoom();
-                        return;
-                    }
+            DOM.reconnectBtn.addEventListener('click', () => {
+                console.log('🔄 手动重新连接...');
+                DOM.reconnectBtn.classList.add('hidden');
+                DOM.reconnectBtn.disabled = true;
+
+                // 清理旧连接
+                if (State.call) {
+                    State.call.close();
+                    State.call = null;
                 }
-
-                // URL 强制指定角色
-                const forceRole = getURLParam('role');
-                if (forceRole === 'teacher' || forceRole === 'student') {
-                    State.role = forceRole;
-                    State.name = forceRole === 'teacher' ? '老师' : '学生';
-                    enterRoom();
-                    return;
+                if (State.peer) {
+                    State.peer.destroy();
+                    State.peer = null;
                 }
+                State.isConnected = false;
+                State.isCalling = false;
+                State.remoteStreamReceived = false;
 
-                // 显示加入面板
-                DOM.joinPanel.classList.remove('hidden');
-                DOM.loading.classList.add('hidden');
-                DOM.videoRoom.classList.add('hidden');
-                DOM.userBadge.classList.add('hidden');
-            }
+                setRemoteOnline(false);
+                DOM.remoteVideo.srcObject = null;
+                DOM.remoteLabel.innerHTML = '<i class="fas fa-user"></i> 等待中...';
 
-            DOM.joinBtn.addEventListener('click', () => {
-                const name = DOM.nameInput.value.trim();
-                if (!name) {
-                    showToast('请输入你的名字', 'warning');
-                    return;
-                }
-
-                State.name = name;
-                State.role = (name.toLowerCase() === CONFIG.TEACHER_NAME.toLowerCase()) ? 'teacher' : 'student';
-
-                enterRoom();
+                // 重新启动
+                setTimeout(() => {
+                    startPeer();
+                    DOM.reconnectBtn.disabled = false;
+                }, 500);
             });
 
-            DOM.nameInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') DOM.joinBtn.click();
-            });
-
-            DOM.exitBtn.addEventListener('click', () => {
-                if (confirm('确定要退出课堂吗？')) {
-                    hangup();
-                    window.location.href = window.location.pathname;
-                }
-            });
-
-            function enterRoom() {
-                DOM.joinPanel.classList.add('hidden');
-                DOM.videoRoom.classList.remove('hidden');
-                DOM.localLabel.textContent = State.name;
-                updateRoom();
-                updateUser(State.name, State.role);
-
-                if (State.role === 'teacher') {
-                    showToast('👨‍🏫 欢迎老师！', 'success');
-                    setStatus('👨‍🏫 以老师身份进入...', 'info');
-                } else {
-                    showToast('🎓 欢迎同学！', 'info');
-                    setStatus('🎓 以学生身份进入...', 'info');
-                }
-
-                startPeer();
-            }
-
             // ============================================================
-            //  8. PeerJS 核心
+            //  13. PeerJS 核心
             // ============================================================
             function startPeer() {
                 const peerId = (State.role === 'teacher') ? CONFIG.ROOM_ID : undefined;
@@ -1038,6 +1239,9 @@
                     State.peer.destroy();
                     State.peer = null;
                 }
+
+                State.isHangup = false;
+                State.retryCount = 0;
 
                 State.peer = new Peer(peerId, CONFIG.PEER);
 
@@ -1058,12 +1262,13 @@
                     switch (err.type) {
                         case 'unavailable-id':
                             if (State.role === 'teacher') {
-                                setStatus('⚠️ 已有一位老师，请用其他名字作为学生进入', 'error');
-                                showToast('老师已在线，请用其他名字作为学生进入', 'error');
+                                setStatus('⚠️ 已有一位老师在线', 'error');
+                                showToast('已有一位老师在线，请稍后重试', 'error');
+                                showReconnectButton();
                             }
                             break;
                         case 'peer-unavailable':
-                            if (State.role === 'student') {
+                            if (State.role === 'stu') {
                                 setStatus('⏳ 老师不在线，等待中...', 'warning');
                                 showToast('老师不在线，等待中...', 'warning');
                                 scheduleReconnect();
@@ -1077,24 +1282,38 @@
                         default:
                             setStatus('错误: ' + err.message, 'error');
                             showToast('错误: ' + err.message, 'error');
+                            showReconnectButton();
                     }
                 });
 
                 State.peer.on('disconnected', () => {
                     console.log('⚠️ Peer 断开连接');
                     setStatus('⚠️ 连接断开，尝试重连...', 'warning');
-                    if (State.peer) {
+                    if (State.peer && !State.isHangup) {
                         State.peer.reconnect();
+                    } else {
+                        showReconnectButton();
                     }
                 });
 
                 State.peer.on('close', () => {
                     console.log('📴 Peer 已关闭');
+                    if (!State.isHangup && !State.isConnected) {
+                        showReconnectButton();
+                    }
                 });
             }
 
             // ============================================================
-            //  9. 老师设置
+            //  14. 显示重连按钮
+            // ============================================================
+            function showReconnectButton() {
+                DOM.reconnectBtn.classList.remove('hidden');
+                DOM.reconnectBtn.disabled = false;
+            }
+
+            // ============================================================
+            //  15. 老师设置
             // ============================================================
             function setupTeacher() {
                 setStatus('📷 正在打开摄像头...', 'info');
@@ -1106,11 +1325,9 @@
                         DOM.localVideo.play().catch(e => console.warn('本地视频播放:', e));
                         console.log('✅ 老师摄像头已就绪');
 
-                        // ⭐ 老师监听来电
                         State.peer.on('call', (incoming) => {
                             console.log('📞 收到学生来电！');
 
-                            // 关闭旧通话
                             if (State.call) {
                                 State.call.close();
                                 State.call = null;
@@ -1126,7 +1343,6 @@
                                 setupCall(incoming);
                                 State.call = incoming;
                             } else {
-                                // 兜底
                                 navigator.mediaDevices.getUserMedia({ video: true, audio: true })
                                     .then(s => {
                                         State.localStream = s;
@@ -1144,13 +1360,13 @@
                         });
 
                         setStatus('👨‍🏫 老师在线，等待学生加入...', 'info');
+                        DOM.reconnectBtn.classList.add('hidden');
                     })
                     .catch(err => {
                         console.error('老师摄像头错误:', err);
                         setStatus('❌ 无法访问摄像头，仅音频模式', 'warning');
                         showToast('请授权摄像头和麦克风权限', 'warning');
 
-                        // 无摄像头降级
                         State.peer.on('call', (incoming) => {
                             console.log('📞 收到来电（无摄像头模式）');
 
@@ -1174,11 +1390,12 @@
                             }
                         });
                         setStatus('👨‍🏫 老师在线（无摄像头），等待学生...', 'info');
+                        DOM.reconnectBtn.classList.add('hidden');
                     });
             }
 
             // ============================================================
-            //  10. 学生设置
+            //  16. 学生设置
             // ============================================================
             function setupStudent() {
                 setStatus('📷 正在打开摄像头...', 'info');
@@ -1191,6 +1408,7 @@
                         console.log('✅ 学生摄像头已就绪');
 
                         setStatus('📞 正在呼叫老师...', 'info');
+                        DOM.reconnectBtn.classList.add('hidden');
                         callTeacher();
                     })
                     .catch(err => {
@@ -1204,16 +1422,18 @@
                             State.localStream = dest.stream;
                             DOM.localVideo.srcObject = dest.stream;
                             setStatus('📞 正在呼叫老师（仅音频）...', 'info');
+                            DOM.reconnectBtn.classList.add('hidden');
                             callTeacher();
                         } catch (e) {
                             setStatus('❌ 无法建立连接', 'error');
                             showToast('无法访问摄像头和麦克风', 'error');
+                            showReconnectButton();
                         }
                     });
             }
 
             // ============================================================
-            //  11. 学生呼叫老师（防重复）
+            //  17. 学生呼叫老师
             // ============================================================
             function callTeacher() {
                 if (State.isCalling || State.isConnected) {
@@ -1253,201 +1473,134 @@
             }
 
             // ============================================================
-            //  12. ⭐ 设置通话（稳健版）
+            //  18. 设置通话
             // ============================================================
-           // ============================================================
-//  12. ⭐ 诊断版 setupCall — 加入 ICE 状态监控
-// ============================================================
-function setupCall(c) {
-    // 重置远程流接收标志
-    State.remoteStreamReceived = false;
+            function setupCall(c) {
+                State.remoteStreamReceived = false;
 
-    // ============================================================
-    //  🔍 ICE / WebRTC 诊断
-    // ============================================================
-    const pc = c.peerConnection;
+                // ICE 诊断
+                const pc = c.peerConnection;
+                pc.addEventListener('iceconnectionstatechange', () => {
+                    const state = pc.iceConnectionState;
+                    console.log('🔍 ICE state:', state);
+                    if (state === 'connected') {
+                        console.log('✅ ICE 连接成功');
+                        setStatus('✅ 媒体通道已建立', 'success');
+                    } else if (state === 'failed') {
+                        setStatus('❌ ICE 连接失败', 'error');
+                        showToast('网络穿透失败', 'warning');
+                        showReconnectButton();
+                    }
+                });
 
-    // 1. ICE 连接状态变化
-    pc.addEventListener('iceconnectionstatechange', () => {
-        const state = pc.iceConnectionState;
-        console.log('🔍 ICE state:', state);
-        
-        if (state === 'failed') {
-            setStatus('❌ ICE 连接失败，尝试 TURN 中...', 'error');
-            showToast('网络穿透失败，正在尝试中继服务器...', 'warning');
-        } else if (state === 'connected') {
-            console.log('✅ ICE 连接成功（可能是 P2P 或 TURN）');
-            setStatus('✅ 媒体通道已建立', 'success');
-        } else if (state === 'checking') {
-            setStatus('⏳ 正在检测网络穿透...', 'info');
-        } else if (state === 'disconnected') {
-            setStatus('⚠️ ICE 连接断开', 'warning');
-        }
-    });
+                c.on('stream', (stream) => {
+                    if (State.remoteStreamReceived) {
+                        console.log('⚠️ 忽略重复的远程视频流');
+                        return;
+                    }
+                    State.remoteStreamReceived = true;
 
-    // 2. 整体连接状态变化
-    pc.addEventListener('connectionstatechange', () => {
-        console.log('🔍 Connection state:', pc.connectionState);
-        
-        if (pc.connectionState === 'failed') {
-            setStatus('❌ WebRTC 连接失败', 'error');
-            showToast('连接失败，请检查网络', 'error');
-        } else if (pc.connectionState === 'connected') {
-            console.log('✅ WebRTC 连接已建立');
-        }
-    });
+                    console.log('📺 收到远程视频流');
+                    console.log('   - 视频轨道数:', stream.getVideoTracks().length);
+                    console.log('   - 音频轨道数:', stream.getAudioTracks().length);
 
-    // 3. ICE 候选收集状态
-    pc.addEventListener('icegatheringstatechange', () => {
-        console.log('🔍 ICE gathering:', pc.iceGatheringState);
-    });
+                    State.remoteStream = stream;
 
-    // 4. 监听 ICE 候选（看有没有 relay 候选）
-    pc.addEventListener('icecandidate', (event) => {
-        if (event.candidate) {
-            const candidate = event.candidate;
-            console.log('🔍 ICE candidate:', {
-                type: candidate.type,        // host / srflx / relay
-                protocol: candidate.protocol,
-                address: candidate.address,
-                port: candidate.port
-            });
-            
-            // ⭐ 关键：看有没有 relay 类型的候选
-            if (candidate.type === 'relay') {
-                console.log('✅✅✅ TURN relay 候选已生成！');
-            } else if (candidate.type === 'srflx') {
-                console.log('✅ 公网地址候选 (srflx) 已生成');
-            } else if (candidate.type === 'host') {
-                console.log('ℹ️ 本地地址候选 (host) 已生成');
-            }
-        }
-    });
+                    DOM.remoteVideo.pause();
+                    DOM.remoteVideo.srcObject = null;
 
-    // 5. 定期打印状态（每 5 秒）
-    const statusInterval = setInterval(() => {
-        if (!State.call || State.call !== c) {
-            clearInterval(statusInterval);
-            return;
-        }
-        
-        console.log('📊 WebRTC 状态:', {
-            ice: pc.iceConnectionState,
-            connection: pc.connectionState,
-            gathering: pc.iceGatheringState,
-            'local描述': pc.localDescription ? '✅' : '❌',
-            '远程描述': pc.remoteDescription ? '✅' : '❌',
-        });
-    }, 5000);
+                    requestAnimationFrame(() => {
+                        DOM.remoteVideo.srcObject = stream;
 
-    // ============================================================
-    //  原有的 stream / close / error 处理
-    // ============================================================
-    c.on('stream', (stream) => {
-        if (State.remoteStreamReceived) {
-            console.log('⚠️ 忽略重复的远程视频流');
-            return;
-        }
-        State.remoteStreamReceived = true;
+                        const playPromise = DOM.remoteVideo.play();
 
-        console.log('📺 收到远程视频流');
-        console.log('   - 视频轨道数:', stream.getVideoTracks().length);
-        console.log('   - 音频轨道数:', stream.getAudioTracks().length);
-
-        State.remoteStream = stream;
-
-        DOM.remoteVideo.pause();
-        DOM.remoteVideo.srcObject = null;
-
-        requestAnimationFrame(() => {
-            DOM.remoteVideo.srcObject = stream;
-
-            const playPromise = DOM.remoteVideo.play();
-
-            if (playPromise !== undefined) {
-                playPromise
-                    .then(() => {
-                        console.log('✅ 远程视频播放成功');
-                        setRemoteOnline(true);
-                        DOM.remoteLabel.innerHTML =
-                            `<i class="fas fa-user"></i> ${State.role === 'teacher' ? '学生' : '老师'}`;
-                        setStatus('✅ 已连接！', 'success');
-                        State.isConnected = true;
-                        State.isCalling = false;
-                        State.retryCount = 0;
-                        showToast('📹 连接已建立！', 'success');
-                    })
-                    .catch(error => {
-                        console.warn('⚠️ 远程视频播放被阻止:', error.name, error.message);
-
-                        if (error.name === 'AbortError') {
-                            console.log('ℹ️ 播放请求被中断，视频将在稍后恢复');
-                            setTimeout(() => {
-                                DOM.remoteVideo.play().catch(e => console.warn('重试播放失败:', e));
-                            }, 500);
-                            return;
-                        }
-
-                        setRemoteOnline(true);
-                        setStatus('⚠️ 点击视频区域以播放', 'warning');
-                        showToast('点击视频画面开始播放', 'info');
-
-                        const playOnClick = () => {
-                            DOM.remoteVideo.play()
+                        if (playPromise !== undefined) {
+                            playPromise
                                 .then(() => {
-                                    console.log('✅ 用户点击后播放成功');
+                                    console.log('✅ 远程视频播放成功');
+                                    setRemoteOnline(true);
+                                    DOM.remoteLabel.innerHTML =
+                                        `<i class="fas fa-user"></i> ${State.role === 'teacher' ? '学生' : '老师'}`;
                                     setStatus('✅ 已连接！', 'success');
+                                    State.isConnected = true;
+                                    State.isCalling = false;
+                                    State.retryCount = 0;
+                                    DOM.reconnectBtn.classList.add('hidden');
+                                    showToast('📹 连接已建立！', 'success');
                                 })
-                                .catch(e => console.warn('用户点击后播放仍失败:', e));
-                            DOM.mainVideo.removeEventListener('click', playOnClick);
-                        };
-                        DOM.mainVideo.addEventListener('click', playOnClick, { once: true });
+                                .catch(error => {
+                                    console.warn('⚠️ 远程视频播放被阻止:', error.name);
+
+                                    if (error.name === 'AbortError') {
+                                        setTimeout(() => {
+                                            DOM.remoteVideo.play().catch(e => console.warn(
+                                                '重试播放失败:', e));
+                                        }, 500);
+                                        return;
+                                    }
+
+                                    setRemoteOnline(true);
+                                    setStatus('⚠️ 点击视频区域以播放', 'warning');
+                                    showToast('点击视频画面开始播放', 'info');
+
+                                    const playOnClick = () => {
+                                        DOM.remoteVideo.play()
+                                            .then(() => {
+                                                console.log('✅ 用户点击后播放成功');
+                                                setStatus('✅ 已连接！', 'success');
+                                            })
+                                            .catch(e => console.warn('用户点击后播放仍失败:', e));
+                                        DOM.mainVideo.removeEventListener('click', playOnClick);
+                                    };
+                                    DOM.mainVideo.addEventListener('click', playOnClick, { once: true });
+                                });
+                        }
                     });
+
+                    setRemoteOnline(true);
+                    DOM.remoteLabel.innerHTML =
+                        `<i class="fas fa-user"></i> ${State.role === 'teacher' ? '学生' : '老师'}`;
+                });
+
+                c.on('close', () => {
+                    console.log('📴 通话已结束');
+                    State.remoteStreamReceived = false;
+                    DOM.remoteVideo.srcObject = null;
+                    State.remoteStream = null;
+                    setRemoteOnline(false);
+                    DOM.remoteLabel.innerHTML = '<i class="fas fa-user"></i> 已断开';
+                    State.isConnected = false;
+                    State.isCalling = false;
+
+                    if (State.role === 'teacher') {
+                        setStatus('👨‍🏫 等待学生...', 'info');
+                        DOM.remoteLabel.innerHTML = '<i class="fas fa-user"></i> 等待中...';
+                    } else {
+                        setStatus('📴 通话已结束', 'warning');
+                        if (!State.isHangup) {
+                            showReconnectButton();
+                        }
+                    }
+                    showToast('对方已离开', 'warning');
+                });
+
+                c.on('error', (err) => {
+                    console.error('通话错误:', err);
+                    State.remoteStreamReceived = false;
+                    State.isCalling = false;
+                    setStatus('错误: ' + err.message, 'error');
+                    if (State.role === 'stu' && !State.isHangup) {
+                        showReconnectButton();
+                    }
+                });
             }
-        });
 
-        setRemoteOnline(true);
-        DOM.remoteLabel.innerHTML =
-            `<i class="fas fa-user"></i> ${State.role === 'teacher' ? '学生' : '老师'}`;
-    });
-
-    c.on('close', () => {
-        console.log('📴 通话已结束');
-        clearInterval(statusInterval);
-        State.remoteStreamReceived = false;
-        DOM.remoteVideo.srcObject = null;
-        State.remoteStream = null;
-        setRemoteOnline(false);
-        DOM.remoteLabel.innerHTML = '<i class="fas fa-user"></i> 已断开';
-        State.isConnected = false;
-        State.isCalling = false;
-
-        if (State.role === 'teacher') {
-            setStatus('👨‍🏫 等待学生...', 'info');
-            DOM.remoteLabel.innerHTML = '<i class="fas fa-user"></i> 等待中...';
-        } else {
-            setStatus('📴 通话已结束，尝试重连...', 'warning');
-            scheduleReconnect();
-        }
-        showToast('对方已离开', 'warning');
-    });
-
-    c.on('error', (err) => {
-        console.error('通话错误:', err);
-        clearInterval(statusInterval);
-        State.remoteStreamReceived = false;
-        State.isCalling = false;
-        setStatus('错误: ' + err.message, 'error');
-        if (State.role === 'student') {
-            scheduleReconnect();
-        }
-    });
-}
             // ============================================================
-            //  13. 自动重连
+            //  19. 自动重连（学生专用）
             // ============================================================
             function scheduleReconnect() {
-                if (State.role !== 'student') return;
+                if (State.role !== 'stu') return;
+                if (State.isHangup) return;
                 if (State.reconnectTimer) {
                     clearTimeout(State.reconnectTimer);
                     State.reconnectTimer = null;
@@ -1455,8 +1608,9 @@ function setupCall(c) {
 
                 State.retryCount++;
                 if (State.retryCount > CONFIG.MAX_RETRY) {
-                    setStatus('❌ 重连次数过多，请刷新页面', 'error');
-                    showToast('无法连接到老师，请刷新页面', 'error');
+                    setStatus('❌ 重连次数过多，请手动重连', 'error');
+                    showToast('无法连接到老师，请点击重连按钮', 'error');
+                    showReconnectButton();
                     return;
                 }
 
@@ -1466,17 +1620,19 @@ function setupCall(c) {
                 setStatus(`⏳ 等待老师上线 (${State.retryCount}/${CONFIG.MAX_RETRY})...`, 'warning');
 
                 State.reconnectTimer = setTimeout(() => {
-                    if (!State.isConnected && State.role === 'student' && State.peer) {
-                        State.isCalling = false; // 重置呼叫状态
+                    if (!State.isConnected && State.role === 'stu' && State.peer && !State.isHangup) {
+                        State.isCalling = false;
                         callTeacher();
                     }
                 }, delay);
             }
 
             // ============================================================
-            //  14. 挂断
+            //  20. ⭐ 挂断（支持重新连接）
             // ============================================================
             function hangup() {
+                State.isHangup = true;
+
                 if (State.reconnectTimer) {
                     clearTimeout(State.reconnectTimer);
                     State.reconnectTimer = null;
@@ -1508,14 +1664,19 @@ function setupCall(c) {
                 setRemoteOnline(false);
                 DOM.remoteVideo.srcObject = null;
                 DOM.localVideo.srcObject = null;
-                setStatus('📴 已断开', 'warning');
+                setStatus('📴 已挂断', 'warning');
+
                 DOM.screenBtn.innerHTML = '<i class="fas fa-desktop"></i> 共享屏幕';
                 DOM.screenBtn.className = 'ctrl-btn screen';
                 State.isScreenSharing = false;
+
+                // ⭐ 显示重新连接按钮
+                showReconnectButton();
+                showToast('已挂断，点击"重新连接"可再次加入', 'info');
             }
 
             // ============================================================
-            //  15. 控制按钮
+            //  21. 控制按钮
             // ============================================================
             DOM.micBtn.addEventListener('click', () => {
                 if (!State.localStream) return;
@@ -1541,7 +1702,17 @@ function setupCall(c) {
                 }
             });
 
+            // ============================================================
+            //  22. 屏幕共享（手机检测）
+            // ============================================================
             DOM.screenBtn.addEventListener('click', async function() {
+                // 检测手机
+                const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                if (isMobile) {
+                    showToast('📱 手机浏览器不支持共享整个屏幕，请使用电脑', 'warning');
+                    return;
+                }
+
                 if (State.isScreenSharing) {
                     try {
                         const newStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -1616,10 +1787,10 @@ function setupCall(c) {
             DOM.hangupBtn.addEventListener('click', hangup);
 
             // ============================================================
-            //  16. 启动应用
+            //  23. 启动应用
             // ============================================================
             updateRoom();
-            setStatus('准备加入', 'info');
+            setStatus('请登录', 'info');
 
             window.addEventListener('beforeunload', () => {
                 if (State.localStream) State.localStream.getTracks().forEach(t => t.stop());
@@ -1627,7 +1798,14 @@ function setupCall(c) {
                 if (State.reconnectTimer) clearTimeout(State.reconnectTimer);
             });
 
-            initJoin();
+            // 默认显示登录页
+            DOM.loginPanel.classList.remove('hidden');
+            DOM.videoRoom.classList.add('hidden');
+            DOM.loading.classList.add('hidden');
+
+            console.log('✅ 千帆课堂已启动，请登录');
+            console.log('📋 数据库表: students');
+            console.log('📋 角色: teacher (老师) / stu (学生)');
 
         })();
     </script>
