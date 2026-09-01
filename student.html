@@ -1190,6 +1190,7 @@
         // ============================================================
         const translations = {
             fr: {
+                  noComment: "Aucun commentaire pour le moment.",
                 pageTitle: "Espace étudiant",
                 logoutText: "Déconnexion",
                 statBookedLabel: "Cours à venir",
@@ -1366,6 +1367,7 @@
                 confirmCancelCourse: "Voulez-vous vraiment annuler ce cours ? Les crédits vous seront restitués."
             },
             zh: {
+                noComment: "暂无评语。",
                 pageTitle: "学生空间",
                 logoutText: "退出登录",
                 statBookedLabel: "即将上课",
@@ -1790,8 +1792,15 @@ async function sendCourseEmailNotificationToTeacher(courseId, action, studentNam
         // ============================================================
         // 工具函数
         // ============================================================
-        function escapeHtml(s) { if (!s) return ''; return s.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
-
+     function escapeHtml(s) {
+    if (!s) return '';
+    return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
         function showToast(msg, type) {
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
@@ -2076,8 +2085,7 @@ async function sendCourseEmailNotificationToTeacher(courseId, action, studentNam
                         ${hasTeacherComment ? `
                             <div class="teacher-comment-area">
                                 <i class="fas fa-comment-dots"></i> <strong>${t.teacherCommentLabel}</strong>
-                                <button class="action-btn btn-rate" style="margin-top: 5px; padding: 4px 12px; font-size: 0.75rem;" onclick="showTeacherComment('${escapeHtml(c.teacher_comment)}')">${t.viewComment}</button>
-                            </div>
+                                <button class="action-btn btn-rate" style="margin-top: 5px; padding: 4px 12px; font-size: 0.75rem;" onclick="showTeacherCommentById('${c.id}')">${t.viewComment}</button>
                         ` : ''}
                         <div class="course-actions">
                             ${!isCancelled && canConfirm ? `<button class="action-btn btn-confirm" onclick="confirmCourse('${c.id}')"><i class="fas fa-check-circle"></i> ${t.confirmPresence}</button>` : ''}
@@ -2122,6 +2130,32 @@ async function sendCourseEmailNotificationToTeacher(courseId, action, studentNam
                 container.innerHTML = `<div class="empty-state">❌ ${t.errorLoading || 'Erreur de chargement'}</div>`;
             }
         }
+        function showTeacherCommentById(courseId) {
+    const t = translations[currentLang];
+    const course = myCourses.find(c => c.id === courseId);
+    if (!course) {
+        showToast('Cours non trouvé', 'error');
+        return;
+    }
+    const comment = course.teacher_comment;
+    if (!comment || comment.trim() === '') {
+        document.getElementById('teacherCommentContent').innerHTML = `
+            <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; text-align: center; color: #999;">
+                <i class="fas fa-comment-slash" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
+                ${t.noComment || 'Aucun commentaire pour le moment.'}
+            </div>
+        `;
+        document.getElementById('teacherCommentModal').style.display = 'flex';
+        return;
+    }
+    const safeComment = escapeHtml(comment).replace(/\n/g, '<br>');
+    document.getElementById('teacherCommentContent').innerHTML = `
+        <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; line-height: 1.8;">
+            ${safeComment}
+        </div>
+    `;
+    document.getElementById('teacherCommentModal').style.display = 'flex';
+}
              // ============================================================
         // 日期格式化函数（支持中法双语）
         // ============================================================
@@ -2754,10 +2788,28 @@ async function sendCourseEmailNotificationToTeacher(courseId, action, studentNam
             document.getElementById('ratingModal').style.display = 'flex';
         }
 
-        function showTeacherComment(comment) {
-            document.getElementById('teacherCommentContent').innerHTML = `<div style="padding: 15px; background: #f5f5f5; border-radius: 8px;">${escapeHtml(comment)}</div>`;
-            document.getElementById('teacherCommentModal').style.display = 'flex';
-        }
+       function showTeacherComment(comment) {
+    // 🔥 如果 comment 为空或 null，显示提示信息
+    if (!comment || comment.trim() === '') {
+        document.getElementById('teacherCommentContent').innerHTML = `
+            <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; text-align: center; color: #999;">
+                <i class="fas fa-comment-slash" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
+                Aucun commentaire pour le moment.
+            </div>
+        `;
+        document.getElementById('teacherCommentModal').style.display = 'flex';
+        return;
+    }
+    
+    // 🔥 使用 escapeHtml 安全显示，并保留换行
+    const safeComment = escapeHtml(comment).replace(/\n/g, '<br>');
+    document.getElementById('teacherCommentContent').innerHTML = `
+        <div style="padding: 15px; background: #f5f5f5; border-radius: 8px; line-height: 1.8; white-space: pre-wrap;">
+            ${safeComment}
+        </div>
+    `;
+    document.getElementById('teacherCommentModal').style.display = 'flex';
+}
 
         async function saveRating(e) {
             e.preventDefault();
@@ -3092,6 +3144,7 @@ async function sendCourseEmailNotificationToTeacher(courseId, action, studentNam
         }
 
         // 暴露全局函数
+        window.showTeacherCommentById = showTeacherCommentById;
         window.confirmCourse = confirmCourse;
         window.openRatingModal = openRatingModal;
         window.showTeacherComment = showTeacherComment;
