@@ -159,7 +159,7 @@ h1, h2, h3, h4, h5 {
 }
 
 /* ============================================
-   顶部语言切换 - 桌面端显示
+   语言切换
    ============================================ */
 .language-toggle {
     position: absolute;
@@ -249,10 +249,8 @@ h1, h2, h3, h4, h5 {
     border: none;
     cursor: pointer;
     padding: 0;
-    z-index: 1005 !important;
+    z-index: 102;
     position: relative;
-    flex-shrink: 0;
-    pointer-events: auto;
 }
 
 .hamburger span {
@@ -262,8 +260,6 @@ h1, h2, h3, h4, h5 {
     border-radius: 10px;
     transition: all 0.3s ease;
     transform-origin: left center;
-    display: block;
-    pointer-events: none;
 }
 
 .hamburger.active span:nth-child(1) {
@@ -448,36 +444,6 @@ h1, h2, h3, h4, h5 {
 .admin-btn i {
     color: white !important;
     font-size: 1rem;
-}
-
-/* ============================================
-   导航栏内的语言切换 - 默认隐藏（桌面端）
-   ============================================ */
-.nav-lang-toggle {
-    display: none !important;
-}
-
-/* ============================================
-   遮罩层
-   ============================================ */
-.nav-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1002;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    pointer-events: none;
-}
-
-.nav-overlay.active {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
 }
 
 /* ============================================
@@ -776,6 +742,7 @@ h1, h2, h3, h4, h5 {
     transform: translateX(5px);
 }
 
+
 /* ============================================
    KPI 统计栏 + 教学评价（卡片式）
    ============================================ */
@@ -790,6 +757,20 @@ h1, h2, h3, h4, h5 {
     gap: 24px;
     max-width: 800px;
     margin: 0 auto 50px;
+}
+
+@media (max-width: 768px) {
+    .kpi-cards {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .kpi-cards {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
 }
 
 .kpi-card {
@@ -829,6 +810,42 @@ h1, h2, h3, h4, h5 {
     font-size: 0.85rem;
     color: var(--medium-gray);
     margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+    .kpi-card {
+        padding: 18px 12px;
+    }
+    .kpi-card-icon {
+        font-size: 1.5rem;
+    }
+    .kpi-card-number {
+        font-size: 1.8rem;
+    }
+    .kpi-card-number .kpi-percent {
+        font-size: 1.2rem;
+    }
+    .kpi-card-label {
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .kpi-card {
+        padding: 14px 8px;
+    }
+    .kpi-card-icon {
+        font-size: 1.2rem;
+    }
+    .kpi-card-number {
+        font-size: 1.4rem;
+    }
+    .kpi-card-number .kpi-percent {
+        font-size: 1rem;
+    }
+    .kpi-card-label {
+        font-size: 0.6rem;
+    }
 }
 
 /* 教学评价 */
@@ -877,6 +894,7 @@ h1, h2, h3, h4, h5 {
     white-space: nowrap;
 }
 
+/* 评价卡片 */
 .feedback-card {
     border: 1px solid var(--light-gray);
     border-radius: var(--border-radius);
@@ -936,6 +954,15 @@ h1, h2, h3, h4, h5 {
     align-items: center;
 }
 
+/* 部分填充星星的样式 */
+.feedback-card-score .stars .star-partial {
+    background: linear-gradient(90deg, #f1c40f 50%, #ddd 50%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+}
+
 .feedback-card-meta {
     display: flex;
     flex-wrap: wrap;
@@ -981,6 +1008,7 @@ h1, h2, h3, h4, h5 {
     margin-right: 6px;
 }
 
+/* 加载更多按钮 */
 .load-more-btn {
     max-width: 250px;
     margin: 25px auto 0;
@@ -993,6 +1021,7 @@ h1, h2, h3, h4, h5 {
     background: var(--primary-light-blue);
 }
 
+/* 空状态 */
 .feedback-empty {
     text-align: center;
     padding: 40px 20px;
@@ -1013,6 +1042,52 @@ h1, h2, h3, h4, h5 {
 
 .feedback-empty p {
     color: var(--medium-gray);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .kpi-feedback-section {
+        padding: 40px 0 50px;
+    }
+    .feedback-section {
+        padding: 20px;
+    }
+    .feedback-header h3 {
+        font-size: 1.2rem;
+    }
+    .feedback-header p {
+        font-size: 0.85rem;
+    }
+    .feedback-card {
+        padding: 16px 18px;
+    }
+    .feedback-card-header {
+        flex-direction: column;
+        gap: 2px;
+    }
+    .feedback-card-meta {
+        font-size: 0.8rem;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .feedback-section {
+        padding: 16px;
+    }
+    .feedback-card {
+        padding: 14px;
+    }
+    .feedback-card-name {
+        font-size: 0.95rem;
+    }
+    .feedback-card-score {
+        font-size: 1rem;
+    }
+    .feedback-card-comment {
+        font-size: 0.85rem;
+        padding: 10px 14px;
+    }
 }
 
 /* ============================================
@@ -1973,233 +2048,24 @@ h1, h2, h3, h4, h5 {
 }
 
 /* ============================================
-   响应式设计 - 平板/手机
+   响应式设计
    ============================================ */
 @media (max-width: 1024px) {
-    /* 隐藏顶部语言切换 */
-    .language-toggle {
-        display: none !important;
-    }
-
-    /* 显示导航栏语言切换 */
-    .nav-lang-toggle {
-        display: flex !important;
-        gap: 6px;
-        z-index: 1002;
-        flex-shrink: 0;
-        order: 3;
-        align-items: center;
-    }
-
-    .nav-lang-toggle .lang-btn {
-        background: var(--white);
-        border: none;
-        padding: 4px 10px;
-        border-radius: 20px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 0.7rem;
-        box-shadow: var(--shadow);
-        transition: var(--transition);
-        min-width: 36px;
-        height: 28px;
-        justify-content: center;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .nav-lang-toggle .lang-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-hover);
-    }
-
-    .nav-lang-toggle .lang-btn.active {
-        background: var(--primary-yellow);
-        color: var(--primary-blue);
-    }
-
-    .nav-lang-toggle .lang-btn i {
-        display: none;
-    }
-
-    /* 导航栏布局 */
-    .nav-container {
-        padding: 10px 12px;
-        min-height: 56px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 6px;
-        position: relative;
-        z-index: 1000;
-    }
-
-    /* 汉堡菜单 */
-    .hamburger {
-        display: flex !important;
-        z-index: 1005 !important;
-        order: 1;
-        flex-shrink: 0;
-        pointer-events: auto !important;
-        background: transparent;
-        border: none;
-        padding: 4px;
-        width: 28px;
-        height: 22px;
-        flex-direction: column;
-        justify-content: space-between;
-        cursor: pointer;
-    }
-
-    .hamburger span {
-        display: block;
-        width: 100%;
-        height: 3px;
-        background-color: var(--primary-blue);
-        border-radius: 10px;
-        transition: all 0.3s ease;
-        transform-origin: left center;
-        pointer-events: none;
-    }
-
-    /* Logo */
-    .logo {
-        position: static;
-        transform: none;
-        z-index: 1002;
-        order: 2;
-        font-size: 0.95rem;
-        flex: 0 1 auto;
-        justify-content: center;
-        margin: 0 4px;
-    }
-
-    .logo img {
-        height: 32px;
-    }
-
-    /* 侧滑菜单 */
-    .nav-links {
-        position: fixed;
-        top: 0;
-        right: -100%;
-        width: 80%;
-        max-width: 300px;
-        height: 100vh;
-        background-color: var(--white);
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: stretch;
-        padding: 70px 20px 30px 24px;
-        gap: 0;
-        transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-        overflow-y: auto;
-        z-index: 1003;
-        box-shadow: -8px 0 30px rgba(0, 0, 0, 0.15);
-        display: flex !important;
-        border-left: 1px solid rgba(0,0,0,0.05);
-        pointer-events: none;
-    }
-
-    .nav-links.active {
-        right: 0;
-        pointer-events: auto;
-    }
-
-    .nav-links a {
-        width: 100%;
-        padding: 12px 0;
-        border-bottom: 1px solid var(--light-gray);
-        font-size: 0.95rem;
-        white-space: normal;
-        text-align: left;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        pointer-events: auto;
-        color: var(--dark-gray);
-        text-decoration: none;
-    }
-
-    .nav-links a::after {
-        display: none;
-    }
-
-    .nav-links a i {
-        width: 22px;
-        color: var(--primary-blue);
-        font-size: 0.95rem;
-        text-align: center;
-    }
-
-    .user-info {
-        width: 100%;
-        margin-top: 10px;
-        padding: 10px 0;
-        border-top: 2px solid var(--light-gray);
-        justify-content: space-between;
-        position: relative;
-        border-radius: 0;
-        background: transparent;
-        pointer-events: auto;
-        display: flex !important;
-    }
-
-    .user-info span {
-        font-size: 0.9rem;
-        max-width: 120px;
-    }
-
-    .user-dropdown {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        left: auto;
-        width: 200px;
-        z-index: 2000;
-        margin-top: 5px;
-        background: white;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow-hover);
-        border: 1px solid var(--light-gray);
-        pointer-events: auto;
-    }
-
-    body.menu-open {
-        overflow: hidden;
-    }
-
-    .admin-btn {
-        min-width: auto;
-        padding: 10px 14px;
-        font-size: 0.85rem;
-        width: 100%;
-        justify-content: center;
-        margin-top: 6px;
-        pointer-events: auto;
-    }
-
-    /* 其他响应式 */
     .themes-grid {
         grid-template-columns: repeat(3, 1fr);
     }
-
     .course-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-
     .situation-card-wrapper {
         grid-template-columns: 1fr;
         gap: 30px;
     }
-
     .situation-info {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 20px;
     }
-
     .situation-info-item {
         padding: 20px;
         flex-direction: column;
@@ -2207,7 +2073,6 @@ h1, h2, h3, h4, h5 {
         border-left: none;
         border-top: 4px solid var(--primary-blue);
     }
-
     .situation-info-item i {
         font-size: 1.8rem;
         width: auto;
@@ -2215,7 +2080,7 @@ h1, h2, h3, h4, h5 {
 }
 
 @media (max-width: 992px) {
-    .kpi-cards {
+    .kpi-stats-grid {
         max-width: 100%;
     }
 }
@@ -2228,11 +2093,9 @@ h1, h2, h3, h4, h5 {
     .hero {
         padding: 50px 0;
     }
-
     .hero h2 {
         font-size: 1.5rem;
     }
-
     .hero p {
         font-size: 0.95rem;
     }
@@ -2248,13 +2111,11 @@ h1, h2, h3, h4, h5 {
         gap: 25px;
         padding: 0 16px;
     }
-
     .test-card {
         width: 100%;
         max-width: 380px;
         margin: 0 auto;
     }
-
     .test-card .btn {
         width: 100%;
         text-align: center;
@@ -2268,14 +2129,12 @@ h1, h2, h3, h4, h5 {
         align-items: center;
         gap: 20px;
     }
-
     .theme-card {
         width: 100%;
         max-width: 350px;
         margin: 0 auto;
         text-align: center;
     }
-
     .theme-link {
         justify-content: center;
     }
@@ -2285,22 +2144,18 @@ h1, h2, h3, h4, h5 {
         max-width: 400px;
         margin: 30px auto 0;
     }
-
     .course-card.featured {
         transform: none;
     }
-
     .course-card.featured:hover {
         transform: translateY(-8px);
     }
-
     .course-card .course-level {
         position: static;
         display: inline-block;
         margin-bottom: 10px;
         align-self: flex-start;
     }
-
     .course-card .featured-badge {
         position: static;
         display: inline-block;
@@ -2311,7 +2166,6 @@ h1, h2, h3, h4, h5 {
     .article-image {
         height: 220px;
     }
-
     .article-content {
         padding: 25px 16px;
     }
@@ -2320,7 +2174,6 @@ h1, h2, h3, h4, h5 {
         bottom: 70px;
         right: 15px;
     }
-
     .install-btn {
         padding: 10px 18px;
         font-size: 0.85rem;
@@ -2331,7 +2184,6 @@ h1, h2, h3, h4, h5 {
         right: 16px;
         max-width: none;
     }
-
     .user-dropdown {
         min-width: 250px;
         right: -10px;
@@ -2340,24 +2192,19 @@ h1, h2, h3, h4, h5 {
     .situation-section {
         padding: 50px 0;
     }
-
     .situation-card-header {
         padding: 20px;
     }
-
     .situation-card-body {
         padding: 20px;
     }
-
     .situation-card-body h3 {
         font-size: 1.3rem;
     }
-
     .situation-info {
         grid-template-columns: 1fr;
         gap: 15px;
     }
-
     .situation-info-item {
         flex-direction: row;
         padding: 15px 20px;
@@ -2365,7 +2212,6 @@ h1, h2, h3, h4, h5 {
         border-top: none;
         text-align: left;
     }
-
     .situation-info-item i {
         font-size: 1.5rem;
         width: 40px;
@@ -2375,25 +2221,25 @@ h1, h2, h3, h4, h5 {
         padding: 30px 20px;
         margin-top: 40px;
     }
-
+    
     .pre-register-content {
         flex-direction: column;
         text-align: center;
     }
-
+    
     .pre-register-icon {
         font-size: 2.8rem;
     }
-
+    
     .pre-register-text h3 {
         font-size: 1.3rem;
     }
-
+    
     .pre-register-text p {
         font-size: 0.9rem;
         max-width: 100%;
     }
-
+    
     .btn-pre-register {
         padding: 14px 24px;
         font-size: 1rem;
@@ -2402,106 +2248,29 @@ h1, h2, h3, h4, h5 {
         width: 100%;
         max-width: 300px;
     }
-
-    .kpi-cards {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-    }
-
-    .kpi-card {
-        padding: 18px 12px;
-    }
-
-    .kpi-card-icon {
-        font-size: 1.5rem;
-    }
-
-    .kpi-card-number {
-        font-size: 1.8rem;
-    }
-
-    .kpi-card-number .kpi-percent {
-        font-size: 1.2rem;
-    }
-
-    .kpi-card-label {
-        font-size: 0.7rem;
-    }
-
-    .feedback-section {
-        padding: 20px;
-    }
-
-    .feedback-header h3 {
-        font-size: 1.2rem;
-    }
-
-    .feedback-header p {
-        font-size: 0.85rem;
-    }
-
-    .feedback-card {
-        padding: 16px 18px;
-    }
-
-    .feedback-card-header {
-        flex-direction: column;
-        gap: 2px;
-    }
-
-    .feedback-card-meta {
-        font-size: 0.8rem;
-        gap: 8px;
-    }
-
-    /* 手机端 Logo */
-    .logo {
-        font-size: 1rem;
-        white-space: nowrap;
-    }
-
-    .logo span {
-        display: inline-block;
-        white-space: nowrap;
-    }
-
-    .logo img {
-        height: 35px;
-    }
-
-    .lang-btn {
-        padding: 4px 8px;
-        font-size: 0.7rem;
-        min-width: 40px;
-    }
 }
 
 @media (max-width: 480px) {
     .test-card {
         max-width: 100%;
     }
-
     .theme-card {
         max-width: 100%;
     }
-
     .footer-content {
         grid-template-columns: 1fr;
         gap: 30px;
         text-align: center;
     }
-
     .contact-item {
         justify-content: center;
     }
-
     .situation-card-header {
         flex-direction: column;
         align-items: center;
         text-align: center;
         gap: 10px;
     }
-
     .situation-icon {
         font-size: 2.5rem;
     }
@@ -2510,101 +2279,147 @@ h1, h2, h3, h4, h5 {
         padding: 24px 16px;
         margin-top: 30px;
     }
-
+    
     .pre-register-icon {
         font-size: 2.2rem;
     }
-
+    
     .pre-register-text h3 {
         font-size: 1.1rem;
     }
-
+    
     .btn-pre-register {
         padding: 12px 20px;
         font-size: 0.9rem;
         gap: 8px;
         max-width: 100%;
     }
+}
 
-    .kpi-cards {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
+/* ============================================
+   导航栏响应式
+   ============================================ */
+/* ============================================
+   导航栏响应式
+   ============================================ */
+@media (max-width: 1024px) {
+    .nav-container {
+        padding: 12px 16px;
+        min-height: 60px;
+        position: relative;
     }
 
-    .kpi-card {
-        padding: 14px 8px;
-    }
-
-    .kpi-card-icon {
-        font-size: 1.2rem;
-    }
-
-    .kpi-card-number {
-        font-size: 1.4rem;
-    }
-
-    .kpi-card-number .kpi-percent {
-        font-size: 1rem;
-    }
-
-    .kpi-card-label {
-        font-size: 0.6rem;
-    }
-
-    .feedback-section {
-        padding: 16px;
-    }
-
-    .feedback-card {
-        padding: 14px;
-    }
-
-    .feedback-card-name {
-        font-size: 0.95rem;
-    }
-
-    .feedback-card-score {
-        font-size: 1rem;
-    }
-
-    .feedback-card-comment {
-        font-size: 0.85rem;
-        padding: 10px 14px;
+    /* 汉堡菜单放在最上层 */
+    .hamburger {
+        display: flex;
+        z-index: 1002;
+        order: 1;
+        position: relative;
     }
 
     .logo {
-        font-size: 0.85rem;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1;  /* 降低 logo 的层级 */
+        order: 2;
     }
 
-    .logo img {
-        height: 30px;
-    }
-
-    .nav-links {
-        padding: 70px 18px 20px 18px;
-        max-width: 290px;
-    }
-
-    .nav-links a {
-        padding: 14px 0;
-        font-size: 0.95rem;
-    }
-
-    .hamburger {
-        width: 26px;
-        height: 20px;
+    .language-toggle {
+        position: static;
+        display: flex;
+        gap: 8px;
+        order: 3;
+        z-index: 1;  /* 降低语言切换的层级 */
     }
 
     .lang-btn {
-        padding: 4px 6px;
-        font-size: 0.65rem;
-        min-width: 34px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        min-width: 55px;
     }
 
-    .nav-lang-toggle .lang-btn {
-        padding: 3px 8px;
-        font-size: 0.65rem;
-        min-width: 32px;
-        height: 24px;
+    .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 75%;
+        max-width: 320px;
+        height: 100vh;
+        background-color: var(--white);
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        padding: 70px 20px 30px 25px;
+        gap: 0;
+        transition: right 0.3s ease;
+        overflow-y: auto;
+        z-index: 1001;  /* 低于汉堡菜单 */
+        box-shadow: -5px 0 20px rgba(0, 0, 0, 0.15);
+        display: flex !important;
+    }
+
+    .nav-links.active {
+        right: 0;
+    }
+
+    .nav-links a {
+        width: 100%;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--light-gray);
+        font-size: 1rem;
+        white-space: normal;
+        text-align: left;
+    }
+
+    .nav-links a::after {
+        display: none;
+    }
+
+    .user-info {
+        width: 100%;
+        margin-top: 20px;
+        padding: 12px 0;
+        border-top: 1px solid var(--light-gray);
+        justify-content: space-between;
+        position: relative;
+    }
+
+    .user-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: auto;
+        width: 220px;
+        z-index: 1003;
+        margin-top: 5px;
+    }
+
+    body.menu-open {
+        overflow: hidden;
+    }
+}
+
+/* 手机端 Logo 文字 */
+@media (max-width: 768px) {
+    .logo {
+        font-size: 1rem;
+        white-space: nowrap;
+    }
+    .logo span {
+        display: inline-block;
+        white-space: nowrap;
+    }
+    .logo img {
+        height: 35px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        font-size: 0.85rem;
+    }
+    .logo img {
+        height: 30px;
     }
 }
