@@ -11508,7 +11508,7 @@ FR : Faux. L’école doit respecter la liberté d’expression encadrée et la 
 
 ✅ B. Oui, tant que c’est dans le cadre pédagogique
 FR : Correct. Les discussions religieuses sont autorisées dans le cadre éducatif et respectueux.
-中：正确。在教育课堂上、遵守规则的宗教讨论是允许的。
+中：正确。在教育课堂上、遵守规则的宗教讨论是允许的。因为在法国公立学校，宗教本身可以作为教学内容进行讨论，例如历史、地理、哲学或公民教育课程中；但这不等于可以进行宗教宣传或传教（prosélytisme）。
 
 ❌ C. Non, sauf avec autorisation parentale
 FR : Faux. Les discussions encadrées ne nécessitent pas toujours l’autorisation des parents.
@@ -21073,7 +21073,7 @@ FR : Faux. La Banque centrale européenne n'a pas son siège au Luxembourg. Luxe
   category: "Mises en situation",
   difficulté: "simple",
   typeQuestion: "question simulée",
-  question: "Y先生要给自己的女儿施行割礼（excision），这在法国是否允许？",
+  question: "Monsieur Y. souhaite faire pratiquer une excision à sa fille. Est-ce que cela est autorisé en France ?",
   options: [
     "Oui, c'est une tradition familiale",
     "Oui, avec l'accord des parents",
