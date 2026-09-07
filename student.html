@@ -783,6 +783,48 @@
             .date-group-body.collapsed {
                 display: none;
             }
+/* 按钮脉冲动画 */
+@keyframes pulse-btn {
+    0% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(33, 150, 243, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0); }
+}
+
+/* 倒计时数字跳动动画 */
+@keyframes countdown-pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.85; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes countdown-urgent {
+    0% { transform: scale(1); color: #e74c3c; }
+    50% { transform: scale(1.08); color: #c0392b; }
+    100% { transform: scale(1); color: #e74c3c; }
+}
+
+.countdown-text {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--primary-blue);
+    display: inline-block;
+    animation: countdown-pulse 2s ease-in-out infinite;
+    font-variant-numeric: tabular-nums;
+}
+
+.countdown-text.soon {
+    color: #e74c3c;
+    font-weight: 700;
+    animation: countdown-urgent 1s ease-in-out infinite;
+}
+
+/* 状态标签中的倒计时 */
+.status-badge .countdown-text {
+    animation: countdown-pulse 2s ease-in-out infinite;
+}
+.status-badge .countdown-text.soon {
+    animation: countdown-urgent 1s ease-in-out infinite;
+}
     </style>
 </head>
 <body>
@@ -1188,362 +1230,426 @@
         // ============================================================
         // 翻译
         // ============================================================
-        const translations = {
-            fr: {
-                  noComment: "Aucun commentaire pour le moment.",
-                pageTitle: "Espace étudiant",
-                logoutText: "Déconnexion",
-                statBookedLabel: "Cours à venir",
-                statCompletedLabel: "Cours terminés",
-                statRatingLabel: "Note moyenne",
-                statTeacherLabel: "Intervenants",
-                totalCreditLabel: "📚 Crédits totaux",
-                scheduledHoursLabel: "⏰ Heures programmées",
-                inProgressHoursLabel: "🔄 En cours",
-                usedHoursLabel: "✅ Heures consommées",
-                remainingCreditLabel: "⏳ Restant",
-                myCoursesTitle: "Mes cours",
-                emptyCoursesUpcoming: "📭 Aucun cours à venir",
-                emptyCoursesPast: "📭 Aucun cours passé",
-                ratingTitle: "Évaluer le cours",
-                ratingLabel: "Note (1 à 5)",
-                commentLabel: "Commentaire",
-                saveRatingText: "Envoyer",
-                cancelRatingText: "Annuler",
-                confirmPresence: "Confirmer ma présence",
-                evaluate: "Évaluer",
-                cancelCourse: "Annuler le cours",
-                toastConfirmed: "Présence confirmée",
-                toastError: "Erreur",
-                toastRating: "Merci pour votre évaluation !",
-                toastCancelled: "Cours annulé, crédits restitués",
-                teacherCommentTitle: "Avis de l'intervenant",
-                statusScheduled: "📅 Planifié",
-                statusInProgress: "🔄 En cours",
-                statusCompleted: "✅ Terminé",
-                statusCancelled: "❌ Annulé",
-                pendingConfirm: "⏳ En attente de confirmation",
-                teacherCommentBtn: "Voir l'avis",
-                cancelModalTitle: "Annuler le cours",
-                cancelReasonLabel: "📝 Motif d'annulation",
-                reasonStudentLeave: "📖 Étudiant absent (justifié)",
-                reasonTeacherBusy: "👨‍🏫 Enseignant indisponible",
-                reasonStudentAbsent: "❌ Étudiant absent (injustifié)",
-                reasonOther: "📝 Autre",
-                cancelBtnText: "Annuler",
-                confirmCancelBtnText: "Confirmer l'annulation",
-                cancelSuccess: "Cours annulé",
-                cancelFail: "Erreur lors de l'annulation",
-                cannotCancel: "⚠️ Annulation au moins 24h à l'avance",
-                feedbackTitle: "📝 Évaluation de la formation",
-                feedbackIntro: "Merci d'avoir suivi cette formation ! Votre retour est précieux.",
-                feedbackNameText: "Nom (pseudonyme accepté)",
-                privacyNote: "⚠️ Pour protéger votre vie privée, vous pouvez utiliser un pseudonyme.",
-                feedbackExamText: "Type d'examen",
-                feedbackScoreText: "Score (0-40)",
-                feedbackCommentText: "Votre avis / Commentaire",
-                feedbackPublicText: "Je souhaite que mon avis soit partagé (anonymisé)",
-                feedbackCancelText: "Annuler",
-                feedbackSubmitText: "Envoyer",
-                toastFeedbackSuccess: "✅ Merci pour votre évaluation !",
-                toastFeedbackError: "❌ Erreur lors de l'envoi",
-                feedbackAlreadySubmitted: "⚠️ Vous avez déjà évalué cette formation.",
-                feedbackBtnText: "📝 Évaluer la formation",
-                feedbackDoneText: "✅ Formation évaluée",
-                feedbackEntryTitle: "📝 Évaluation de la formation",
-                ratingCriteriaTitle: "Critères d'évaluation",
-                totalScoreLabel: "Score total",
-                coursSuivis: "Cours suivis :",
-                partagez: "Partagez votre expérience pour nous aider à améliorer nos formations.",
-                vousAvezTermine: "Vous avez terminé tous vos cours !",
-                bookingTitle: "📅 Réserver un cours",
-                refreshBtnText: "Rafraîchir",
-                slotsLoading: "Chargement des créneaux disponibles...",
-                noSlotsAvailable: "📭 Aucun créneau disponible pour le moment",
-                bookingConfirmTitle: "Confirmer la réservation",
-                bookingTypeLabel: "Type de cours",
-                bookingConfirmText: "Confirmer la réservation",
-                bookingCancelText: "Annuler",
-                toastBookingSuccess: "✅ Cours réservé avec succès !",
-                toastBookingError: "❌ Erreur lors de la réservation",
-                toastInsufficientCredit: "❌ Crédits insuffisants",
-                toastSlotUnavailable: "❌ Ce créneau n'est plus disponible",
-                sourceTeacher: "📋 Créé par intervenant",
-                sourceStudent: "📋 Réservé par étudiant",
-                cancelBooking: "Annuler la réservation",
-                toastBookingCancelled: "✅ Réservation annulée, crédits restitués",
-                // 课程类型
-            
-                // 在 fr 中添加
-            weekdays_long: {
-                monday: 'Lundi',
-                tuesday: 'Mardi',
-                wednesday: 'Mercredi',
-                thursday: 'Jeudi',
-                friday: 'Vendredi',
-                saturday: 'Samedi',
-                sunday: 'Dimanche'
-            },
-            months_long: {
-                january: 'janvier',
-                february: 'février',
-                march: 'mars',
-                april: 'avril',
-                may: 'mai',
-                june: 'juin',
-                july: 'juillet',
-                august: 'août',
-                september: 'septembre',
-                october: 'octobre',
-                november: 'novembre',
-                december: 'décembre'
-            },
-            dateFormat: '{weekday} {day} {month} {year}',
-            créneaux: 'créneau(x)',
-            available: 'Disponible',
-            expired: 'Expiré',
-            booked: 'Réservé',
-            reserve: 'Réserver',
-            insufficientCredits: 'Crédits insuffisants',
-            noSlotsAvailable: '📭 Aucun créneau disponible pour le moment',
-            course_ec: "1️⃣ Examen civique",
-            course_ec110: "📚 Carte 10 ans - Complet",
-            course_ec14: "🎫 Carte 4 ans - Complet",
-            course_ec1f: "🛂 Nationalité - Complet",
-            course_ec210: "📚 Carte 10 ans - Accéléré",
-            course_ec24: "🎫 Carte 4 ans - Accéléré",
-            course_ec2f: "🛂 Nationalité - Accéléré",
-            course_ec310: "📚 Carte 10 ans - Sur mesure",
-            course_ec34: "🎫 Carte 4 ans - Sur mesure",
-            course_ec3f: "🛂 Nationalité - Sur mesure",
-            course_ex10: "📝 Carte 10 ans - Simulation",
-            course_ex4: "📝 Carte 4 ans - Simulation",
-            course_exf: "📝 Nationalité - Simulation",
-                // 新增
-                noTeacher: "Intervenant inconnu",
-                locationToDefine: "À définir",
-                durationHours: "heures",
-                support: "Support",
-                meetLink: "Lien Meet",
-                cancelReason: "Motif",
-                bookedViaAvailability: "Réservé via disponibilité",
-                teacherCommentLabel: "Avis du professeur:",
-                viewComment: "Voir l'avis",
-                close: "Fermer",
-                selectReason: "Veuillez sélectionner un motif",
-                teacher: "Intervenant",
-                date: "Date",
-                duration: "Durée",
-                creditsAvailable: "Crédits disponibles",
-                afterReservation: "Après réservation",
-                hoursRemaining: "heures resteront",
-                courseType: "Type de cours",
-                confirmReservation: "Confirmer la réservation",
-                cancel: "Annuler",
-                reserve: "Réserver",
-                insufficientCredits: "Crédits insuffisants",
-                slotUnavailable: "Ce créneau n'est plus disponible",
-                bookingSuccess: "Cours réservé avec succès",
-                bookingError: "Erreur lors de la réservation",
-                bookingCancelled: "Réservation annulée, crédits restitués",
-                selectCourseType: "Veuillez sélectionner un type de cours",
-                refresh: "Rafraîchir",
-                loading: "Chargement...",
-                errorLoading: "Erreur de chargement",
-                available: "Disponible",
-                expired: "Expiré",
-                booked: "Réservé",
-                createdByTeacher: "Créé par intervenant",
-                reservedByStudent: "Réservé par étudiant",
-                cancelReservation: "Annuler la réservation",
-                confirmCancelBooking: "Voulez-vous vraiment annuler cette réservation ? Les crédits vous seront restitués.",
-                notStudentBooking: "Ce cours n'a pas été réservé par un étudiant.",
-                noRating: "Note 1-5",
-                cancelBookingModalTitle: "Annuler la réservation",
-                cancelBookingCancelText: "Annuler",
-                confirmBookingCancelText: "Confirmer l'annulation",
-                creditsRestored: "✅ Les crédits seront restitués.",
-                // 确认取消课程
-                confirmCancelCourse: "Voulez-vous vraiment annuler ce cours ? Les crédits vous seront restitués."
-            },
-            zh: {
-                noComment: "暂无评语。",
-                pageTitle: "学生空间",
-                logoutText: "退出登录",
-                statBookedLabel: "即将上课",
-                statCompletedLabel: "已完成课程",
-                statRatingLabel: "平均评分",
-                statTeacherLabel: "老师人数",
-                totalCreditLabel: "📚 总课时",
-                scheduledHoursLabel: "⏰ 已计划时数",
-                inProgressHoursLabel: "🔄 进行中时数",
-                usedHoursLabel: "✅ 已使用时数",
-                remainingCreditLabel: "⏳ 剩余时数",
-                myCoursesTitle: "我的课程",
-                emptyCoursesUpcoming: "📭 暂无即将开始的课程",
-                emptyCoursesPast: "📭 暂无历史课程",
-                ratingTitle: "评价课程",
-                ratingLabel: "评分 (1到5)",
-                commentLabel: "评论",
-                saveRatingText: "提交",
-                cancelRatingText: "取消",
-                confirmPresence: "确认出席",
-                evaluate: "评价",
-                cancelCourse: "取消课程",
-                toastConfirmed: "出席已确认",
-                toastError: "错误",
-                toastRating: "感谢您的评价！",
-                toastCancelled: "课程已取消，课时已返还",
-                teacherCommentTitle: "老师的评语",
-                statusScheduled: "📅 计划中",
-                statusInProgress: "🔄 进行中",
-                statusCompleted: "✅ 已完成",
-                statusCancelled: "❌ 已取消",
-                pendingConfirm: "⏳ 等待您确认",
-                teacherCommentBtn: "查看评语",
-                cancelModalTitle: "取消课程",
-                cancelReasonLabel: "📝 取消原因",
-                reasonStudentLeave: "📖 学生请假",
-                reasonTeacherBusy: "👨‍🏫 老师有事",
-                reasonStudentAbsent: "❌ 学生缺席",
-                reasonOther: "📝 其他",
-                cancelBtnText: "取消",
-                confirmCancelBtnText: "确认取消",
-                cancelSuccess: "课程已取消",
-                cancelFail: "取消失败",
-                cannotCancel: "⚠️ 课程必须提前24小时取消",
-                feedbackTitle: "📝 教学评价",
-                feedbackIntro: "感谢您参加本次培训！您的反馈非常重要。",
-                feedbackNameText: "姓名（可使用化名）",
-                privacyNote: "⚠️ 为保护您的隐私，您可以使用化名。",
-                feedbackExamText: "考试类型",
-                feedbackScoreText: "分数 (0-40)",
-                feedbackCommentText: "您的评价",
-                feedbackPublicText: "我愿意分享我的评价（匿名）",
-                feedbackCancelText: "取消",
-                feedbackSubmitText: "提交",
-                toastFeedbackSuccess: "✅ 感谢您的评价！",
-                toastFeedbackError: "❌ 提交失败",
-                feedbackAlreadySubmitted: "⚠️ 您已经评价过本次培训了。",
-                feedbackBtnText: "📝 评价培训",
-                feedbackDoneText: "✅ 已评价",
-                feedbackEntryTitle: "📝 教学评价",
-                ratingCriteriaTitle: "评价标准",
-                totalScoreLabel: "总分",
-                coursSuivis: "已完成课程：",
-                partagez: "分享您的学习体验，帮助我们改进课程。",
-                vousAvezTermine: "您已完成所有课程！",
-                bookingTitle: "📅 预约课程",
-                refreshBtnText: "刷新",
-                slotsLoading: "加载可用时间段...",
-                noSlotsAvailable: "📭 暂无可用时间段",
-                bookingConfirmTitle: "确认预约",
-                bookingTypeLabel: "课程类型",
-                bookingConfirmText: "确认预约",
-                bookingCancelText: "取消",
-                toastBookingSuccess: "✅ 预约成功！",
-                toastBookingError: "❌ 预约失败",
-                toastInsufficientCredit: "❌ 课时不足",
-                toastSlotUnavailable: "❌ 该时间段已被预约",
-                sourceTeacher: "📋 老师创建",
-                sourceStudent: "📋 学生预约",
-                cancelBooking: "取消预约",
-                toastBookingCancelled: "✅ 预约已取消，课时已返还",
-                weekdays_long: {
-                    monday: '星期一',
-                    tuesday: '星期二',
-                    wednesday: '星期三',
-                    thursday: '星期四',
-                    friday: '星期五',
-                    saturday: '星期六',
-                    sunday: '星期日'
-                },
-                months_long: {
-                    january: '1月',
-                    february: '2月',
-                    march: '3月',
-                    april: '4月',
-                    may: '5月',
-                    june: '6月',
-                    july: '7月',
-                    august: '8月',
-                    september: '9月',
-                    october: '10月',
-                    november: '11月',
-                    december: '12月'
-                },
-                dateFormat: '{year}年{month}{day}日 {weekday}',
-                créneaux: '个时间段',
-                available: '可用',
-                expired: '已过期',
-                booked: '已预约',
-                reserve: '预约',
-                insufficientCredits: '课时不足',
-                noSlotsAvailable: '📭 暂无可用时间段',
-                // 课程类型
-                course_ec: "1️⃣ 公民考试",
-                course_ec110: "📚 十年卡 - 全能班",
-                course_ec14: "🎫 四年卡 - 全能班",
-                course_ec1f: "🛂 入籍 - 全能班",
-                course_ec210: "📚 十年卡 - 速成",
-                course_ec24: "🎫 四年卡 - 速成",
-                course_ec2f: "🛂 入籍 - 速成",
-                course_ec310: "📚 十年卡 - 自选",
-                course_ec34: "🎫 四年卡 - 自选",
-                course_ec3f: "🛂 入籍 - 自选",
-                course_ex10: "📝 十年卡 - 模拟考试",
-                course_ex4: "📝 四年卡 - 模拟考试",
-                course_exf: "📝 入籍 - 模拟考试",
-                // 新增
-                noTeacher: "未知老师",
-                locationToDefine: "待定",
-                durationHours: "小时",
-                support: "资料",
-                meetLink: "会议链接",
-                cancelReason: "原因",
-                bookedViaAvailability: "通过空闲时间预约",
-                teacherCommentLabel: "老师评语:",
-                viewComment: "查看评语",
-                close: "关闭",
-                selectReason: "请选择原因",
-                teacher: "老师",
-                date: "日期",
-                duration: "时长",
-                creditsAvailable: "可用课时",
-                afterReservation: "预约后",
-                hoursRemaining: "小时剩余",
-                courseType: "课程类型",
-                confirmReservation: "确认预约",
-                cancel: "取消",
-                reserve: "预约",
-                insufficientCredits: "课时不足",
-                slotUnavailable: "该时间段已被预约",
-                bookingSuccess: "预约成功",
-                bookingError: "预约失败",
-                bookingCancelled: "预约已取消，课时已返还",
-                selectCourseType: "请选择课程类型",
-                refresh: "刷新",
-                loading: "加载中...",
-                errorLoading: "加载失败",
-                available: "可用",
-                expired: "已过期",
-                booked: "已预约",
-                createdByTeacher: "老师创建",
-                reservedByStudent: "学生预约",
-                cancelReservation: "取消预约",
-                confirmCancelBooking: "确定要取消这个预约吗？课时将返还。",
-                notStudentBooking: "这个课程不是学生预约的。",
-                noRating: "请选择1-5分",
-                cancelBookingModalTitle: "取消预约",
-                cancelBookingCancelText: "取消",
-                confirmBookingCancelText: "确认取消",
-                creditsRestored: "✅ 课时将返还。",
-                // 确认取消课程
-                confirmCancelCourse: "确定要取消这个课程吗？课时将返还。"
-            }
-        };
-
-
+      const translations = {
+    fr: {
+        clickToJoin: "🔔 Cliquez ci-dessous pour rejoindre",
+    autoRefresh: "auto-refresh",
+    teacherNotStarted: "⏳ L'enseignant n'a pas encore commencé le cours",
+    confirmedAttendance: "✅ Présence confirmée !",
+    noMeetingLink: "⚠️ Aucun lien de réunion trouvé, veuillez contacter l'enseignant.",
+    teacherStarted: "🔔 L'enseignant a commencé le cours !",
+         detecting: "détection automatique",
+        // ===== 倒计时 & 课堂状态 =====
+        waitingForTeacher: "⏳ En attente de l'enseignant...",
+        waitingForClass: "⏳ En attente du cours...",
+        joinClass: "📹 Rejoindre le cours",
+        alreadyJoined: "✅ Déjà dans la classe",
+        rejoinClass: "🔄 Rejoindre à nouveau",
+        enterWaitingRoom: "🚪 Entrer en salle d'attente",
+        countdownDays: "j",
+        countdownHours: "h",
+        countdownMinutes: "min",
+        countdownSeconds: "s",
+        countdownSoon: "🔴",
+        statusWaitingJoin: "🔔 En attente de rejoindre",
+        statusWaitingTeacher: "⏳ En attente du professeur...",
+        noComment: "Aucun commentaire pour le moment.",
+        
+        // ===== 页面标题 =====
+        pageTitle: "Espace étudiant",
+        logoutText: "Déconnexion",
+        
+        // ===== 统计卡片 =====
+        statBookedLabel: "Cours à venir",
+        statCompletedLabel: "Cours terminés",
+        statRatingLabel: "Note moyenne",
+        statTeacherLabel: "Intervenants",
+        totalCreditLabel: "📚 Crédits totaux",
+        scheduledHoursLabel: "⏰ Heures programmées",
+        inProgressHoursLabel: "🔄 En cours",
+        usedHoursLabel: "✅ Heures consommées",
+        remainingCreditLabel: "⏳ Restant",
+        
+        // ===== 课程列表 =====
+        myCoursesTitle: "Mes cours",
+        emptyCoursesUpcoming: "📭 Aucun cours à venir",
+        emptyCoursesPast: "📭 Aucun cours passé",
+        
+        // ===== 评价 =====
+        ratingTitle: "Évaluer le cours",
+        ratingLabel: "Note (1 à 5)",
+        commentLabel: "Commentaire",
+        saveRatingText: "Envoyer",
+        cancelRatingText: "Annuler",
+        confirmPresence: "Confirmer ma présence",
+        evaluate: "Évaluer",
+        cancelCourse: "Annuler le cours",
+        toastConfirmed: "Présence confirmée",
+        toastError: "Erreur",
+        toastRating: "Merci pour votre évaluation !",
+        toastCancelled: "Cours annulé, crédits restitués",
+        teacherCommentTitle: "Avis de l'intervenant",
+        
+        // ===== 状态标签 =====
+        statusScheduled: "📅 Planifié",
+        statusInProgress: "🔄 En cours",
+        statusCompleted: "✅ Terminé",
+        statusCancelled: "❌ Annulé",
+        pendingConfirm: "⏳ En attente de confirmation",
+        teacherCommentBtn: "Voir l'avis",
+        
+        // ===== 取消课程 =====
+        cancelModalTitle: "Annuler le cours",
+        cancelReasonLabel: "📝 Motif d'annulation",
+        reasonStudentLeave: "📖 Étudiant absent (justifié)",
+        reasonTeacherBusy: "👨‍🏫 Enseignant indisponible",
+        reasonStudentAbsent: "❌ Étudiant absent (injustifié)",
+        reasonOther: "📝 Autre",
+        cancelBtnText: "Annuler",
+        confirmCancelBtnText: "Confirmer l'annulation",
+        cancelSuccess: "Cours annulé",
+        cancelFail: "Erreur lors de l'annulation",
+        cannotCancel: "⚠️ Annulation au moins 24h à l'avance",
+        confirmCancelCourse: "Voulez-vous vraiment annuler ce cours ? Les crédits vous seront restitués.",
+        
+        // ===== 教学评价 =====
+        feedbackTitle: "📝 Évaluation de la formation",
+        feedbackIntro: "Merci d'avoir suivi cette formation ! Votre retour est précieux.",
+        feedbackNameText: "Nom (pseudonyme accepté)",
+        privacyNote: "⚠️ Pour protéger votre vie privée, vous pouvez utiliser un pseudonyme.",
+        feedbackExamText: "Type d'examen",
+        feedbackScoreText: "Score (0-40)",
+        feedbackCommentText: "Votre avis / Commentaire",
+        feedbackPublicText: "Je souhaite que mon avis soit partagé (anonymisé)",
+        feedbackCancelText: "Annuler",
+        feedbackSubmitText: "Envoyer",
+        toastFeedbackSuccess: "✅ Merci pour votre évaluation !",
+        toastFeedbackError: "❌ Erreur lors de l'envoi",
+        feedbackAlreadySubmitted: "⚠️ Vous avez déjà évalué cette formation.",
+        feedbackBtnText: "📝 Évaluer la formation",
+        feedbackDoneText: "✅ Formation évaluée",
+        feedbackEntryTitle: "📝 Évaluation de la formation",
+        ratingCriteriaTitle: "Critères d'évaluation",
+        totalScoreLabel: "Score total",
+        coursSuivis: "Cours suivis :",
+        partagez: "Partagez votre expérience pour nous aider à améliorer nos formations.",
+        vousAvezTermine: "Vous avez terminé tous vos cours !",
+        
+        // ===== 预约 =====
+        bookingTitle: "📅 Réserver un cours",
+        refreshBtnText: "Rafraîchir",
+        slotsLoading: "Chargement des créneaux disponibles...",
+        noSlotsAvailable: "📭 Aucun créneau disponible pour le moment",
+        bookingConfirmTitle: "Confirmer la réservation",
+        bookingTypeLabel: "Type de cours",
+        bookingConfirmText: "Confirmer la réservation",
+        bookingCancelText: "Annuler",
+        toastBookingSuccess: "✅ Cours réservé avec succès !",
+        toastBookingError: "❌ Erreur lors de la réservation",
+        toastInsufficientCredit: "❌ Crédits insuffisants",
+        toastSlotUnavailable: "❌ Ce créneau n'est plus disponible",
+        sourceTeacher: "📋 Créé par intervenant",
+        sourceStudent: "📋 Réservé par étudiant",
+        cancelBooking: "Annuler la réservation",
+        toastBookingCancelled: "✅ Réservation annulée, crédits restitués",
+        cancelBookingModalTitle: "Annuler la réservation",
+        cancelBookingCancelText: "Annuler",
+        confirmBookingCancelText: "Confirmer l'annulation",
+        creditsRestored: "✅ Les crédits seront restitués.",
+        notStudentBooking: "Ce cours n'a pas été réservé par un étudiant.",
+        selectCourseType: "Veuillez sélectionner un type de cours",
+        bookingSuccess: "Cours réservé avec succès",
+        bookingError: "Erreur lors de la réservation",
+        bookingCancelled: "Réservation annulée, crédits restitués",
+        slotUnavailable: "Ce créneau n'est plus disponible",
+        insufficientCredits: "Crédits insuffisants",
+        reserve: "Réserver",
+        
+        // ===== 通用 =====
+        noTeacher: "Intervenant inconnu",
+        locationToDefine: "À définir",
+        durationHours: "heures",
+        support: "Support",
+        meetLink: "Lien Meet",
+        cancelReason: "Motif",
+        bookedViaAvailability: "Réservé via disponibilité",
+        teacherCommentLabel: "Avis du professeur:",
+        viewComment: "Voir l'avis",
+        close: "Fermer",
+        selectReason: "Veuillez sélectionner un motif",
+        teacher: "Intervenant",
+        date: "Date",
+        duration: "Durée",
+        creditsAvailable: "Crédits disponibles",
+        afterReservation: "Après réservation",
+        hoursRemaining: "heures resteront",
+        courseType: "Type de cours",
+        confirmReservation: "Confirmer la réservation",
+        cancel: "Annuler",
+        refresh: "Rafraîchir",
+        loading: "Chargement...",
+        errorLoading: "Erreur de chargement",
+        available: "Disponible",
+        expired: "Expiré",
+        booked: "Réservé",
+        createdByTeacher: "Créé par intervenant",
+        reservedByStudent: "Réservé par étudiant",
+        cancelReservation: "Annuler la réservation",
+        noRating: "Note 1-5",
+        confirmCancelBooking: "Voulez-vous vraiment annuler cette réservation ? Les crédits vous seront restitués.",
+        
+        // ===== 课程类型 =====
+        course_ec: "1️⃣ Examen civique",
+        course_ec110: "📚 Carte 10 ans - Complet",
+        course_ec14: "🎫 Carte 4 ans - Complet",
+        course_ec1f: "🛂 Nationalité - Complet",
+        course_ec210: "📚 Carte 10 ans - Accéléré",
+        course_ec24: "🎫 Carte 4 ans - Accéléré",
+        course_ec2f: "🛂 Nationalité - Accéléré",
+        course_ec310: "📚 Carte 10 ans - Sur mesure",
+        course_ec34: "🎫 Carte 4 ans - Sur mesure",
+        course_ec3f: "🛂 Nationalité - Sur mesure",
+        course_ex10: "📝 Carte 10 ans - Simulation",
+        course_ex4: "📝 Carte 4 ans - Simulation",
+        course_exf: "📝 Nationalité - Simulation",
+        
+        // ===== 日期 =====
+        weekdays_long: {
+            monday: 'Lundi',
+            tuesday: 'Mardi',
+            wednesday: 'Mercredi',
+            thursday: 'Jeudi',
+            friday: 'Vendredi',
+            saturday: 'Samedi',
+            sunday: 'Dimanche'
+        },
+        months_long: {
+            january: 'janvier',
+            february: 'février',
+            march: 'mars',
+            april: 'avril',
+            may: 'mai',
+            june: 'juin',
+            july: 'juillet',
+            august: 'août',
+            september: 'septembre',
+            october: 'octobre',
+            november: 'novembre',
+            december: 'décembre'
+        },
+        dateFormat: '{weekday} {day} {month} {year}',
+        créneaux: 'créneau(x)',
+    },
+    zh: {
+           clickToJoin: "🔔 点击下方加入课堂",
+    autoRefresh: "自动刷新中",
+    teacherNotStarted: "⏳ 老师尚未开始上课，请稍候...",
+    confirmedAttendance: "✅ 已确认出席！",
+    noMeetingLink: "⚠️ 没有找到会议链接，请联系老师。",
+    teacherStarted: "🔔 老师已开始上课！",
+         detecting: "自动检测中",
+        // ===== 倒计时 & 课堂状态 =====
+        waitingForTeacher: "⏳ 等待老师开始...",
+        waitingForClass: "⏳ 等待上课...",
+        joinClass: "📹 加入课堂",
+        alreadyJoined: "✅ 已加入课堂",
+        rejoinClass: "🔄 重新加入",
+        enterWaitingRoom: "🚪 进入等候室",
+        countdownDays: "天",
+        countdownHours: "小时",
+        countdownMinutes: "分钟",
+        countdownSeconds: "秒",
+        countdownSoon: "🔴",
+        statusWaitingJoin: "🔔 等待加入",
+        statusWaitingTeacher: "⏳ 等待老师开始...",
+        noComment: "暂无评语。",
+        
+        // ===== 页面标题 =====
+        pageTitle: "学生空间",
+        logoutText: "退出登录",
+        
+        // ===== 统计卡片 =====
+        statBookedLabel: "即将上课",
+        statCompletedLabel: "已完成课程",
+        statRatingLabel: "平均评分",
+        statTeacherLabel: "老师人数",
+        totalCreditLabel: "📚 总课时",
+        scheduledHoursLabel: "⏰ 已计划时数",
+        inProgressHoursLabel: "🔄 进行中时数",
+        usedHoursLabel: "✅ 已使用时数",
+        remainingCreditLabel: "⏳ 剩余时数",
+        
+        // ===== 课程列表 =====
+        myCoursesTitle: "我的课程",
+        emptyCoursesUpcoming: "📭 暂无即将开始的课程",
+        emptyCoursesPast: "📭 暂无历史课程",
+        
+        // ===== 评价 =====
+        ratingTitle: "评价课程",
+        ratingLabel: "评分 (1到5)",
+        commentLabel: "评论",
+        saveRatingText: "提交",
+        cancelRatingText: "取消",
+        confirmPresence: "确认出席",
+        evaluate: "评价",
+        cancelCourse: "取消课程",
+        toastConfirmed: "出席已确认",
+        toastError: "错误",
+        toastRating: "感谢您的评价！",
+        toastCancelled: "课程已取消，课时已返还",
+        teacherCommentTitle: "老师的评语",
+        
+        // ===== 状态标签 =====
+        statusScheduled: "📅 计划中",
+        statusInProgress: "🔄 进行中",
+        statusCompleted: "✅ 已完成",
+        statusCancelled: "❌ 已取消",
+        pendingConfirm: "⏳ 等待您确认",
+        teacherCommentBtn: "查看评语",
+        
+        // ===== 取消课程 =====
+        cancelModalTitle: "取消课程",
+        cancelReasonLabel: "📝 取消原因",
+        reasonStudentLeave: "📖 学生请假",
+        reasonTeacherBusy: "👨‍🏫 老师有事",
+        reasonStudentAbsent: "❌ 学生缺席",
+        reasonOther: "📝 其他",
+        cancelBtnText: "取消",
+        confirmCancelBtnText: "确认取消",
+        cancelSuccess: "课程已取消",
+        cancelFail: "取消失败",
+        cannotCancel: "⚠️ 课程必须提前24小时取消",
+        confirmCancelCourse: "确定要取消这个课程吗？课时将返还。",
+        
+        // ===== 教学评价 =====
+        feedbackTitle: "📝 教学评价",
+        feedbackIntro: "感谢您参加本次培训！您的反馈非常重要。",
+        feedbackNameText: "姓名（可使用化名）",
+        privacyNote: "⚠️ 为保护您的隐私，您可以使用化名。",
+        feedbackExamText: "考试类型",
+        feedbackScoreText: "分数 (0-40)",
+        feedbackCommentText: "您的评价",
+        feedbackPublicText: "我愿意分享我的评价（匿名）",
+        feedbackCancelText: "取消",
+        feedbackSubmitText: "提交",
+        toastFeedbackSuccess: "✅ 感谢您的评价！",
+        toastFeedbackError: "❌ 提交失败",
+        feedbackAlreadySubmitted: "⚠️ 您已经评价过本次培训了。",
+        feedbackBtnText: "📝 评价培训",
+        feedbackDoneText: "✅ 已评价",
+        feedbackEntryTitle: "📝 教学评价",
+        ratingCriteriaTitle: "评价标准",
+        totalScoreLabel: "总分",
+        coursSuivis: "已完成课程：",
+        partagez: "分享您的学习体验，帮助我们改进课程。",
+        vousAvezTermine: "您已完成所有课程！",
+        
+        // ===== 预约 =====
+        bookingTitle: "📅 预约课程",
+        refreshBtnText: "刷新",
+        slotsLoading: "加载可用时间段...",
+        noSlotsAvailable: "📭 暂无可用时间段",
+        bookingConfirmTitle: "确认预约",
+        bookingTypeLabel: "课程类型",
+        bookingConfirmText: "确认预约",
+        bookingCancelText: "取消",
+        toastBookingSuccess: "✅ 预约成功！",
+        toastBookingError: "❌ 预约失败",
+        toastInsufficientCredit: "❌ 课时不足",
+        toastSlotUnavailable: "❌ 该时间段已被预约",
+        sourceTeacher: "📋 老师创建",
+        sourceStudent: "📋 学生预约",
+        cancelBooking: "取消预约",
+        toastBookingCancelled: "✅ 预约已取消，课时已返还",
+        cancelBookingModalTitle: "取消预约",
+        cancelBookingCancelText: "取消",
+        confirmBookingCancelText: "确认取消",
+        creditsRestored: "✅ 课时将返还。",
+        notStudentBooking: "这个课程不是学生预约的。",
+        selectCourseType: "请选择课程类型",
+        bookingSuccess: "预约成功",
+        bookingError: "预约失败",
+        bookingCancelled: "预约已取消，课时已返还",
+        slotUnavailable: "该时间段已被预约",
+        insufficientCredits: "课时不足",
+        reserve: "预约",
+        
+        // ===== 通用 =====
+        noTeacher: "未知老师",
+        locationToDefine: "待定",
+        durationHours: "小时",
+        support: "资料",
+        meetLink: "会议链接",
+        cancelReason: "原因",
+        bookedViaAvailability: "通过空闲时间预约",
+        teacherCommentLabel: "老师评语:",
+        viewComment: "查看评语",
+        close: "关闭",
+        selectReason: "请选择原因",
+        teacher: "老师",
+        date: "日期",
+        duration: "时长",
+        creditsAvailable: "可用课时",
+        afterReservation: "预约后",
+        hoursRemaining: "小时剩余",
+        courseType: "课程类型",
+        confirmReservation: "确认预约",
+        cancel: "取消",
+        refresh: "刷新",
+        loading: "加载中...",
+        errorLoading: "加载失败",
+        available: "可用",
+        expired: "已过期",
+        booked: "已预约",
+        createdByTeacher: "老师创建",
+        reservedByStudent: "学生预约",
+        cancelReservation: "取消预约",
+        noRating: "请选择1-5分",
+        confirmCancelBooking: "确定要取消这个预约吗？课时将返还。",
+        
+        // ===== 课程类型 =====
+        course_ec: "1️⃣ 公民考试",
+        course_ec110: "📚 十年卡 - 全能班",
+        course_ec14: "🎫 四年卡 - 全能班",
+        course_ec1f: "🛂 入籍 - 全能班",
+        course_ec210: "📚 十年卡 - 速成",
+        course_ec24: "🎫 四年卡 - 速成",
+        course_ec2f: "🛂 入籍 - 速成",
+        course_ec310: "📚 十年卡 - 自选",
+        course_ec34: "🎫 四年卡 - 自选",
+        course_ec3f: "🛂 入籍 - 自选",
+        course_ex10: "📝 十年卡 - 模拟考试",
+        course_ex4: "📝 四年卡 - 模拟考试",
+        course_exf: "📝 入籍 - 模拟考试",
+        
+        // ===== 日期 =====
+        weekdays_long: {
+            monday: '星期一',
+            tuesday: '星期二',
+            wednesday: '星期三',
+            thursday: '星期四',
+            friday: '星期五',
+            saturday: '星期六',
+            sunday: '星期日'
+        },
+        months_long: {
+            january: '1月',
+            february: '2月',
+            march: '3月',
+            april: '4月',
+            may: '5月',
+            june: '6月',
+            july: '7月',
+            august: '8月',
+            september: '9月',
+            october: '10月',
+            november: '11月',
+            december: '12月'
+        },
+        dateFormat: '{year}年{month}{day}日 {weekday}',
+        créneaux: '个时间段',
+    }
+};
 
         // ============================================================
 // EMAILJS 配置 - 课程邮件
@@ -1989,115 +2095,429 @@ async function sendCourseEmailNotificationToTeacher(courseId, action, studentNam
             document.getElementById('remainingCredit').textContent = remainingCredit;
         }
 
-        // ============================================================
-        // 渲染课程列表（区分预约和老师创建）
-        // ============================================================
-        function renderCoursesList() {
-            const container = document.getElementById('coursesList');
-            const t = translations[currentLang];
 
-            let filtered = [];
-            if (currentFilter === 'upcoming') {
-                filtered = myCourses.filter(c => c.status !== 'completed' && c.status !== 'cancelled');
-            } else {
-                filtered = myCourses.filter(c => c.status === 'completed' || c.status === 'cancelled');
-            }
 
-            if (filtered.length === 0) {
-                let msg = currentFilter === 'upcoming' ? t.emptyCoursesUpcoming : t.emptyCoursesPast;
-                container.innerHTML = `<div class="empty-state">${msg}</div>`;
-                return;
-            }
 
-            container.innerHTML = filtered.map(c => {
-                const teacher = c.teacher || c.teachers;
-                const endTime = calculateEndTime(c.start_time, c.duration || 2);
-                const timeDisplay = `${formatDateTime(c.start_time)} - ${endTime.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}`;
+// ============================================================
+// 渲染课程列表（完整重写 - 正确处理倒计时归零和老师开始）
+// ============================================================
+function renderCoursesList() {
+    const container = document.getElementById('coursesList');
+    const t = translations[currentLang];
 
-                let statusText = '', statusClass = '';
-                const now = new Date();
-                const courseStart = new Date(c.start_time);
-                const courseEnd = endTime;
-                const isNow = courseStart <= now && courseEnd >= now;
+    let filtered = [];
+    if (currentFilter === 'upcoming') {
+        filtered = myCourses.filter(c => c.status !== 'completed' && c.status !== 'cancelled');
+    } else {
+        filtered = myCourses.filter(c => c.status === 'completed' || c.status === 'cancelled');
+    }
 
-                if (c.status === 'cancelled') {
-                    statusText = t.statusCancelled;
-                    statusClass = 'status-cancelled';
-                } else if (c.status === 'completed') {
-                    statusText = t.statusCompleted;
-                    statusClass = 'status-completed';
-                } else if (c.teacher_started && !c.student_confirmed && isNow) {
-                    statusText = t.pendingConfirm;
-                    statusClass = 'status-pending';
-                } else if (c.teacher_started && c.student_confirmed && isNow) {
-                    statusText = t.statusInProgress;
-                    statusClass = 'status-in-progress';
-                } else if (courseStart > now) {
-                    statusText = t.statusScheduled;
-                    statusClass = 'status-scheduled';
-                } else {
-                    statusText = t.statusScheduled;
-                    statusClass = 'status-scheduled';
-                }
+    if (filtered.length === 0) {
+        let msg = currentFilter === 'upcoming' ? t.emptyCoursesUpcoming : t.emptyCoursesPast;
+        container.innerHTML = `<div class="empty-state">${msg}</div>`;
+        return;
+    }
 
-                const canConfirm = c.teacher_started && !c.student_confirmed && isNow;
-                const canRate = c.status === 'completed' && !c.student_rating;
-                const isCancelled = c.status === 'cancelled';
-                const isStudentBooking = c.source === 'student_booking';
+    container.innerHTML = filtered.map(c => {
+        const teacher = c.teacher || c.teachers;
+        const endTime = calculateEndTime(c.start_time, c.duration || 2);
+        const timeDisplay = `${formatDateTime(c.start_time)} - ${endTime.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})}`;
+
+        let statusText = '', statusClass = '';
+        const now = new Date();
+        const courseStart = new Date(c.start_time);
+        const courseEnd = endTime;
+        
+        const diffMs = courseStart - now;
+        const isBefore = diffMs > 0;
+        const isNow = courseStart <= now && courseEnd >= now;
+        const isExpired = now > courseEnd;
+
+        // ===== 计算倒计时 =====
+        let countdownText = '';
+        let countdownClass = 'countdown-text';
+        
+        if (c.status !== 'cancelled' && c.status !== 'completed') {
+            if (isBefore) {
+                // 🔥 倒计时进行中
+                const totalSeconds = Math.floor(diffMs / 1000);
                 
-                // 🔥 关键区别：
-                // - 预约的课 (source = 'student_booking')：显示"取消预约"
-                // - 老师创建的课 (source = 'teacher' 或 null)：显示"取消课程"
-                const canCancelBooking = isStudentBooking && c.status === 'scheduled' && isMoreThan24HoursAhead(c.start_time);
-                const canCancelCourse = !isStudentBooking && c.status === 'scheduled' && !c.teacher_started && isMoreThan24HoursAhead(c.start_time);
-
-                const hasTeacherComment = c.teacher_comment && c.teacher_comment.trim() !== '';
-                const courseTypeDisplay = getCourseTypeText(c.course_type);
-                const teacherName = teacher?.name || t.noTeacher;
-                const locationDisplay = c.location || t.locationToDefine;
-                const durationDisplay = `${c.duration || 2} ${t.durationHours}`;
-
-                let sourceBadge = '';
-                if (isStudentBooking) {
-                    sourceBadge = `<span class="source-badge student"><i class="fas fa-calendar-plus"></i> ${t.sourceStudent}</span>`;
-                } else {
-                    sourceBadge = `<span class="source-badge teacher"><i class="fas fa-chalkboard-user"></i> ${t.sourceTeacher}</span>`;
+                if (totalSeconds > 0) {
+                    const diffMin = Math.floor(totalSeconds / 60);
+                    const diffHours = Math.floor(diffMin / 60);
+                    const diffDays = Math.floor(diffHours / 24);
+                    const remainHours = diffHours % 24;
+                    const remainMin = diffMin % 60;
+                    const remainSec = totalSeconds % 60;
+                    
+                    if (diffDays > 0) {
+                        countdownText = `⏳ ${diffDays}${t.countdownDays} ${remainHours}${t.countdownHours} ${remainMin}${t.countdownMinutes} ${remainSec}${t.countdownSeconds}`;
+                    } else if (diffHours > 0) {
+                        countdownText = `⏳ ${diffHours}${t.countdownHours} ${remainMin}${t.countdownMinutes} ${remainSec}${t.countdownSeconds}`;
+                    } else if (diffMin > 0) {
+                        countdownText = `⏳ ${diffMin}${t.countdownMinutes} ${remainSec}${t.countdownSeconds}`;
+                    } else {
+                        countdownText = `⏳ ${remainSec}${t.countdownSeconds}`;
+                    }
+                    
+                    if (totalSeconds < 300) {
+                        countdownClass = 'countdown-text soon';
+                    }
                 }
-
-                return `
-                    <div class="course-card">
-                        <div class="course-header">
-                            <span class="course-title">${courseTypeDisplay} - ${timeDisplay}</span>
-                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                                ${sourceBadge}
-                                <span class="status-badge ${statusClass}">${statusText}</span>
-                            </div>
-                        </div>
-                        <div class="course-details">
-                            <div class="detail-item"><i class="fas fa-chalkboard-user"></i> ${t.teacher}: ${escapeHtml(teacherName)}</div>
-                            <div class="detail-item"><i class="fas fa-map-marker-alt"></i> ${locationDisplay}</div>
-                            <div class="detail-item"><i class="fas fa-clock"></i> ${t.duration}: ${durationDisplay}</div>
-                            ${c.material_link ? `<div class="detail-item"><i class="fas fa-link"></i> <a href="${c.material_link}" target="_blank">${t.support}</a></div>` : ''}
-                            ${c.meeting_link ? `<div class="detail-item"><i class="fas fa-video"></i> <a href="${c.meeting_link}" target="_blank">${t.meetLink}</a></div>` : ''}
-                            ${isCancelled && c.cancel_reason ? `<div class="detail-item"><i class="fas fa-ban"></i> ${t.cancelReason}: ${escapeHtml(c.cancel_reason)}</div>` : ''}
-                            ${isStudentBooking ? `<div class="detail-item"><i class="fas fa-calendar-check"></i> ${t.bookedViaAvailability}</div>` : ''}
-                        </div>
-                        ${hasTeacherComment ? `
-                            <div class="teacher-comment-area">
-                                <i class="fas fa-comment-dots"></i> <strong>${t.teacherCommentLabel}</strong>
-                                <button class="action-btn btn-rate" style="margin-top: 5px; padding: 4px 12px; font-size: 0.75rem;" onclick="showTeacherCommentById('${c.id}')">${t.viewComment}</button>
-                        ` : ''}
-                        <div class="course-actions">
-                            ${!isCancelled && canConfirm ? `<button class="action-btn btn-confirm" onclick="confirmCourse('${c.id}')"><i class="fas fa-check-circle"></i> ${t.confirmPresence}</button>` : ''}
-                            ${!isCancelled && canRate ? `<button class="action-btn btn-rate" onclick="openRatingModal('${c.id}')"><i class="fas fa-star"></i> ${t.evaluate}</button>` : ''}
-                            ${!isCancelled && canCancelCourse ? `<button class="action-btn btn-cancel-course" onclick="openCancelModal('${c.id}','${c.start_time}','${escapeHtml(teacherName)}','${c.course_type}')"><i class="fas fa-trash-alt"></i> ${t.cancelCourse}</button>` : ''}
-                            ${!isCancelled && canCancelBooking ? `<button class="action-btn btn-cancel-booking" onclick="openCancelBookingModal('${c.id}','${c.start_time}','${escapeHtml(teacherName)}','${c.course_type}')"><i class="fas fa-undo"></i> ${t.cancelReservation}</button>` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
+            }
         }
 
+        // ===== 🔥 状态判断（核心修复） =====
+        if (c.status === 'cancelled') {
+            statusText = t.statusCancelled;
+            statusClass = 'status-cancelled';
+        } else if (c.status === 'completed') {
+            statusText = t.statusCompleted;
+            statusClass = 'status-completed';
+        } 
+        // 🔥 情况1: 老师已开始，学生已确认 → 进行中
+        else if (c.teacher_started && c.student_confirmed && isNow) {
+            statusText = t.statusInProgress;
+            statusClass = 'status-in-progress';
+        } 
+        // 🔥 情况2: 老师已开始，学生未确认 → 等待学生加入
+        else if (c.teacher_started && !c.student_confirmed && isNow) {
+            statusText = t.clickToJoin;
+            statusClass = 'status-pending';
+        } 
+        // 🔥 情况3: 老师已开始，但还没到课程时间（老师提前开始了）
+        else if (c.teacher_started && !c.student_confirmed && isBefore) {
+            statusText = t.waitingForClass;
+            statusClass = 'status-scheduled';
+        }
+        // 🔥 情况4: 课程时间已到，老师还没开始 → 等待老师
+        else if (isNow && !c.teacher_started) {
+            statusText = t.waitingForTeacher;
+            statusClass = 'status-pending';
+        } 
+        // 🔥 情况5: 课程还没开始 → 显示倒计时
+        else if (isBefore && !c.teacher_started) {
+            statusText = countdownText || t.statusScheduled;
+            statusClass = 'status-scheduled';
+        } 
+        // 🔥 默认
+        else {
+            statusText = t.statusScheduled;
+            statusClass = 'status-scheduled';
+        }
+
+        // ===== 判断操作按钮 =====
+        // 🔥 核心：可以加入课堂的条件
+        const canJoin = c.teacher_started && !c.student_confirmed && isNow && c.status !== 'cancelled' && c.status !== 'completed';
+        
+        // 等待老师开始
+        const waitingForTeacher = isNow && !c.teacher_started && c.status !== 'cancelled' && c.status !== 'completed';
+        
+        // 🔥 课程还没开始（倒计时中）
+        const isWaitingToStart = isBefore && c.status === 'scheduled' && !c.teacher_started;
+        
+        const canRate = c.status === 'completed' && !c.student_rating;
+        const isCancelled = c.status === 'cancelled';
+        const isStudentBooking = c.source === 'student_booking';
+        const canCancelBooking = isStudentBooking && c.status === 'scheduled' && isMoreThan24HoursAhead(c.start_time);
+        const canCancelCourse = !isStudentBooking && c.status === 'scheduled' && !c.teacher_started && isMoreThan24HoursAhead(c.start_time);
+        const hasTeacherComment = c.teacher_comment && c.teacher_comment.trim() !== '';
+
+        // ===== 课程信息 =====
+        const courseTypeDisplay = getCourseTypeText(c.course_type);
+        const teacherName = teacher?.name || t.noTeacher;
+        const locationDisplay = c.location || t.locationToDefine;
+        const durationDisplay = `${c.duration || 2} ${t.durationHours}`;
+
+        let sourceBadge = isStudentBooking 
+            ? `<span class="source-badge student"><i class="fas fa-calendar-plus"></i> ${t.sourceStudent}</span>`
+            : `<span class="source-badge teacher"><i class="fas fa-chalkboard-user"></i> ${t.sourceTeacher}</span>`;
+
+        // ===== 构建操作按钮 =====
+        let actionsHtml = '';
+
+        // 🔥 1. 加入课堂按钮（老师已开始，等待学生加入）
+        if (!isCancelled && canJoin) {
+            actionsHtml += `
+                <button class="action-btn btn-confirm" onclick="confirmAndJoinClass('${c.id}')" style="background: #2196F3; padding: 10px 28px; font-size: 1rem; border-radius: 30px; box-shadow: 0 4px 15px rgba(33,150,243,0.4); animation: pulse-btn 2s infinite;">
+                    <i class="fas fa-video"></i> ${t.joinClass || '📹 加入课堂'}
+                </button>
+            `;
+        }
+
+        // 🔥 2. 等待老师开始（课程时间到了，老师还没开始）
+        if (!isCancelled && waitingForTeacher) {
+            actionsHtml = `
+                <span style="color: var(--orange); font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-hourglass-half fa-spin"></i> 
+                    ${t.statusWaitingTeacher || '⏳ 等待老师开始...'}
+                    <span style="font-size: 0.8rem; color: var(--gray);">(${t.autoRefresh})</span>
+                </span>
+            `;
+        }
+
+        // 🔥 3. 倒计时中（课程还没开始）
+        if (!isCancelled && isWaitingToStart) {
+            actionsHtml = `
+                <span class="${countdownClass}" style="font-size: 1.1rem;">
+                    ${countdownText || t.statusScheduled}
+                </span>
+                <span style="font-size: 0.7rem; color: var(--gray); margin-left: 8px;">⏳ ${t.autoRefresh}</span>
+            `;
+        }
+
+        // 4. 评价按钮
+        if (!isCancelled && canRate) {
+            actionsHtml += `<button class="action-btn btn-rate" onclick="openRatingModal('${c.id}')"><i class="fas fa-star"></i> ${t.evaluate}</button>`;
+        }
+
+        // 5. 取消课程按钮（老师创建的课）
+        if (!isCancelled && canCancelCourse) {
+            actionsHtml += `<button class="action-btn btn-cancel-course" onclick="openCancelModal('${c.id}','${c.start_time}','${escapeHtml(teacherName)}','${c.course_type}')"><i class="fas fa-trash-alt"></i> ${t.cancelCourse}</button>`;
+        }
+
+        // 6. 取消预约按钮（学生预约的课）
+        if (!isCancelled && canCancelBooking) {
+            actionsHtml += `<button class="action-btn btn-cancel-booking" onclick="openCancelBookingModal('${c.id}','${c.start_time}','${escapeHtml(teacherName)}','${c.course_type}')"><i class="fas fa-undo"></i> ${t.cancelReservation}</button>`;
+        }
+
+        // 7. 已确认状态
+        if (!actionsHtml && !isCancelled) {
+            if (c.teacher_started && c.student_confirmed && isNow) {
+                actionsHtml = `
+                    <span style="color: var(--green); font-weight: 600;"><i class="fas fa-check-circle"></i> ${t.alreadyJoined}</span>
+                    ${c.meeting_link ? `
+                        <button class="action-btn" onclick="window.open('${c.meeting_link}', '_blank')" style="background: #9C27B0; color: white; padding: 8px 20px; font-size: 0.9rem; border-radius: 30px;">
+                            <i class="fas fa-redo"></i> ${t.rejoinClass}
+                        </button>
+                    ` : ''}
+                `;
+            }
+        }
+
+        // ===== 渲染卡片 =====
+        return `
+            <div class="course-card">
+                <div class="course-header">
+                    <span class="course-title">${courseTypeDisplay} - ${timeDisplay}</span>
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        ${sourceBadge}
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                </div>
+                <div class="course-details">
+                    <div class="detail-item"><i class="fas fa-chalkboard-user"></i> ${t.teacher}: ${escapeHtml(teacherName)}</div>
+                    <div class="detail-item"><i class="fas fa-map-marker-alt"></i> ${locationDisplay}</div>
+                    <div class="detail-item"><i class="fas fa-clock"></i> ${t.duration}: ${durationDisplay}</div>
+                    ${c.material_link ? `<div class="detail-item"><i class="fas fa-link"></i> <a href="${c.material_link}" target="_blank">${t.support}</a></div>` : ''}
+                    ${isCancelled && c.cancel_reason ? `<div class="detail-item"><i class="fas fa-ban"></i> ${t.cancelReason}: ${escapeHtml(c.cancel_reason)}</div>` : ''}
+                    ${isStudentBooking ? `<div class="detail-item"><i class="fas fa-calendar-check"></i> ${t.bookedViaAvailability}</div>` : ''}
+                </div>
+                ${hasTeacherComment ? `
+                    <div class="teacher-comment-area">
+                        <i class="fas fa-comment-dots"></i> <strong>${t.teacherCommentLabel}</strong>
+                        <button class="action-btn btn-rate" style="margin-top: 5px; padding: 4px 12px; font-size: 0.75rem;" onclick="showTeacherCommentById('${c.id}')">${t.viewComment}</button>
+                    </div>
+                ` : ''}
+                <div class="course-actions">
+                    ${actionsHtml}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+// ============================================================
+// 实时订阅 - 监听课程变化
+// ============================================================
+let courseSubscription = null;
+
+function subscribeToCourseChanges() {
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    if (!supabase) return;
+
+    if (courseSubscription) {
+        courseSubscription.unsubscribe();
+        courseSubscription = null;
+    }
+
+    courseSubscription = supabase
+        .channel('student_course_changes')
+        .on(
+            'postgres_changes',
+            {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'courses',
+                filter: `student_id=eq.${currentStudent.userId}`
+            },
+            (payload) => {
+                const course = payload.new;
+                const old = payload.old;
+                
+                // 🔥 检测关键变化：老师开始上课 或 状态变化
+                if (course.teacher_started === true && old?.teacher_started !== true) {
+                    console.log('🔔 老师已开始上课，自动刷新');
+                    loadMyCourses();
+                    showToast(t.teacherStarted, 'success');
+                    return;
+                }
+                
+                // 状态变化（完成/取消）
+                if (course.status !== old?.status) {
+                    console.log(`🔄 课程状态变化: ${old?.status} → ${course.status}`);
+                    loadMyCourses();
+                }
+            }
+        )
+        .subscribe((status, err) => {
+            if (status === 'SUBSCRIBED') {
+                console.log('✅ 已订阅课程变化');
+            }
+            if (err) {
+                console.error('❌ 订阅失败:', err);
+            }
+        });
+}
+// ============================================================
+// 倒计时定时器（包含自动刷新逻辑 - 修复版）
+// ============================================================
+let countdownInterval = null;
+
+function startCountdownTimer() {
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+    }
+    
+    countdownInterval = setInterval(() => {
+        // 🔥 检查是否需要自动刷新
+        let needRefresh = false;
+        let refreshReason = '';
+        
+        for (const c of myCourses) {
+            if (c.status === 'cancelled' || c.status === 'completed') continue;
+            
+            const now = new Date();
+            const courseStart = new Date(c.start_time);
+            const endTime = calculateEndTime(c.start_time, c.duration || 2);
+            
+            // 🔥 条件1: 倒计时结束（当前时间 >= 课程开始时间）
+            if (now >= courseStart) {
+                // 如果老师已开始上课，或者课程状态还是 scheduled，需要刷新
+                if (c.teacher_started === true || c.status === 'scheduled') {
+                    needRefresh = true;
+                    refreshReason = '⏰ 倒计时结束，课程开始';
+                    break;
+                }
+            }
+            
+            // 🔥 条件2: 课程已结束但状态未更新
+            if (now > endTime && c.status !== 'completed' && c.status !== 'cancelled') {
+                needRefresh = true;
+                refreshReason = '✅ 课程已结束';
+                break;
+            }
+            
+            // 🔥 条件3: 老师已开始上课（通过 teacher_started 标志）
+            if (c.teacher_started === true && c.status === 'scheduled') {
+                needRefresh = true;
+                refreshReason = '🔔 老师已开始上课';
+                break;
+            }
+            
+            // 🔥 条件4: 老师已开始但学生未确认，且当前时间在课程时间内
+            if (c.teacher_started === true && c.student_confirmed === false) {
+                const now2 = new Date();
+                if (now2 >= courseStart && now2 <= endTime) {
+                    needRefresh = true;
+                    refreshReason = '🔔 等待学生加入';
+                    break;
+                }
+            }
+        }
+        
+        // 🔥 需要刷新时，重新加载数据并更新UI
+        if (needRefresh) {
+            console.log(`🔄 自动刷新: ${refreshReason}`);
+            loadMyCourses();
+            loadAvailableSlots();
+            return;
+        }
+        
+        // 🔥 没有需要刷新的情况，更新倒计时显示
+        const hasCountdown = myCourses.some(c => {
+            const now = new Date();
+            const courseStart = new Date(c.start_time);
+            return now < courseStart && c.status !== 'cancelled' && c.status !== 'completed';
+        });
+        
+        if (hasCountdown) {
+            renderCoursesList();
+        }
+    }, 1000); // 🔥 改为每3秒检查一次，更及时
+}
+
+// ============================================================
+// 页面卸载时清理定时器
+// ============================================================
+window.addEventListener('beforeunload', function() {
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
+});
+
+// ============================================================
+// 确认出席并加入课堂（合并功能）
+// ============================================================
+async function confirmAndJoinClass(courseId) {
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const t = translations[currentLang];
+    
+    try {
+        // 获取课程信息
+        const { data: course, error: fetchError } = await supabase
+            .from('courses')
+            .select('meeting_link, teacher_started')
+            .eq('id', courseId)
+            .single();
+        
+        if (fetchError) throw fetchError;
+        
+        // 检查老师是否已开始上课
+        if (!course.teacher_started) {
+           showToast(t.teacherNotStarted, 'warning');
+            return;
+        }
+        
+        // 更新学生确认状态
+        const { error: updateError } = await supabase
+            .from('courses')
+            .update({ 
+                student_confirmed: true, 
+                status: 'in_progress' 
+            })
+            .eq('id', courseId);
+        
+        if (updateError) {
+            showToast(t.toastError + ': ' + updateError.message, 'error');
+            return;
+        }
+        
+        showToast(t.confirmedAttendance, 'success');
+        await loadMyCourses();
+        
+        // 跳转到会议链接
+        if (course.meeting_link) {
+            window.open(course.meeting_link, '_blank');
+        } else {
+            showToast('⚠️ 没有找到会议链接，请联系老师。', 'warning');
+        }
+        
+    } catch (error) {
+        console.error('加入课堂失败:', error);
+        showToast(t.toastError + ': ' + error.message, 'error');
+    }
+}
         // ============================================================
         // 渲染可用时间段（预约功能）
         // ============================================================
@@ -2764,15 +3184,52 @@ async function sendCourseEmailNotificationToTeacher(courseId, action, studentNam
         // ============================================================
         // 课程操作
         // ============================================================
-        async function confirmCourse(courseId) {
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            const t = translations[currentLang];
-            const { error } = await supabase.from('courses').update({ student_confirmed: true, status: 'in_progress' }).eq('id', courseId);
-            if (error) { showToast(t.toastError, 'error'); return; }
-            showToast(t.toastConfirmed, 'success');
-            await loadMyCourses();
+        // ============================================================
+// 修改 confirmCourse 函数：确认出席并跳转会议链接
+// ============================================================
+async function confirmCourse(courseId) {
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const t = translations[currentLang];
+    
+    try {
+        // 先获取课程信息，拿到会议链接
+        const { data: course, error: fetchError } = await supabase
+            .from('courses')
+            .select('meeting_link')
+            .eq('id', courseId)
+            .single();
+        
+        if (fetchError) throw fetchError;
+        
+        // 更新学生确认状态
+        const { error: updateError } = await supabase
+            .from('courses')
+            .update({ 
+                student_confirmed: true, 
+                status: 'in_progress' 
+            })
+            .eq('id', courseId);
+        
+        if (updateError) {
+            showToast(t.toastError + ': ' + updateError.message, 'error');
+            return;
         }
-
+        
+        showToast(t.confirmedAttendance, 'success');
+        await loadMyCourses();
+        
+        // 如果有会议链接，跳转
+        if (course.meeting_link) {
+            window.open(course.meeting_link, '_blank');
+        } else {
+            showToast('⚠️ 没有找到会议链接，请联系老师。', 'warning');
+        }
+        
+    } catch (error) {
+        console.error('确认出席失败:', error);
+        showToast(t.toastError + ': ' + error.message, 'error');
+    }
+}
         function openRatingModal(courseId) {
             const t = translations[currentLang];
             document.getElementById('ratingTitle').textContent = t.ratingTitle;
@@ -3115,57 +3572,84 @@ async function sendCourseEmailNotificationToTeacher(courseId, action, studentNam
         // ============================================================
         // 初始化
         // ============================================================
-        async function init() {
-            let retries = 0;
-            while (!window.supabaseAuth && retries < 10) {
-                await new Promise(r => setTimeout(r, 500));
-                retries++;
-            }
+     // ============================================================
+// 初始化
+// ============================================================
+async function init() {
+    let retries = 0;
+    while (!window.supabaseAuth && retries < 10) {
+        await new Promise(r => setTimeout(r, 500));
+        retries++;
+    }
 
-            if (!window.supabaseAuth) {
-                document.getElementById('coursesList').innerHTML = '<div class="empty-state">Erreur de chargement. Veuillez rafraîchir.</div>';
-                return;
-            }
+    if (!window.supabaseAuth) {
+        document.getElementById('coursesList').innerHTML = '<div class="empty-state">Erreur de chargement. Veuillez rafraîchir.</div>';
+        return;
+    }
 
-            currentStudent = await getStudentFromToken();
-            if (!currentStudent) return;
+    currentStudent = await getStudentFromToken();
+    if (!currentStudent) return;
 
-            document.getElementById('studentName').textContent = currentStudent.name;
-            document.getElementById('logoutBtn').onclick = () => {
-                sessionStorage.clear();
-                window.location.href = 'examen-civique.html';
-            };
-
-            initModals();
-            initFilters();
-            updateUIText();
-            await loadMyCourses();
-            await loadAvailableSlots();
+    document.getElementById('studentName').textContent = currentStudent.name;
+    document.getElementById('logoutBtn').onclick = () => {
+        // 取消订阅
+        if (courseSubscription) {
+            courseSubscription.unsubscribe();
+            courseSubscription = null;
         }
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
+        sessionStorage.clear();
+        window.location.href = 'examen-civique.html';
+    };
 
-        // 暴露全局函数
-        window.showTeacherCommentById = showTeacherCommentById;
-        window.confirmCourse = confirmCourse;
-        window.openRatingModal = openRatingModal;
-        window.showTeacherComment = showTeacherComment;
-        window.openCancelModal = openCancelModal;
-        window.closeCancelModal = closeCancelModal;
-        window.openCancelBookingModal = openCancelBookingModal;
-        window.closeCancelBookingModal = closeCancelBookingModal;
-        window.executeCancelBooking = executeCancelBooking;
-        window.openFeedbackModal = openFeedbackModal;
-        window.closeFeedbackModal = closeFeedbackModal;
-        window.submitFeedback = submitFeedback;
-        window.openBookingConfirm = openBookingConfirm;
-        window.closeBookingConfirm = closeBookingConfirm;
-        window.confirmBooking = confirmBooking;
-        window.cancelStudentBooking = openCancelBookingModal;
-          // 暴露折叠函数到全局
-        window.toggleTeacherGroup = toggleTeacherGroup;
-        window.toggleDateGroup = toggleDateGroup;
-       
+    initModals();
+    initFilters();
+    updateUIText();
+    await loadMyCourses();
+    await loadAvailableSlots();
 
-        document.addEventListener('DOMContentLoaded', init);
+    // 🔥 启动实时订阅（老师开始上课时自动刷新）
+    subscribeToCourseChanges();
+
+    // 🔥 启动倒计时定时器
+    startCountdownTimer();
+}
+
+// ============================================================
+// 暴露全局函数
+// ============================================================
+window.showTeacherCommentById = showTeacherCommentById;
+window.confirmCourse = confirmCourse;
+window.openRatingModal = openRatingModal;
+window.showTeacherComment = showTeacherComment;
+window.openCancelModal = openCancelModal;
+window.closeCancelModal = closeCancelModal;
+window.openCancelBookingModal = openCancelBookingModal;
+window.closeCancelBookingModal = closeCancelBookingModal;
+window.executeCancelBooking = executeCancelBooking;
+window.openFeedbackModal = openFeedbackModal;
+window.closeFeedbackModal = closeFeedbackModal;
+window.submitFeedback = submitFeedback;
+window.openBookingConfirm = openBookingConfirm;
+window.closeBookingConfirm = closeBookingConfirm;
+window.confirmBooking = confirmBooking;
+window.cancelStudentBooking = openCancelBookingModal;
+window.toggleTeacherGroup = toggleTeacherGroup;
+window.toggleDateGroup = toggleDateGroup;
+window.confirmAndJoinClass = confirmAndJoinClass;
+window.teacherRejoinMeeting = function(meetingLink) {
+    if (meetingLink) {
+        window.open(meetingLink, '_blank');
+    }
+};
+
+// ============================================================
+// DOM 加载完成后初始化
+// ============================================================
+document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>

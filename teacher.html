@@ -1033,132 +1033,228 @@ function formatDateTime(dateStr) {
         // ============================================================
         // 渲染课程列表（可折叠版本 - 中法双语）
         // ============================================================
-        function renderCoursesList() {
-            const container = document.getElementById('coursesList');
-            if (!container) return;
+        // ============================================================
+// 渲染课程列表（老师端 - 完整重写）
+// ============================================================
+function renderCoursesList() {
+    const container = document.getElementById('coursesList');
+    if (!container) return;
+    
+    const filteredCourses = getFilteredCourses();
+    
+    if (filteredCourses.length === 0) { 
+        const emptyMsg = showOnlyUpcoming ? '📭 Aucun cours à venir' : '📭 Aucun cours terminé';
+        container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`; 
+        return; 
+    }
+    
+    // 按日期分组
+    const coursesByDate = {};
+    filteredCourses.forEach(c => {
+        const dateKey = c.start_time.split('T')[0];
+        if (!coursesByDate[dateKey]) {
+            coursesByDate[dateKey] = [];
+        }
+        coursesByDate[dateKey].push(c);
+    });
+    
+    // 排序日期
+    const sortedDates = Object.keys(coursesByDate).sort();
+    
+    let html = '';
+    let dateIndex = 0;
+    
+    sortedDates.forEach(dateKey => {
+        const courses = coursesByDate[dateKey];
+        const dateStr = formatDateLong(dateKey, 'fr');
+        const dateKey2 = `course_date_${dateIndex}`;
+        const isOpen = dateIndex === 0;
+        
+        html += `
+            <div class="date-group">
+                <div class="date-group-header" onclick="toggleDateGroup('${dateKey2}')">
+                    <i class="fas fa-chevron-right toggle-icon ${isOpen ? '' : 'collapsed'}" id="${dateKey2}_icon"></i>
+                    <i class="fas fa-calendar-day" style="color: var(--primary-blue);"></i>
+                    <span class="date-label" id="${dateKey2}_label">${dateStr}</span>
+                    <span class="date-count">${courses.length}</span>
+                </div>
+                <div class="date-group-body ${isOpen ? '' : 'collapsed'}" id="${dateKey2}_body">
+        `;
+        
+        courses.forEach(c => {
+            const now = new Date();
+            const courseStart = new Date(c.start_time);
+            const courseEnd = calculateEndTime(c.start_time, c.duration || 2);
+            const isNow = courseStart <= now && courseEnd >= now;
+            const isExpired = now > courseEnd;
+            const isCancelled = c.status === 'cancelled';
+            const timeRange = formatTimeRange(c.start_time, c.duration || 2);
             
-            const filteredCourses = getFilteredCourses();
-            
-            if (filteredCourses.length === 0) { 
-                const emptyMsg = showOnlyUpcoming ? '📭 Aucun cours à venir' : '📭 Aucun cours terminé';
-                container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`; 
-                return; 
+            // 状态判断
+            let statusText = '', statusClass = '';
+            if (isCancelled) {
+                statusText = '❌ Annulé';
+                statusClass = 'status-cancelled';
+            } else if (c.status === 'completed') {
+                statusText = '✅ Terminé';
+                statusClass = 'status-completed';
+            } else if (c.teacher_started && c.student_confirmed && isNow) {
+                statusText = '🔄 En cours';
+                statusClass = 'status-in-progress';
+            } else if (c.teacher_started && !c.student_confirmed && isNow) {
+                statusText = '⏳ En attente élève';
+                statusClass = 'status-pending';
+            } else if (courseStart > now) {
+                statusText = '📅 Planifié';
+                statusClass = 'status-scheduled';
+            } else if (isExpired && !c.teacher_started) {
+                statusText = '⏰ Délai dépassé';
+                statusClass = 'status-cancelled';
+            } else {
+                statusText = '📅 Planifié';
+                statusClass = 'status-scheduled';
             }
             
-            // 按日期分组
-            const coursesByDate = {};
-            filteredCourses.forEach(c => {
-                const dateKey = c.start_time.split('T')[0];
-                if (!coursesByDate[dateKey]) {
-                    coursesByDate[dateKey] = [];
-                }
-                coursesByDate[dateKey].push(c);
-            });
+            // 左侧边框颜色
+            let borderColor = '#3498db';
+            if (isCancelled) borderColor = '#7f8c8d';
+            else if (c.status === 'completed') borderColor = '#2ecc71';
+            else if (c.teacher_started) borderColor = '#f39c12';
             
-            // 排序日期
-            const sortedDates = Object.keys(coursesByDate).sort();
+            // 构建操作按钮
+            let actionsHtml = '';
             
-            let html = '';
-            let dateIndex = 0;
-            
-            sortedDates.forEach(dateKey => {
-                const courses = coursesByDate[dateKey];
-                const dateStr = formatDateLong(dateKey, 'fr'); // 默认法文，后面再处理切换
-                const dateKey2 = `course_date_${dateIndex}`;
-                const isOpen = dateIndex === 0; // 默认展开第一个日期
-                
-                html += `
-                    <div class="date-group">
-                        <div class="date-group-header" onclick="toggleDateGroup('${dateKey2}')">
-                            <i class="fas fa-chevron-right toggle-icon ${isOpen ? '' : 'collapsed'}" id="${dateKey2}_icon"></i>
-                            <i class="fas fa-calendar-day" style="color: var(--primary-blue);"></i>
-                            <span class="date-label" id="${dateKey2}_label">${dateStr}</span>
-                            <span class="date-count">${courses.length}</span>
-                        </div>
-                        <div class="date-group-body ${isOpen ? '' : 'collapsed'}" id="${dateKey2}_body">
+            // 1. 编辑地点/会议链接（课程未取消、未完成）
+            if (!isCancelled && c.status !== 'completed') {
+                actionsHtml += `
+                    <button class="action-btn btn-edit" onclick="openEditCourse('${c.id}','${escapeHtml(c.location||'')}','${escapeHtml(c.meeting_link||'')}')">
+                        <i class="fas fa-map-marker-alt"></i> 📍 Lieu / Meet
+                    </button>
                 `;
-                
-                courses.forEach(c => {
-                    const now = new Date();
-                    const courseStart = new Date(c.start_time);
-                    const courseEnd = calculateEndTime(c.start_time, c.duration || 2);
-                    const isNow = courseStart <= now && courseEnd >= now;
-                    const isExpired = now > courseEnd;
-                    const isCancelled = c.status === 'cancelled';
-                    const timeRange = formatTimeRange(c.start_time, c.duration || 2);
-                    
-                    let statusText = '', statusClass = '';
-                    if (isCancelled) {
-                        statusText = '❌ Annulé';
-                        statusClass = 'status-cancelled';
-                    } else if (c.status === 'completed') {
-                        statusText = '✅ Terminé';
-                        statusClass = 'status-completed';
-                    } else if (c.teacher_started && c.student_confirmed && isNow) {
-                        statusText = '🔄 En cours';
-                        statusClass = 'status-in-progress';
-                    } else if (c.teacher_started && !c.student_confirmed && isNow) {
-                        statusText = '⏳ En attente élève';
-                        statusClass = 'status-pending';
-                    } else if (courseStart > now) {
-                        statusText = '📅 Planifié';
-                        statusClass = 'status-scheduled';
-                    } else if (isExpired && !c.teacher_started) {
-                        statusText = '⏰ Délai dépassé';
-                        statusClass = 'status-cancelled';
-                    } else {
-                        statusText = '📅 Planifié';
-                        statusClass = 'status-scheduled';
-                    }
-                    
-                    html += `
-                        <div class="course-card" style="border-left: 4px solid ${isCancelled ? '#7f8c8d' : (c.status === 'completed' ? '#2ecc71' : (c.teacher_started ? '#f39c12' : '#3498db'))};">
-                            <div class="course-header">
-                                <span class="course-title">${getTypeText(c.course_type)} - ${formatDateTime(c.start_time)} (${timeRange})</span>
-                                <span class="status-badge ${statusClass}">${statusText}</span>
-                            </div>
-                            <div class="course-details">
-                                <div class="detail-item"><i class="fas fa-user-graduate"></i> Élève: ${escapeHtml(c.students?.name || 'N/A')}</div>
-                                <div class="detail-item"><i class="fas fa-map-marker-alt"></i> ${c.location || '📍 À définir'}</div>
-                                <div class="detail-item"><i class="fas fa-video"></i> ${c.meeting_link ? `<a href="${c.meeting_link}" target="_blank">🔗 Lien Meet</a>` : '📹 Non défini'}</div>
-                                ${c.material_link ? `<div class="detail-item"><i class="fas fa-paperclip"></i> <a href="${c.material_link}" target="_blank">📎 Support de cours</a></div>` : ''}
-                                ${c.cancel_reason ? `<div class="detail-item"><i class="fas fa-ban"></i> Motif annulation: "${escapeHtml(c.cancel_reason)}"</div>` : ''}
-                                ${c.student_rating ? `<div class="detail-item"><i class="fas fa-star"></i> Note élève: ${renderStars(c.student_rating)}</div>` : ''}
-                                ${c.student_comment ? `<div class="detail-item"><i class="fas fa-comment-dots"></i> Commentaire élève: "${escapeHtml(c.student_comment)}"</div>` : ''}
-                                ${c.teacher_comment ? `<div class="detail-item"><i class="fas fa-comment"></i> Votre commentaire: "${escapeHtml(c.teacher_comment)}"</div>` : ''}
-                            </div>
-                            <div class="course-actions">
-                                ${!isCancelled && c.status !== 'completed' ? `<button class="action-btn btn-edit" onclick="openEditCourse('${c.id}','${escapeHtml(c.location||'')}','${escapeHtml(c.meeting_link||'')}')"><i class="fas fa-map-marker-alt"></i> 📍 Lieu / Meet</button>` : ''}
-                                
-                                ${!isCancelled && !c.teacher_started && c.status !== 'completed' && !isExpired ? `<button class="action-btn btn-start" onclick="startCourse('${c.id}')"><i class="fas fa-play"></i> ▶️ Démarrer</button>` : ''}
-                                
-                                ${!isCancelled && c.status === 'scheduled' && !c.teacher_started ? `<button class="action-btn btn-cancel" onclick="openCancelModal('${c.id}','${c.course_type}','${escapeHtml(c.students?.name || '')}','${c.start_time}')"><i class="fas fa-ban"></i> ❌ Annuler</button>` : ''}
-                                
-                                ${!isCancelled && !c.teacher_started && c.status !== 'completed' && isExpired ? `<span class="action-btn" style="background:#e74c3c; color:white; cursor:default;"><i class="fas fa-exclamation-triangle"></i> ⏰ Délai dépassé</span>` : ''}
-                                
-                                ${!isCancelled && c.teacher_started && !c.student_confirmed ? `<span class="action-btn" style="background:#f39c12; color:white; cursor:default;"><i class="fas fa-hourglass-half"></i> ⏳ Attente élève</span>` : ''}
-                                
-                                ${!isCancelled && c.teacher_started && c.status !== 'completed' ? `<button class="action-btn btn-end" onclick="endCourse('${c.id}')"><i class="fas fa-stop"></i> ⏹️ Terminer</button>` : ''}
-                                
-                                ${!isCancelled && c.status !== 'completed' ? `<button class="action-btn btn-material" onclick="openMaterialModal('${c.id}','${escapeHtml(c.material_link||'')}','${escapeHtml(c.teacher_comment||'')}')"><i class="fas fa-paperclip"></i> 📎 Support / Commentaire</button>` : ''}
-                                
-                                ${!isCancelled && c.status === 'completed' && !c.teacher_comment ? `<button class="action-btn btn-material" onclick="openMaterialModal('${c.id}','${escapeHtml(c.material_link||'')}','${escapeHtml(c.teacher_comment||'')}')"><i class="fas fa-comment"></i> 💬 Ajouter commentaire</button>` : ''}
-                            </div>
-                        </div>
+            }
+            
+            // 2. 开始上课按钮（未取消、未开始、未完成、未过期）
+            if (!isCancelled && !c.teacher_started && c.status !== 'completed' && !isExpired) {
+                actionsHtml += `
+                    <button class="action-btn btn-start" onclick="startCourse('${c.id}')" style="background: #27ae60; padding: 8px 24px; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(39,174,96,0.3);">
+                        <i class="fas fa-play"></i> ▶️ Démarrer
+                    </button>
+                `;
+            }
+            
+            // 3. 重新加入按钮（老师已开始、未取消、未完成）
+            if (!isCancelled && c.teacher_started && c.status !== 'completed') {
+                if (c.meeting_link) {
+                    actionsHtml += `
+                        <button class="action-btn" onclick="teacherRejoinMeeting('${c.meeting_link}')" style="background: #9C27B0; color: white; padding: 8px 20px; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(156,39,176,0.3);">
+                            <i class="fas fa-redo"></i> 🔄 Rejoindre
+                        </button>
                     `;
-                });
-                
-                html += `
-                        </div>
-                    </div>
-                `;
-                
-                dateIndex++;
-            });
+                } else {
+                    actionsHtml += `
+                        <span class="action-btn" style="background: #7f8c8d; color: white; cursor: default;">
+                            <i class="fas fa-exclamation-triangle"></i> ⚠️ Pas de lien
+                        </span>
+                    `;
+                }
+            }
             
-            container.innerHTML = html;
-        }
-
+            // 4. 取消课程按钮（未取消、未开始、计划中）
+            if (!isCancelled && c.status === 'scheduled' && !c.teacher_started) {
+                actionsHtml += `
+                    <button class="action-btn btn-cancel" onclick="openCancelModal('${c.id}','${c.course_type}','${escapeHtml(c.students?.name || '')}','${c.start_time}')">
+                        <i class="fas fa-ban"></i> ❌ Annuler
+                    </button>
+                `;
+            }
+            
+            // 5. 过期状态（未取消、未开始、未完成、已过期）
+            if (!isCancelled && !c.teacher_started && c.status !== 'completed' && isExpired) {
+                actionsHtml += `
+                    <span class="action-btn" style="background:#e74c3c; color:white; cursor:default;">
+                        <i class="fas fa-exclamation-triangle"></i> ⏰ Délai dépassé
+                    </span>
+                `;
+            }
+            
+            // 6. 等待学生确认（老师已开始、学生未确认）
+            if (!isCancelled && c.teacher_started && !c.student_confirmed && c.status !== 'completed') {
+                actionsHtml += `
+                    <span class="action-btn" style="background:#f39c12; color:white; cursor:default;">
+                        <i class="fas fa-hourglass-half"></i> ⏳ Attente élève
+                    </span>
+                `;
+            }
+            
+            // 7. 结束课程按钮（老师已开始、学生已确认、未完成）
+            if (!isCancelled && c.teacher_started && c.student_confirmed && c.status !== 'completed') {
+                actionsHtml += `
+                    <button class="action-btn btn-end" onclick="endCourse('${c.id}')" style="background: #e74c3c; padding: 8px 20px;">
+                        <i class="fas fa-stop"></i> ⏹️ Terminer
+                    </button>
+                `;
+            }
+            
+            // 8. 支持/评论按钮（未取消）
+            if (!isCancelled && c.status !== 'completed') {
+                actionsHtml += `
+                    <button class="action-btn btn-material" onclick="openMaterialModal('${c.id}','${escapeHtml(c.material_link||'')}','${escapeHtml(c.teacher_comment||'')}')">
+                        <i class="fas fa-paperclip"></i> 📎 Support
+                    </button>
+                `;
+            }
+            
+            // 9. 已完成课程 - 添加评论按钮
+            if (!isCancelled && c.status === 'completed' && !c.teacher_comment) {
+                actionsHtml += `
+                    <button class="action-btn btn-material" onclick="openMaterialModal('${c.id}','${escapeHtml(c.material_link||'')}','${escapeHtml(c.teacher_comment||'')}')" style="background: #8e44ad;">
+                        <i class="fas fa-comment"></i> 💬 Ajouter commentaire
+                    </button>
+                `;
+            }
+            
+            // 10. 如果没有任何操作按钮，显示"已完成"
+            if (!actionsHtml && !isCancelled) {
+                actionsHtml = `
+                    <span style="color: var(--green); font-weight: 600;">
+                        <i class="fas fa-check-circle"></i> ✅ Cours terminé
+                    </span>
+                `;
+            }
+            
+            html += `
+                <div class="course-card" style="border-left: 4px solid ${borderColor};">
+                    <div class="course-header">
+                        <span class="course-title">${getTypeText(c.course_type)} - ${formatDateTime(c.start_time)} (${timeRange})</span>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="detail-item"><i class="fas fa-user-graduate"></i> Élève: ${escapeHtml(c.students?.name || 'N/A')}</div>
+                        <div class="detail-item"><i class="fas fa-map-marker-alt"></i> ${c.location || '📍 À définir'}</div>
+                        <div class="detail-item"><i class="fas fa-video"></i> ${c.meeting_link ? `<a href="${c.meeting_link}" target="_blank">🔗 Lien Meet</a>` : '📹 Non défini'}</div>
+                        ${c.material_link ? `<div class="detail-item"><i class="fas fa-paperclip"></i> <a href="${c.material_link}" target="_blank">📎 Support de cours</a></div>` : ''}
+                        ${c.cancel_reason ? `<div class="detail-item"><i class="fas fa-ban"></i> Motif annulation: "${escapeHtml(c.cancel_reason)}"</div>` : ''}
+                        ${c.student_rating ? `<div class="detail-item"><i class="fas fa-star"></i> Note élève: ${renderStars(c.student_rating)}</div>` : ''}
+                        ${c.student_comment ? `<div class="detail-item"><i class="fas fa-comment-dots"></i> Commentaire élève: "${escapeHtml(c.student_comment)}"</div>` : ''}
+                        ${c.teacher_comment ? `<div class="detail-item"><i class="fas fa-comment"></i> Votre commentaire: "${escapeHtml(c.teacher_comment)}"</div>` : ''}
+                    </div>
+                    <div class="course-actions">
+                        ${actionsHtml}
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `
+                </div>
+            </div>
+        `;
+        
+        dateIndex++;
+    });
+    
+    container.innerHTML = html;
+}
         // ============================================================
         // 折叠/展开函数（老师端）
         // ============================================================
@@ -1195,21 +1291,61 @@ function formatDateTime(dateStr) {
             showToast('Informations mises à jour ✓', 'success');
             await loadCourses();
         }
+        // ============================================================
+// 老师端 - 开始上课（自动跳转会议 + 更新状态）
+// ============================================================
+async function startCourse(id) {
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const now = new Date();
+    const localTimeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+    
+    try {
+        // 先获取课程信息，拿到会议链接
+        const { data: course, error: fetchError } = await supabase
+            .from('courses')
+            .select('meeting_link')
+            .eq('id', id)
+            .single();
         
-        async function startCourse(id) {
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            const now = new Date();
-            const localTimeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
-            
-            const { error } = await supabase
-                .from('courses')
-                .update({ teacher_started: true, actual_start: localTimeStr, status: 'in_progress' })
-                .eq('id', id);
-            if (error) { showToast('Erreur lors du démarrage', 'error'); return; }
-            showToast('Cours démarré ! En attente de l\'élève ✓', 'success');
-            await loadCourses();
+        if (fetchError) throw fetchError;
+        
+        // 🔥 更新课程状态：teacher_started = true, status = 'in_progress'
+        const { error } = await supabase
+            .from('courses')
+            .update({ 
+                teacher_started: true,      // 老师已开始
+                actual_start: localTimeStr, // 实际开始时间
+                status: 'in_progress'       // 状态改为进行中
+            })
+            .eq('id', id);
+        
+        if (error) throw error;
+        
+        showToast('✅ Cours démarré !', 'success');
+        await loadCourses(); // 重新加载列表
+        
+        // 如果有会议链接，自动跳转
+        if (course.meeting_link) {
+            window.open(course.meeting_link, '_blank');
+        } else {
+            showToast('⚠️ Aucun lien Meet configuré. Veuillez en ajouter via "📍 Lieu / Meet".', 'warning');
         }
         
+    } catch (error) {
+        console.error('开始课程失败:', error);
+        showToast('❌ Erreur: ' + error.message, 'error');
+    }
+}
+  // ============================================================
+        // 新增：重新加入会议（老师端）
+        // ============================================================
+        function teacherRejoinMeeting(meetingLink) {
+            if (meetingLink) {
+                window.open(meetingLink, '_blank');
+            } else {
+                showToast('⚠️ Aucun lien Meet configuré.', 'warning');
+            }
+        }
         async function endCourse(id) {
             const supabase = window.supabaseAuth.getSupabaseClient();
             const now = new Date();
@@ -1697,8 +1833,9 @@ async function loadAvailabilities() {
         window.openCancelModal = openCancelModal;
         window.deleteAvailability = deleteAvailability;
         window.cancelBookingSlot = cancelBookingSlot;
-              window.toggleDateGroup = toggleDateGroup;
-          window.toggleDateGroupAvail = toggleDateGroupAvail;
+        window.toggleDateGroup = toggleDateGroup;
+        window.teacherRejoinMeeting = teacherRejoinMeeting;
+        window.toggleDateGroupAvail = toggleDateGroupAvail;
         init();
     </script>
 </body>
