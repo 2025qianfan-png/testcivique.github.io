@@ -925,68 +925,68 @@ function formatDateTime(dateStr) {
                 });
             });
             
-            document.getElementById('confirmCancelBtn').onclick = async () => {
-                let selectedReason = null;
-                document.querySelectorAll('input[name="cancelReason"]').forEach(r => {
-                    if (r.checked) selectedReason = r.value;
-                });
-                
-                if (selectedReason === '其他') {
-                    const customReason = document.getElementById('customReason').value.trim();
-                    if (customReason) selectedReason = customReason;
-                }
-                
-                if (!selectedReason) {
-                    showToast('Veuillez sélectionner un motif d\'annulation', 'error');
-                    return;
-                }
-                
-                const supabase = window.supabaseAuth.getSupabaseClient();
-                
-                const { data: courseData } = await supabase
-                    .from('courses')
-                    .select('student_id, duration, status')
-                    .eq('id', pendingCancelCourse.courseId)
-                    .single();
-                
-                if (courseData) {
-                    const isConsumingStatus = courseData.status === 'scheduled' || courseData.status === 'in_progress' || courseData.status === 'completed';
-                    if (isConsumingStatus && courseData.student_id && courseData.duration) {
-                        const { data: studentData } = await supabase
-                            .from('students')
-                            .select('credit')
-                            .eq('id', courseData.student_id)
-                            .single();
-                        
-                        if (studentData) {
-                            const newCredit = (studentData.credit || 0) + courseData.duration;
-                            await supabase
-                                .from('students')
-                                .update({ credit: newCredit })
-                                .eq('id', courseData.student_id);
-                            console.log(`课时已返还: +${courseData.duration}小时，学生新课时: ${newCredit}`);
-                        }
-                    }
-                }
-                
-                const { error } = await supabase
-                    .from('courses')
-                    .update({ 
-                        status: 'cancelled',
-                        cancel_reason: selectedReason
-                    })
-                    .eq('id', pendingCancelCourse.courseId);
-                
-                if (error) {
-                    showToast('Erreur lors de l\'annulation', 'error');
-                } else {
-                    showToast('Cours annulé ✓ (crédits restitués)', 'success');
-                    document.getElementById('cancelCourseModal').style.display = 'none';
-                    await loadCourses();
-                }
-                pendingCancelCourse = null;
-            };
+          // 取消课程 - 保持原有逻辑（返还课时）
+document.getElementById('confirmCancelBtn').onclick = async () => {
+    let selectedReason = null;
+    document.querySelectorAll('input[name="cancelReason"]').forEach(r => {
+        if (r.checked) selectedReason = r.value;
+    });
+    
+    if (selectedReason === '其他') {
+        const customReason = document.getElementById('customReason').value.trim();
+        if (customReason) selectedReason = customReason;
+    }
+    
+    if (!selectedReason) {
+        showToast('Veuillez sélectionner un motif d\'annulation', 'error');
+        return;
+    }
+    
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    
+    const { data: courseData } = await supabase
+        .from('courses')
+        .select('student_id, duration, status')
+        .eq('id', pendingCancelCourse.courseId)
+        .single();
+    
+    if (courseData) {
+        const isConsumingStatus = courseData.status === 'scheduled' || courseData.status === 'in_progress' || courseData.status === 'completed';
+        if (isConsumingStatus && courseData.student_id && courseData.duration) {
+            const { data: studentData } = await supabase
+                .from('students')
+                .select('credit')
+                .eq('id', courseData.student_id)
+                .single();
             
+            if (studentData) {
+                const newCredit = (studentData.credit || 0) + courseData.duration;
+                await supabase
+                    .from('students')
+                    .update({ credit: newCredit })
+                    .eq('id', courseData.student_id);
+                console.log(`课时已返还: +${courseData.duration}小时，学生新课时: ${newCredit}`);
+            }
+        }
+    }
+    
+    const { error } = await supabase
+        .from('courses')
+        .update({ 
+            status: 'cancelled',
+            cancel_reason: selectedReason
+        })
+        .eq('id', pendingCancelCourse.courseId);
+    
+    if (error) {
+        showToast('Erreur lors de l\'annulation', 'error');
+    } else {
+        showToast('Cours annulé ✓ (crédits restitués)', 'success');
+        document.getElementById('cancelCourseModal').style.display = 'none';
+        await loadCourses();
+    }
+    pendingCancelCourse = null;
+};
             document.getElementById('closeCancelModalBtn').onclick = () => {
                 document.getElementById('cancelCourseModal').style.display = 'none';
                 pendingCancelCourse = null;
@@ -1255,7 +1255,230 @@ function renderCoursesList() {
     
     container.innerHTML = html;
 }
-        // ============================================================
+        
+
+// ============================================================
+// 渲染课程列表（老师端 - 完整版）
+// ============================================================
+function renderCoursesList() {
+    const container = document.getElementById('coursesList');
+    if (!container) return;
+    
+    const filteredCourses = getFilteredCourses();
+    
+    if (filteredCourses.length === 0) { 
+        const emptyMsg = showOnlyUpcoming ? '📭 Aucun cours à venir' : '📭 Aucun cours terminé';
+        container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`; 
+        return; 
+    }
+    
+    // 按日期分组
+    const coursesByDate = {};
+    filteredCourses.forEach(c => {
+        const dateKey = c.start_time.split('T')[0];
+        if (!coursesByDate[dateKey]) {
+            coursesByDate[dateKey] = [];
+        }
+        coursesByDate[dateKey].push(c);
+    });
+    
+    // 排序日期
+    const sortedDates = Object.keys(coursesByDate).sort();
+    
+    let html = '';
+    let dateIndex = 0;
+    
+    sortedDates.forEach(dateKey => {
+        const courses = coursesByDate[dateKey];
+        const dateStr = formatDateLong(dateKey, 'fr');
+        const dateKey2 = `course_date_${dateIndex}`;
+        const isOpen = dateIndex === 0;
+        
+        html += `
+            <div class="date-group">
+                <div class="date-group-header" onclick="toggleDateGroup('${dateKey2}')">
+                    <i class="fas fa-chevron-right toggle-icon ${isOpen ? '' : 'collapsed'}" id="${dateKey2}_icon"></i>
+                    <i class="fas fa-calendar-day" style="color: var(--primary-blue);"></i>
+                    <span class="date-label" id="${dateKey2}_label">${dateStr}</span>
+                    <span class="date-count">${courses.length}</span>
+                </div>
+                <div class="date-group-body ${isOpen ? '' : 'collapsed'}" id="${dateKey2}_body">
+        `;
+        
+        courses.forEach(c => {
+            const now = new Date();
+            const courseStart = new Date(c.start_time);
+            const courseEnd = calculateEndTime(c.start_time, c.duration || 2);
+            const isNow = courseStart <= now && courseEnd >= now;
+            const isExpired = now > courseEnd;
+            const isCancelled = c.status === 'cancelled';
+            const timeRange = formatTimeRange(c.start_time, c.duration || 2);
+            
+            // 状态判断
+            let statusText = '', statusClass = '';
+            if (isCancelled) {
+                statusText = '❌ Annulé';
+                statusClass = 'status-cancelled';
+            } else if (c.status === 'completed') {
+                statusText = '✅ Terminé';
+                statusClass = 'status-completed';
+            } else if (c.teacher_started && c.student_confirmed && isNow) {
+                statusText = '🔄 En cours';
+                statusClass = 'status-in-progress';
+            } else if (c.teacher_started && !c.student_confirmed && isNow) {
+                statusText = '⏳ En attente élève';
+                statusClass = 'status-pending';
+            } else if (courseStart > now) {
+                statusText = '📅 Planifié';
+                statusClass = 'status-scheduled';
+            } else if (isExpired && !c.teacher_started) {
+                statusText = '⏰ Délai dépassé';
+                statusClass = 'status-cancelled';
+            } else {
+                statusText = '📅 Planifié';
+                statusClass = 'status-scheduled';
+            }
+            
+            // 左侧边框颜色
+            let borderColor = '#3498db';
+            if (isCancelled) borderColor = '#7f8c8d';
+            else if (c.status === 'completed') borderColor = '#2ecc71';
+            else if (c.teacher_started) borderColor = '#f39c12';
+            
+            // 构建操作按钮
+            let actionsHtml = '';
+            
+            // 1. 编辑地点/会议链接（课程未取消、未完成）
+            if (!isCancelled && c.status !== 'completed') {
+                actionsHtml += `
+                    <button class="action-btn btn-edit" onclick="openEditCourse('${c.id}','${escapeHtml(c.location||'')}','${escapeHtml(c.meeting_link||'')}')">
+                        <i class="fas fa-map-marker-alt"></i> 📍 Lieu / Meet
+                    </button>
+                `;
+            }
+            
+            // 2. 开始上课按钮（未取消、未开始、未完成、未过期）
+            if (!isCancelled && !c.teacher_started && c.status !== 'completed' && !isExpired) {
+                actionsHtml += `
+                    <button class="action-btn btn-start" onclick="startCourse('${c.id}')" style="background: #27ae60; padding: 8px 24px; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(39,174,96,0.3);">
+                        <i class="fas fa-play"></i> ▶️ Démarrer
+                    </button>
+                `;
+            }
+            
+            // 3. 重新加入按钮（老师已开始、未取消、未完成）
+            if (!isCancelled && c.teacher_started && c.status !== 'completed') {
+                if (c.meeting_link) {
+                    actionsHtml += `
+                        <button class="action-btn" onclick="teacherRejoinMeeting('${c.meeting_link}')" style="background: #9C27B0; color: white; padding: 8px 20px; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(156,39,176,0.3);">
+                            <i class="fas fa-redo"></i> 🔄 Rejoindre
+                        </button>
+                    `;
+                } else {
+                    actionsHtml += `
+                        <span class="action-btn" style="background: #7f8c8d; color: white; cursor: default;">
+                            <i class="fas fa-exclamation-triangle"></i> ⚠️ Pas de lien
+                        </span>
+                    `;
+                }
+            }
+            
+            // 4. 取消课程按钮（未取消、未开始、计划中）
+            if (!isCancelled && c.status === 'scheduled' && !c.teacher_started) {
+                actionsHtml += `
+                    <button class="action-btn btn-cancel" onclick="openCancelModal('${c.id}','${c.course_type}','${escapeHtml(c.students?.name || '')}','${c.start_time}')">
+                        <i class="fas fa-ban"></i> ❌ Annuler
+                    </button>
+                `;
+            }
+            
+            // 5. 🔥 结束课程按钮（老师已开始、未完成）- 不需要学生确认，不扣费
+            if (!isCancelled && c.teacher_started && c.status !== 'completed') {
+                actionsHtml += `
+                    <button class="action-btn btn-end" onclick="endCourse('${c.id}')" style="background: #e74c3c; padding: 8px 20px;">
+                        <i class="fas fa-stop"></i> ⏹️ Terminer
+                    </button>
+                `;
+            }
+            
+            // 6. 🔥 强制结束按钮（未取消、未开始、已过期）- 不扣费
+            if (!isCancelled && !c.teacher_started && c.status !== 'completed' && isExpired) {
+                actionsHtml += `
+                    <button class="action-btn" onclick="forceEndCourse('${c.id}')" style="background: #e67e22; color: white; padding: 8px 20px;">
+                        <i class="fas fa-forward"></i> ⏭️ Forcer la fin
+                    </button>
+                `;
+            }
+            
+            // 7. 等待学生确认（老师已开始、学生未确认、未完成）
+            if (!isCancelled && c.teacher_started && !c.student_confirmed && c.status !== 'completed') {
+                actionsHtml += `
+                    <span class="action-btn" style="background:#f39c12; color:white; cursor:default;">
+                        <i class="fas fa-hourglass-half"></i> ⏳ Attente élève
+                    </span>
+                `;
+            }
+            
+            // 8. 支持/评论按钮（未取消）
+            if (!isCancelled && c.status !== 'completed') {
+                actionsHtml += `
+                    <button class="action-btn btn-material" onclick="openMaterialModal('${c.id}','${escapeHtml(c.material_link||'')}','${escapeHtml(c.teacher_comment||'')}')">
+                        <i class="fas fa-paperclip"></i> 📎 Support
+                    </button>
+                `;
+            }
+            
+            // 9. 已完成课程 - 添加评论按钮
+            if (!isCancelled && c.status === 'completed' && !c.teacher_comment) {
+                actionsHtml += `
+                    <button class="action-btn btn-material" onclick="openMaterialModal('${c.id}','${escapeHtml(c.material_link||'')}','${escapeHtml(c.teacher_comment||'')}')" style="background: #8e44ad;">
+                        <i class="fas fa-comment"></i> 💬 Ajouter commentaire
+                    </button>
+                `;
+            }
+            
+            // 10. 如果没有任何操作按钮，显示"已完成"
+            if (!actionsHtml && !isCancelled) {
+                actionsHtml = `
+                    <span style="color: var(--green); font-weight: 600;">
+                        <i class="fas fa-check-circle"></i> ✅ Cours terminé
+                    </span>
+                `;
+            }
+            
+            html += `
+                <div class="course-card" style="border-left: 4px solid ${borderColor};">
+                    <div class="course-header">
+                        <span class="course-title">${getTypeText(c.course_type)} - ${formatDateTime(c.start_time)} (${timeRange})</span>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="detail-item"><i class="fas fa-user-graduate"></i> Élève: ${escapeHtml(c.students?.name || 'N/A')}</div>
+                        <div class="detail-item"><i class="fas fa-map-marker-alt"></i> ${c.location || '📍 À définir'}</div>
+                        <div class="detail-item"><i class="fas fa-video"></i> ${c.meeting_link ? `<a href="${c.meeting_link}" target="_blank">🔗 Lien Meet</a>` : '📹 Non défini'}</div>
+                        ${c.material_link ? `<div class="detail-item"><i class="fas fa-paperclip"></i> <a href="${c.material_link}" target="_blank">📎 Support de cours</a></div>` : ''}
+                        ${c.cancel_reason ? `<div class="detail-item"><i class="fas fa-ban"></i> Motif annulation: "${escapeHtml(c.cancel_reason)}"</div>` : ''}
+                        ${c.student_rating ? `<div class="detail-item"><i class="fas fa-star"></i> Note élève: ${renderStars(c.student_rating)}</div>` : ''}
+                        ${c.student_comment ? `<div class="detail-item"><i class="fas fa-comment-dots"></i> Commentaire élève: "${escapeHtml(c.student_comment)}"</div>` : ''}
+                        ${c.teacher_comment ? `<div class="detail-item"><i class="fas fa-comment"></i> Votre commentaire: "${escapeHtml(c.teacher_comment)}"</div>` : ''}
+                    </div>
+                    <div class="course-actions">
+                        ${actionsHtml}
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `
+                </div>
+            </div>
+        `;
+        
+        dateIndex++;
+    });
+    
+    container.innerHTML = html;
+}// ============================================================
         // 折叠/展开函数（老师端）
         // ============================================================
         function toggleDateGroup(dateKey) {
@@ -1346,20 +1569,71 @@ async function startCourse(id) {
                 showToast('⚠️ Aucun lien Meet configuré.', 'warning');
             }
         }
-        async function endCourse(id) {
-            const supabase = window.supabaseAuth.getSupabaseClient();
-            const now = new Date();
-            const localTimeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
-            
-            const { error } = await supabase
-                .from('courses')
-                .update({ actual_end: localTimeStr, status: 'completed' })
-                .eq('id', id);
-            if (error) { showToast('Erreur', 'error'); return; }
-            showToast('Cours terminé ! ✓', 'success');
-            await loadCourses();
-        }
+        // ============================================================
+// 修改：老师端 - 结束课程（不需要学生确认，不扣费）
+// ============================================================
+async function endCourse(id) {
+    if (!confirm('Voulez-vous vraiment terminer ce cours ?')) return;
+    
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const now = new Date();
+    const localTimeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+    
+    try {
+        // 更新课程状态为 completed，自动确认学生
+        const { error } = await supabase
+            .from('courses')
+            .update({ 
+                actual_end: localTimeStr, 
+                status: 'completed',
+                student_confirmed: true  // 自动标记学生已确认
+            })
+            .eq('id', id);
         
+        if (error) throw error;
+        
+        showToast('✅ Cours terminé !', 'success');
+        await loadCourses();
+        
+    } catch (error) {
+        console.error('结束课程失败:', error);
+        showToast('❌ Erreur: ' + error.message, 'error');
+    }
+}
+// ============================================================
+// 修改：强制结束课程（老师未点击开始，直接结束，不扣费）
+// ============================================================
+async function forceEndCourse(id) {
+    if (!confirm('⚠️ Ce cours n\'a pas été démarré. Voulez-vous vraiment le terminer ?')) return;
+    
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const now = new Date();
+    const localTimeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+    
+    try {
+        // 更新状态为已完成
+        const { error } = await supabase
+            .from('courses')
+            .update({ 
+                actual_end: localTimeStr, 
+                status: 'completed',
+                teacher_started: true,
+                student_confirmed: true
+            })
+            .eq('id', id);
+        
+        if (error) throw error;
+        
+        showToast('✅ Cours forcé terminé !', 'success');
+        await loadCourses();
+        
+    } catch (error) {
+        console.error('强制结束失败:', error);
+        showToast('❌ Erreur: ' + error.message, 'error');
+    }
+}
+
+
         function openMaterialModal(courseId, materialLink, teacherComment) {
             document.getElementById('materialCourseId').value = courseId;
             document.getElementById('materialLink').value = materialLink || '';
@@ -1836,6 +2110,8 @@ async function loadAvailabilities() {
         window.toggleDateGroup = toggleDateGroup;
         window.teacherRejoinMeeting = teacherRejoinMeeting;
         window.toggleDateGroupAvail = toggleDateGroupAvail;
+        // 暴露到全局
+        window.forceEndCourse = forceEndCourse;
         init();
     </script>
 </body>
