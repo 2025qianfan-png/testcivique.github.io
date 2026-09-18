@@ -881,7 +881,7 @@
                 const { date, time } = formatDateSimple(course.start_time);
                 const courseTypeName = getTypeDisplayText(course.course_type);
 
-                const shouldExclude = (action !== 'create');
+                const shouldExclude = (action === 'cancel' || action === 'complete');
 
                 let teacherCoursesFormatted = '✅ Aucun cours à venir.';
                 let studentCoursesFormatted = '✅ Aucun cours à venir.';
