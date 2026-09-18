@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gestion des cours - Association Mille Voiles</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -29,6 +29,7 @@
             background: var(--light-gray);
             color: var(--dark-gray);
             min-height: 100vh;
+            -webkit-text-size-adjust: 100%;
         }
         h1, h2, h3 { font-family: 'Montserrat', sans-serif; color: var(--primary-blue); }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
@@ -70,7 +71,7 @@
             gap: 20px;
             margin: 30px 0;
         }
-        @media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
         .stat-card {
             background: white;
             border-radius: var(--border-radius);
@@ -78,6 +79,7 @@
             text-align: center;
             box-shadow: var(--shadow);
         }
+        @media (max-width: 768px) { .stat-card { padding: 14px; } }
         .stat-card .stat-icon { font-size: 2rem; color: var(--primary-blue); margin-bottom: 10px; }
         .stat-card .stat-number { font-size: 2rem; font-weight: 700; color: var(--primary-blue); }
         .stat-card .stat-label { font-size: 0.8rem; color: var(--medium-gray); }
@@ -100,6 +102,7 @@
             font-family: inherit;
             flex: 1;
             min-width: 150px;
+            font-size: 16px; /* 防止 iOS 缩放 */
         }
         
         .btn-refresh, .btn-add {
@@ -111,6 +114,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            font-size: 0.9rem;
         }
         .btn-refresh { background: var(--primary-blue); color: white; }
         .btn-add { background: var(--green); color: white; }
@@ -178,6 +182,7 @@
             align-items: center;
             gap: 6px;
             transition: all 0.2s;
+            font-size: 0.85rem;
         }
         .action-btn:hover { transform: translateY(-2px); }
         .btn-edit { background: var(--primary-blue); color: white; }
@@ -197,6 +202,7 @@
             align-items: center;
             justify-content: center;
             padding: 16px;
+            overflow-y: auto;
         }
         .modal-content {
             background: white;
@@ -206,6 +212,7 @@
             max-width: 650px;
             max-height: 90vh;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         .modal-header {
             display: flex;
@@ -231,6 +238,7 @@
             border: 2px solid #ddd;
             border-radius: 8px;
             font-family: inherit;
+            font-size: 16px; /* 防止 iOS 自动缩放 */
         }
         .form-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px; }
         .cancel-btn { padding: 10px 20px; background: var(--light-gray); border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
@@ -246,19 +254,23 @@
         }
         
         .rating-stars { display: flex; gap: 8px; margin-top: 8px; }
-        .star { font-size: 1.8rem; cursor: pointer; color: #ddd; }
+        .star { font-size: 1.8rem; cursor: pointer; color: #ddd; user-select: none; }
         .star.active { color: #f1c40f; }
         
         .toast {
             position: fixed;
             bottom: 20px;
             right: 20px;
+            left: 20px;
+            max-width: 400px;
+            margin-left: auto;
             padding: 12px 24px;
             border-radius: 8px;
             color: white;
             font-weight: 600;
             z-index: 1100;
             animation: fadeInUp 0.3s;
+            font-size: 0.9rem;
         }
         .toast-success { background: var(--green); }
         .toast-error { background: var(--red); }
@@ -289,12 +301,13 @@
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
+            padding: 16px;
         }
         .confirm-dialog-overlay.active { opacity: 1; visibility: visible; }
         .confirm-dialog-card {
             background: white;
             border-radius: 20px;
-            width: 90%;
+            width: 100%;
             max-width: 480px;
             transform: scale(0.9);
             transition: transform 0.3s ease;
@@ -330,13 +343,15 @@
         .level1-item { border-bottom: 1px solid #eee; }
         .level1-header {
             background: #f0f4f8;
-            padding: 12px 15px;
+            padding: 14px 15px;
             cursor: pointer;
             font-weight: 700;
             color: var(--primary-blue);
             display: flex;
             align-items: center;
             gap: 10px;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
         .level1-header .chevron { margin-left: auto; transition: transform 0.2s; }
         .level1-header.collapsed .chevron { transform: rotate(-90deg); }
@@ -344,7 +359,7 @@
         .level2-container.hidden { display: none; }
         .level2-item { border-bottom: 1px solid #f0f0f0; }
         .level2-header {
-            padding: 10px 15px 10px 35px;
+            padding: 14px 15px 14px 35px;
             cursor: pointer;
             font-weight: 600;
             color: var(--primary-light-blue);
@@ -352,18 +367,25 @@
             align-items: center;
             gap: 10px;
             background: #fafafa;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
         .level2-header .chevron2 { margin-left: auto; transition: transform 0.2s; font-size: 12px; }
         .level2-header.collapsed .chevron2 { transform: rotate(-90deg); }
-        .level3-container { padding: 8px 15px 8px 55px; display: flex; flex-wrap: wrap; gap: 8px; background: white; }
+        .level3-container { padding: 10px 15px 10px 55px; display: flex; flex-wrap: wrap; gap: 8px; background: white; }
         .level3-container.hidden { display: none; }
         .type-option {
-            padding: 6px 14px;
+            padding: 10px 16px;
             border-radius: 20px;
             background: #e8eef4;
             cursor: pointer;
             transition: all 0.2s;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            min-height: 40px;
+            display: inline-flex;
+            align-items: center;
         }
         .type-option:hover { background: #d0dce8; }
         .type-option.selected { background: var(--primary-blue); color: white; }
@@ -405,11 +427,12 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ddd;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
         .cancel-reason-option:hover { background: #f5f5f5; border-color: var(--primary-blue); }
         .cancel-reason-option.selected { background: rgba(0,64,128,0.05); border-color: var(--primary-blue); }
@@ -418,6 +441,86 @@
         .cancel-reason-option input[type="radio"] { width: 18px; height: 18px; cursor: pointer; }
         .custom-reason-input { margin-top: 10px; display: none; }
         .custom-reason-input.show { display: block; }
+
+        /* ============================================================ */
+        /* 📱 移动端优化 */
+        /* ============================================================ */
+        @media (max-width: 768px) {
+            .container { padding: 0 12px; }
+            .main-header h1 { font-size: 1.3rem; }
+            .main-header p { font-size: 0.8rem; }
+            
+            .filters-bar {
+                padding: 12px;
+                gap: 10px;
+            }
+            .filters-bar > div[style*="margin-left: auto"] {
+                margin-left: 0 !important;
+                width: 100%;
+                justify-content: center;
+            }
+            .filter-select {
+                min-width: 100%;
+                font-size: 16px;
+            }
+            .btn-refresh, .btn-add {
+                flex: 1;
+                justify-content: center;
+            }
+            
+            .courses-list { padding: 12px; }
+            .course-card { padding: 14px; }
+            .course-title { font-size: 0.95rem; }
+            .course-details { grid-template-columns: 1fr; padding: 8px; }
+            
+            .course-actions { gap: 8px; }
+            .action-btn {
+                flex: 1;
+                justify-content: center;
+                font-size: 0.8rem;
+                padding: 10px 12px;
+            }
+            
+            .modal {
+                padding: 0;
+                align-items: flex-end;
+            }
+            .modal-content {
+                border-radius: 20px 20px 0 0;
+                max-height: 92vh;
+                padding: 20px;
+                padding-bottom: 0;
+            }
+            .modal-header { margin-bottom: 15px; }
+            .modal-title { font-size: 1.2rem; }
+            
+            /* ✅ 保存按钮吸附底部，防止被键盘遮挡 */
+            .form-actions {
+                position: sticky;
+                bottom: 0;
+                background: white;
+                padding: 15px 0;
+                margin: 0 -20px;
+                padding-left: 20px;
+                padding-right: 20px;
+                box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+                z-index: 10;
+            }
+            .form-actions button { flex: 1; }
+            
+            .level1-header, .level2-header { padding: 16px 15px; }
+            .level2-header { padding-left: 30px; }
+            .level3-container { padding: 10px 12px 10px 40px; gap: 6px; }
+            .type-option {
+                font-size: 0.85rem;
+                padding: 10px 14px;
+            }
+            
+            .confirm-dialog-footer {
+                flex-direction: column-reverse;
+            }
+            .confirm-dialog-footer button { width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -634,278 +737,265 @@
         }
 
         // ============================================================
+        // 🆕 规范化 datetime-local 值 → "YYYY-MM-DD HH:MM:00"
+        //    兼容电脑端（无秒）和手机端（带秒）
+        // ============================================================
+        function normalizeLocalDateTime(localValue) {
+            if (!localValue) return null;
+            // localValue 期望格式: "YYYY-MM-DDTHH:MM" 或 "YYYY-MM-DDTHH:MM:SS"
+            const parts = localValue.split('T');
+            if (parts.length !== 2) return null;
+            const datePart = parts[0];
+            let timePart = parts[1];
+            // 只保留 HH:MM
+            const hm = timePart.split(':');
+            if (hm.length < 2) return null;
+            const hh = hm[0].padStart(2, '0');
+            const mm = hm[1].padStart(2, '0');
+            return `${datePart} ${hh}:${mm}:00`;
+        }
+
+        // ============================================================
         // 发送课程通知邮件
         // ============================================================
-        // ============================================================
-// 发送课程通知邮件
-// ============================================================
-async function getUpcomingCoursesForUser(userId, userType, excludeCourseId = null) {
-    try {
-        const supabase = window.supabaseAuth.getSupabaseClient();
-        if (!supabase) return [];
-
-        const now = new Date().toISOString();
-        let query = supabase
-            .from('courses')
-            .select(`
-                *,
-                teacher:teacher_id(id, name, email),
-                student:student_id(id, name, email)
-            `)
-            .eq('status', 'scheduled')
-            .gte('start_time', now)
-            .order('start_time', { ascending: true });
-
-        if (userType === 'teacher') {
-            query = query.eq('teacher_id', userId);
-        } else if (userType === 'student') {
-            query = query.eq('student_id', userId);
-        }
-
-        // 排除当前课程（修改/删除/取消时使用）
-        if (excludeCourseId) {
-            query = query.neq('id', excludeCourseId);
-        }
-
-        const { data, error } = await query;
-        if (error) return [];
-        return data || [];
-    } catch (error) {
-        return [];
-    }
-}
-
-function formatUpcomingCoursesForEmail(courses, userType) {
-    if (!courses || courses.length === 0) {
-        return '✅ Aucun cours à venir.';
-    }
-
-    let formatted = '';
-    courses.forEach((course, index) => {
-        const { date, time } = formatDateSimple(course.start_time);
-        const teacherName = course.teacher?.name || 'À déterminer';
-        const studentName = course.student?.name || 'À déterminer';
-        const courseTypeName = getTypeDisplayText(course.course_type);
-
-        formatted += `${index + 1}. ${date} à ${time} `;
-        formatted += `| ${courseTypeName} `;
-        formatted += `| ${course.duration || 2}h`;
-
-        if (userType === 'teacher') {
-            formatted += ` | Élève: ${studentName}`;
-        } else if (userType === 'student') {
-            formatted += ` | Enseignant: ${teacherName}`;
-        }
-        formatted += '\n';
-    });
-    return formatted;
-}
-async function sendCourseEmailNotification(courseId, action) {
-    try {
-        // ============================================================
-        // 1. 检查 EmailJS 是否可用
-        // ============================================================
-        if (typeof emailjs === 'undefined') {
-            console.warn('⚠️ EmailJS non disponible');
-            return { success: true, message: 'EmailJS non disponible, envoi ignoré', skipped: true };
-        }
-
-        try {
-            emailjs.init(EMAILJS_COURSE.PUBLIC_KEY);
-            console.log('✅ EmailJS (Cours) initialisé');
-        } catch (e) {
-            console.log('ℹ️ EmailJS déjà initialisé pour les cours');
-        }
-
-        // ============================================================
-        // 2. 获取 Supabase 客户端
-        // ============================================================
-        const supabase = window.supabaseAuth.getSupabaseClient();
-        if (!supabase) {
-            console.warn('⚠️ Supabase non disponible');
-            return { success: true, message: 'Supabase non disponible, envoi ignoré', skipped: true };
-        }
-
-        // ============================================================
-        // 3. 获取课程详情（含老师和学生信息）
-        // ============================================================
-        const { data: course, error } = await supabase
-            .from('courses')
-            .select(`
-                *,
-                teacher:teacher_id(id, name, email),
-                student:student_id(id, name, email)
-            `)
-            .eq('id', courseId)
-            .single();
-
-        if (error) {
-            console.error('❌ Erreur récupération cours:', error.message);
-            return { success: true, message: 'Erreur récupération cours, envoi ignoré', skipped: true };
-        }
-
-        if (!course) {
-            console.warn('⚠️ Cours non trouvé');
-            return { success: true, message: 'Cours non trouvé, envoi ignoré', skipped: true };
-        }
-
-        // ============================================================
-        // 4. 检查是否有邮箱
-        // ============================================================
-        const teacher = course.teacher || null;
-        const student = course.student || null;
-
-        const hasTeacherEmail = teacher && teacher.email && teacher.email.trim() !== '';
-        const hasStudentEmail = student && student.email && student.email.trim() !== '';
-
-        // 🔥 如果老师和学生都没有邮箱，直接跳过
-        if (!hasTeacherEmail && !hasStudentEmail) {
-            console.log('ℹ️ 老师和学生都没有邮箱，跳过邮件发送 (courseId: ' + courseId + ')');
-            return { success: true, message: 'Aucun email disponible, envoi ignoré', skipped: true };
-        }
-
-        // ============================================================
-        // 5. 准备邮件数据
-        // ============================================================
-        const actionLabels = {
-            'create': 'créé',
-            'update': 'modifié',
-            'cancel': 'annulé',
-            'complete': 'terminé'
-        };
-        const actionLabel = actionLabels[action] || action || 'modifié';
-
-        const { date, time } = formatDateSimple(course.start_time);
-        const courseTypeName = getTypeDisplayText(course.course_type);
-
-        // 🔥 根据 action 决定是否排除当前课程
-        // create 和 update 时不排除（显示所有课程）
-        // cancel 和 complete 时排除（取消/完成的课程不显示）
-        const shouldExclude = (action === 'cancel' || action === 'complete');
-
-        // ============================================================
-        // 6. 获取老师和学生的课程列表
-        // ============================================================
-        let teacherCoursesFormatted = '✅ Aucun cours à venir.';
-        let studentCoursesFormatted = '✅ Aucun cours à venir.';
-
-        if (teacher && teacher.id) {
+        async function getUpcomingCoursesForUser(userId, userType, excludeCourseId = null) {
             try {
-                const teacherCourses = await getUpcomingCoursesForUser(teacher.id, 'teacher', shouldExclude ? courseId : null);
-                teacherCoursesFormatted = formatUpcomingCoursesForEmail(teacherCourses, 'teacher');
-            } catch (e) {
-                console.warn('⚠️ 获取老师课程列表失败:', e.message);
+                const supabase = window.supabaseAuth.getSupabaseClient();
+                if (!supabase) return [];
+
+                const now = new Date().toISOString();
+                let query = supabase
+                    .from('courses')
+                    .select(`
+                        *,
+                        teacher:teacher_id(id, name, email),
+                        student:student_id(id, name, email)
+                    `)
+                    .eq('status', 'scheduled')
+                    .gte('start_time', now)
+                    .order('start_time', { ascending: true });
+
+                if (userType === 'teacher') {
+                    query = query.eq('teacher_id', userId);
+                } else if (userType === 'student') {
+                    query = query.eq('student_id', userId);
+                }
+
+                if (excludeCourseId) {
+                    query = query.neq('id', excludeCourseId);
+                }
+
+                const { data, error } = await query;
+                if (error) return [];
+                return data || [];
+            } catch (error) {
+                return [];
             }
         }
 
-        if (student && student.id) {
-            try {
-                const studentCourses = await getUpcomingCoursesForUser(student.id, 'student', shouldExclude ? courseId : null);
-                studentCoursesFormatted = formatUpcomingCoursesForEmail(studentCourses, 'student');
-            } catch (e) {
-                console.warn('⚠️ 获取学生课程列表失败:', e.message);
+        function formatUpcomingCoursesForEmail(courses, userType) {
+            if (!courses || courses.length === 0) {
+                return '✅ Aucun cours à venir.';
             }
+
+            let formatted = '';
+            courses.forEach((course, index) => {
+                const { date, time } = formatDateSimple(course.start_time);
+                const teacherName = course.teacher?.name || 'À déterminer';
+                const studentName = course.student?.name || 'À déterminer';
+                const courseTypeName = getTypeDisplayText(course.course_type);
+
+                formatted += `${index + 1}. ${date} à ${time} `;
+                formatted += `| ${courseTypeName} `;
+                formatted += `| ${course.duration || 2}h`;
+
+                if (userType === 'teacher') {
+                    formatted += ` | Élève: ${studentName}`;
+                } else if (userType === 'student') {
+                    formatted += ` | Enseignant: ${teacherName}`;
+                }
+                formatted += '\n';
+            });
+            return formatted;
         }
 
-        // ============================================================
-        // 7. 发送邮件
-        // ============================================================
-        let sentCount = 0;
-        const errors = [];
-
-        // 7.1 发送给老师
-        if (hasTeacherEmail) {
-            const teacherParams = {
-                to_email: teacher.email,
-                to_name: teacher.name || 'Enseignant',
-                teacher_name: teacher.name || 'Enseignant',
-                action: actionLabel,
-                course_type: courseTypeName,
-                date: date,
-                time: time,
-                duration: course.duration || 2,
-                student_name: student?.name || '-',
-                student_email: student?.email || '-',
-                upcoming_courses: teacherCoursesFormatted,
-                subject: `📚 [Enseignant] Mise à jour planning - ${date}`
-            };
-
+        async function sendCourseEmailNotification(courseId, action) {
             try {
-                await emailjs.send(
-                    EMAILJS_COURSE.SERVICE_ID,
-                    EMAILJS_COURSE.TEACHER_TEMPLATE_ID,
-                    teacherParams,
-                    EMAILJS_COURSE.PUBLIC_KEY
-                );
-                console.log(`✅ [Cours] Email envoyé à l'enseignant: ${teacher.email}`);
-                sentCount++;
-            } catch (e) {
-                console.error(`❌ [Cours] Échec envoi à l'enseignant ${teacher.email}:`, e.message);
-                errors.push(`Enseignant: ${e.message}`);
-            }
-        }
+                if (typeof emailjs === 'undefined') {
+                    console.warn('⚠️ EmailJS non disponible');
+                    return { success: true, message: 'EmailJS non disponible, envoi ignoré', skipped: true };
+                }
 
-        // 7.2 发送给学生
-        if (hasStudentEmail) {
-            const studentParams = {
-                to_email: student.email,
-                to_name: student.name || 'Élève',
-                student_name: student.name || 'Élève',
-                action: actionLabel,
-                course_type: courseTypeName,
-                date: date,
-                time: time,
-                duration: course.duration || 2,
-                teacher_name: teacher?.name || '-',
-                teacher_email: teacher?.email || '-',
-                upcoming_courses: studentCoursesFormatted,
-                subject: `📚 [Élève] Mise à jour planning - ${date}`
-            };
+                try {
+                    emailjs.init(EMAILJS_COURSE.PUBLIC_KEY);
+                    console.log('✅ EmailJS (Cours) initialisé');
+                } catch (e) {
+                    console.log('ℹ️ EmailJS déjà initialisé pour les cours');
+                }
 
-            try {
-                await emailjs.send(
-                    EMAILJS_COURSE.SERVICE_ID,
-                    EMAILJS_COURSE.STUDENT_TEMPLATE_ID,
-                    studentParams,
-                    EMAILJS_COURSE.PUBLIC_KEY
-                );
-                console.log(`✅ [Cours] Email envoyé à l'élève: ${student.email}`);
-                sentCount++;
-            } catch (e) {
-                console.error(`❌ [Cours] Échec envoi à l'élève ${student.email}:`, e.message);
-                errors.push(`Élève: ${e.message}`);
+                const supabase = window.supabaseAuth.getSupabaseClient();
+                if (!supabase) {
+                    console.warn('⚠️ Supabase non disponible');
+                    return { success: true, message: 'Supabase non disponible, envoi ignoré', skipped: true };
+                }
+
+                const { data: course, error } = await supabase
+                    .from('courses')
+                    .select(`
+                        *,
+                        teacher:teacher_id(id, name, email),
+                        student:student_id(id, name, email)
+                    `)
+                    .eq('id', courseId)
+                    .single();
+
+                if (error) {
+                    console.error('❌ Erreur récupération cours:', error.message);
+                    return { success: true, message: 'Erreur récupération cours, envoi ignoré', skipped: true };
+                }
+
+                if (!course) {
+                    console.warn('⚠️ Cours non trouvé');
+                    return { success: true, message: 'Cours non trouvé, envoi ignoré', skipped: true };
+                }
+
+                const teacher = course.teacher || null;
+                const student = course.student || null;
+
+                const hasTeacherEmail = teacher && teacher.email && teacher.email.trim() !== '';
+                const hasStudentEmail = student && student.email && student.email.trim() !== '';
+
+                if (!hasTeacherEmail && !hasStudentEmail) {
+                    console.log('ℹ️ 老师和学生都没有邮箱，跳过邮件发送 (courseId: ' + courseId + ')');
+                    return { success: true, message: 'Aucun email disponible, envoi ignoré', skipped: true };
+                }
+
+                const actionLabels = {
+                    'create': 'créé',
+                    'update': 'modifié',
+                    'cancel': 'annulé',
+                    'complete': 'terminé'
+                };
+                const actionLabel = actionLabels[action] || action || 'modifié';
+
+                const { date, time } = formatDateSimple(course.start_time);
+                const courseTypeName = getTypeDisplayText(course.course_type);
+
+                const shouldExclude = (action !== 'create');
+
+                let teacherCoursesFormatted = '✅ Aucun cours à venir.';
+                let studentCoursesFormatted = '✅ Aucun cours à venir.';
+
+                if (teacher && teacher.id) {
+                    try {
+                        const teacherCourses = await getUpcomingCoursesForUser(teacher.id, 'teacher', shouldExclude ? courseId : null);
+                        teacherCoursesFormatted = formatUpcomingCoursesForEmail(teacherCourses, 'teacher');
+                    } catch (e) {
+                        console.warn('⚠️ 获取老师课程列表失败:', e.message);
+                    }
+                }
+
+                if (student && student.id) {
+                    try {
+                        const studentCourses = await getUpcomingCoursesForUser(student.id, 'student', shouldExclude ? courseId : null);
+                        studentCoursesFormatted = formatUpcomingCoursesForEmail(studentCourses, 'student');
+                    } catch (e) {
+                        console.warn('⚠️ 获取学生课程列表失败:', e.message);
+                    }
+                }
+
+                let sentCount = 0;
+                const errors = [];
+
+                if (hasTeacherEmail) {
+                    const teacherParams = {
+                        to_email: teacher.email,
+                        to_name: teacher.name || 'Enseignant',
+                        teacher_name: teacher.name || 'Enseignant',
+                        action: actionLabel,
+                        course_type: courseTypeName,
+                        date: date,
+                        time: time,
+                        duration: course.duration || 2,
+                        student_name: student?.name || '-',
+                        student_email: student?.email || '-',
+                        upcoming_courses: teacherCoursesFormatted,
+                        subject: `📚 [Enseignant] Mise à jour planning - ${date}`
+                    };
+
+                    try {
+                        await emailjs.send(
+                            EMAILJS_COURSE.SERVICE_ID,
+                            EMAILJS_COURSE.TEACHER_TEMPLATE_ID,
+                            teacherParams,
+                            EMAILJS_COURSE.PUBLIC_KEY
+                        );
+                        console.log(`✅ [Cours] Email envoyé à l'enseignant: ${teacher.email}`);
+                        sentCount++;
+                    } catch (e) {
+                        console.error(`❌ [Cours] Échec envoi à l'enseignant ${teacher.email}:`, e.message);
+                        errors.push(`Enseignant: ${e.message}`);
+                    }
+                }
+
+                if (hasStudentEmail) {
+                    const studentParams = {
+                        to_email: student.email,
+                        to_name: student.name || 'Élève',
+                        student_name: student.name || 'Élève',
+                        action: actionLabel,
+                        course_type: courseTypeName,
+                        date: date,
+                        time: time,
+                        duration: course.duration || 2,
+                        teacher_name: teacher?.name || '-',
+                        teacher_email: teacher?.email || '-',
+                        upcoming_courses: studentCoursesFormatted,
+                        subject: `📚 [Élève] Mise à jour planning - ${date}`
+                    };
+
+                    try {
+                        await emailjs.send(
+                            EMAILJS_COURSE.SERVICE_ID,
+                            EMAILJS_COURSE.STUDENT_TEMPLATE_ID,
+                            studentParams,
+                            EMAILJS_COURSE.PUBLIC_KEY
+                        );
+                        console.log(`✅ [Cours] Email envoyé à l'élève: ${student.email}`);
+                        sentCount++;
+                    } catch (e) {
+                        console.error(`❌ [Cours] Échec envoi à l'élève ${student.email}:`, e.message);
+                        errors.push(`Élève: ${e.message}`);
+                    }
+                }
+
+                if (sentCount === 0 && errors.length === 0) {
+                    return { success: true, message: 'Aucun email envoyé', sentCount: 0 };
+                }
+
+                if (sentCount > 0) {
+                    console.log(`✅ [Cours] ${sentCount} email(s) envoyé(s) pour le cours ${courseId}`);
+                }
+
+                return {
+                    success: true,
+                    sentCount: sentCount,
+                    message: `${sentCount} email(s) envoyé(s)`,
+                    errors: errors.length > 0 ? errors : null
+                };
+
+            } catch (error) {
+                console.error('❌ [Cours] Erreur inattendue dans sendCourseEmailNotification:', error);
+                return { 
+                    success: true, 
+                    message: 'Erreur inattendue, envoi ignoré', 
+                    error: error.message,
+                    skipped: true 
+                };
             }
         }
 
         // ============================================================
-        // 8. 返回结果
-        // ============================================================
-        if (sentCount === 0 && errors.length === 0) {
-            return { success: true, message: 'Aucun email envoyé', sentCount: 0 };
-        }
-
-        if (sentCount > 0) {
-            console.log(`✅ [Cours] ${sentCount} email(s) envoyé(s) pour le cours ${courseId}`);
-        }
-
-        return {
-            success: true,
-            sentCount: sentCount,
-            message: `${sentCount} email(s) envoyé(s)`,
-            errors: errors.length > 0 ? errors : null
-        };
-
-    } catch (error) {
-        console.error('❌ [Cours] Erreur inattendue dans sendCourseEmailNotification:', error);
-        return { 
-            success: true, 
-            message: 'Erreur inattendue, envoi ignoré', 
-            error: error.message,
-            skipped: true 
-        };
-    }
-}
-// ============================================================
         // 课程管理核心代码
         // ============================================================
         
@@ -948,6 +1038,23 @@ async function sendCourseEmailNotification(courseId, action) {
             return codes;
         }
 
+        // 🆕 统一的"绑定点击"辅助函数：同时支持 click 和 touchend
+        //   避免移动端重复触发，也避免父元素拦截
+        function bindTap(el, handler) {
+            let touched = false;
+            el.addEventListener('touchend', (e) => {
+                touched = true;
+                e.preventDefault();
+                handler(e);
+                // 200ms 内忽略 click，防止重复触发
+                setTimeout(() => { touched = false; }, 300);
+            }, { passive: false });
+            el.addEventListener('click', (e) => {
+                if (touched) return;
+                handler(e);
+            });
+        }
+
         function renderCourseTypeSelector(selectedCode = '') {
             const container = document.getElementById('courseTypeSelector');
             if (!container) return;
@@ -981,8 +1088,10 @@ async function sendCourseEmailNotification(courseId, action) {
             html += `</div></div></div>`;
             container.innerHTML = html;
             
+            // 🆕 一级标题：折叠/展开
             document.querySelectorAll('.level1-header').forEach(h => {
-                h.addEventListener('click', () => {
+                bindTap(h, (e) => {
+                    e.stopPropagation();
                     const l2 = document.getElementById('level2-root');
                     if (l2.classList.contains('hidden')) {
                         l2.classList.remove('hidden');
@@ -993,8 +1102,10 @@ async function sendCourseEmailNotification(courseId, action) {
                     }
                 });
             });
+            
+            // 🆕 二级标题：折叠/展开
             document.querySelectorAll('.level2-header').forEach(h => {
-                h.addEventListener('click', (e) => {
+                bindTap(h, (e) => {
                     e.stopPropagation();
                     const code = h.dataset.level2;
                     const l3 = document.getElementById(`level3-${code}`);
@@ -1007,17 +1118,21 @@ async function sendCourseEmailNotification(courseId, action) {
                     }
                 });
             });
+            
+            // 🆕 三级选项：选中课程类型
             document.querySelectorAll('.type-option').forEach(opt => {
-                opt.addEventListener('click', (e) => {
+                bindTap(opt, (e) => {
                     e.stopPropagation();
                     const code = opt.dataset.code;
                     document.querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
                     opt.classList.add('selected');
                     document.getElementById('courseTypeValue').value = code;
-                    document.getElementById('selectedTypeDisplay').style.display = 'inline-block';
-                    document.getElementById('selectedTypeDisplay').textContent = '已选: ' + getTypeDisplayText(code);
+                    const display = document.getElementById('selectedTypeDisplay');
+                    display.style.display = 'inline-block';
+                    display.textContent = '已选: ' + getTypeDisplayText(code);
                 });
             });
+            
             if (selectedCode && selectedCode !== 'ec') {
                 const selectedOpt = document.querySelector(`.type-option[data-code="${selectedCode}"]`);
                 if (selectedOpt) {
@@ -1063,8 +1178,11 @@ async function sendCourseEmailNotification(courseId, action) {
             const supabase = window.supabaseAuth.getSupabaseClient();
             const student = allStudents.find(s => s.id === studentId);
             if (!student) return true;
-            if (student.credit === undefined || student.credit === null) return true;
-            const currentCredit = student.credit;
+            if (student.credit === undefined || student.credit === null) {
+                // 未设置 credit 字段，跳过
+                return true;
+            }
+            const currentCredit = Number(student.credit) || 0;
             if (currentCredit < hours) {
                 showToast(`课时不足！学生 ${student.name} 只有 ${currentCredit} 小时，需要 ${hours} 小时`, 'error');
                 return false;
@@ -1085,7 +1203,7 @@ async function sendCourseEmailNotification(courseId, action) {
             const student = allStudents.find(s => s.id === studentId);
             if (!student) return true;
             if (student.credit === undefined || student.credit === null) return true;
-            const newCredit = (student.credit || 0) + hours;
+            const newCredit = (Number(student.credit) || 0) + hours;
             const { error } = await supabase.from('students').update({ credit: newCredit }).eq('id', studentId);
             if (error) {
                 console.error('返还课时失败:', error);
@@ -1350,7 +1468,9 @@ async function sendCourseEmailNotification(courseId, action) {
                 document.getElementById('selectedTypeDisplay').textContent = '已选: ' + getTypeDisplayText(course.course_type);
             }
             
+            // 🆕 兼容带秒/不带秒的数据库时间
             const startTimeISO = course.start_time.replace(' ', 'T');
+            // 只取前 16 位 "YYYY-MM-DDTHH:MM"
             document.getElementById('startTime').value = startTimeISO.slice(0, 16);
             document.getElementById('duration').value = course.duration || 2;
             document.getElementById('location').value = course.location || '';
@@ -1369,8 +1489,11 @@ async function sendCourseEmailNotification(courseId, action) {
             const courseId = document.getElementById('courseId').value;
             
             if (teacherId && startTimeLocal) {
-                const [datePart, timePart] = startTimeLocal.split('T');
-                const startTimeStr = `${datePart} ${timePart}:00`;
+                const startTimeStr = normalizeLocalDateTime(startTimeLocal);
+                if (!startTimeStr) {
+                    conflictWarning.style.display = 'none';
+                    return true;
+                }
                 const hasConflict = checkConflict(teacherId, startTimeStr, courseId || null, duration);
                 conflictWarning.style.display = hasConflict ? 'flex' : 'none';
                 return !hasConflict;
@@ -1398,8 +1521,17 @@ async function sendCourseEmailNotification(courseId, action) {
             const studentId = document.getElementById('studentId').value;
             const startTimeLocal = document.getElementById('startTime').value;
             const duration = parseFloat(document.getElementById('duration').value) || 2;
-            const courseType = document.getElementById('courseTypeValue').value;
+            let courseType = document.getElementById('courseTypeValue').value;
             const newStatus = document.getElementById('status').value;
+            
+            // 🆕 兜底：如果 courseTypeValue 为空，从 DOM 找已选类型
+            if (!courseType) {
+                const selectedOpt = document.querySelector('.type-option.selected');
+                if (selectedOpt) {
+                    courseType = selectedOpt.dataset.code;
+                    document.getElementById('courseTypeValue').value = courseType;
+                }
+            }
             
             if (!startTimeLocal) {
                 showToast('Veuillez sélectionner une date et heure', 'error');
@@ -1410,8 +1542,12 @@ async function sendCourseEmailNotification(courseId, action) {
                 return;
             }
             
-            const [datePart, timePart] = startTimeLocal.split('T');
-            const startTimeStr = `${datePart} ${timePart}:00`;
+            // 🆕 使用 normalizeLocalDateTime，兼容电脑端和手机端
+            const startTimeStr = normalizeLocalDateTime(startTimeLocal);
+            if (!startTimeStr) {
+                showToast('Format de date invalide', 'error');
+                return;
+            }
             
             if (checkConflict(teacherId, startTimeStr, id || null, duration)) {
                 showToast('Conflit horaire avec un autre cours !', 'error');
@@ -1436,7 +1572,6 @@ async function sendCourseEmailNotification(courseId, action) {
                 return;
             }
             
-            // 如果状态变为 cancelled，弹出模态框选择取消原因
             if (newStatus === 'cancelled') {
                 pendingCancelData = { id, data, oldCourse: id ? allCourses.find(c => c.id === id) : null };
                 openCancelReasonModal();
@@ -1456,7 +1591,6 @@ async function sendCourseEmailNotification(courseId, action) {
                     if (error) throw error;
                     newCourseId = inserted[0].id;
                     
-                    // 只发一次：创建课程
                     await sendCourseEmailNotification(newCourseId, 'create');
                 } else {
                     const oldCourse = allCourses.find(c => c.id === id);
@@ -1496,7 +1630,6 @@ async function sendCourseEmailNotification(courseId, action) {
                     const { error } = await supabase.from('courses').update(data).eq('id', id);
                     if (error) throw error;
                     
-                    // 只发一次：修改课程（非取消状态）
                     if (newStatus !== 'cancelled') {
                         await sendCourseEmailNotification(id, 'update');
                     }
@@ -1524,7 +1657,6 @@ async function sendCourseEmailNotification(courseId, action) {
                 if (isNewCourse) {
                     const { data: inserted, error } = await supabase.from('courses').insert([{ ...data, cancel_reason: selectedReason }]).select();
                     if (error) throw error;
-                    // 创建课程但状态是取消，发取消通知
                     await sendCourseEmailNotification(inserted[0].id, 'cancel');
                 } else {
                     const oldStatus = oldCourse.status;
@@ -1541,7 +1673,6 @@ async function sendCourseEmailNotification(courseId, action) {
                     const { error } = await supabase.from('courses').update({ ...data, cancel_reason: selectedReason }).eq('id', id);
                     if (error) throw error;
                     
-                    // 只发一次：取消课程
                     await sendCourseEmailNotification(id, 'cancel');
                 }
                 
@@ -1558,7 +1689,7 @@ async function sendCourseEmailNotification(courseId, action) {
 
         function initCancelReasonModalEvents() {
             document.querySelectorAll('#cancelReasonModal .cancel-reason-option').forEach(option => {
-                option.addEventListener('click', () => {
+                bindTap(option, () => {
                     const radio = option.querySelector('input[type="radio"]');
                     radio.checked = true;
                     document.querySelectorAll('#cancelReasonModal .cancel-reason-option').forEach(opt => opt.classList.remove('selected'));
@@ -1634,7 +1765,6 @@ async function sendCourseEmailNotification(courseId, action) {
                     await refundStudentCredit(courseToDelete.student_id, courseToDelete.duration || 2);
                 }
                 
-                // 只发一次：删除/取消课程
                 await sendCourseEmailNotification(pendingDeleteCourseId, 'cancel');
                 
                 const { error } = await supabase.from('courses').delete().eq('id', pendingDeleteCourseId);
@@ -1710,8 +1840,9 @@ async function sendCourseEmailNotification(courseId, action) {
         filterType.addEventListener('change', () => renderCoursesList());
         filterTeacher.addEventListener('change', () => renderCoursesList());
         
+        // 🆕 星星评分：同时支持点击和触摸
         document.querySelectorAll('#ratingStars .star').forEach(star => {
-            star.addEventListener('click', () => {
+            bindTap(star, () => {
                 const val = parseInt(star.dataset.value);
                 document.getElementById('studentRating').value = val;
                 updateStarDisplay(val);
