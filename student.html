@@ -2453,7 +2453,7 @@ function startCountdownTimer() {
         if (hasCountdown) {
             renderCoursesList();
         }
-    }, 5000); // 🔥 改为每3秒检查一次，更及时
+    }, 1000); // 🔥 改为每3秒检查一次，更及时
 }
 
 // ============================================================
@@ -2472,7 +2472,7 @@ window.addEventListener('beforeunload', function() {
 async function confirmAndJoinClass(courseId) {
     const supabase = window.supabaseAuth.getSupabaseClient();
     const t = translations[currentLang];
-    
+
     try {
         // 获取课程信息
         const { data: course, error: fetchError } = await supabase
@@ -2480,45 +2480,44 @@ async function confirmAndJoinClass(courseId) {
             .select('meeting_link, teacher_started')
             .eq('id', courseId)
             .single();
-        
+
         if (fetchError) throw fetchError;
-        
-        // 检查老师是否已开始上课
+
         if (!course.teacher_started) {
-           showToast(t.teacherNotStarted, 'warning');
+            showToast(t.teacherNotStarted, 'warning');
             return;
         }
-        
-        // 更新学生确认状态
-        const { error: updateError } = await supabase
-            .from('courses')
-            .update({ 
-                student_confirmed: true, 
-                status: 'in_progress' 
-            })
-            .eq('id', courseId);
-        
-        if (updateError) {
-            showToast(t.toastError + ': ' + updateError.message, 'error');
-            return;
-        }
-        
-        showToast(t.confirmedAttendance, 'success');
-        await loadMyCourses();
-        
-        // 跳转到会议链接
+
+        // 🔥 关键：先打开会议链接（在用户手势上下文中，避免被拦截）
         if (course.meeting_link) {
             window.open(course.meeting_link, '_blank');
         } else {
             showToast('⚠️ 没有找到会议链接，请联系老师。', 'warning');
         }
-        
+
+        // 再更新学生确认状态
+        const { error: updateError } = await supabase
+            .from('courses')
+            .update({
+                student_confirmed: true,
+                status: 'in_progress'
+            })
+            .eq('id', courseId);
+
+        if (updateError) {
+            showToast(t.toastError + ': ' + updateError.message, 'error');
+            return;
+        }
+
+        showToast(t.confirmedAttendance, 'success');
+        await loadMyCourses();
+
     } catch (error) {
         console.error('加入课堂失败:', error);
         showToast(t.toastError + ': ' + error.message, 'error');
     }
 }
-        // ============================================================
+// ============================================================
         // 渲染可用时间段（预约功能）
         // ============================================================
         async function loadAvailableSlots() {
