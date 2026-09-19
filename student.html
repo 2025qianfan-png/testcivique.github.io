@@ -2009,74 +2009,84 @@ async function sendCourseEmailNotificationToTeacher(courseId, action, studentNam
         // ============================================================
         // 数据加载 - 课程
         // ============================================================
-        async function loadMyCourses() {
-            if (!window.supabaseAuth) {
-                console.error('supabaseAuth 未加载');
-                setTimeout(loadMyCourses, 1000);
-                return;
-            }
-            const supabase = window.supabaseAuth.getSupabaseClient();
+        // ============================================================
+// 数据加载 - 课程（带防重入锁）
+// ============================================================
+let isLoadingCourses = false;
 
-            try {
-                const coursesRes = await supabase
-                    .from('courses')
-                    .select(`*, teachers:teacher_id(id, name)`)
-                    .eq('student_id', currentStudent.userId)
-                    .order('start_time', { ascending: true });
+async function loadMyCourses() {
+    if (isLoadingCourses) return;
+    isLoadingCourses = true;
 
-                myCourses = coursesRes.data || [];
+    try {
+        if (!window.supabaseAuth) {
+            console.error('supabaseAuth 未加载');
+            setTimeout(loadMyCourses, 1000);
+            return;
+        }
+        const supabase = window.supabaseAuth.getSupabaseClient();
 
-                const studentRes = await supabase
-                    .from('students')
-                    .select('credit')
-                    .eq('id', currentStudent.userId)
-                    .single();
-                studentCredit = studentRes.data?.credit || 0;
+        const coursesRes = await supabase
+            .from('courses')
+            .select(`*, teachers:teacher_id(id, name)`)
+            .eq('student_id', currentStudent.userId)
+            .order('start_time', { ascending: true });
 
-                try {
-                    const feedbackRes = await supabase
-                        .from('student_feedback')
-                        .select('id')
-                        .eq('student_id', currentStudent.userId)
-                        .maybeSingle();
-                    feedbackSubmitted = !!feedbackRes.data;
-                } catch (e) {
-                    feedbackSubmitted = false;
-                }
+        myCourses = coursesRes.data || [];
 
-                const teacherIds = [...new Set(myCourses.map(c => c.teacher_id).filter(id => id))];
-                let teacherData = [];
-                if (teacherIds.length > 0) {
-                    const { data } = await supabase.from('students').select('id, name').in('id', teacherIds);
-                    teacherData = data || [];
-                    myCourses.forEach(c => {
-                        if (c.teacher_id) {
-                            c.teacher = teacherData.find(t => t.id === c.teacher_id);
-                        }
-                    });
-                }
+        const studentRes = await supabase
+            .from('students')
+            .select('credit')
+            .eq('id', currentStudent.userId)
+            .single();
+        studentCredit = studentRes.data?.credit || 0;
 
-                const activeCourses = myCourses.filter(c => c.status !== 'cancelled');
-                const toCome = activeCourses.filter(c => c.status !== 'completed' && new Date(c.start_time) > new Date()).length;
-                const completed = activeCourses.filter(c => c.status === 'completed').length;
-                const rated = activeCourses.filter(c => c.student_rating);
-                const avg = rated.length ? (rated.reduce((s, c) => s + c.student_rating, 0) / rated.length).toFixed(1) : 0;
-
-                document.getElementById('upcomingCount').textContent = toCome;
-                document.getElementById('completedCount').textContent = completed;
-                document.getElementById('avgRating').textContent = avg;
-                document.getElementById('teacherCount').textContent = teacherData.length;
-
-                updateCreditStats();
-                renderCoursesList();
-                renderFeedbackEntry();
-
-            } catch (error) {
-                console.error('加载课程失败:', error);
-                showToast(t.translations?.[currentLang]?.errorLoading || 'Erreur de chargement', 'error');
-            }
+        try {
+            const feedbackRes = await supabase
+                .from('student_feedback')
+                .select('id')
+                .eq('student_id', currentStudent.userId)
+                .maybeSingle();
+            feedbackSubmitted = !!feedbackRes.data;
+        } catch (e) {
+            feedbackSubmitted = false;
         }
 
+        const teacherIds = [...new Set(myCourses.map(c => c.teacher_id).filter(id => id))];
+        let teacherData = [];
+        if (teacherIds.length > 0) {
+            const { data } = await supabase.from('students').select('id, name').in('id', teacherIds);
+            teacherData = data || [];
+            myCourses.forEach(c => {
+                if (c.teacher_id) {
+                    c.teacher = teacherData.find(t => t.id === c.teacher_id);
+                }
+            });
+        }
+
+        const activeCourses = myCourses.filter(c => c.status !== 'cancelled');
+        const toCome = activeCourses.filter(c => c.status !== 'completed' && new Date(c.start_time) > new Date()).length;
+        const completed = activeCourses.filter(c => c.status === 'completed').length;
+        const rated = activeCourses.filter(c => c.student_rating);
+        const avg = rated.length ? (rated.reduce((s, c) => s + c.student_rating, 0) / rated.length).toFixed(1) : 0;
+
+        document.getElementById('upcomingCount').textContent = toCome;
+        document.getElementById('completedCount').textContent = completed;
+        document.getElementById('avgRating').textContent = avg;
+        document.getElementById('teacherCount').textContent = teacherData.length;
+
+        updateCreditStats();
+        renderCoursesList();
+        updateCountdownTexts(); // 🔥 渲染后立即填充倒计时
+        renderFeedbackEntry();
+
+    } catch (error) {
+        console.error('加载课程失败:', error);
+        showToast(translations[currentLang]?.errorLoading || 'Erreur de chargement', 'error');
+    } finally {
+        isLoadingCourses = false;
+    }
+}
         function updateCreditStats() {
             const remainingCredit = studentCredit || 0;
             const scheduledCourses = myCourses.filter(c => c.status === 'scheduled');
@@ -2196,10 +2206,11 @@ function renderCoursesList() {
             statusClass = 'status-pending';
         } 
         // 🔥 情况5: 课程还没开始 → 显示倒计时
+                // 🔥 情况5: 课程还没开始 → 徽章只显示"已计划"（倒计时放操作区）
         else if (isBefore && !c.teacher_started) {
-            statusText = countdownText || t.statusScheduled;
+            statusText = t.statusScheduled;
             statusClass = 'status-scheduled';
-        } 
+        }  
         // 🔥 默认
         else {
             statusText = t.statusScheduled;
@@ -2256,10 +2267,10 @@ function renderCoursesList() {
             `;
         }
 
-        // 🔥 3. 倒计时中（课程还没开始）
+                // 🔥 3. 倒计时中（课程还没开始）
         if (!isCancelled && isWaitingToStart) {
             actionsHtml = `
-                <span class="${countdownClass}" style="font-size: 1.1rem;">
+                <span class="${countdownClass}" data-countdown-course-id="${c.id}" style="font-size: 1.1rem;">
                     ${countdownText || t.statusScheduled}
                 </span>
                 <span style="font-size: 0.7rem; color: var(--gray); margin-left: 8px;">⏳ ${t.autoRefresh}</span>
@@ -2342,7 +2353,7 @@ function subscribeToCourseChanges() {
 
     courseSubscription = supabase
         .channel('student_course_changes')
-        .on(
+              .on(
             'postgres_changes',
             {
                 event: 'UPDATE',
@@ -2352,19 +2363,26 @@ function subscribeToCourseChanges() {
             },
             (payload) => {
                 const course = payload.new;
-                const old = payload.old;
-                
-                // 🔥 检测关键变化：老师开始上课 或 状态变化
-                if (course.teacher_started === true && old?.teacher_started !== true) {
+                const old = payload.old || {};
+                const t = translations[currentLang]; // 🔥 加这行，避免 t undefined
+
+                // 🔥 情况1: 老师刚开始上课 → 立刻刷新 + 提示
+                if (course.teacher_started === true && old.teacher_started !== true) {
                     console.log('🔔 老师已开始上课，自动刷新');
+                    showToast(t.teacherStarted || '🔔 老师已开始上课！', 'success');
                     loadMyCourses();
-                    showToast(t.teacherStarted, 'success');
                     return;
                 }
-                
-                // 状态变化（完成/取消）
-                if (course.status !== old?.status) {
-                    console.log(`🔄 课程状态变化: ${old?.status} → ${course.status}`);
+
+                // 🔥 情况2: 状态变化（scheduled → in_progress / completed / cancelled）
+                if (course.status !== old.status) {
+                    console.log(`🔄 课程状态变化: ${old.status} → ${course.status}`);
+                    loadMyCourses();
+                }
+
+                // 🔥 情况3（新增）: 老师上传了评语 → 刷新让它显示出来
+                if (course.teacher_comment && course.teacher_comment !== old.teacher_comment) {
+                    console.log('💬 老师添加了评语');
                     loadMyCourses();
                 }
             }
@@ -2381,81 +2399,100 @@ function subscribeToCourseChanges() {
 // ============================================================
 // 倒计时定时器（包含自动刷新逻辑 - 修复版）
 // ============================================================
+// ============================================================
+// 倒计时定时器（修复版：只更新文本，不重新渲染整个列表）
+// ============================================================
 let countdownInterval = null;
+let lastRefreshAt = 0;
+const REFRESH_COOLDOWN = 5000; // 5秒内最多刷新一次
 
 function startCountdownTimer() {
-    if (countdownInterval) {
-        clearInterval(countdownInterval);
-    }
-    
+    if (countdownInterval) clearInterval(countdownInterval);
+
     countdownInterval = setInterval(() => {
-        // 🔥 检查是否需要自动刷新
+        const now = new Date();
         let needRefresh = false;
         let refreshReason = '';
-        
+
         for (const c of myCourses) {
             if (c.status === 'cancelled' || c.status === 'completed') continue;
-            
-            const now = new Date();
+
             const courseStart = new Date(c.start_time);
             const endTime = calculateEndTime(c.start_time, c.duration || 2);
-            
-            // 🔥 条件1: 倒计时结束（当前时间 >= 课程开始时间）
-            if (now >= courseStart) {
-                // 如果老师已开始上课，或者课程状态还是 scheduled，需要刷新
-                if (c.teacher_started === true || c.status === 'scheduled') {
-                    needRefresh = true;
-                    refreshReason = '⏰ 倒计时结束，课程开始';
+
+            // 条件1: 到达开课时间，老师还没开始，状态还是 scheduled
+            if (now >= courseStart && now <= endTime) {
+                if (!c.teacher_started && c.status === 'scheduled') {
+                    if (now - lastRefreshAt > REFRESH_COOLDOWN) {
+                        needRefresh = true;
+                        refreshReason = '⏰ 到达开课时间';
+                    }
                     break;
                 }
             }
-            
-            // 🔥 条件2: 课程已结束但状态未更新
+
+            // 条件2: 课程已结束但状态未更新
             if (now > endTime && c.status !== 'completed' && c.status !== 'cancelled') {
-                needRefresh = true;
-                refreshReason = '✅ 课程已结束';
-                break;
-            }
-            
-            // 🔥 条件3: 老师已开始上课（通过 teacher_started 标志）
-            if (c.teacher_started === true && c.status === 'scheduled') {
-                needRefresh = true;
-                refreshReason = '🔔 老师已开始上课';
-                break;
-            }
-            
-            // 🔥 条件4: 老师已开始但学生未确认，且当前时间在课程时间内
-            if (c.teacher_started === true && c.student_confirmed === false) {
-                const now2 = new Date();
-                if (now2 >= courseStart && now2 <= endTime) {
+                if (now - lastRefreshAt > REFRESH_COOLDOWN) {
                     needRefresh = true;
-                    refreshReason = '🔔 等待学生加入';
-                    break;
+                    refreshReason = '✅ 课程已结束';
                 }
+                break;
             }
         }
-        
-        // 🔥 需要刷新时，重新加载数据并更新UI
+
         if (needRefresh) {
+            lastRefreshAt = Date.now();
             console.log(`🔄 自动刷新: ${refreshReason}`);
             loadMyCourses();
-            loadAvailableSlots();
             return;
         }
-        
-        // 🔥 没有需要刷新的情况，更新倒计时显示
-        const hasCountdown = myCourses.some(c => {
-            const now = new Date();
-            const courseStart = new Date(c.start_time);
-            return now < courseStart && c.status !== 'cancelled' && c.status !== 'completed';
-        });
-        
-        if (hasCountdown) {
-            renderCoursesList();
-        }
-    }, 1000); // 🔥 改为每3秒检查一次，更及时
+
+        // 🔥 关键：只更新倒计时文本，不重建 DOM
+        updateCountdownTexts();
+    }, 1000);
 }
 
+// ============================================================
+// 只更新倒计时文本（不重建 DOM，避免按钮被替换导致点不中）
+// ============================================================
+function updateCountdownTexts() {
+    const t = translations[currentLang];
+    const now = new Date();
+
+    document.querySelectorAll('[data-countdown-course-id]').forEach(el => {
+        const courseId = el.dataset.countdownCourseId;
+        const course = myCourses.find(c => c.id === courseId);
+        if (!course) return;
+
+        const courseStart = new Date(course.start_time);
+        if (now >= courseStart) return;
+
+        const totalSeconds = Math.floor((courseStart - now) / 1000);
+        if (totalSeconds <= 0) return;
+
+        const diffMin = Math.floor(totalSeconds / 60);
+        const diffHours = Math.floor(diffMin / 60);
+        const diffDays = Math.floor(diffHours / 24);
+        const remainHours = diffHours % 24;
+        const remainMin = diffMin % 60;
+        const remainSec = totalSeconds % 60;
+
+        let text = '';
+        if (diffDays > 0) {
+            text = `⏳ ${diffDays}${t.countdownDays} ${remainHours}${t.countdownHours} ${remainMin}${t.countdownMinutes} ${remainSec}${t.countdownSeconds}`;
+        } else if (diffHours > 0) {
+            text = `⏳ ${diffHours}${t.countdownHours} ${remainMin}${t.countdownMinutes} ${remainSec}${t.countdownSeconds}`;
+        } else if (diffMin > 0) {
+            text = `⏳ ${diffMin}${t.countdownMinutes} ${remainSec}${t.countdownSeconds}`;
+        } else {
+            text = `⏳ ${remainSec}${t.countdownSeconds}`;
+        }
+
+        el.textContent = text;
+        el.className = totalSeconds < 300 ? 'countdown-text soon' : 'countdown-text';
+    });
+}
 // ============================================================
 // 页面卸载时清理定时器
 // ============================================================
@@ -2469,12 +2506,22 @@ window.addEventListener('beforeunload', function() {
 // ============================================================
 // 确认出席并加入课堂（合并功能）
 // ============================================================
+// ============================================================
+// 确认出席并加入课堂（带按钮防抖）
+// ============================================================
 async function confirmAndJoinClass(courseId) {
     const supabase = window.supabaseAuth.getSupabaseClient();
     const t = translations[currentLang];
 
+    // 立即禁用按钮，防止连点
+    const btn = window.event?.target?.closest('button');
+    if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+        btn.style.pointerEvents = 'none';
+    }
+
     try {
-        // 获取课程信息
         const { data: course, error: fetchError } = await supabase
             .from('courses')
             .select('meeting_link, teacher_started')
@@ -2485,17 +2532,17 @@ async function confirmAndJoinClass(courseId) {
 
         if (!course.teacher_started) {
             showToast(t.teacherNotStarted, 'warning');
+            if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.style.pointerEvents = ''; }
             return;
         }
 
-        // 🔥 关键：先打开会议链接（在用户手势上下文中，避免被拦截）
+        // 🔥 先打开会议链接（在用户手势上下文中，避免被拦截）
         if (course.meeting_link) {
             window.open(course.meeting_link, '_blank');
         } else {
-            showToast('⚠️ 没有找到会议链接，请联系老师。', 'warning');
+            showToast(t.noMeetingLink || '⚠️ 没有找到会议链接，请联系老师。', 'warning');
         }
 
-        // 再更新学生确认状态
         const { error: updateError } = await supabase
             .from('courses')
             .update({
@@ -2506,6 +2553,7 @@ async function confirmAndJoinClass(courseId) {
 
         if (updateError) {
             showToast(t.toastError + ': ' + updateError.message, 'error');
+            if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.style.pointerEvents = ''; }
             return;
         }
 
@@ -2515,6 +2563,7 @@ async function confirmAndJoinClass(courseId) {
     } catch (error) {
         console.error('加入课堂失败:', error);
         showToast(t.toastError + ': ' + error.message, 'error');
+        if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.style.pointerEvents = ''; }
     }
 }
 // ============================================================
