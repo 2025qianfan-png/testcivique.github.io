@@ -2177,50 +2177,42 @@ function renderCoursesList() {
             }
         }
 
-        // ===== 🔥 状态判断（核心修复） =====
+               // ===== 🔥 状态判断（teacher_started 最优先） =====
         if (c.status === 'cancelled') {
             statusText = t.statusCancelled;
             statusClass = 'status-cancelled';
         } else if (c.status === 'completed') {
             statusText = t.statusCompleted;
             statusClass = 'status-completed';
-        } 
-        // 🔥 情况1: 老师已开始，学生已确认 → 进行中
-        else if (c.teacher_started && c.student_confirmed && isNow) {
+        }
+        // 🔥 老师已开始 + 学生已确认 → 进行中
+        else if (c.teacher_started && c.student_confirmed) {
             statusText = t.statusInProgress;
             statusClass = 'status-in-progress';
-        } 
-        // 🔥 情况2: 老师已开始，学生未确认 → 等待学生加入
-        else if (c.teacher_started && !c.student_confirmed && isNow) {
+        }
+        // 🔥 老师已开始 + 学生未确认 → 无论到没到时间，都提示加入
+        else if (c.teacher_started && !c.student_confirmed) {
             statusText = t.clickToJoin;
             statusClass = 'status-pending';
-        } 
-        // 🔥 情况3: 老师已开始，但还没到课程时间（老师提前开始了）
-        else if (c.teacher_started && !c.student_confirmed && isBefore) {
-            statusText = t.waitingForClass;
-            statusClass = 'status-scheduled';
         }
-        // 🔥 情况4: 课程时间已到，老师还没开始 → 等待老师
+        // 老师没开始 + 到点了 → 等待老师
         else if (isNow && !c.teacher_started) {
             statusText = t.waitingForTeacher;
             statusClass = 'status-pending';
-        } 
-        // 🔥 情况5: 课程还没开始 → 显示倒计时
-                // 🔥 情况5: 课程还没开始 → 徽章只显示"已计划"（倒计时放操作区）
+        }
+        // 老师没开始 + 没到点 → 已计划
         else if (isBefore && !c.teacher_started) {
             statusText = t.statusScheduled;
             statusClass = 'status-scheduled';
-        }  
-        // 🔥 默认
+        }
+        // 默认
         else {
             statusText = t.statusScheduled;
             statusClass = 'status-scheduled';
         }
-
         // ===== 判断操作按钮 =====
         // 🔥 核心：可以加入课堂的条件
-        const canJoin = c.teacher_started && !c.student_confirmed && isNow && c.status !== 'cancelled' && c.status !== 'completed';
-        
+        const canJoin = c.teacher_started && !c.student_confirmed && c.status !== 'cancelled' && c.status !== 'completed';
         // 等待老师开始
         const waitingForTeacher = isNow && !c.teacher_started && c.status !== 'cancelled' && c.status !== 'completed';
         
