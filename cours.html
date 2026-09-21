@@ -102,7 +102,7 @@
             font-family: inherit;
             flex: 1;
             min-width: 150px;
-            font-size: 16px; /* 防止 iOS 缩放 */
+            font-size: 16px;
         }
         
         .btn-refresh, .btn-add {
@@ -238,7 +238,7 @@
             border: 2px solid #ddd;
             border-radius: 8px;
             font-family: inherit;
-            font-size: 16px; /* 防止 iOS 自动缩放 */
+            font-size: 16px;
         }
         .form-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px; }
         .cancel-btn { padding: 10px 20px; background: var(--light-gray); border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
@@ -494,7 +494,6 @@
             .modal-header { margin-bottom: 15px; }
             .modal-title { font-size: 1.2rem; }
             
-            /* ✅ 保存按钮吸附底部，防止被键盘遮挡 */
             .form-actions {
                 position: sticky;
                 bottom: 0;
@@ -520,6 +519,62 @@
                 flex-direction: column-reverse;
             }
             .confirm-dialog-footer button { width: 100%; }
+        }
+
+        /* ============================================================ */
+        /* 🔄 全局加载遮罩 */
+        /* ============================================================ */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+            padding: 16px;
+        }
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .loading-box {
+            background: white;
+            border-radius: 16px;
+            padding: 30px 40px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            min-width: 220px;
+            max-width: 320px;
+            transform: scale(0.9);
+            transition: transform 0.2s ease;
+        }
+        .loading-overlay.active .loading-box {
+            transform: scale(1);
+        }
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e0e0e0;
+            border-top-color: var(--primary-blue);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: var(--primary-blue);
+            font-weight: 600;
+            font-size: 0.95rem;
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -561,6 +616,14 @@
         </div>
     </main>
     <footer class="footer"><div class="container"><p>&copy; 2025 Association Mille Voiles</p></div></footer>
+
+    <!-- ===== 全局加载遮罩 ===== -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-box">
+            <div class="loading-spinner"></div>
+            <div class="loading-text" id="loadingText">Chargement...</div>
+        </div>
+    </div>
 
     <!-- 课程模态框 -->
     <div class="modal" id="courseModal">
@@ -690,6 +753,27 @@
         };
 
         // ============================================================
+        // 🆕 全局加载遮罩控制
+        // ============================================================
+        let loadingCount = 0;
+
+        function showLoading(text = 'Chargement...') {
+            loadingCount++;
+            const overlay = document.getElementById('loadingOverlay');
+            const textEl = document.getElementById('loadingText');
+            if (textEl) textEl.textContent = text;
+            if (overlay) overlay.classList.add('active');
+        }
+
+        function hideLoading() {
+            loadingCount = Math.max(0, loadingCount - 1);
+            if (loadingCount === 0) {
+                const overlay = document.getElementById('loadingOverlay');
+                if (overlay) overlay.classList.remove('active');
+            }
+        }
+
+        // ============================================================
         // 课程名称映射（完整名称）
         // ============================================================
         function getTypeDisplayText(code) {
@@ -738,16 +822,13 @@
 
         // ============================================================
         // 🆕 规范化 datetime-local 值 → "YYYY-MM-DD HH:MM:00"
-        //    兼容电脑端（无秒）和手机端（带秒）
         // ============================================================
         function normalizeLocalDateTime(localValue) {
             if (!localValue) return null;
-            // localValue 期望格式: "YYYY-MM-DDTHH:MM" 或 "YYYY-MM-DDTHH:MM:SS"
             const parts = localValue.split('T');
             if (parts.length !== 2) return null;
             const datePart = parts[0];
             let timePart = parts[1];
-            // 只保留 HH:MM
             const hm = timePart.split(':');
             if (hm.length < 2) return null;
             const hh = hm[0].padStart(2, '0');
@@ -881,7 +962,7 @@
                 const { date, time } = formatDateSimple(course.start_time);
                 const courseTypeName = getTypeDisplayText(course.course_type);
 
-                const shouldExclude = (action === 'cancel' || action === 'complete');
+                const shouldExclude = (action !== 'create');
 
                 let teacherCoursesFormatted = '✅ Aucun cours à venir.';
                 let studentCoursesFormatted = '✅ Aucun cours à venir.';
@@ -1038,15 +1119,12 @@
             return codes;
         }
 
-        // 🆕 统一的"绑定点击"辅助函数：同时支持 click 和 touchend
-        //   避免移动端重复触发，也避免父元素拦截
         function bindTap(el, handler) {
             let touched = false;
             el.addEventListener('touchend', (e) => {
                 touched = true;
                 e.preventDefault();
                 handler(e);
-                // 200ms 内忽略 click，防止重复触发
                 setTimeout(() => { touched = false; }, 300);
             }, { passive: false });
             el.addEventListener('click', (e) => {
@@ -1088,7 +1166,6 @@
             html += `</div></div></div>`;
             container.innerHTML = html;
             
-            // 🆕 一级标题：折叠/展开
             document.querySelectorAll('.level1-header').forEach(h => {
                 bindTap(h, (e) => {
                     e.stopPropagation();
@@ -1103,7 +1180,6 @@
                 });
             });
             
-            // 🆕 二级标题：折叠/展开
             document.querySelectorAll('.level2-header').forEach(h => {
                 bindTap(h, (e) => {
                     e.stopPropagation();
@@ -1119,7 +1195,6 @@
                 });
             });
             
-            // 🆕 三级选项：选中课程类型
             document.querySelectorAll('.type-option').forEach(opt => {
                 bindTap(opt, (e) => {
                     e.stopPropagation();
@@ -1179,7 +1254,6 @@
             const student = allStudents.find(s => s.id === studentId);
             if (!student) return true;
             if (student.credit === undefined || student.credit === null) {
-                // 未设置 credit 字段，跳过
                 return true;
             }
             const currentCredit = Number(student.credit) || 0;
@@ -1366,6 +1440,7 @@
         }
 
         async function loadData() {
+            showLoading('Chargement des données...');
             try {
                 const supabase = window.supabaseAuth.getSupabaseClient();
                 if (!supabase) {
@@ -1398,6 +1473,8 @@
             } catch (err) {
                 console.error(err);
                 showToast('Erreur chargement: ' + err.message, 'error');
+            } finally {
+                hideLoading();
             }
         }
 
@@ -1468,9 +1545,7 @@
                 document.getElementById('selectedTypeDisplay').textContent = '已选: ' + getTypeDisplayText(course.course_type);
             }
             
-            // 🆕 兼容带秒/不带秒的数据库时间
             const startTimeISO = course.start_time.replace(' ', 'T');
-            // 只取前 16 位 "YYYY-MM-DDTHH:MM"
             document.getElementById('startTime').value = startTimeISO.slice(0, 16);
             document.getElementById('duration').value = course.duration || 2;
             document.getElementById('location').value = course.location || '';
@@ -1524,7 +1599,6 @@
             let courseType = document.getElementById('courseTypeValue').value;
             const newStatus = document.getElementById('status').value;
             
-            // 🆕 兜底：如果 courseTypeValue 为空，从 DOM 找已选类型
             if (!courseType) {
                 const selectedOpt = document.querySelector('.type-option.selected');
                 if (selectedOpt) {
@@ -1542,7 +1616,6 @@
                 return;
             }
             
-            // 🆕 使用 normalizeLocalDateTime，兼容电脑端和手机端
             const startTimeStr = normalizeLocalDateTime(startTimeLocal);
             if (!startTimeStr) {
                 showToast('Format de date invalide', 'error');
@@ -1578,6 +1651,7 @@
                 return;
             }
             
+            showLoading(id ? 'Modification du cours...' : 'Création du cours...');
             try {
                 const isNewCourse = !id;
                 let newCourseId = id;
@@ -1641,6 +1715,8 @@
             } catch (err) {
                 console.error(err);
                 showToast('Erreur: ' + (err.message || 'Vérifiez la console'), 'error');
+            } finally {
+                hideLoading();
             }
         }
 
@@ -1651,6 +1727,7 @@
             const { id, data, oldCourse } = pendingCancelData;
             const supabase = window.supabaseAuth.getSupabaseClient();
             
+            showLoading('Annulation du cours...');
             try {
                 const isNewCourse = !id;
                 
@@ -1683,6 +1760,8 @@
             } catch (err) {
                 console.error(err);
                 showToast('Erreur: ' + (err.message || 'Vérifiez la console'), 'error');
+            } finally {
+                hideLoading();
             }
             pendingCancelData = null;
         }
@@ -1760,6 +1839,7 @@
             const supabase = window.supabaseAuth.getSupabaseClient();
             const courseToDelete = allCourses.find(c => c.id === pendingDeleteCourseId);
             
+            showLoading('Suppression du cours...');
             try {
                 if (courseToDelete && (courseToDelete.status === 'scheduled' || courseToDelete.status === 'in_progress' || courseToDelete.status === 'completed')) {
                     await refundStudentCredit(courseToDelete.student_id, courseToDelete.duration || 2);
@@ -1777,6 +1857,8 @@
             } catch (err) {
                 console.error(err);
                 showToast('Erreur lors de la suppression', 'error');
+            } finally {
+                hideLoading();
             }
         }
 
@@ -1814,6 +1896,8 @@
                 evaluated_at: new Date().toISOString(),
                 status: 'completed'
             };
+            
+            showLoading('Enregistrement de l\'évaluation...');
             try {
                 const { error } = await supabase.from('courses').update(data).eq('id', courseId);
                 if (error) throw error;
@@ -1822,6 +1906,8 @@
                 showToast('Évaluation enregistrée', 'success');
             } catch (err) {
                 showToast('Erreur: ' + err.message, 'error');
+            } finally {
+                hideLoading();
             }
         }
 
@@ -1840,7 +1926,6 @@
         filterType.addEventListener('change', () => renderCoursesList());
         filterTeacher.addEventListener('change', () => renderCoursesList());
         
-        // 🆕 星星评分：同时支持点击和触摸
         document.querySelectorAll('#ratingStars .star').forEach(star => {
             bindTap(star, () => {
                 const val = parseInt(star.dataset.value);
