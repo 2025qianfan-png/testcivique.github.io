@@ -1523,34 +1523,37 @@ async function startCourse(id) {
     const localTimeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
     
     try {
-        // 先获取课程信息，拿到会议链接
-        const { data: course, error: fetchError } = await supabase
-            .from('courses')
-            .select('meeting_link')
-            .eq('id', id)
-            .single();
+        // 🔥 1. 先同步获取课程信息（不 await，直接用缓存的 allCourses）
+        const cachedCourse = allCourses.find(c => c.id === id);
+        const meetingLink = cachedCourse?.meeting_link;
         
-        if (fetchError) throw fetchError;
+        // 🔥 2. 立刻打开窗口（还在用户点击的同步上下文里！）
+        let newWindow = null;
+        if (meetingLink) {
+            newWindow = window.open(meetingLink, '_blank');
+            if (!newWindow) {
+                // 如果被拦截，提示用户
+                showToast('⚠️ Le navigateur a bloqué l\'ouverture. Cliquez sur "🔄 Rejoindre" ci-dessous.', 'warning');
+            }
+        }
         
-        // 🔥 更新课程状态：teacher_started = true, status = 'in_progress'
+        // 🔥 3. 然后再更新数据库（异步）
         const { error } = await supabase
             .from('courses')
             .update({ 
-                teacher_started: true,      // 老师已开始
-                actual_start: localTimeStr, // 实际开始时间
-                status: 'in_progress'       // 状态改为进行中
+                teacher_started: true,
+                actual_start: localTimeStr,
+                status: 'in_progress'
             })
             .eq('id', id);
         
         if (error) throw error;
         
         showToast('✅ Cours démarré !', 'success');
-        await loadCourses(); // 重新加载列表
+        await loadCourses();
         
-        // 如果有会议链接，自动跳转
-        if (course.meeting_link) {
-            window.open(course.meeting_link, '_blank');
-        } else {
+        // 如果没链接，提示
+        if (!meetingLink) {
             showToast('⚠️ Aucun lien Meet configuré. Veuillez en ajouter via "📍 Lieu / Meet".', 'warning');
         }
         
@@ -1559,7 +1562,7 @@ async function startCourse(id) {
         showToast('❌ Erreur: ' + error.message, 'error');
     }
 }
-  // ============================================================
+// ============================================================
         // 新增：重新加入会议（老师端）
         // ============================================================
         function teacherRejoinMeeting(meetingLink) {
