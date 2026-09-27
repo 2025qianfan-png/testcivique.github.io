@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Pages privées / d'administration : ne pas indexer
+Disallow: /admin.html
+Disallow: /teacher.html
+Disallow: /student.html
+Disallow: /dashboard-etudiant.html
+
+Sitemap: https://assmv.fr/sitemap.xml

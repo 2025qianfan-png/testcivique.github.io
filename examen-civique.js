@@ -1587,7 +1587,7 @@ async function loadStats() {
         const { count: totalCount, error: totalError } = await supabase
             .from('users')
             .select('*', { count: 'exact', head: true })
-            .in('role', ['stu', 'stu_all']);
+            .in('role', ['stu', 'stu_all', 'user']);
         if (totalError) throw totalError;
         
         const studentCount = totalCount || 0;
