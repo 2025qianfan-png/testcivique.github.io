@@ -1,648 +1,816 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Administration - Association Mille Voiles</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="admin.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
-    <style>
-        /* ===== TAB SYSTEM ===== */
-        .admin-tabs {
-            display: flex;
-            gap: 4px;
-            background: var(--light-gray);
-            border-radius: 12px;
-            padding: 4px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-        .admin-tabs button {
-            padding: 12px 28px;
-            border: none;
-            background: transparent;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: var(--medium-gray);
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: 'Montserrat', sans-serif;
-        }
-        .admin-tabs button:hover {
-            background: rgba(0,64,128,0.05);
-        }
-        .admin-tabs button.active {
-            background: var(--primary-blue);
-            color: white;
-            box-shadow: 0 4px 15px rgba(0,64,128,0.20);
-        }
-        .admin-tabs button i { margin-right: 8px; }
-
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ===== PRE-REGISTRATION BADGE ===== */
-        .pre-reg-badge {
-            display: inline-block;
-            padding: 3px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-        .badge-pending { background: #fef3c7; color: #92400e; }
-        .badge-validated { background: #d1fae5; color: #065f46; }
-        .badge-rejected { background: #fee2e2; color: #991b1b; }
-
-        .pre-reg-count {
-            background: var(--primary-yellow);
-            color: var(--primary-blue);
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-left: 10px;
-        }
-
-        .action-btn-validate {
-            background: var(--green);
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .action-btn-validate:hover { background: #219653; transform: scale(1.02); }
-
-        .action-btn-reject {
-            background: var(--red);
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-left: 6px;
-        }
-        .action-btn-reject:hover { background: #c0392b; transform: scale(1.02); }
-
-        .action-btn-detail {
-            background: var(--primary-light-blue);
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-right: 6px;
-        }
-        .action-btn-detail:hover { background: var(--primary-blue); transform: scale(1.02); }
-
-        .action-btn-edit-pre {
-            background: var(--primary-light-blue);
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-right: 4px;
-        }
-        .action-btn-edit-pre:hover { background: var(--primary-blue); transform: scale(1.02); }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--medium-gray);
-        }
-        .empty-state i { font-size: 3rem; color: #ddd; margin-bottom: 15px; }
-
-        /* ===== DETAIL MODAL ===== */
-        .modal-detail .modal-content { max-width: 700px; }
-        .detail-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px 24px;
-            margin: 15px 0;
-        }
-        .detail-item { padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
-        .detail-item .label { font-weight: 600; color: var(--primary-blue); font-size: 0.8rem; }
-        .detail-item .value { font-size: 0.95rem; color: var(--dark-gray); }
-        .detail-full { grid-column: 1 / -1; }
-
-        /* ===== PAYMENT BADGE ===== */
-        .payment-badge {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-        .payment-wechat { background: rgba(7,193,96,0.15); color: #07c160; }
-        .payment-alipay { background: rgba(22,119,255,0.15); color: #1677ff; }
-        .payment-xiaohongshu { background: rgba(255,36,66,0.15); color: #ff2442; }
-        .payment-cb { background: rgba(26,115,232,0.15); color: #1a73e8; }
-
-        /* ===== CREDIT STYLES ===== */
-        .credit-normal { color: var(--green); font-weight: 600; }
-        .credit-low { color: var(--orange); font-weight: 600; }
-        .credit-zero { color: var(--red); font-weight: 600; }
-        .credit-na { color: var(--medium-gray); }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .detail-grid { grid-template-columns: 1fr; }
-            .admin-tabs button { padding: 10px 16px; font-size: 0.8rem; }
-        }
-
-        /* ===== EDIT PRE-REG MODAL ===== */
-        .edit-prereg-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px 20px;
-        }
-        .edit-prereg-full { grid-column: 1 / -1; }
-        @media (max-width: 768px) {
-            .edit-prereg-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes">
+<title>Administration — Association Mille Voiles</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="admin.css">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+.lang-switch {
+    display: inline-flex;
+    background: rgba(255,255,255,0.2);
+    border-radius: 30px;
+    padding: 3px;
+    gap: 2px;
+}
+.lang-switch .lang-btn {
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+.lang-switch .lang-btn.active {
+    background: white;
+    color: var(--primary);
+}
+.lang-switch .lang-btn:hover:not(.active) {
+    background: rgba(255,255,255,0.15);
+}
+</style>
 </head>
-<body>
-    <header class="main-header">
-        <div class="container">
-            <h1>Administration</h1>
-            <p>Association Mille Voiles - Gestion des comptes et pré-inscriptions</p>
-        </div>
-    </header>
+<body data-theme="civique">
 
-    <nav class="main-nav">
-        <div class="container">
-            <a href="examen-civique.html" class="back-home">
-                <i class="fas fa-arrow-left"></i> Retour à l'accueil
-            </a>
-        </div>
-    </nav>
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="main-header">
+<div class="container">
+<div class="header-left">
+<div class="header-logo"><i class="fas fa-shield-alt"></i></div>
+<div class="header-title">
+<h1 id="headerTitle" data-i18n="header.title">Administration</h1>
+<span class="subtitle" id="headerSubtitle" data-i18n="header.subtitle">Association Mille Voiles</span>
+</div>
+</div>
+<div class="header-actions">
+<div class="lang-switch">
+<button class="lang-btn active" data-lang="fr" onclick="setLang('fr')">FR</button>
+<button class="lang-btn" data-lang="zh" onclick="setLang('zh')">中文</button>
+</div>
+<a href="#" class="back-link" id="backHomeLink"><i class="fas fa-arrow-left"></i> <span id="backHomeText" data-i18n="header.back">Retour</span></a>
+<div class="user-info"><i class="fas fa-user-circle"></i> <span id="currentAdminName">Administrateur</span></div>
+<button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span data-i18n="header.logout">Déconnexion</span></button>
+</div>
+</div>
+</header>
 
-    <main class="admin-content" id="adminContent">
-        <div class="container">
+<!-- ============================================================
+     TABS (6 个)
+     ============================================================ -->
+<nav class="admin-tabs"><div class="container">
+<button class="admin-tab active" data-tab="users" data-scope="both"><i class="fas fa-users"></i> <span data-i18n="tab.users">Utilisateurs</span></button>
+<button class="admin-tab" data-tab="prereg" data-scope="civique"><i class="fas fa-user-plus"></i> <span data-i18n="tab.prereg">Pré-inscriptions</span> <span class="tab-count" id="preRegCount">0</span></button>
+<button class="admin-tab" data-tab="civique-courses" data-scope="civique"><i class="fas fa-graduation-cap"></i> <span data-i18n="tab.civique">Cours Civique</span></button>
+<button class="admin-tab" data-tab="french-courses" data-scope="francais"><i class="fas fa-language"></i> <span data-i18n="tab.french">Cours Français</span></button>
+<button class="admin-tab" data-tab="student-exams" data-scope="both"><i class="fas fa-file-signature"></i> <span data-i18n="tab.exams">Examens élèves</span></button>
+<button class="admin-tab" data-tab="calendar" data-scope="both"><i class="fas fa-calendar-alt"></i> <span data-i18n="tab.calendar">Calendrier</span></button>
+</div></nav>
 
-            <!-- ===== DASHBOARD ===== -->
-            <section class="dashboard">
-                <div class="dashboard-header">
-                    <div>
-                        <h1 class="dashboard-title">Tableau de bord</h1>
-                        <p>Gérez les utilisateurs et les pré-inscriptions</p>
-                    </div>
-                    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-                        <div class="user-info">
-                            <i class="fas fa-user-circle"></i>
-                            <div>
-                                <div id="currentAdminName">Administrateur</div>
-                                <div style="font-size: 0.9rem; color: var(--medium-gray);" id="currentAdminRole">Rôle: Admin</div>
-                            </div>
-                        </div>
-                        <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
-                    </div>
-                </div>
+<!-- ============================================================
+     CONTENT
+     ============================================================ -->
+<main class="admin-content"><div class="container">
 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-users"></i></div>
-                        <div class="stat-number" id="totalUsers">0</div>
-                        <div class="stat-label">Utilisateurs</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
-                        <div class="stat-number" id="stuCount">0</div>
-                        <div class="stat-label">Élèves</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-passport"></i></div>
-                        <div class="stat-number" id="typeNCount">0</div>
-                        <div class="stat-label">Type N</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
-                        <div class="stat-number" id="typeRCount">0</div>
-                        <div class="stat-label">Type R</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-id-card-alt"></i></div>
-                        <div class="stat-number" id="typeMCount">0</div>
-                        <div class="stat-label">Type M</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-user-tag"></i></div>
-                        <div class="stat-number" id="typeTCount">0</div>
-                        <div class="stat-label">Type T</div>
-                    </div>
-                </div>
-            </section>
+<!-- ============ TAB 1: USERS ============ -->
+<section class="tab-content active" id="tab-users" data-theme="civique">
+<div class="stats-grid">
+<div class="stat-card blue"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-number" id="statTotalUsers">0</div><div class="stat-label" data-i18n="stat.total">Total</div></div>
+<div class="stat-card purple"><div class="stat-icon"><i class="fas fa-chalkboard-user"></i></div><div class="stat-number" id="statTeachers">0</div><div class="stat-label" data-i18n="stat.teachers">Intervenants</div></div>
+<div class="stat-card green"><div class="stat-icon"><i class="fas fa-user-graduate"></i></div><div class="stat-number" id="statStuCivique">0</div><div class="stat-label" data-i18n="stat.stuCivique">Élèves Civique</div></div>
+<div class="stat-card orange"><div class="stat-icon"><i class="fas fa-language"></i></div><div class="stat-number" id="statStuFrench">0</div><div class="stat-label" data-i18n="stat.stuFrench">Élèves Français</div></div>
+<div class="stat-card red"><div class="stat-icon"><i class="fas fa-user-tag"></i></div><div class="stat-number" id="statMembers">0</div><div class="stat-label" data-i18n="stat.members">Membres</div></div>
+<div class="stat-card"><div class="stat-icon"><i class="fas fa-crown"></i></div><div class="stat-number" id="statAdmins">0</div><div class="stat-label" data-i18n="stat.admins">Administrateurs</div></div>
+</div>
 
-            <!-- ===== TABS ===== -->
-            <div class="admin-tabs">
-                <button class="active" data-tab="users"><i class="fas fa-users"></i> Utilisateurs</button>
-                <button data-tab="prereg"><i class="fas fa-user-plus"></i> Pré-inscriptions <span class="pre-reg-count" id="preRegCount">0</span></button>
-            </div>
+<div class="card">
+<div class="card-header">
+<h2><i class="fas fa-users"></i> <span data-i18n="card.users.title">Gestion des utilisateurs</span><span class="subtitle" data-i18n="card.users.subtitle">Civique · Français · Intervenants · Membres</span></h2>
+<button class="btn btn-success" id="addUserBtn"><i class="fas fa-user-plus"></i> <span data-i18n="btn.add">Ajouter</span></button>
+</div>
+<div class="toolbar">
+<div class="toolbar-left">
+<div class="search-box"><input type="text" id="searchInput" data-i18n-placeholder="search.name" placeholder="Rechercher par nom..."><button class="search-btn" id="searchBtn"><i class="fas fa-search"></i></button></div>
+</div>
+<div class="toolbar-right">
+<div class="filter-group" id="userFilters">
+<button class="filter-btn active" data-filter="all" data-i18n="filter.all">Tous</button>
+<button class="filter-btn" data-filter="role-admin" data-i18n="filter.admin">👑 Admins</button>
+<button class="filter-btn" data-filter="role-teacher" data-i18n="filter.teacher">👨‍🏫 Intervenants</button>
+<button class="filter-btn" data-filter="role-stu" data-i18n="filter.stu">📘 Civique</button>
+<button class="filter-btn" data-filter="role-stu_fr" data-i18n="filter.stuFr">🇫🇷 Français</button>
+<button class="filter-btn" data-filter="role-stu_all" data-i18n="filter.stuAll">📘🇫🇷 Double</button>
+<button class="filter-btn" data-filter="role-user" data-i18n="filter.user">👤 Membres</button>
+<button class="filter-btn" data-filter="expired" data-i18n="filter.expired">⚠️ Expirés</button>
+</div>
+</div>
+</div>
+<div class="table-wrapper">
+<table class="users-table">
+<thead><tr>
+<th data-i18n="th.name">Nom</th>
+<th data-i18n="th.role">Rôle</th>
+<th data-i18n="th.modules">Modules</th>
+<th data-i18n="th.type">Type</th>
+<th data-i18n="th.level">Niveau</th>
+<th data-i18n="th.creditCivique">📘 Civique</th>
+<th data-i18n="th.creditFrench">🇫🇷 Français</th>
+<th data-i18n="th.expiry">Expiration</th>
+<th data-i18n="th.email">📧 Email</th>
+<th data-i18n="th.password">🔑 Mot de passe</th>
+<th data-i18n="th.actions">Actions</th>
+</tr></thead>
+<tbody id="usersTableBody">
+<tr><td colspan="11" class="loading"><i class="fas fa-spinner fa-spin"></i> <span data-i18n="loading">Chargement...</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
 
-            <!-- ===== TAB 1 : UTILISATEURS ===== -->
-            <div class="tab-content active" id="tab-users">
-                <div class="course-card">
-                    <div class="course-info">
-                        <h3><i class="fas fa-book-open"></i> Gestion des cours</h3>
-                        <p>Créer, modifier et organiser les cours de l'association</p>
-                    </div>
-                    <button class="course-btn" id="courseManageBtn">Accéder <i class="fas fa-arrow-right"></i></button>
-                </div>
+<!-- ============ TAB 2: PREREG ============ -->
+<section class="tab-content" id="tab-prereg" data-theme="civique">
+<div class="card">
+<div class="card-header">
+<h2><i class="fas fa-user-plus"></i> <span data-i18n="card.prereg.title">Pré-inscriptions</span> <span class="tab-count" id="preRegCount2">0</span><span class="subtitle" data-i18n="card.prereg.subtitle">Demandes d'inscription (Examen civique)</span></h2>
+</div>
+<div class="table-wrapper">
+<table class="users-table">
+<thead><tr>
+<th data-i18n="th.name">Nom</th>
+<th data-i18n="th.type">Type</th>
+<th data-i18n="th.role">Rôle</th>
+<th data-i18n="th.inscription">Inscription</th>
+<th data-i18n="th.expiry">Expiration</th>
+<th data-i18n="th.credit">📚 Crédits</th>
+<th data-i18n="th.order">📦 Commande</th>
+<th data-i18n="th.payment">💳 Paiement</th>
+<th data-i18n="th.status">Statut</th>
+<th data-i18n="th.actions">Actions</th>
+</tr></thead>
+<tbody id="preRegTableBody">
+<tr><td colspan="10" class="loading"><i class="fas fa-spinner fa-spin"></i> <span data-i18n="loading">Chargement...</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
 
-                <section class="users-table-container">
-                    <div class="section-header">
-                        <h2>Gestion des utilisateurs</h2>
-                        <p>Visualisez, modifiez et gérez tous les utilisateurs de l'application</p>
-                    </div>
+<!-- ============ TAB 3: CIVIQUE COURSES ============ -->
+<section class="tab-content" id="tab-civique-courses" data-theme="civique">
+<div class="card">
+<div class="card-header">
+<h2><i class="fas fa-graduation-cap"></i> <span data-i18n="card.civique.title">Cours Civique</span><span class="subtitle" data-i18n="card.civique.subtitle">Cours de préparation à l'examen civique</span></h2>
+<button class="btn btn-success" id="addCiviqueCourseBtn"><i class="fas fa-plus"></i> <span data-i18n="btn.addCourse">Ajouter un cours</span></button>
+</div>
+<div class="toolbar">
+<div class="toolbar-left">
+<div class="search-box"><input type="text" id="civiqueSearchInput" data-i18n-placeholder="search.generic" placeholder="Rechercher..."></div>
+</div>
+<div class="toolbar-right">
+<select class="filter-select" id="civiqueFilterType"><option value="" data-i18n="filter.allTypes">Tous les types</option></select>
+<select class="filter-select" id="civiqueFilterTeacher"><option value="" data-i18n="filter.allTeachers">Tous les intervenants</option></select>
+<button class="filter-btn active" id="civiqueShowUpcoming" data-i18n="filter.upcoming">📅 À venir</button>
+<button class="filter-btn" id="civiqueShowPast" data-i18n="filter.past">📜 Historique</button>
+<button class="btn btn-secondary" id="civiqueRefreshBtn"><i class="fas fa-sync-alt"></i></button>
+</div>
+</div>
+<div class="courses-list" id="civiqueCoursesList"><div class="empty-state" data-i18n="loading">Chargement...</div></div>
+</div>
+</section>
 
-                    <div class="controls">
-                        <div class="search-box">
-                            <input type="text" id="searchInput" placeholder="Rechercher un utilisateur par nom...">
-                            <button class="search-btn" id="searchBtn"><i class="fas fa-search"></i> Rechercher</button>
-                        </div>
-                        <div class="filters">
-                            <button class="filter-btn active" data-filter="all">Tous</button>
-                            <button class="filter-btn" data-filter="type-n">Type N</button>
-                            <button class="filter-btn" data-filter="type-r">Type R</button>
-                            <button class="filter-btn" data-filter="type-m">Type M</button>
-                            <button class="filter-btn" data-filter="type-t">Type T</button>
-                            <button class="filter-btn" data-filter="role-user">Membres</button>
-                            <button class="filter-btn" data-filter="role-stu">Élèves</button>
-                            <button class="filter-btn" data-filter="role-teacher">Intervenants</button>
-                            <button class="filter-btn" data-filter="role-admin">Administrateurs</button>
-                            <button class="filter-btn" data-filter="expired">Expirés</button>
-                        </div>
-                    </div>
+<!-- ============ TAB 4: FRENCH COURSES ============ -->
+<section class="tab-content" id="tab-french-courses" data-theme="francais">
+<div class="card">
+<div class="card-header">
+<h2><i class="fas fa-language"></i> <span data-i18n="card.french.title">Cours Français</span><span class="subtitle" data-i18n="card.french.subtitle">Cours de français (FLE)</span></h2>
+<button class="btn btn-success" id="addFrenchCourseBtn"><i class="fas fa-plus"></i> <span data-i18n="btn.addCourse">Ajouter un cours</span></button>
+</div>
+<div class="toolbar">
+<div class="toolbar-left">
+<div class="search-box"><input type="text" id="frenchSearchInput" data-i18n-placeholder="search.generic" placeholder="Rechercher..."></div>
+</div>
+<div class="toolbar-right">
+<select class="filter-select" id="frenchFilterType"><option value="" data-i18n="filter.allTypes">Tous les types</option></select>
+<select class="filter-select" id="frenchFilterTeacher"><option value="" data-i18n="filter.allTeachers">Tous les intervenants</option></select>
+<button class="filter-btn active" id="frenchShowUpcoming" data-i18n="filter.upcoming">📅 À venir</button>
+<button class="filter-btn" id="frenchShowPast" data-i18n="filter.past">📜 Historique</button>
+<button class="btn btn-secondary" id="frenchRefreshBtn"><i class="fas fa-sync-alt"></i></button>
+</div>
+</div>
+<div class="courses-list" id="frenchCoursesList"><div class="empty-state" data-i18n="loading">Chargement...</div></div>
+</div>
+</section>
 
-                    <div class="table-wrapper">
-                        <table class="users-table">
-                            <thead>
-                                <th>Nom</th>
-                                <th>Type</th>
-                                <th>Rôle</th>
-                                <th>Date de création</th>
-                                <th>Date d'expiration</th>
-                                <th>📚 Crédits</th>
-                                <th>📧 Email</th>
-                                <th>Mot de passe</th>
-                                <th>Actions</th>
-                            </thead>
-                            <tbody id="usersTableBody"></tbody>
-                        </table>
-                    </div>
+<!-- ============ TAB 5: STUDENT EXAMS ============ -->
+<section class="tab-content" id="tab-student-exams" data-theme="civique">
+<div class="card">
+<div class="card-header">
+<h2><i class="fas fa-file-signature"></i> <span data-i18n="card.exams.title">Examens des élèves</span><span class="subtitle" data-i18n="card.exams.subtitle">Suivi des examens passés (Civique / Français)</span></h2>
+<button class="btn btn-success" id="addStudentExamBtn"><i class="fas fa-plus"></i> <span data-i18n="btn.addExam">Ajouter un examen</span></button>
+</div>
+<div class="toolbar">
+<div class="toolbar-left">
+<div class="search-box"><input type="text" id="studentExamSearchInput" data-i18n-placeholder="search.name" placeholder="Rechercher par nom..."></div>
+</div>
+<div class="toolbar-right">
+<div class="filter-group" id="studentExamFilters">
+<button class="filter-btn active" data-filter="all" data-i18n="filter.all">Tous</button>
+<button class="filter-btn" data-filter="cat-civique" data-i18n="filter.civique">📘 Civique</button>
+<button class="filter-btn" data-filter="cat-francais" data-i18n="filter.french">🇫🇷 Français</button>
+<button class="filter-btn" data-filter="status-passed" data-i18n="filter.passed">✅ Réussis</button>
+<button class="filter-btn" data-filter="status-failed" data-i18n="filter.failed">❌ Échoués</button>
+<button class="filter-btn" data-filter="status-planned" data-i18n="filter.planned">📅 Planifiés</button>
+</div>
+</div>
+</div>
+<div class="table-wrapper">
+<table class="users-table">
+<thead><tr>
+<th data-i18n="th.student">Élève</th>
+<th data-i18n="th.category">Catégorie</th>
+<th data-i18n="th.examType">Type</th>
+<th data-i18n="th.date">Date</th>
+<th data-i18n="th.score">Score</th>
+<th data-i18n="th.result">Résultat</th>
+<th data-i18n="th.notes">Notes</th>
+<th data-i18n="th.actions">Actions</th>
+</tr></thead>
+<tbody id="studentExamsTableBody">
+<tr><td colspan="8" class="loading"><i class="fas fa-spinner fa-spin"></i> <span data-i18n="loading">Chargement...</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
 
-                    <div class="loading" id="tableLoading">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>Chargement des données...</p>
-                    </div>
+<!-- ============ TAB 6: CALENDAR ============ -->
+<section class="tab-content" id="tab-calendar" data-theme="civique">
+<div class="card">
+<div class="card-header">
+<h2><i class="fas fa-calendar-alt"></i> <span data-i18n="card.calendar.title">Calendrier des cours</span><span class="subtitle" data-i18n="card.calendar.subtitle">Vue hebdomadaire des cours programmés</span></h2>
+</div>
 
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="login-btn" id="addUserBtn" style="width: auto; padding: 12px 30px;">
-                            <i class="fas fa-user-plus"></i> Ajouter un utilisateur
-                        </button>
-                    </div>
-                </section>
-            </div>
+<div class="calendar-toolbar">
+<div class="calendar-week-nav">
+<button class="nav-btn" onclick="changeWeek(-1)"><i class="fas fa-chevron-left"></i> <span data-i18n="cal.prevWeek">Semaine précédente</span></button>
+<button class="nav-btn" onclick="changeWeek(0)"><i class="fas fa-calendar-day"></i> <span data-i18n="cal.today">Aujourd'hui</span></button>
+<button class="nav-btn" onclick="changeWeek(1)"><span data-i18n="cal.nextWeek">Semaine suivante</span> <i class="fas fa-chevron-right"></i></button>
+</div>
+<div class="calendar-week-label" id="calendarWeekLabel">—</div>
+</div>
 
-            <!-- ===== TAB 2 : PRÉ-INSCRIPTIONS ===== -->
-            <div class="tab-content" id="tab-prereg">
-                <section class="users-table-container">
-                    <div class="section-header">
-                        <h2>Pré-inscriptions <span class="pre-reg-count" id="preRegCount2">0</span></h2>
-                        <p>Validez ou rejetez les demandes d'inscription en attente</p>
-                    </div>
+<div class="calendar-filters" style="margin-bottom:16px;">
+<select class="filter-select" id="calFilterCategory">
+<option value="all" data-i18n="cal.filter.allModules">Tous les modules</option>
+<option value="civique" data-i18n="cal.filter.civique">📘 Civique</option>
+<option value="francais" data-i18n="cal.filter.francais">🇫🇷 Français</option>
+</select>
+<select class="filter-select" id="calFilterTeacher"><option value="" data-i18n="cal.filter.allTeachers">Tous les intervenants</option></select>
+<select class="filter-select" id="calFilterStudent"><option value="" data-i18n="cal.filter.allStudents">Tous les élèves</option></select>
+<select class="filter-select" id="calFilterStatus">
+<option value="all" data-i18n="cal.filter.allStatus">Tous les statuts</option>
+<option value="scheduled" data-i18n="cal.filter.scheduled">📅 Planifié</option>
+<option value="in_progress" data-i18n="cal.filter.inProgress">🔄 En cours</option>
+<option value="completed" data-i18n="cal.filter.completed">✅ Terminé</option>
+<option value="cancelled" data-i18n="cal.filter.cancelled">❌ Annulé</option>
+</select>
+</div>
 
-                    <div class="table-wrapper">
-                        <table class="users-table">
-                            <thead>
-                                <th>Nom</th>
-                                <th>Type</th>
-                                <th>Rôle</th>
-                                <th>Date d'inscription</th>
-                                <th>Date d'expiration</th>
-                                <th>📚 Crédits</th>
-                                <th>📦 Commande</th>
-                                <th>💳 Paiement</th>
-                                <th>Statut</th>
-                                <th>Actions</th>
-                            </thead>
-                            <tbody id="preRegTableBody"></tbody>
-                        </table>
-                    </div>
+<!-- 桌面端：周视图 -->
+<div class="week-view" id="weekView">
+<div class="empty-state" data-i18n="loading">Chargement...</div>
+</div>
 
-                    <div class="loading" id="preRegLoading">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>Chargement des pré-inscriptions...</p>
-                    </div>
-                </section>
-            </div>
+<!-- 移动端：列表视图 -->
+<div class="calendar-mobile-list" id="calendarMobileList">
+<div class="empty-state" data-i18n="loading">Chargement...</div>
+</div>
 
-        </div>
-    </main>
+</div>
+</section>
 
-    <!-- ===== MODAL DÉTAIL PRÉ-INSCRIPTION ===== -->
-    <div class="modal modal-detail" id="detailModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Détails de la pré-inscription</h2>
-                <button class="close-btn" id="closeDetailBtn">&times;</button>
-            </div>
-            <div id="detailContent">
-                <div class="detail-grid">
-                    <div class="detail-item"><span class="label">Nom</span><div class="value" id="dName">-</div></div>
-                    <div class="detail-item"><span class="label">Type</span><div class="value" id="dType">-</div></div>
-                    <div class="detail-item"><span class="label">Rôle</span><div class="value" id="dRole">-</div></div>
-                    <div class="detail-item"><span class="label">Date d'inscription</span><div class="value" id="dCreated">-</div></div>
-                    <div class="detail-item"><span class="label">Date d'expiration</span><div class="value" id="dTimer">-</div></div>
-                    <div class="detail-item"><span class="label">📚 Crédits</span><div class="value" id="dCredit">-</div></div>
-                    <div class="detail-item"><span class="label">Prix estimé</span><div class="value" id="dPrice">-</div></div>
-                    <div class="detail-item"><span class="label">📦 Numéro de commande</span><div class="value" id="dOrderNumber">-</div></div>
-                    <div class="detail-item"><span class="label">💳 Moyen de paiement</span><div class="value" id="dPaymentMethod">-</div></div>
-                    <div class="detail-item"><span class="label">Statut</span><div class="value" id="dStatus">-</div></div>
-                    <div class="detail-item detail-full"><span class="label">Email</span><div class="value" id="dEmail">-</div></div>
-                    <div class="detail-item detail-full"><span class="label">Date de naissance</span><div class="value" id="dBirth">-</div></div>
-                    <div class="detail-item detail-full"><span class="label">Lieu de naissance</span><div class="value" id="dBirthPlace">-</div></div>
-                    <div class="detail-item detail-full"><span class="label">Adresse</span><div class="value" id="dAddress">-</div></div>
-                    <div class="detail-item detail-full"><span class="label">Téléphone</span><div class="value" id="dPhone">-</div></div>
-                    <div class="detail-item detail-full"><span class="label">Forfait</span><div class="value" id="dPack">-</div></div>
-                </div>
-            </div>
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
-                <button class="cancel-btn" id="closeDetailBtn2">Fermer</button>
-            </div>
-        </div>
-    </div>
+</div></main>
 
-    <!-- ===== MODAL ÉDITION PRÉ-INSCRIPTION ===== -->
-    <div class="modal" id="editPreRegModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">✏️ Modifier la pré-inscription</h2>
-                <button class="close-btn" id="closeEditPreRegBtn">&times;</button>
-            </div>
-            <form id="editPreRegForm">
-                <input type="hidden" id="editPreRegId">
-                <div class="edit-prereg-grid">
-                    <div class="form-group">
-                        <label for="editPreRegName">Nom d'utilisateur *</label>
-                        <input type="text" id="editPreRegName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editPreRegEmail">📧 Email</label>
-                        <input type="email" id="editPreRegEmail" placeholder="exemple@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="editPreRegPassword">Mot de passe</label>
-                        <input type="text" id="editPreRegPassword" placeholder="Nouveau mot de passe">
-                        <small style="color: #666; font-size: 0.75rem;">Laissez vide pour garder le mot de passe actuel</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="editPreRegType">Type *</label>
-                        <select id="editPreRegType" required>
-                            <option value="n">Type N (Naturalisation)</option>
-                            <option value="r">Type R (Carte 10 ans)</option>
-                            <option value="m">Type M (Pluriannuelle)</option>
-                            <option value="t">Type T (TCF IRN)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="editPreRegRole">Rôle</label>
-                        <select id="editPreRegRole">
-                            <option value="">Aucun rôle</option>
-                            <option value="user">Membre</option>
-                            <option value="stu">Élève</option>
-                            <option value="teacher">Intervenant</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="editPreRegTimer">Date d'expiration</label>
-                        <input type="datetime-local" id="editPreRegTimer">
-                    </div>
-                    <div class="form-group">
-                        <label for="editPreRegCredit">📚 Crédits (heures)</label>
-                        <input type="number" id="editPreRegCredit" min="0" step="1" value="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="editPreRegPrice">💰 Prix estimé (€)</label>
-                        <input type="number" id="editPreRegPrice" min="0" step="1" value="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="editPreRegOrderNumber">📦 Numéro de commande</label>
-                        <input type="text" id="editPreRegOrderNumber" placeholder="Ex: #CMD-2025-001">
-                    </div>
-                    <div class="form-group">
-                        <label for="editPreRegPaymentMethod">💳 Moyen de paiement</label>
-                        <select id="editPreRegPaymentMethod">
-                            <option value="">Sélectionner</option>
-                            <option value="wechat">WeChat 微信</option>
-                            <option value="alipay">Alipay 支付宝</option>
-                            <option value="xiaohongshu">Xiaohongshu 小红书</option>
-                            <option value="cb">CB 银行卡</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="editPreRegPhone">📱 Téléphone</label>
-                        <input type="text" id="editPreRegPhone" placeholder="06 12 34 56 78">
-                    </div>
-                    <div class="form-group">
-                        <label for="editPreRegPack">📦 Forfait</label>
-                        <input type="text" id="editPreRegPack" placeholder="Ex: 20h, 10h...">
-                    </div>
-                    <div class="form-group edit-prereg-full">
-                        <label for="editPreRegAddress">📍 Adresse</label>
-                        <input type="text" id="editPreRegAddress" placeholder="Adresse complète">
-                    </div>
-                    <div class="form-group">
-                        <label for="editPreRegBirth">📅 Date de naissance</label>
-                        <input type="date" id="editPreRegBirth">
-                    </div>
-                    <div class="form-group">
-                        <label for="editPreRegBirthPlace">📍 Lieu de naissance</label>
-                        <input type="text" id="editPreRegBirthPlace" placeholder="Ville, pays">
-                    </div>
-                </div>
-                <div class="form-actions" style="margin-top: 25px;">
-                    <button type="button" class="cancel-btn" id="cancelEditPreRegBtn">Annuler</button>
-                    <button type="submit" class="save-btn"><i class="fas fa-save"></i> Enregistrer les modifications</button>
-                </div>
-            </form>
-        </div>
-    </div>
+<footer class="main-footer"><div class="container"><p data-i18n="footer">© 2025-2026 Association Mille Voiles / 千帆协会</p></div></footer>
 
-    <!-- ===== MODAL ÉDITION UTILISATEUR ===== -->
-    <div class="modal" id="editUserModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="modalTitle">Modifier l'utilisateur</h2>
-                <button class="close-btn" id="closeModalBtn">&times;</button>
-            </div>
-            <form id="editUserForm">
-                <input type="hidden" id="editUserId">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editUserName">Nom d'utilisateur</label>
-                        <input type="text" id="editUserName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editUserEmail">📧 Email</label>
-                        <input type="email" id="editUserEmail" placeholder="exemple@email.com">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editUserPassword">Mot de passe (laisser vide pour ne pas changer)</label>
-                        <input type="password" id="editUserPassword" placeholder="Nouveau mot de passe">
-                    </div>
-                    <div class="form-group">
-                        <label for="editUserType">Type d'utilisateur</label>
-                        <select id="editUserType" required>
-                            <option value="n">Type N</option>
-                            <option value="r">Type R</option>
-                            <option value="m">Type M</option>
-                            <option value="t">Type T</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editUserRole">Rôle</label>
-                        <select id="editUserRole">
-                            <option value="">Aucun rôle</option>
-                            <option value="user">Membre</option>
-                            <option value="stu">Élève</option>
-                            <option value="teacher">Intervenant</option>
-                            <option value="admin">Administrateur</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Date de création</label>
-                        <div style="padding: 15px; background: var(--light-gray); border-radius: 8px;" id="editUserCreatedAt">Chargement...</div>
-                    </div>
-                </div>
-                <div class="form-group form-full">
-                    <label>Date d'expiration (facultatif)</label>
-                    <input type="datetime-local" id="editUserTimer">
-                </div>
-                <div class="form-group form-full" id="editCreditGroup" style="display: none;">
-                    <label for="editUserCredit">📚 Crédits (heures de cours restantes)</label>
-                    <input type="number" id="editUserCredit" min="0" step="1" value="0" placeholder="Nombre d'heures">
-                    <small style="color: #666; display: block; margin-top: 5px;">Uniquement pour les élèves</small>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="cancel-btn" id="cancelEditBtn">Annuler</button>
-                    <button type="submit" class="save-btn"><i class="fas fa-save"></i> Enregistrer</button>
-                </div>
-            </form>
-        </div>
-    </div>
+<!-- ============================================================
+     MODAL: COURSE DETAIL (只读弹窗)
+     ============================================================ -->
+<div class="modal" id="courseDetailModal">
+<div class="modal-content">
+<div class="modal-header">
+<h3 id="courseDetailTitle" data-i18n="cd.title">Détails du cours</h3>
+<button class="close-modal" onclick="closeModal('courseDetailModal')">&times;</button>
+</div>
+<div id="courseDetailBody">
+<!-- 动态填充 -->
+</div>
+<div class="form-actions">
+<button class="cancel-action-btn" onclick="closeModal('courseDetailModal')" data-i18n="btn.close">Fermer</button>
+</div>
+</div>
+</div>
 
-    <!-- ===== MODAL AJOUT UTILISATEUR ===== -->
-    <div class="modal" id="addUserModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Ajouter un utilisateur</h2>
-                <button class="close-btn" id="closeAddModalBtn">&times;</button>
-            </div>
-            <form id="addUserForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="addUserName">Nom d'utilisateur</label>
-                        <input type="text" id="addUserName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="addUserEmail">📧 Email</label>
-                        <input type="email" id="addUserEmail" placeholder="exemple@email.com">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="addUserPassword">Mot de passe</label>
-                        <input type="password" id="addUserPassword" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="addUserType">Type d'utilisateur</label>
-                        <select id="addUserType" required>
-                            <option value="n">Type N</option>
-                            <option value="r">Type R</option>
-                            <option value="m">Type M</option>
-                            <option value="t">Type T</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="addUserRole">Rôle (facultatif)</label>
-                        <select id="addUserRole">
-                            <option value="">Aucun rôle</option>
-                            <option value="user">Membre</option>
-                            <option value="stu">Élève</option>
-                            <option value="teacher">Intervenant</option>
-                            <option value="admin">Administrateur</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Date d'expiration (facultatif)</label>
-                        <input type="datetime-local" id="addUserTimer">
-                    </div>
-                </div>
-                <div class="form-group form-full" id="addCreditGroup" style="display: none;">
-                    <label for="addUserCredit">📚 Crédits (heures de cours)</label>
-                    <input type="number" id="addUserCredit" min="0" step="1" value="5" placeholder="Ex: 5, 10, 20">
-                    <small style="color: #666; display: block; margin-top: 5px;">Uniquement pour les élèves - nombre d'heures de cours</small>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="cancel-btn" id="cancelAddBtn">Annuler</button>
-                    <button type="submit" class="save-btn"><i class="fas fa-user-plus"></i> Créer</button>
-                </div>
-            </form>
-        </div>
-    </div>
+<!-- ============================================================
+     MODAL: USER
+     ============================================================ -->
+<div class="modal" id="userModal">
+<div class="modal-content modal-lg">
+<div class="modal-header">
+<h3 id="userModalTitle" data-i18n="um.title.add">Ajouter un utilisateur</h3>
+<button class="close-modal" onclick="closeModal('userModal')">&times;</button>
+</div>
+<form id="userForm">
+<input type="hidden" id="userId">
 
-    <!-- ===== CONFIRMATION SUPPRESSION ===== -->
-    <div class="confirm-dialog" id="deleteConfirmDialog">
-        <div class="confirm-content">
-            <h3><i class="fas fa-exclamation-triangle" style="color: var(--red); margin-right: 10px;"></i> Confirmer la suppression</h3>
-            <p>Êtes-vous sûr de vouloir supprimer l'utilisateur <strong id="deleteUserName"></strong> ? Cette action est irréversible.</p>
-            <div class="confirm-actions">
-                <button class="confirm-btn confirm-cancel" id="cancelDeleteBtn">Annuler</button>
-                <button class="confirm-btn confirm-delete" id="confirmDeleteBtn"><i class="fas fa-trash"></i> Supprimer</button>
-            </div>
-        </div>
-    </div>
+<div class="form-row">
+<div class="form-group"><label data-i18n="form.name">Nom *</label><input type="text" id="userName" required></div>
+<div class="form-group"><label data-i18n="form.email">Email</label><input type="email" id="userEmail"></div>
+</div>
 
-    <footer class="main-footer">
-        <div class="container">
-            <div class="footer-bottom">
-                <p>&copy; 2025 Association Mille Voiles - Tous droits réservés.</p>
-            </div>
-        </div>
-    </footer>
-  
-    <script src="admin.js"></script>
+<div class="form-row">
+<div class="form-group"><label data-i18n="form.password">Mot de passe <span class="hint" data-i18n="form.passwordHint">(vide=inchangé)</span></label><input type="text" id="userPassword"></div>
+<div class="form-group">
+<label data-i18n="form.role">Rôle *</label>
+<select id="userRole" required>
+<option value="user" data-i18n="role.user">👤 Membre</option>
+<option value="stu" data-i18n="role.stu">📘 Élève Civique</option>
+<option value="stu_fr" data-i18n="role.stuFr">🇫🇷 Élève Français</option>
+<option value="stu_all" data-i18n="role.stuAll">📘🇫🇷 Élève Double</option>
+<option value="teacher" data-i18n="role.teacher">👨‍🏫 Intervenant</option>
+<option value="admin" data-i18n="role.admin">👑 Administrateur</option>
+</select>
+</div>
+</div>
+
+<div class="form-group" id="modulesGroup">
+<label id="modulesLabel" data-i18n="form.modules">Modules autorisés</label>
+<div style="display:flex;gap:20px;flex-wrap:wrap;">
+<label class="checkbox-group"><input type="checkbox" id="userModuleCivique" value="civique"> <span data-i18n="module.civique">📘 Civique</span></label>
+<label class="checkbox-group"><input type="checkbox" id="userModuleFrancais" value="francais"> <span data-i18n="module.francais">🇫🇷 Français</span></label>
+</div>
+</div>
+
+<!-- ===== CIVIQUE FIELDS ===== -->
+<div id="civiqueFields" class="form-row" style="display:none;">
+<div class="form-group">
+<label data-i18n="form.typeCivique">Type de cours</label>
+<select id="userType">
+<option value="" data-i18n="form.none">—</option>
+<option value="n">N — Naturalisation (入籍)</option>
+<option value="r">R — Carte 10 ans (十年卡)</option>
+<option value="m">M — Carte pluriannuelle (多年卡)</option>
+<option value="t">T — Tous droits (全部权限)</option>
+</select>
+</div>
+<div class="form-group" id="civiqueCreditGroup">
+<label data-i18n="form.creditCivique">📘 Crédits Civique (h)</label>
+<input type="number" id="userCredit" min="0" step="1" value="0">
+</div>
+</div>
+<div id="civiqueTimerRow" style="display:none;" class="form-group">
+<label data-i18n="form.expiryCivique">Expiration Civique</label>
+<input type="datetime-local" id="userTimer">
+</div>
+
+<!-- ===== FRANÇAIS FIELDS ===== -->
+<div id="francaisFields" class="form-row" style="display:none;">
+<div class="form-group">
+<label data-i18n="form.typeFrench">Type d'examen français</label>
+<select id="userFrenchType">
+<option value="" data-i18n="form.none">—</option>
+<option value="n">N — DELF</option>
+<option value="r">R — DALF</option>
+<option value="m">M — TCF</option>
+<option value="t">T — TCF IRN</option>
+</select>
+</div>
+<div class="form-group">
+<label data-i18n="form.levelFrench">Niveau Français</label>
+<select id="userLevel">
+<option value="" data-i18n="form.none">—</option>
+<option value="A1">A1 — Débutant</option>
+<option value="A2">A2 — Élémentaire</option>
+<option value="B1">B1 — Intermédiaire</option>
+<option value="B2">B2 — Intermédiaire avancé</option>
+<option value="C1">C1 — Avancé</option>
+<option value="C2">C2 — Maîtrise</option>
+</select>
+</div>
+</div>
+
+<div id="francaisTimerRow" style="display:none;" class="form-row">
+<div class="form-group">
+<label data-i18n="form.creditFrench">🇫🇷 Crédits Français (h)</label>
+<input type="number" id="userFrenchCredit" min="0" step="1" value="0">
+</div>
+<div class="form-group">
+<label data-i18n="form.expiryFrench">Expiration Français</label>
+<input type="datetime-local" id="userFrenchTimer">
+</div>
+</div>
+
+<div class="form-group">
+<label data-i18n="form.createdAt">Date de création</label>
+<div style="padding:12px;background:var(--light-gray);border-radius:8px;" id="userCreatedAt">—</div>
+</div>
+
+<div class="form-actions">
+<button type="button" class="cancel-action-btn" onclick="closeModal('userModal')" data-i18n="btn.cancel">Annuler</button>
+<button type="submit" class="save-action-btn"><i class="fas fa-save"></i> <span data-i18n="btn.save">Enregistrer</span></button>
+</div>
+</form>
+</div>
+</div>
+
+<!-- ============================================================
+     MODAL: PRE-REG DETAIL
+     ============================================================ -->
+<div class="modal" id="detailModal">
+<div class="modal-content modal-lg">
+<div class="modal-header">
+<h3 data-i18n="pd.title">Détails de la pré-inscription</h3>
+<button class="close-modal" onclick="closeModal('detailModal')">&times;</button>
+</div>
+<div class="detail-grid">
+<div class="detail-item"><span class="label" data-i18n="th.name">Nom</span><div class="value" id="dName">-</div></div>
+<div class="detail-item"><span class="label" data-i18n="th.type">Type</span><div class="value" id="dType">-</div></div>
+<div class="detail-item"><span class="label" data-i18n="th.role">Rôle</span><div class="value" id="dRole">-</div></div>
+<div class="detail-item"><span class="label" data-i18n="th.inscription">Inscription</span><div class="value" id="dCreated">-</div></div>
+<div class="detail-item"><span class="label" data-i18n="th.expiry">Expiration</span><div class="value" id="dTimer">-</div></div>
+<div class="detail-item"><span class="label" data-i18n="th.credit">📚 Crédits</span><div class="value" id="dCredit">-</div></div>
+<div class="detail-item"><span class="label" data-i18n="pd.price">Prix</span><div class="value" id="dPrice">-</div></div>
+<div class="detail-item"><span class="label" data-i18n="th.order">📦 Commande</span><div class="value" id="dOrderNumber">-</div></div>
+<div class="detail-item"><span class="label" data-i18n="th.payment">💳 Paiement</span><div class="value" id="dPaymentMethod">-</div></div>
+<div class="detail-item"><span class="label" data-i18n="th.status">Statut</span><div class="value" id="dStatus">-</div></div>
+<div class="detail-item detail-full"><span class="label" data-i18n="form.email">Email</span><div class="value" id="dEmail">-</div></div>
+<div class="detail-item detail-full"><span class="label" data-i18n="pd.birth">Naissance</span><div class="value" id="dBirth">-</div></div>
+<div class="detail-item detail-full"><span class="label" data-i18n="pd.birthPlace">Lieu de naissance</span><div class="value" id="dBirthPlace">-</div></div>
+<div class="detail-item detail-full"><span class="label" data-i18n="pd.address">Adresse</span><div class="value" id="dAddress">-</div></div>
+<div class="detail-item detail-full"><span class="label" data-i18n="pd.phone">Téléphone</span><div class="value" id="dPhone">-</div></div>
+<div class="detail-item detail-full"><span class="label" data-i18n="pd.pack">Forfait</span><div class="value" id="dPack">-</div></div>
+</div>
+<div class="form-actions">
+<button class="cancel-action-btn" onclick="closeModal('detailModal')" data-i18n="btn.close">Fermer</button>
+</div>
+</div>
+</div>
+
+<!-- ============================================================
+     MODAL: PRE-REG EDIT
+     ============================================================ -->
+<div class="modal" id="editPreRegModal">
+<div class="modal-content modal-lg">
+<div class="modal-header">
+<h3 data-i18n="pre.title">✏️ Modifier la pré-inscription</h3>
+<button class="close-modal" onclick="closeModal('editPreRegModal')">&times;</button>
+</div>
+<form id="editPreRegForm">
+<input type="hidden" id="editPreRegId">
+<div class="form-row">
+<div class="form-group"><label data-i18n="form.name">Nom *</label><input type="text" id="editPreRegName" required></div>
+<div class="form-group"><label data-i18n="form.email">Email</label><input type="email" id="editPreRegEmail"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label data-i18n="form.password">Mot de passe</label><input type="text" id="editPreRegPassword" data-i18n-placeholder="form.passwordHint2" placeholder="Vide=inchangé"></div>
+<div class="form-group">
+<label data-i18n="form.type">Type *</label>
+<select id="editPreRegType" required>
+<option value="n">N — Naturalisation (入籍)</option>
+<option value="r">R — Carte 10 ans (十年卡)</option>
+<option value="m">M — Carte pluriannuelle (多年卡)</option>
+<option value="t">T — Tous droits (全部权限)</option>
+</select>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label data-i18n="form.role">Rôle</label>
+<select id="editPreRegRole">
+<option value="" data-i18n="form.none">Aucun</option>
+<option value="user" data-i18n="role.user">👤 Membre</option>
+<option value="stu" data-i18n="role.stu">📘 Élève Civique</option>
+<option value="teacher" data-i18n="role.teacher">👨‍🏫 Intervenant</option>
+</select>
+</div>
+<div class="form-group"><label data-i18n="th.expiry">Expiration</label><input type="datetime-local" id="editPreRegTimer"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label data-i18n="form.credit">📚 Crédits (h)</label><input type="number" id="editPreRegCredit" min="0" step="1" value="0"></div>
+<div class="form-group"><label data-i18n="form.price">💰 Prix (€)</label><input type="number" id="editPreRegPrice" min="0" step="1" value="0"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label data-i18n="th.order">📦 Commande</label><input type="text" id="editPreRegOrderNumber"></div>
+<div class="form-group">
+<label data-i18n="th.payment">💳 Paiement</label>
+<select id="editPreRegPaymentMethod">
+<option value="" data-i18n="form.none">—</option>
+<option value="wechat">WeChat 微信</option>
+<option value="alipay">Alipay 支付宝</option>
+<option value="xiaohongshu">Xiaohongshu 小红书</option>
+<option value="cb">CB 银行卡</option>
+</select>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group"><label data-i18n="pd.phone">📱 Téléphone</label><input type="text" id="editPreRegPhone"></div>
+<div class="form-group"><label data-i18n="pd.pack">📦 Forfait</label><input type="text" id="editPreRegPack"></div>
+</div>
+<div class="form-group"><label data-i18n="pd.address">📍 Adresse</label><input type="text" id="editPreRegAddress"></div>
+<div class="form-row">
+<div class="form-group"><label data-i18n="pd.birth">📅 Naissance</label><input type="date" id="editPreRegBirth"></div>
+<div class="form-group"><label data-i18n="pd.birthPlace">📍 Lieu de naissance</label><input type="text" id="editPreRegBirthPlace"></div>
+</div>
+<div class="form-actions">
+<button type="button" class="cancel-action-btn" onclick="closeModal('editPreRegModal')" data-i18n="btn.cancel">Annuler</button>
+<button type="submit" class="save-action-btn"><i class="fas fa-save"></i> <span data-i18n="btn.save">Enregistrer</span></button>
+</div>
+</form>
+</div>
+</div>
+
+<!-- ============================================================
+     MODAL: COURSE (Ajout/Édition)
+     ============================================================ -->
+<div class="modal" id="courseModal">
+<div class="modal-content modal-lg">
+<div class="modal-header">
+<h3 id="courseModalTitle" data-i18n="cm.title.add">Ajouter un cours</h3>
+<button class="close-modal" onclick="closeModal('courseModal')">&times;</button>
+</div>
+<form id="courseForm">
+<input type="hidden" id="courseId">
+<input type="hidden" id="courseCategory">
+
+<div class="form-group">
+<label data-i18n="cm.mode">Mode de cours *</label>
+<div class="course-mode-selector" id="courseModeSelector">
+<div class="mode-card active" data-mode="solo" onclick="selectCourseMode('solo')">
+<span class="mode-icon">👤</span>
+<span class="mode-name" data-i18n="cm.mode.solo">Cours individuel</span>
+<span class="mode-desc" data-i18n="cm.mode.solo.desc">Un seul élève</span>
+</div>
+<div class="mode-card" data-mode="group" onclick="selectCourseMode('group')">
+<span class="mode-icon">👥</span>
+<span class="mode-name" data-i18n="cm.mode.group">Cours collectif</span>
+<span class="mode-desc" data-i18n="cm.mode.group.desc">Plusieurs élèves</span>
+</div>
+</div>
+<input type="hidden" id="courseMode" value="solo">
+</div>
+
+<div class="form-group" id="soloStudentGroup">
+<label data-i18n="cm.student">Élève *</label>
+<select id="courseStudentSolo"><option value="" data-i18n="form.select">Sélectionner...</option></select>
+</div>
+
+<div class="form-group" id="groupStudentsGroup" style="display:none;">
+<label><span data-i18n="cm.groupStudents">Élèves du groupe *</span> <span class="hint" id="selectedCountHint" data-i18n="cm.groupCount">(0 sélectionné)</span></label>
+<input type="text" id="groupSearchInput" data-i18n-placeholder="search.generic" placeholder="🔍 Rechercher..." style="margin-bottom:8px;">
+<div class="students-multi-select" id="groupStudentsList"></div>
+<div class="selected-students-summary" id="selectedStudentsSummary" style="display:none;">
+<span class="label" data-i18n="cm.selected">✅ Sélectionnés :</span>
+<div class="list" id="selectedStudentsChips"></div>
+</div>
+</div>
+
+<div class="form-group">
+<label data-i18n="cm.teacher">Intervenant *</label>
+<select id="courseTeacher" required><option value="" data-i18n="form.select">Sélectionner...</option></select>
+</div>
+
+<div class="form-group">
+<label data-i18n="cm.type">Type de cours *</label>
+<div id="courseTypeSelector"></div>
+<input type="hidden" id="courseTypeValue">
+<div id="selectedTypeDisplay" class="selected-type-badge" style="display:none;"></div>
+</div>
+
+<div class="form-row">
+<div class="form-group"><label data-i18n="cm.datetime">Date et heure *</label><input type="datetime-local" id="courseStartTime" required></div>
+<div class="form-group"><label data-i18n="cm.duration">Durée (h)</label><input type="number" id="courseDuration" value="2" step="0.5" min="0.5"></div>
+</div>
+
+<div class="form-row">
+<div class="form-group"><label data-i18n="cm.location">Lieu</label><input type="text" id="courseLocation"></div>
+<div class="form-group"><label data-i18n="cm.material">Lien du matériel</label><input type="url" id="courseMaterialLink" placeholder="https://..."></div>
+</div>
+
+<div class="form-row">
+<div class="form-group"><label data-i18n="cm.meeting">🔗 Lien Google Meet / Visio</label><input type="url" id="courseMeetingLink" placeholder="https://meet.google.com/..."></div>
+<div class="form-group">
+<label data-i18n="cm.status">Statut</label>
+<select id="courseStatus">
+<option value="scheduled" data-i18n="filter.scheduled">📅 Planifié</option>
+<option value="completed" data-i18n="filter.completed">✅ Terminé</option>
+<option value="cancelled" data-i18n="filter.cancelled">❌ Annulé</option>
+</select>
+</div>
+</div>
+
+<div class="form-group"><label data-i18n="th.notes">Notes</label><textarea id="courseNotes" rows="2"></textarea></div>
+
+<div id="courseConflictWarning" class="conflict-warning">
+<i class="fas fa-exclamation-triangle"></i> <span data-i18n="cm.conflict">Conflit horaire avec un autre cours !</span>
+</div>
+
+<div class="form-actions">
+<button type="button" class="cancel-action-btn" onclick="closeModal('courseModal')" data-i18n="btn.cancel">Annuler</button>
+<button type="submit" class="save-action-btn"><i class="fas fa-save"></i> <span data-i18n="btn.save">Enregistrer</span></button>
+</div>
+</form>
+</div>
+</div>
+
+<!-- ============================================================
+     MODAL: CANCEL REASON
+     ============================================================ -->
+<div class="modal" id="cancelReasonModal">
+<div class="modal-content">
+<div class="modal-header">
+<h3><i class="fas fa-ban"></i> <span data-i18n="cr.title">Motif d'annulation</span></h3>
+<button class="close-modal" onclick="closeModal('cancelReasonModal')">&times;</button>
+</div>
+<div class="form-group">
+<label data-i18n="cr.subtitle">📝 Sélectionnez ou saisissez le motif</label>
+<div class="cancel-reason-group">
+<label class="cancel-reason-option" data-reason="student_leave">
+<i class="fas fa-user-graduate"></i><span data-i18n="cr.studentLeave">📖 学生请假</span>
+<input type="radio" name="cancelReason" value="学生请假">
+</label>
+<label class="cancel-reason-option" data-reason="teacher_busy">
+<i class="fas fa-chalkboard-user"></i><span data-i18n="cr.teacherBusy">👨‍🏫 老师有事</span>
+<input type="radio" name="cancelReason" value="老师有事">
+</label>
+<label class="cancel-reason-option" data-reason="student_absent">
+<i class="fas fa-user-slash"></i><span data-i18n="cr.studentAbsent">❌ 学生缺席</span>
+<input type="radio" name="cancelReason" value="学生缺席">
+</label>
+<label class="cancel-reason-option" data-reason="other">
+<i class="fas fa-ellipsis-h"></i><span data-i18n="cr.other">📝 其他</span>
+<input type="radio" name="cancelReason" value="其他">
+</label>
+</div>
+<div id="customReasonContainer" class="custom-reason-input">
+<input type="text" id="customReason" data-i18n-placeholder="cr.custom" placeholder="Précisez le motif...">
+</div>
+</div>
+<div class="form-actions">
+<button type="button" class="cancel-action-btn" id="cancelReasonModalBtn" data-i18n="btn.cancel">Annuler</button>
+<button type="button" class="save-action-btn" id="confirmCancelReasonBtn" data-i18n="btn.confirm">Confirmer</button>
+</div>
+</div>
+</div>
+
+<!-- ============================================================
+     MODAL: DELETE CONFIRM
+     ============================================================ -->
+<div class="confirm-dialog-overlay" id="deleteConfirmOverlay">
+<div class="confirm-dialog-card">
+<div class="confirm-dialog-header">
+<i class="fas fa-trash-alt"></i>
+<h3 data-i18n="dc.title">Confirmer la suppression</h3>
+</div>
+<div class="confirm-dialog-body">
+<p data-i18n="dc.message">Êtes-vous sûr de vouloir supprimer ce cours ?</p>
+<p style="margin-top:10px;font-size:0.85rem;color:var(--red);" data-i18n="dc.warning">Cette action est irréversible.</p>
+<div id="deleteCourseInfo" style="margin-top:15px;padding:12px;background:#f5f5f5;border-radius:8px;text-align:left;font-size:0.88rem;">
+<p><strong data-i18n="dc.course">📚 Cours:</strong> <span id="deleteCourseType">-</span></p>
+<p><strong data-i18n="dc.date">📅 Date:</strong> <span id="deleteCourseDate">-</span></p>
+<p><strong data-i18n="dc.teacher">👨‍🏫 Intervenant:</strong> <span id="deleteCourseTeacher">-</span></p>
+<p><strong data-i18n="dc.student">👨‍🎓 Élève(s):</strong> <span id="deleteCourseStudent">-</span></p>
+</div>
+</div>
+<div class="confirm-dialog-footer">
+<button class="btn-confirm-cancel" id="cancelDeleteCourseBtn" data-i18n="btn.cancel">Annuler</button>
+<button class="btn-confirm-delete" id="confirmDeleteCourseBtn" data-i18n="btn.delete">Supprimer</button>
+</div>
+</div>
+</div>
+
+<!-- ============================================================
+     MODAL: EVALUATION
+     ============================================================ -->
+<div class="modal" id="evaluationModal">
+<div class="modal-content">
+<div class="modal-header">
+<h3 data-i18n="ev.title">⭐ Évaluation du cours</h3>
+<button class="close-modal" onclick="closeModal('evaluationModal')">&times;</button>
+</div>
+<form id="evaluationForm">
+<input type="hidden" id="evalCourseId">
+<div class="form-group"><label data-i18n="ev.teacherComment">Commentaire intervenant</label><textarea id="teacherComment" rows="3"></textarea></div>
+<div class="form-group">
+<label data-i18n="ev.rating">Note élève (1-5)</label>
+<div class="rating-stars" id="ratingStars">
+<span class="star" data-value="1">★</span><span class="star" data-value="2">★</span><span class="star" data-value="3">★</span><span class="star" data-value="4">★</span><span class="star" data-value="5">★</span>
+</div>
+<input type="hidden" id="studentRating">
+</div>
+<div class="form-group"><label data-i18n="ev.studentComment">Commentaire élève</label><textarea id="studentComment" rows="3"></textarea></div>
+<div class="form-actions">
+<button type="button" class="cancel-action-btn" onclick="closeModal('evaluationModal')" data-i18n="btn.cancel">Annuler</button>
+<button type="submit" class="save-action-btn" data-i18n="btn.save">Enregistrer</button>
+</div>
+</form>
+</div>
+</div>
+
+<!-- ============================================================
+     MODAL: STUDENT EXAM
+     ============================================================ -->
+<div class="modal" id="studentExamModal">
+<div class="modal-content">
+<div class="modal-header">
+<h3 id="studentExamModalTitle" data-i18n="se.title.add">Ajouter un examen</h3>
+<button class="close-modal" onclick="closeModal('studentExamModal')">&times;</button>
+</div>
+<form id="studentExamForm">
+<input type="hidden" id="studentExamId">
+
+<div class="form-row">
+<div class="form-group">
+<label data-i18n="cm.student">Élève *</label>
+<select id="studentExamStudent" required><option value="" data-i18n="form.select">Sélectionner...</option></select>
+</div>
+<div class="form-group">
+<label data-i18n="se.category">Catégorie *</label>
+<select id="studentExamCategory" required>
+<option value="civique" data-i18n="se.cat.civique">📘 Civique</option>
+<option value="francais" data-i18n="se.cat.francais">🇫🇷 Français</option>
+</select>
+</div>
+</div>
+
+<div class="form-row">
+<div class="form-group">
+<label data-i18n="se.examType">Type d'examen *</label>
+<select id="studentExamType" required></select>
+</div>
+<div class="form-group">
+<label data-i18n="th.date">Date *</label>
+<input type="date" id="studentExamDate" required>
+</div>
+</div>
+
+<div class="form-row">
+<div class="form-group">
+<label data-i18n="th.score">Score</label>
+<input type="number" id="studentExamScore" min="0">
+</div>
+<div class="form-group">
+<label data-i18n="se.total">Total</label>
+<input type="number" id="studentExamTotal" min="0">
+</div>
+</div>
+
+<div class="form-row">
+<div class="form-group">
+<label data-i18n="th.status">Statut *</label>
+<select id="studentExamStatus" required>
+<option value="planned" data-i18n="se.status.planned">📅 Planifié</option>
+<option value="passed" data-i18n="se.status.passed">✅ Réussi</option>
+<option value="failed" data-i18n="se.status.failed">❌ Échoué</option>
+<option value="absent" data-i18n="se.status.absent">🚫 Absent</option>
+</select>
+</div>
+<div class="form-group">
+<label data-i18n="th.notes">Notes</label>
+<input type="text" id="studentExamNotes">
+</div>
+</div>
+
+<div class="form-actions">
+<button type="button" class="cancel-action-btn" onclick="closeModal('studentExamModal')" data-i18n="btn.cancel">Annuler</button>
+<button type="submit" class="save-action-btn"><i class="fas fa-save"></i> <span data-i18n="btn.save">Enregistrer</span></button>
+</div>
+</form>
+</div>
+</div>
+
+<!-- ============================================================
+     LOADING + TOAST
+     ============================================================ -->
+<div class="loading-overlay" id="loadingOverlay">
+<div class="loading-box">
+<div class="loading-spinner"></div>
+<div class="loading-text" id="loadingText" data-i18n="loading">Chargement...</div>
+</div>
+</div>
+
+<div id="toastContainer"></div>
+
+<script src="admin.js"></script>
 </body>
 </html>

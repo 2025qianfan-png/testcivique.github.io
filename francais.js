@@ -87,7 +87,24 @@ const dict = {
         devMsg: "Cette section est en cours de développement. Revenez bientôt !",
         devBtn: "Fermer",
         loginRequired: "Veuillez vous connecter pour accéder à cette section",
-        clickToDiscover: "Cliquez pour découvrir"
+        clickToDiscover: "Cliquez pour découvrir",
+
+        // Feedback
+        feedbackTitle: "⭐ Avis des étudiants",
+        feedbackSubtitle: "Ce que nos étudiants pensent de nos formations",
+        feedbackEmptyTitle: "Aucun avis",
+        feedbackEmptyText: "Soyez le premier à laisser un avis !",
+        feedbackAnonymous: "Anonyme",
+        feedbackExamType: "Examen",
+        feedbackScore: "Score",
+        loadMoreText: "Voir plus d'avis",
+
+        // Roles
+        roleAdmin: "Administration",
+        roleTeacher: "Espace intervenant",
+        roleStudent: "Espace étudiant",
+        roleMember: "Devenir membre",
+        roleMemberLocked: "Accès réservé aux membres"
     },
     zh: {
         mainTitle: "法语 · FLE",
@@ -174,7 +191,24 @@ const dict = {
         devMsg: "该板块正在开发中，敬请期待！",
         devBtn: "关闭",
         loginRequired: "请登录后访问此板块",
-        clickToDiscover: "点击探索"
+        clickToDiscover: "点击探索",
+
+        // Feedback
+        feedbackTitle: "⭐ 学生评价",
+        feedbackSubtitle: "我们的学生怎么说",
+        feedbackEmptyTitle: "暂无评价",
+        feedbackEmptyText: "成为第一个留下评价的人！",
+        feedbackAnonymous: "匿名",
+        feedbackExamType: "考试类型",
+        feedbackScore: "分数",
+        loadMoreText: "查看更多评价",
+
+        // Roles
+        roleAdmin: "管理后台",
+        roleTeacher: "教师空间",
+        roleStudent: "学生空间",
+        roleMember: "成为会员",
+        roleMemberLocked: "仅限会员访问"
     }
 };
 
@@ -183,6 +217,19 @@ const dict = {
 // ============================================================
 let currentLang = 'fr';
 let currentUser = null;
+
+// ============================================================
+// 工具函数
+// ============================================================
+function escapeHtml(s) {
+    if (!s) return '';
+    return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
 
 // ============================================================
 // 语言切换
@@ -207,6 +254,11 @@ function switchLanguage(lang) {
         document.getElementById('langFr').classList.add('active');
     } else {
         document.getElementById('langZh').classList.add('active');
+    }
+
+    // Re-render feedbacks (stars etc.)
+    if (typeof renderFeedbacks === 'function' && allFeedbacks.length > 0) {
+        renderFeedbacks();
     }
 }
 
@@ -279,15 +331,16 @@ function updateUIForUser() {
         const token = btoa(encodeURIComponent(JSON.stringify(tokenData)));
 
         const roleMenu = document.getElementById('roleBasedMenu');
-        
+        const t = dict[currentLang];
+
         if (user.role === 'admin') {
-            roleMenu.innerHTML = `<a href="french-admin.html?token=${token}"><i class="fas fa-cog"></i> Administration</a>`;
+            roleMenu.innerHTML = `<a href="admin.html?token=${encodeURIComponent(token)}&from=francais"><i class="fas fa-cog"></i> ${t.roleAdmin || 'Administration'}</a>`;
         } else if (user.role === 'teacher') {
-            roleMenu.innerHTML = `<a href="french-teacher.html?token=${token}"><i class="fas fa-chalkboard-user"></i> Espace intervenant</a>`;
-        } else if (user.role === 'stu') {
-            roleMenu.innerHTML = `<a href="french-student.html?token=${token}"><i class="fas fa-user-graduate"></i> Espace étudiant</a>`;
+            roleMenu.innerHTML = `<a href="teacher.html?token=${encodeURIComponent(token)}"><i class="fas fa-chalkboard-user"></i> ${t.roleTeacher || 'Espace intervenant'}</a>`;
+        } else if (user.role === 'stu' || user.role === 'stu_fr' || user.role === 'stu_all') {
+            roleMenu.innerHTML = `<a href="student.html?token=${encodeURIComponent(token)}"><i class="fas fa-user-graduate"></i> ${t.roleStudent || 'Espace étudiant'}</a>`;
         } else {
-            roleMenu.innerHTML = `<a href="#" onclick="showToast('Accès réservé aux membres', 'warning')"><i class="fas fa-info-circle"></i> Devenir membre</a>`;
+            roleMenu.innerHTML = `<a href="#" onclick="showToast('${t.roleMemberLocked || 'Accès réservé aux membres'}', 'warning')"><i class="fas fa-info-circle"></i> ${t.roleMember || 'Devenir membre'}</a>`;
         }
     } else {
         userInfo.style.display = 'none';
@@ -312,24 +365,33 @@ async function handleLogin(event) {
 
     const user = await window.supabaseAuth.validateFrenchUser(name, password);
 
-    if (user) {
-        currentUser = {
-            userId: user.id,
-            name: user.name,
-            role: user.role || 'stu',
-            type: user.type || 'n',
-            expiry: user.timer,
-            level: user.level || 'A1'
-        };
-        localStorage.setItem('french_user', JSON.stringify(currentUser));
-        closeLoginModal();
-        updateUIForUser();
-        showToast('Bienvenue ' + user.name + ' !', 'success');
-        renderAllSections();
-    } else {
+    if (!user) {
         errorEl.style.display = 'block';
         errorEl.querySelector('span').textContent = dict[currentLang].errorMessage;
+        return;
     }
+
+    // 🔥 只允许 stu_fr / stu_all / teacher / admin 登录
+    const allowedRoles = ['stu_fr', 'stu_all', 'teacher', 'admin'];
+    if (!allowedRoles.includes(user.role)) {
+        errorEl.style.display = 'block';
+        errorEl.querySelector('span').textContent = dict[currentLang].errorMessage;
+        return;
+    }
+
+    currentUser = {
+        userId: user.id,
+        name: user.name,
+        role: user.role || 'stu_fr',
+        type: user.type || 'n',
+        expiry: user.french_timer || user.timer,
+        level: user.level || 'A1'
+    };
+    localStorage.setItem('french_user', JSON.stringify(currentUser));
+    closeLoginModal();
+    updateUIForUser();
+    showToast((currentLang === 'fr' ? 'Bienvenue ' : '欢迎 ') + user.name + ' !', 'success');
+    renderAllSections();
 }
 
 function logout() {
@@ -338,7 +400,7 @@ function logout() {
     document.getElementById('userInfo').style.display = 'none';
     document.getElementById('navLogin').style.display = 'inline';
     document.getElementById('userDropdown').classList.remove('show');
-    showToast('Déconnecté', 'info');
+    showToast(currentLang === 'fr' ? 'Déconnecté' : '已退出', 'info');
     renderAllSections();
 }
 
@@ -380,18 +442,18 @@ function updateProfile(event) {
     successEl.style.display = 'none';
 
     if (newPwd.length < 6) {
-        errorEl.textContent = 'Le mot de passe doit contenir au moins 6 caractères.';
+        errorEl.textContent = currentLang === 'fr' ? 'Le mot de passe doit contenir au moins 6 caractères.' : '密码至少需要6个字符。';
         errorEl.style.display = 'block';
         return;
     }
 
     if (newPwd !== confirmPwd) {
-        errorEl.textContent = 'Les mots de passe ne correspondent pas.';
+        errorEl.textContent = currentLang === 'fr' ? 'Les mots de passe ne correspondent pas.' : '两次输入的密码不一致。';
         errorEl.style.display = 'block';
         return;
     }
 
-    successEl.textContent = 'Mot de passe mis à jour avec succès !';
+    successEl.textContent = currentLang === 'fr' ? 'Mot de passe mis à jour avec succès !' : '密码更新成功！';
     successEl.style.display = 'block';
     document.getElementById('currentPassword').value = '';
     document.getElementById('newPassword').value = '';
@@ -418,6 +480,7 @@ function closeDevelopingModal() {
 // ============================================================
 async function renderExams() {
     const container = document.getElementById('examsContainer');
+    if (!container) return;
     try {
         if (typeof window.supabaseAuth.getFrenchExams !== 'function') {
             console.error('❌ getFrenchExams 不是函数');
@@ -482,6 +545,7 @@ function handleExamClick(event, examId) {
 // ============================================================
 function renderCourses() {
     const container = document.getElementById('coursesContainer');
+    if (!container) return;
 
     const courseItems = [
         { icon: 'fa-seedling', title: dict[currentLang].course1Title, level: 'A1 · A2', desc: dict[currentLang].course1Desc, duration: dict[currentLang].course1Duration, group: dict[currentLang].course1Group },
@@ -525,11 +589,9 @@ function handleCourseClick(event) {
 // ============================================================
 // RENDER RESSOURCES - 5大技能
 // ============================================================
-// ============================================================
-// RENDER RESSOURCES - 5大技能
-// ============================================================
 function renderRessources() {
     const container = document.getElementById('resourcesContainer');
+    if (!container) return;
 
     const resourceItems = [
         { icon: 'fa-headphones', title: 'Compréhension orale', desc: dict[currentLang].res1Desc, type: 'listening' },
@@ -559,14 +621,12 @@ function renderRessources() {
 function handleResourceClick(event, type) {
     const user = getCurrentUser();
 
-    // 未登录 → 提示登录
     if (!user) {
         showToast(dict[currentLang].loginRequired, 'warning');
         openLoginModal();
         return;
     }
 
-    // 生成 token
     const tokenData = {
         userId: user.userId || user.id,
         name: user.name,
@@ -576,20 +636,150 @@ function handleResourceClick(event, type) {
     };
     const token = btoa(encodeURIComponent(JSON.stringify(tokenData)));
 
-    // 根据类型跳转
     if (type === 'writing') {
-        window.location.href = `ecriture.html?token=${token}`;
+        window.location.href = `ecriture.html?token=${encodeURIComponent(token)}`;
     } else if (type === 'grammar') {
-        window.location.href = `grammaire.html?token=${token}`;
+        window.location.href = `grammaire.html?token=${encodeURIComponent(token)}`;
     } else if (type === 'reading') {
-        window.location.href = `lecture.html?token=${token}`;
+        window.location.href = `lecture.html?token=${encodeURIComponent(token)}`;
     } else if (type === 'listening') {
-        // ✅ 听力 → 跳转到听力页面
-        window.location.href = `ecoute.html?token=${token}`;
+        window.location.href = `ecoute.html?token=${encodeURIComponent(token)}`;
     } else {
-        // speaking → 开发中
-        window.location.href = `developpement.html?token=${token}&type=${type}`;
+        window.location.href = `developpement.html?token=${encodeURIComponent(token)}&type=${type}`;
     }
+}
+
+// ============================================================
+// 🔥 学生评价（只显示法语课）
+// ============================================================
+let allFeedbacks = [];
+let feedbackDisplayCount = 5;
+const FEEDBACK_INCREMENT = 5;
+
+async function loadFeedbacks() {
+    const listContainer = document.getElementById('feedbackList');
+    if (!listContainer) return;
+
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+
+        // 🔥 只查法语课评价
+        const francaisExamTypes = ['delf', 'dalf', 'tcf', 'tcf_irn'];
+
+        const { data, error } = await supabase
+            .from('student_feedback')
+            .select('*')
+            .eq('is_public', true)
+            .in('exam_type', francaisExamTypes)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        allFeedbacks = data || [];
+        feedbackDisplayCount = 5;
+        renderFeedbacks();
+
+    } catch (error) {
+        console.error('加载评价失败:', error);
+        listContainer.innerHTML = `
+            <div class="feedback-empty">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>${dict[currentLang].feedbackEmptyTitle || 'Erreur de chargement'}</h3>
+                <p>${dict[currentLang].feedbackEmptyText || 'Impossible de charger les évaluations'}</p>
+            </div>
+        `;
+    }
+}
+
+function renderFeedbacks() {
+    const listContainer = document.getElementById('feedbackList');
+    const loadMoreBtn = document.getElementById('loadMoreFeedbackBtn');
+    if (!listContainer) return;
+
+    const displayFeedbacks = allFeedbacks.slice(0, feedbackDisplayCount);
+
+    if (displayFeedbacks.length === 0) {
+        listContainer.innerHTML = `
+            <div class="feedback-empty">
+                <i class="fas fa-star"></i>
+                <h3>${dict[currentLang].feedbackEmptyTitle || 'Aucun avis'}</h3>
+                <p>${dict[currentLang].feedbackEmptyText || 'Soyez le premier à laisser un avis !'}</p>
+            </div>
+        `;
+        if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+        return;
+    }
+
+    let html = '';
+    displayFeedbacks.forEach(fb => {
+        const avg = fb.total_score || 0;
+        const starsHtml = renderPreciseStars(avg);
+
+        const examMap = {
+            'delf': '📝 DELF',
+            'dalf': '📝 DALF',
+            'tcf': '📝 TCF',
+            'tcf_irn': '📝 TCF IRN'
+        };
+        const examLabel = examMap[fb.exam_type] || fb.exam_type || '';
+
+        const displayName = fb.is_public ? fb.student_name : (currentLang === 'fr' ? 'Anonyme' : '匿名');
+        const isAnonymous = !fb.is_public;
+
+        html += `
+            <div class="feedback-card">
+                <div class="feedback-card-header">
+                    <div class="feedback-card-name">
+                        ${escapeHtml(displayName)}
+                        ${isAnonymous ? `<span class="badge-anonymous">${dict[currentLang].feedbackAnonymous || 'Anonyme'}</span>` : ''}
+                    </div>
+                    <div class="feedback-card-score">
+                        <span class="total">${avg.toFixed(1)}</span>
+                        <span class="stars">${starsHtml}</span>
+                    </div>
+                </div>
+                <div class="feedback-card-meta">
+                    ${examLabel ? `<span class="badge-exam">${examLabel}</span>` : ''}
+                    ${fb.exam_score !== null && fb.exam_score !== undefined ? `<span>📝 ${dict[currentLang].feedbackScore || 'Score'}: ${fb.exam_score}/40</span>` : ''}
+                    <span>📅 ${new Date(fb.created_at).toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'zh-CN')}</span>
+                </div>
+                ${fb.comment ? `
+                    <div class="feedback-card-comment">
+                        <i class="fas fa-quote-left"></i>
+                        ${escapeHtml(fb.comment)}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    });
+
+    listContainer.innerHTML = html;
+
+    if (loadMoreBtn) {
+        if (feedbackDisplayCount < allFeedbacks.length) {
+            loadMoreBtn.style.display = 'inline-flex';
+            const span = loadMoreBtn.querySelector('span');
+            if (span) {
+                span.textContent = dict[currentLang].loadMoreText || 'Voir plus d\'avis';
+            }
+        } else {
+            loadMoreBtn.style.display = 'none';
+        }
+    }
+}
+
+function renderPreciseStars(score) {
+    const clamped = Math.max(0, Math.min(5, score));
+    const fullStars = Math.floor(clamped);
+    let html = '';
+    for (let i = 0; i < fullStars; i++) html += '★';
+    for (let i = fullStars; i < 5; i++) html += '☆';
+    return html;
+}
+
+function loadMoreFeedback() {
+    feedbackDisplayCount += FEEDBACK_INCREMENT;
+    renderFeedbacks();
 }
 
 // ============================================================
@@ -660,6 +850,7 @@ document.addEventListener('DOMContentLoaded', function() {
     switchLanguage('fr');
     checkAuth();
     renderAllSections();
+    loadFeedbacks();
 });
 
 // ============================================================
@@ -681,3 +872,5 @@ window.handleExamClick = handleExamClick;
 window.handleCourseClick = handleCourseClick;
 window.handleResourceClick = handleResourceClick;
 window.getCurrentUser = getCurrentUser;
+window.loadMoreFeedback = loadMoreFeedback;
+window.loadFeedbacks = loadFeedbacks;

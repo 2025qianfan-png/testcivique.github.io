@@ -1,913 +1,1747 @@
-// ==============================
-// 管理后台核心逻辑（纯 token 验证版）
-// ==============================
+// ============================================================
+// ADMIN.JS — 统一管理后台
+// 用户 + 预注册 + 公民课 + 法语课 + 学生考试 + 日历 + 双语
+// ============================================================
 
-console.log('管理后台初始化...');
+console.log('🚀 Admin.js 初始化...');
 
-// 检查supabaseAuth是否已加载
 if (typeof window.supabaseAuth === 'undefined') {
-    console.error('错误: supabase-config.js 未加载');
-    alert('系统配置加载失败，请刷新页面重试');
+    console.error('❌ supabase-config.js 未加载');
+    alert('系统配置加载失败，请刷新页面');
 }
 
-// ==============================
-// EMAILJS 配置
-// ==============================
+// ============================================================
+// EmailJS 配置
+// ============================================================
 const EMAILJS_CONFIG = {
     PUBLIC_KEY: 'D2jk67ERbrJZSUyvC',
     SERVICE_ID: 'service_5i2hyhb',
     TEMPLATE_ID: 'template_ywlxxks'
 };
 
-// ==============================
-// Token 解析函数
-// ==============================
+const EMAILJS_COURSE = {
+    PUBLIC_KEY: 'c2dTn19suzx4VxUu6',
+    SERVICE_ID: 'service_64o8j3r',
+    TEACHER_TEMPLATE_ID: 'template_m97muhh',
+    STUDENT_TEMPLATE_ID: 'template_f6nsc21'
+};
+
+// ============================================================
+// 全局变量
+// ============================================================
+let currentAdmin = null;
+let currentMode = 'all';
+let currentTab = 'users';
+
+let allUsers = [];
+let filteredUsers = [];
+let allPreRegs = [];
+let allCiviqueCourses = [];
+let allFrenchCourses = [];
+let allStudentExams = [];
+
+let userFilter = 'all';
+let userSearchTerm = '';
+let civiqueFilter = { type: '', teacherId: '', showUpcoming: true, search: '' };
+let frenchFilter = { type: '', teacherId: '', showUpcoming: true, search: '' };
+let studentExamFilter = 'all';
+let studentExamSearch = '';
+
+let pendingDeleteCourse = { id: null, category: null };
+let pendingCancelData = null;
+
+// 🔥 日历 + 双语
+let calendarWeekStart = getMonday(new Date());
+let calendarFilter = {
+    category: 'all',
+    teacherId: '',
+    studentId: '',
+    status: 'all'
+};
+let currentLang = localStorage.getItem('adminLang') || 'fr';
+
+// ============================================================
+// 🔥 双语字典
+// ============================================================
+const I18N = {
+    fr: {
+        'header.title': 'Administration',
+        'header.subtitle': 'Association Mille Voiles',
+        'header.back': 'Retour',
+        'header.logout': 'Déconnexion',
+
+        'tab.users': 'Utilisateurs',
+        'tab.prereg': 'Pré-inscriptions',
+        'tab.civique': 'Cours Civique',
+        'tab.french': 'Cours Français',
+        'tab.exams': 'Examens élèves',
+        'tab.calendar': 'Calendrier',
+
+        'stat.total': 'Total',
+        'stat.teachers': 'Intervenants',
+        'stat.stuCivique': 'Élèves Civique',
+        'stat.stuFrench': 'Élèves Français',
+        'stat.members': 'Membres',
+        'stat.admins': 'Administrateurs',
+
+        'card.users.title': 'Gestion des utilisateurs',
+        'card.users.subtitle': 'Civique · Français · Intervenants · Membres',
+        'card.prereg.title': 'Pré-inscriptions',
+        'card.prereg.subtitle': "Demandes d'inscription (Examen civique)",
+        'card.civique.title': 'Cours Civique',
+        'card.civique.subtitle': "Cours de préparation à l'examen civique",
+        'card.french.title': 'Cours Français',
+        'card.french.subtitle': 'Cours de français (FLE)',
+        'card.exams.title': 'Examens des élèves',
+        'card.exams.subtitle': 'Suivi des examens passés (Civique / Français)',
+        'card.calendar.title': 'Calendrier des cours',
+        'card.calendar.subtitle': 'Vue hebdomadaire des cours programmés',
+
+        'btn.add': 'Ajouter',
+        'btn.addCourse': 'Ajouter un cours',
+        'btn.addExam': 'Ajouter un examen',
+        'btn.cancel': 'Annuler',
+        'btn.save': 'Enregistrer',
+        'btn.close': 'Fermer',
+        'btn.confirm': 'Confirmer',
+        'btn.delete': 'Supprimer',
+
+        'search.name': 'Rechercher par nom...',
+        'search.generic': 'Rechercher...',
+
+        'filter.all': 'Tous',
+        'filter.admin': '👑 Admins',
+        'filter.teacher': '👨‍🏫 Intervenants',
+        'filter.stu': '📘 Civique',
+        'filter.stuFr': '🇫🇷 Français',
+        'filter.stuAll': '📘🇫🇷 Double',
+        'filter.user': '👤 Membres',
+        'filter.expired': '⚠️ Expirés',
+        'filter.allTypes': 'Tous les types',
+        'filter.allTeachers': 'Tous les intervenants',
+        'filter.upcoming': '📅 À venir',
+        'filter.past': '📜 Historique',
+        'filter.civique': '📘 Civique',
+        'filter.french': '🇫🇷 Français',
+        'filter.passed': '✅ Réussis',
+        'filter.failed': '❌ Échoués',
+        'filter.planned': '📅 Planifiés',
+        'filter.scheduled': '📅 Planifié',
+        'filter.completed': '✅ Terminé',
+        'filter.cancelled': '❌ Annulé',
+
+        'th.name': 'Nom',
+        'th.role': 'Rôle',
+        'th.modules': 'Modules',
+        'th.type': 'Type',
+        'th.level': 'Niveau',
+        'th.creditCivique': '📘 Civique',
+        'th.creditFrench': '🇫🇷 Français',
+        'th.expiry': 'Expiration',
+        'th.email': '📧 Email',
+        'th.password': '🔑 Mot de passe',
+        'th.actions': 'Actions',
+        'th.inscription': 'Inscription',
+        'th.credit': '📚 Crédits',
+        'th.order': '📦 Commande',
+        'th.payment': '💳 Paiement',
+        'th.status': 'Statut',
+        'th.student': 'Élève',
+        'th.category': 'Catégorie',
+        'th.examType': 'Type',
+        'th.date': 'Date',
+        'th.score': 'Score',
+        'th.result': 'Résultat',
+        'th.notes': 'Notes',
+
+        'role.user': '👤 Membre',
+        'role.stu': '📘 Élève Civique',
+        'role.stuFr': '🇫🇷 Élève Français',
+        'role.stuAll': '📘🇫🇷 Élève Double',
+        'role.teacher': '👨‍🏫 Intervenant',
+        'role.admin': '👑 Administrateur',
+
+        'module.civique': '📘 Civique',
+        'module.francais': '🇫🇷 Français',
+        'form.typeFrench': "Type d'examen français",
+        'form.name': 'Nom *',
+        'form.email': 'Email',
+        'form.password': 'Mot de passe',
+        'form.passwordHint': '(vide=inchangé)',
+        'form.passwordHint2': 'Vide=inchangé',
+        'form.role': 'Rôle *',
+        'form.modules': 'Modules autorisés',
+        'form.typeCivique': 'Type de cours',
+        'form.creditCivique': '📘 Crédits Civique (h)',
+        'form.expiryCivique': 'Expiration Civique',
+        'form.levelFrench': 'Niveau Français',
+        'form.creditFrench': '🇫🇷 Crédits Français (h)',
+        'form.expiryFrench': 'Expiration Français',
+        'form.createdAt': 'Date de création',
+        'form.type': 'Type *',
+        'form.credit': '📚 Crédits (h)',
+        'form.price': '💰 Prix (€)',
+        'form.none': '—',
+        'form.select': 'Sélectionner...',
+
+        'cm.title.add': 'Ajouter un cours',
+        'cm.mode': 'Mode de cours *',
+        'cm.mode.solo': 'Cours individuel',
+        'cm.mode.solo.desc': 'Un seul élève',
+        'cm.mode.group': 'Cours collectif',
+        'cm.mode.group.desc': 'Plusieurs élèves',
+        'cm.student': 'Élève *',
+        'cm.groupStudents': 'Élèves du groupe *',
+        'cm.groupCount': '(0 sélectionné)',
+        'cm.selected': '✅ Sélectionnés :',
+        'cm.teacher': 'Intervenant *',
+        'cm.type': 'Type de cours *',
+        'cm.datetime': 'Date et heure *',
+        'cm.duration': 'Durée (h)',
+        'cm.location': 'Lieu',
+        'cm.material': 'Lien du matériel',
+        'cm.meeting': '🔗 Lien Google Meet / Visio',
+        'cm.status': 'Statut',
+        'cm.conflict': 'Conflit horaire avec un autre cours !',
+
+        'cr.title': "Motif d'annulation",
+        'cr.subtitle': '📝 Sélectionnez ou saisissez le motif',
+        'cr.studentLeave': '📖 Congé d\'élève',
+        'cr.teacherBusy': '👨‍🏫 Enseignant occupé',
+        'cr.studentAbsent': '❌ Élève absent',
+        'cr.other': '📝 Autre',
+        'cr.custom': 'Précisez le motif...',
+
+        'dc.title': 'Confirmer la suppression',
+        'dc.message': 'Êtes-vous sûr de vouloir supprimer ce cours ?',
+        'dc.warning': 'Cette action est irréversible.',
+        'dc.course': '📚 Cours:',
+        'dc.date': '📅 Date:',
+        'dc.teacher': '👨‍🏫 Intervenant:',
+        'dc.student': '👨‍🎓 Élève(s):',
+
+        'pd.title': 'Détails de la pré-inscription',
+        'pd.price': 'Prix',
+        'pd.birth': 'Naissance',
+        'pd.birthPlace': 'Lieu de naissance',
+        'pd.address': 'Adresse',
+        'pd.phone': 'Téléphone',
+        'pd.pack': 'Forfait',
+        'pre.title': '✏️ Modifier la pré-inscription',
+        'um.title.add': 'Ajouter un utilisateur',
+        'ev.title': '⭐ Évaluation du cours',
+        'ev.teacherComment': 'Commentaire intervenant',
+        'ev.rating': 'Note élève (1-5)',
+        'ev.studentComment': 'Commentaire élève',
+        'se.title.add': 'Ajouter un examen',
+        'se.category': 'Catégorie *',
+        'se.cat.civique': '📘 Civique',
+        'se.cat.francais': '🇫🇷 Français',
+        'se.examType': "Type d'examen *",
+        'se.total': 'Total',
+        'se.status.planned': '📅 Planifié',
+        'se.status.passed': '✅ Réussi',
+        'se.status.failed': '❌ Échoué',
+        'se.status.absent': '🚫 Absent',
+
+        'cd.title': 'Détails du cours',
+
+        'cal.prevWeek': 'Semaine précédente',
+        'cal.today': "Aujourd'hui",
+        'cal.nextWeek': 'Semaine suivante',
+        'cal.filter.allModules': 'Tous les modules',
+        'cal.filter.civique': '📘 Civique',
+        'cal.filter.francais': '🇫🇷 Français',
+        'cal.filter.allTeachers': 'Tous les intervenants',
+        'cal.filter.allStudents': 'Tous les élèves',
+        'cal.filter.allStatus': 'Tous les statuts',
+        'cal.filter.scheduled': '📅 Planifié',
+        'cal.filter.inProgress': '🔄 En cours',
+        'cal.filter.completed': '✅ Terminé',
+        'cal.filter.cancelled': '❌ Annulé',
+        'type.n': 'N — Naturalisation',
+        'type.r': 'R — Carte 10 ans',
+        'type.m': 'M — Carte pluriannuelle',
+        'type.t': 'T — Tout droits',
+
+        'footer': '© 2025-2026 Association Mille Voiles / 千帆协会',
+        'loading': 'Chargement...',
+
+        days: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+        daysFull: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+    },
+
+    zh: {
+        'type.n': 'N — 入籍',
+        'type.r': 'R — 十年卡',
+        'type.m': 'M — 多年卡',
+        'type.t': 'T — 全部内容',
+'form.typeFrench': '法语考试类型',
+        'header.title': '管理后台',
+        'header.subtitle': '千帆协会',
+        'header.back': '返回',
+        'header.logout': '退出登录',
+
+        'tab.users': '用户管理',
+        'tab.prereg': '预注册',
+        'tab.civique': '公民课',
+        'tab.french': '法语课',
+        'tab.exams': '学生考试',
+        'tab.calendar': '日历',
+
+        'stat.total': '总数',
+        'stat.teachers': '教师',
+        'stat.stuCivique': '公民课学员',
+        'stat.stuFrench': '法语课学员',
+        'stat.members': '会员',
+        'stat.admins': '管理员',
+
+        'card.users.title': '用户管理',
+        'card.users.subtitle': '公民课 · 法语课 · 教师 · 会员',
+        'card.prereg.title': '预注册',
+        'card.prereg.subtitle': '报名申请（公民考试）',
+        'card.civique.title': '公民课',
+        'card.civique.subtitle': '公民考试备考课程',
+        'card.french.title': '法语课',
+        'card.french.subtitle': '法语课程（FLE）',
+        'card.exams.title': '学生考试',
+        'card.exams.subtitle': '考试记录（公民 / 法语）',
+        'card.calendar.title': '课程日历',
+        'card.calendar.subtitle': '每周课程视图',
+
+        'btn.add': '添加',
+        'btn.addCourse': '添加课程',
+        'btn.addExam': '添加考试',
+        'btn.cancel': '取消',
+        'btn.save': '保存',
+        'btn.close': '关闭',
+        'btn.confirm': '确认',
+        'btn.delete': '删除',
+
+        'search.name': '按姓名搜索...',
+        'search.generic': '搜索...',
+
+        'filter.all': '全部',
+        'filter.admin': '👑 管理员',
+        'filter.teacher': '👨‍🏫 教师',
+        'filter.stu': '📘 公民课',
+        'filter.stuFr': '🇫🇷 法语课',
+        'filter.stuAll': '📘🇫🇷 双课',
+        'filter.user': '👤 会员',
+        'filter.expired': '⚠️ 已过期',
+        'filter.allTypes': '所有类型',
+        'filter.allTeachers': '所有教师',
+        'filter.upcoming': '📅 即将开始',
+        'filter.past': '📜 历史',
+        'filter.civique': '📘 公民课',
+        'filter.french': '🇫🇷 法语课',
+        'filter.passed': '✅ 通过',
+        'filter.failed': '❌ 未通过',
+        'filter.planned': '📅 已计划',
+        'filter.scheduled': '📅 已安排',
+        'filter.completed': '✅ 已完成',
+        'filter.cancelled': '❌ 已取消',
+
+        'th.name': '姓名',
+        'th.role': '角色',
+        'th.modules': '模块',
+        'th.type': '类型',
+        'th.level': '级别',
+        'th.creditCivique': '📘 公民课时',
+        'th.creditFrench': '🇫🇷 法语课时',
+        'th.expiry': '到期',
+        'th.email': '📧 邮箱',
+        'th.password': '🔑 密码',
+        'th.actions': '操作',
+        'th.inscription': '注册时间',
+        'th.credit': '📚 课时',
+        'th.order': '📦 订单',
+        'th.payment': '💳 支付',
+        'th.status': '状态',
+        'th.student': '学生',
+        'th.category': '类别',
+        'th.examType': '类型',
+        'th.date': '日期',
+        'th.score': '分数',
+        'th.result': '结果',
+        'th.notes': '备注',
+
+        'role.user': '👤 会员',
+        'role.stu': '📘 公民课学员',
+        'role.stuFr': '🇫🇷 法语课学员',
+        'role.stuAll': '📘🇫🇷 双课学员',
+        'role.teacher': '👨‍🏫 教师',
+        'role.admin': '👑 管理员',
+
+        'module.civique': '📘 公民课',
+        'module.francais': '🇫🇷 法语课',
+
+        'form.name': '姓名 *',
+        'form.email': '邮箱',
+        'form.password': '密码',
+        'form.passwordHint': '（留空=不修改）',
+        'form.passwordHint2': '留空=不修改',
+        'form.role': '角色 *',
+        'form.modules': '授权模块',
+        'form.typeCivique': '课程类型',
+        'form.creditCivique': '📘 公民课时（h）',
+        'form.expiryCivique': '公民课到期',
+        'form.levelFrench': '法语级别',
+        'form.creditFrench': '🇫🇷 法语课时（h）',
+        'form.expiryFrench': '法语课到期',
+        'form.createdAt': '创建时间',
+        'form.type': '类型 *',
+        'form.credit': '📚 课时（h）',
+        'form.price': '💰 价格（€）',
+        'form.none': '—',
+        'form.select': '请选择...',
+
+        'cm.title.add': '添加课程',
+        'cm.mode': '课程模式 *',
+        'cm.mode.solo': '一对一',
+        'cm.mode.solo.desc': '单个学生',
+        'cm.mode.group': '小组课',
+        'cm.mode.group.desc': '多个学生',
+        'cm.student': '学生 *',
+        'cm.groupStudents': '小组学生 *',
+        'cm.groupCount': '（已选 0）',
+        'cm.selected': '✅ 已选：',
+        'cm.teacher': '教师 *',
+        'cm.type': '课程类型 *',
+        'cm.datetime': '日期时间 *',
+        'cm.duration': '时长（h）',
+        'cm.location': '地点',
+        'cm.material': '教材链接',
+        'cm.meeting': '🔗 Google Meet / 视频链接',
+        'cm.status': '状态',
+        'cm.conflict': '时间冲突！',
+
+        'cr.title': '取消原因',
+        'cr.subtitle': '📝 请选择或输入原因',
+        'cr.studentLeave': '📖 学生请假',
+        'cr.teacherBusy': '👨‍🏫 老师有事',
+        'cr.studentAbsent': '❌ 学生缺席',
+        'cr.other': '📝 其他',
+        'cr.custom': '请输入原因...',
+
+        'dc.title': '确认删除',
+        'dc.message': '确定要删除这门课程吗？',
+        'dc.warning': '此操作不可恢复。',
+        'dc.course': '📚 课程:',
+        'dc.date': '📅 日期:',
+        'dc.teacher': '👨‍🏫 教师:',
+        'dc.student': '👨‍🎓 学生:',
+
+        'pd.title': '预注册详情',
+        'pd.price': '价格',
+        'pd.birth': '出生日期',
+        'pd.birthPlace': '出生地',
+        'pd.address': '地址',
+        'pd.phone': '电话',
+        'pd.pack': '套餐',
+        'pre.title': '✏️ 修改预注册',
+        'um.title.add': '添加用户',
+        'ev.title': '⭐ 课程评价',
+        'ev.teacherComment': '教师评语',
+        'ev.rating': '学生评分（1-5）',
+        'ev.studentComment': '学生评语',
+        'se.title.add': '添加考试',
+        'se.category': '类别 *',
+        'se.cat.civique': '📘 公民',
+        'se.cat.francais': '🇫🇷 法语',
+        'se.examType': '考试类型 *',
+        'se.total': '总分',
+        'se.status.planned': '📅 已计划',
+        'se.status.passed': '✅ 通过',
+        'se.status.failed': '❌ 未通过',
+        'se.status.absent': '🚫 缺席',
+
+        'cd.title': '课程详情',
+
+        'cal.prevWeek': '上一周',
+        'cal.today': '今天',
+        'cal.nextWeek': '下一周',
+        'cal.filter.allModules': '所有模块',
+        'cal.filter.civique': '📘 公民课',
+        'cal.filter.francais': '🇫🇷 法语课',
+        'cal.filter.allTeachers': '所有教师',
+        'cal.filter.allStudents': '所有学生',
+        'cal.filter.allStatus': '所有状态',
+        'cal.filter.scheduled': '📅 已安排',
+        'cal.filter.inProgress': '🔄 进行中',
+        'cal.filter.completed': '✅ 已完成',
+        'cal.filter.cancelled': '❌ 已取消',
+
+        'footer': '© 2025-2026 千帆协会 / Association Mille Voiles',
+        'loading': '加载中...',
+
+        days: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+        daysFull: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日']
+    }
+};
+
+function t(key) {
+    return (I18N[currentLang] && I18N[currentLang][key])
+        || (I18N.fr[key])
+        || key;
+}
+
+function getMonday(d) {
+    const date = new Date(d);
+    const day = date.getDay();
+    const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date(date.setDate(diff));
+    monday.setHours(0, 0, 0, 0);
+    return monday;
+}
+
+function setLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('adminLang', lang);
+    applyLanguage();
+}
+window.setLang = setLang;
+
+// ============================================================
+// 课程类型配置
+// ============================================================
+const CIVIQUE_TYPES = {
+    rootCode: 'ec', rootName: '1️⃣ 公民考试',
+    children: [
+        { name: '➡️ 全能班', code: 'ec1', children: [
+            { name: '十年卡全能班', code: 'ec110' },
+            { name: '四年卡全能班', code: 'ec14' },
+            { name: '入籍全能班', code: 'ec1f' }
+        ]},
+        { name: '➡️ 速成班', code: 'ec2', children: [
+            { name: '十年卡速成', code: 'ec210' },
+            { name: '四年卡速成', code: 'ec24' },
+            { name: '入籍速成', code: 'ec2f' }
+        ]},
+        { name: '➡️ 自选班', code: 'ec3', children: [
+            { name: '十年卡自选', code: 'ec310' },
+            { name: '四年卡自选', code: 'ec34' },
+            { name: '入籍自选', code: 'ec3f' }
+        ]},
+        { name: '➡️ 模拟考试', code: 'ex', children: [
+            { name: '四年卡模拟考试', code: 'ex4' },
+            { name: '十年卡模拟考试', code: 'ex10' },
+            { name: '入籍模拟考试', code: 'exf' }
+        ]}
+    ]
+};
+
+const FRENCH_TYPES = [
+    { name: '🌱 Débutant A1-A2', code: 'beginner' },
+    { name: '📈 Intermédiaire B1-B2', code: 'intermediate' },
+    { name: '🎯 Avancé C1-C2', code: 'advanced' },
+    { name: '💼 Français des affaires', code: 'business' },
+    { name: '📝 Préparation DELF', code: 'delf' },
+    { name: '📝 Préparation DALF', code: 'dalf' },
+    { name: '📝 Préparation TCF', code: 'tcf' },
+    { name: '📝 Préparation TCF IRN', code: 'tcf_irn' }
+];
+
+const STUDENT_EXAM_TYPES = {
+    civique: [
+        { code: 'civique', label: '📘 公民考试' },
+        { code: '4ans', label: '🎫 四年卡' },
+        { code: '10ans', label: '📚 十年卡' },
+        { code: 'nationalite', label: '🛂 入籍' }
+    ],
+    francais: [
+        { code: 'tcf_irn', label: '📝 TCF IRN' },
+        { code: 'delf', label: '📝 DELF' },
+        { code: 'dalf', label: '📝 DALF' }
+    ]
+};
+
+const DEFAULT_MEETING_LINK = 'https://meet.google.com/bof-kzvo-ndh';
+const HE_TEACHER_LINK = 'https://meet.google.com/gkv-cirp-iqo';
+const ZHOU_TEACHER_LINK = 'https://meet.google.com/bof-kzvo-ndh';
+// ============================================================
+// 工具函数
+// ============================================================
+function escapeHtml(s) {
+    if (!s) return '';
+    return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function showToast(msg, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
+    const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+    toast.innerHTML = '<i class="fas ' + (icons[type] || icons.success) + '"></i> <span>' + escapeHtml(msg) + '</span>';
+    container.appendChild(toast);
+    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3500);
+}
+
+let loadingCount = 0;
+function showLoading(text) {
+    loadingCount++;
+    const overlay = document.getElementById('loadingOverlay');
+    const textEl = document.getElementById('loadingText');
+    if (textEl) textEl.textContent = text || t('loading');
+    if (overlay) overlay.classList.add('active');
+}
+function hideLoading() {
+    loadingCount = Math.max(0, loadingCount - 1);
+    if (loadingCount === 0) {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) overlay.classList.remove('active');
+    }
+}
+
+function closeModal(id) {
+    const m = document.getElementById(id);
+    if (m) m.style.display = 'none';
+}
+function openModal(id) {
+    const m = document.getElementById(id);
+    if (m) m.style.display = 'flex';
+}
+
+function formatDateTime(dateStr) {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '—';
+    return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatDateShort(dateStr) {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '—';
+    return d.toLocaleDateString('fr-FR');
+}
+
+function formatDateForEmail(dateStr) {
+    if (!dateStr) return { date: '—', time: '—' };
+    try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return { date: '—', time: '—' };
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return { date: day + '/' + month + '/' + year, time: hours + ':' + minutes };
+    } catch (e) {
+        return { date: '—', time: '—' };
+    }
+}
+
+function normalizeLocalDateTime(localValue) {
+    if (!localValue) return null;
+    const parts = localValue.split('T');
+    if (parts.length !== 2) return null;
+    const hm = parts[1].split(':');
+    if (hm.length < 2) return null;
+    return parts[0] + ' ' + hm[0].padStart(2, '0') + ':' + hm[1].padStart(2, '0') + ':00';
+}
+
+function isExpired(user) {
+    if (!user.timer) return false;
+    return new Date(user.timer) < new Date();
+}
+
+function getCiviqueTypeText(code) {
+    if (!code) return '—';
+    const map = {
+        'ec': '1️⃣ 公民考试', 'ec110': '📚 十年卡全能班', 'ec14': '🎫 四年卡全能班', 'ec1f': '🛂 入籍全能班',
+        'ec210': '📚 十年卡速成', 'ec24': '🎫 四年卡速成', 'ec2f': '🛂 入籍速成',
+        'ec310': '📚 十年卡自选', 'ec34': '🎫 四年卡自选', 'ec3f': '🛂 入籍自选',
+        'ex4': '📝 四年卡模拟考试', 'ex10': '📝 十年卡模拟考试', 'exf': '📝 入籍模拟考试'
+    };
+    return map[code] || code;
+}
+
+function getFrenchTypeText(code) {
+    const map = {
+        'beginner': '🌱 Débutant', 'intermediate': '📈 Intermédiaire', 'advanced': '🎯 Avancé',
+        'business': '💼 Affaires', 'delf': '📝 DELF', 'dalf': '📝 DALF',
+        'tcf': '📝 TCF', 'tcf_irn': '📝 TCF IRN'
+    };
+    return map[code] || code || '—';
+}
+
+function getStudentExamTypeLabel(code) {
+    for (const cat in STUDENT_EXAM_TYPES) {
+        for (const t2 of STUDENT_EXAM_TYPES[cat]) {
+            if (t2.code === code) return t2.label;
+        }
+    }
+    return code || '—';
+}
+
+function getAllCiviqueTypeCodes() {
+    const codes = ['ec'];
+    for (const g of CIVIQUE_TYPES.children) {
+        codes.push(g.code);
+        for (const c of g.children) codes.push(c.code);
+    }
+    return codes;
+}
+
+// ============================================================
+// Token 解析
+// ============================================================
 function getAdminToken() {
-    const urlParams = new URLSearchParams(window.location.search);
-    let token = urlParams.get('token');
-    
+    const params = new URLSearchParams(window.location.search);
+    let token = params.get('token');
     if (token) {
         sessionStorage.setItem('adminToken', token);
         return token;
     }
-    
     token = sessionStorage.getItem('adminToken');
     if (token) {
-        const newUrl = window.location.pathname + '?token=' + token;
+        const newUrl = window.location.pathname + '?token=' + token + (currentMode !== 'all' ? '&from=' + currentMode : '');
         window.history.replaceState({}, '', newUrl);
         return token;
     }
-    
     return null;
 }
 
-function parseTokenFromUrl() {
+function parseToken() {
     const token = getAdminToken();
-    if (!token) {
-        console.error('没有找到 token');
-        return null;
-    }
-    
+    if (!token) return null;
     try {
-        const jsonString = decodeURIComponent(atob(token));
-        const data = JSON.parse(jsonString);
-        return data;
+        return JSON.parse(decodeURIComponent(atob(token)));
     } catch (e) {
         console.error('Token 解析失败:', e);
         return null;
     }
 }
 
-function validateAdminToken(tokenData) {
-    if (!tokenData) return false;
-    if (tokenData.role !== 'admin') {
-        console.error('不是管理员账户');
-        return false;
-    }
-    if (tokenData.expiry) {
-        const expiryDate = new Date(tokenData.expiry);
-        const now = new Date();
-        if (expiryDate < now) {
-            console.error('账户已过期');
-            return false;
-        }
+function validateToken(data) {
+    if (!data) return false;
+    if (data.role !== 'admin') return false;
+    if (data.expiry) {
+        if (new Date(data.expiry) < new Date()) return false;
     }
     return true;
 }
 
-// ==============================
-// DOM 元素引用
-// ==============================
-const adminContent = document.getElementById('adminContent');
-const usersTableBody = document.getElementById('usersTableBody');
-const preRegTableBody = document.getElementById('preRegTableBody');
-const tableLoading = document.getElementById('tableLoading');
-const preRegLoading = document.getElementById('preRegLoading');
-const editUserModal = document.getElementById('editUserModal');
-const addUserModal = document.getElementById('addUserModal');
-const detailModal = document.getElementById('detailModal');
-const editUserForm = document.getElementById('editUserForm');
-const addUserForm = document.getElementById('addUserForm');
-const logoutBtn = document.getElementById('logoutBtn');
-const deleteConfirmDialog = document.getElementById('deleteConfirmDialog');
-
-const searchInput = document.getElementById('searchInput');
-const searchBtn = document.getElementById('searchBtn');
-const filterButtons = document.querySelectorAll('.filter-btn');
-const addUserBtn = document.getElementById('addUserBtn');
-
-const totalUsersEl = document.getElementById('totalUsers');
-const typeNCountEl = document.getElementById('typeNCount');
-const typeRCountEl = document.getElementById('typeRCount');
-const typeMCountEl = document.getElementById('typeMCount');
-const typeTCountEl = document.getElementById('typeTCount');
-const currentAdminNameEl = document.getElementById('currentAdminName');
-const currentAdminRoleEl = document.getElementById('currentAdminRole');
-const stuCountEl = document.getElementById('stuCount');
-const courseManageBtn = document.getElementById('courseManageBtn');
-const preRegCountEl = document.getElementById('preRegCount');
-const preRegCountEl2 = document.getElementById('preRegCount2');
-
-// ==============================
-// 全局变量
-// ==============================
-let currentAdmin = null;
-let allUsers = [];
-let filteredUsers = [];
-let allPreRegs = [];
-let currentFilter = 'all';
-let userToDelete = null;
-let currentSearchTerm = '';
-
-function isExpired(user) {
-    return user.timer ? new Date(user.timer) < new Date() : false;
-}
-
-// ==============================
-// 页面加载初始化
-// ==============================
-document.addEventListener('DOMContentLoaded', function() {
-    const tokenData = parseTokenFromUrl();
-    
-    if (!tokenData || !validateAdminToken(tokenData)) {
-        showToast(
-            'Accès refusé',
-            'Vous devez être connecté en tant qu\'administrateur pour accéder à cette page.',
-            'error'
-        );
-        setTimeout(() => {
-            window.location.href = 'index.html';
-        }, 2000);
-        return;
-    }
-    
-    currentAdmin = {
-        id: tokenData.userId,
-        name: tokenData.name,
-        role: tokenData.role,
-        type: tokenData.type,
-        expiry: tokenData.expiry,
-        daysLeft: tokenData.daysLeft
-    };
-    
-    currentAdminNameEl.textContent = currentAdmin.name;
-    currentAdminRoleEl.textContent = `Rôle: Administrateur`;
-    
-    adminContent.style.display = 'block';
-    
-    initEventListeners();
-    loadUsers();
-    loadPreRegistrations();
-    setupTabs();
-    
-    // 预加载 EmailJS
-    loadEmailJS();
-});
-
-// ==============================
-// TABS
-// ==============================
-function setupTabs() {
-    document.querySelectorAll('.admin-tabs button').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.admin-tabs button').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            const tab = this.dataset.tab;
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById('tab-' + tab).classList.add('active');
-        });
-    });
-}
-
-// ==============================
-// 初始化事件监听器
-// ==============================
-function initEventListeners() {
-    logoutBtn.addEventListener('click', function() {
-        sessionStorage.removeItem('adminToken');
-        sessionStorage.removeItem('adminUser');
-        window.location.href = 'index.html';
-    });
-    
-    searchBtn.addEventListener('click', handleSearch);
-    searchInput.addEventListener('keyup', function(e) {
-        if (e.key === 'Enter') handleSearch();
-    });
-    
-    filterButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            filterButtons.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            currentFilter = this.dataset.filter;
-            applyFilters();
-        });
-    });
-    
-    addUserBtn.addEventListener('click', showAddUserModal);
-    
-    document.getElementById('addUserRole').addEventListener('change', function() {
-        const creditGroup = document.getElementById('addCreditGroup');
-        if (this.value === 'stu') {
-            creditGroup.style.display = 'block';
-        } else {
-            creditGroup.style.display = 'none';
-        }
-    });
-    
-    document.getElementById('closeModalBtn').addEventListener('click', () => closeModal(editUserModal));
-    document.getElementById('closeAddModalBtn').addEventListener('click', () => closeModal(addUserModal));
-    document.getElementById('closeDetailBtn').addEventListener('click', () => closeModal(detailModal));
-    document.getElementById('closeDetailBtn2').addEventListener('click', () => closeModal(detailModal));
-    document.getElementById('cancelEditBtn').addEventListener('click', () => closeModal(editUserModal));
-    document.getElementById('cancelAddBtn').addEventListener('click', () => closeModal(addUserModal));
-    
-    editUserForm.addEventListener('submit', handleEditUser);
-    addUserForm.addEventListener('submit', handleAddUser);
-    
-    document.getElementById('cancelDeleteBtn').addEventListener('click', () => closeModal(deleteConfirmDialog));
-    document.getElementById('confirmDeleteBtn').addEventListener('click', handleDeleteUser);
-    
-    window.addEventListener('click', function(e) {
-        if (e.target === editUserModal) closeModal(editUserModal);
-        if (e.target === addUserModal) closeModal(addUserModal);
-        if (e.target === detailModal) closeModal(detailModal);
-        if (e.target === deleteConfirmDialog) closeModal(deleteConfirmDialog);
-    });
-    
-    if (courseManageBtn) {
-        courseManageBtn.addEventListener('click', function() {
-            window.location.href = 'cours.html';
-        });
-    }
-}
-
-// ==============================
-// EmailJS 加载函数
-// ==============================
+// ============================================================
+// 🔥 EMAILJS 邮件函数
+// ============================================================
 function loadEmailJS() {
     return new Promise((resolve, reject) => {
         if (typeof emailjs !== 'undefined') {
-            console.log('✅ EmailJS déjà chargé');
+            try { emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY); } catch (e) {}
             resolve();
             return;
         }
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
         script.onload = () => {
-            console.log('✅ EmailJS chargé avec succès');
-            emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+            try { emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY); } catch (e) {}
             resolve();
         };
-        script.onerror = () => {
-            console.error('❌ Échec chargement EmailJS');
-            reject(new Error('Impossible de charger EmailJS'));
-        };
+        script.onerror = () => reject(new Error('EmailJS load failed'));
         document.head.appendChild(script);
     });
 }
 
-// ==============================
-// 发送邮件函数
-// ==============================
 async function sendActivationEmail(userEmail, userName, userType, userRole, userPassword) {
-    try {
-        // Vérifier que EmailJS est chargé
-        if (typeof emailjs === 'undefined') {
-            console.log('📧 Chargement de EmailJS...');
-            await loadEmailJS();
-        }
+    if (typeof emailjs === 'undefined') await loadEmailJS();
+    if (typeof emailjs === 'undefined') throw new Error('EmailJS non disponible');
 
-        const typeLabels = {
-            'n': 'Naturalisation (入籍)',
-            'r': 'Carte 10 ans (十年居留)',
-            'm': 'Carte pluriannuelle (多年居留)'
-        };
-        
-        const roleLabels = {
-            'user': 'Membre (会员)',
-            'stu': 'Élève (学员)'
-        };
+    const typeLabels = {
+        'n': 'Naturalisation (入籍)', 'r': 'Carte 10 ans (十年居留)',
+        'm': 'Carte pluriannuelle (多年居留)', 't': 'TCF IRN'
+    };
+    const roleLabels = { 'user': 'Membre (会员)', 'stu': 'Élève (学员)', 'teacher': 'Intervenant' };
 
-        const templateParams = {
-            to_email: userEmail,
-            to_name: userName,
-            user_name: userName,
-            user_type: typeLabels[userType] || userType,
-            user_role: roleLabels[userRole] || userRole,
-            user_password: userPassword || 'Votre mot de passe',
-            login_url: 'https://www.assmv.fr/examen-civique.html',
-            contact_email: '2025qianfan@gmail.com',
-            subject: '🎉 Votre compte Mille Voiles est activé ! / 🎉 您的千帆协会账户已激活！'
-        };
+    const params = {
+        to_email: userEmail,
+        to_name: userName,
+        user_name: userName,
+        user_type: typeLabels[userType] || userType || '—',
+        user_role: roleLabels[userRole] || userRole || '—',
+        user_password: userPassword || '—',
+        login_url: 'https://www.assmv.fr/examen-civique.html',
+        contact_email: '2025qianfan@gmail.com',
+        subject: '🎉 Votre compte Mille Voiles est activé ! / 🎉 您的千帆协会账户已激活！'
+    };
 
-        console.log('📧 Envoi email à:', userEmail);
-        console.log('📧 Template ID:', EMAILJS_CONFIG.TEMPLATE_ID);
-        console.log('🔗 Lien de connexion:', templateParams.login_url);
-
-        const response = await emailjs.send(
-            EMAILJS_CONFIG.SERVICE_ID,
-            EMAILJS_CONFIG.TEMPLATE_ID,
-            templateParams,
-            EMAILJS_CONFIG.PUBLIC_KEY
-        );
-
-        console.log('✅ Email envoyé avec succès:', response);
-        return { success: true, response };
-
-    } catch (error) {
-        console.error('❌ Erreur envoi email:', error);
-        return { success: false, error: error.message };
-    }
+    await emailjs.send(EMAILJS_CONFIG.SERVICE_ID, EMAILJS_CONFIG.TEMPLATE_ID, params, EMAILJS_CONFIG.PUBLIC_KEY);
 }
 
-// ==============================
-// 用户管理功能
-// ==============================
-async function loadUsers() {
-    showLoading(true);
-    
+async function getUpcomingCoursesForUser(userId, userType, excludeCourseId) {
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
-        
-        const { data, error } = await supabase
-            .from('students')
+        if (!supabase) return [];
+        const now = new Date().toISOString();
+        let query = supabase
+            .from('courses_v2')
             .select('*')
-            .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        
-        allUsers = data || [];
-        applyFilters();
-        updateStats();
-        showLoading(false);
-        
-    } catch (error) {
-        console.error('加载用户错误:', error);
-        showToast('Erreur lors du chargement des utilisateurs', 'error');
-        showLoading(false);
+            .eq('status', 'scheduled')
+            .gte('start_time', now)
+            .order('start_time', { ascending: true });
+
+        if (userType === 'teacher') {
+            query = query.eq('teacher_id', userId);
+        } else if (userType === 'student') {
+            const { data: csList } = await supabase
+                .from('course_students')
+                .select('course_id')
+                .eq('student_id', userId);
+            const courseIds = (csList || []).map(cs => cs.course_id);
+
+            const { data: legacyCourses } = await supabase
+                .from('courses_v2')
+                .select('id')
+                .eq('student_id', userId);
+            const legacyIds = (legacyCourses || []).map(c => c.id);
+            const allIds = [...new Set([...courseIds, ...legacyIds])];
+
+            if (allIds.length === 0) return [];
+            query = query.in('id', allIds);
+        }
+
+        if (excludeCourseId) query = query.neq('id', excludeCourseId);
+
+        const { data, error } = await query;
+        if (error) return [];
+        return data || [];
+    } catch (e) {
+        return [];
     }
 }
 
-function renderCreditCell(user) {
-    if (user.role !== 'stu') {
-        return '<span class="credit-na">—</span>';
-    }
-    const credit = (user.credit !== undefined && user.credit !== null) ? user.credit : 0;
-    let creditClass = 'credit-normal';
-    if (credit <= 0) creditClass = 'credit-zero';
-    else if (credit <= 3) creditClass = 'credit-low';
-    return `<span class="${creditClass}">📚 ${credit} h</span>`;
+function formatUpcomingCoursesForEmail(courses) {
+    if (!courses || courses.length === 0) return '✅ Aucun cours à venir.';
+    let formatted = '';
+    courses.forEach((course, index) => {
+        const { date, time } = formatDateForEmail(course.start_time);
+        const courseTypeName = course.category === 'civique'
+            ? getCiviqueTypeText(course.course_type)
+            : getFrenchTypeText(course.course_type);
+        formatted += (index + 1) + '. ' + date + ' à ' + time + ' | ' + courseTypeName + ' | ' + (course.duration || 2) + 'h\n';
+    });
+    return formatted;
 }
 
-function renderUsersTable() {
-    if (filteredUsers.length === 0) {
-        usersTableBody.innerHTML = `
-            <tr>
-                <td colspan="9" style="text-align: center; padding: 40px;">
-                    <i class="fas fa-users" style="font-size: 3rem; color: #ddd; margin-bottom: 15px;"></i>
-                    <p style="color: var(--medium-gray);">Aucun utilisateur trouvé</p>
-                </td>
-            </tr>
-        `;
-        return;
-    }
-    
-    usersTableBody.innerHTML = '';
-    
-    filteredUsers.forEach(user => {
-        const row = document.createElement('tr');
-        if (isExpired(user)) row.classList.add('expired-row');
-        
-        const createdAt = user.created_at ? new Date(user.created_at).toLocaleDateString('fr-FR', {
-            day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
-        }) : 'N/A';
-        
-        let timerInfo = 'Pas de date';
-        let timerClass = '';
-        if (user.timer) {
-            const timerDate = new Date(user.timer);
-            const now = new Date();
-            if (timerDate < now) {
-                timerInfo = `Expiré le ${timerDate.toLocaleDateString('fr-FR')}`;
-                timerClass = 'expired';
-            } else {
-                const daysLeft = Math.ceil((timerDate - now) / (1000 * 60 * 60 * 24));
-                timerInfo = `${timerDate.toLocaleDateString('fr-FR')} (${daysLeft} jours restants)`;
-                timerClass = daysLeft <= 7 ? 'warning' : 'active';
+async function sendCourseEmailNotification(courseId, action) {
+    try {
+        if (typeof emailjs === 'undefined') {
+            console.warn('⚠️ EmailJS non disponible');
+            return { success: true, skipped: true };
+        }
+        try { emailjs.init(EMAILJS_COURSE.PUBLIC_KEY); } catch (e) {}
+
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        if (!supabase) return { success: true, skipped: true };
+
+        const { data: course, error } = await supabase
+            .from('courses_v2')
+            .select('*')
+            .eq('id', courseId)
+            .single();
+
+        if (error || !course) return { success: true, skipped: true };
+
+        const { data: courseStudents } = await supabase
+            .from('course_students')
+            .select('student_id')
+            .eq('course_id', courseId);
+
+        let studentIds = (courseStudents || []).map(cs => cs.student_id);
+        if (studentIds.length === 0 && course.student_id) {
+            studentIds = [course.student_id];
+        }
+
+        const userIds = [course.teacher_id, ...studentIds].filter(Boolean);
+
+        const { data: users } = await supabase
+            .from('users')
+            .select('id, name, email')
+            .in('id', userIds);
+
+        const userMap = {};
+        (users || []).forEach(u => { userMap[u.id] = u; });
+
+        const teacher = userMap[course.teacher_id] || null;
+        const students = studentIds.map(id => userMap[id]).filter(Boolean);
+        const studentsWithEmail = students.filter(s => s.email && s.email.trim() !== '');
+
+        const hasTeacherEmail = teacher && teacher.email && teacher.email.trim() !== '';
+
+        if (!hasTeacherEmail && studentsWithEmail.length === 0) {
+            console.log('ℹ️ 无邮箱，跳过发送');
+            return { success: true, skipped: true };
+        }
+
+        const actionLabels = {
+            'create': 'créé', 'update': 'modifié',
+            'cancel': 'annulé', 'complete': 'terminé'
+        };
+        const actionLabel = actionLabels[action] || action;
+
+        const { date, time } = formatDateForEmail(course.start_time);
+        const courseTypeName = course.category === 'civique'
+            ? getCiviqueTypeText(course.course_type)
+            : getFrenchTypeText(course.course_type);
+
+        const shouldExclude = (action !== 'create');
+        let sentCount = 0;
+
+        if (hasTeacherEmail) {
+            let teacherCourses = '✅ Aucun cours à venir.';
+            try {
+                const list = await getUpcomingCoursesForUser(teacher.id, 'teacher', shouldExclude ? courseId : null);
+                teacherCourses = formatUpcomingCoursesForEmail(list);
+            } catch (e) {}
+
+            const teacherParams = {
+                to_email: teacher.email,
+                to_name: teacher.name || 'Enseignant',
+                teacher_name: teacher.name || 'Enseignant',
+                action: actionLabel,
+                course_type: courseTypeName,
+                date: date, time: time,
+                duration: course.duration || 2,
+                student_name: students.map(s => s.name).join(', ') || '-',
+                student_email: studentsWithEmail.map(s => s.email).join(', ') || '-',
+                upcoming_courses: teacherCourses,
+                subject: '📚 [Enseignant] Cours ' + actionLabel + ' - ' + date
+            };
+
+            try {
+                await emailjs.send(EMAILJS_COURSE.SERVICE_ID, EMAILJS_COURSE.TEACHER_TEMPLATE_ID, teacherParams, EMAILJS_COURSE.PUBLIC_KEY);
+                sentCount++;
+                console.log('✅ 邮件已发老师:', teacher.email);
+            } catch (e) {
+                console.error('❌ 发老师邮件失败:', e.message);
             }
         }
-        
-        let typeClass = '', typeText = '';
-        switch(user.type) {
-            case 'n': typeClass = 'type-n'; typeText = 'Type N'; break;
-            case 'r': typeClass = 'type-r'; typeText = 'Type R'; break;
-            case 'm': typeClass = 'type-m'; typeText = 'Type M'; break;
-            case 't': typeClass = 'type-t'; typeText = 'Type T'; break;
-            default: typeClass = 'type-t'; typeText = 'Type T';
+
+        for (const student of studentsWithEmail) {
+            let studentCourses = '✅ Aucun cours à venir.';
+            try {
+                const list = await getUpcomingCoursesForUser(student.id, 'student', shouldExclude ? courseId : null);
+                studentCourses = formatUpcomingCoursesForEmail(list);
+            } catch (e) {}
+
+            const studentParams = {
+                to_email: student.email,
+                to_name: student.name || 'Élève',
+                student_name: student.name || 'Élève',
+                action: actionLabel,
+                course_type: courseTypeName,
+                date: date, time: time,
+                duration: course.duration || 2,
+                teacher_name: teacher?.name || '-',
+                teacher_email: teacher?.email || '-',
+                upcoming_courses: studentCourses,
+                subject: '📚 [Élève] Cours ' + actionLabel + ' - ' + date
+            };
+
+            try {
+                await emailjs.send(EMAILJS_COURSE.SERVICE_ID, EMAILJS_COURSE.STUDENT_TEMPLATE_ID, studentParams, EMAILJS_COURSE.PUBLIC_KEY);
+                sentCount++;
+                console.log('✅ 邮件已发学生:', student.email);
+            } catch (e) {
+                console.error('❌ 发学生邮件失败:', student.email, e.message);
+            }
         }
-        
-        let roleClass = '', roleText = '';
-        if (user.role === 'admin') { roleClass = 'role-admin'; roleText = 'Administrateur'; }
-        else if (user.role === 'user') { roleClass = 'role-user'; roleText = 'Membre'; }
-        else if (user.role === 'stu') { roleClass = 'role-stu'; roleText = 'Élève'; }
-        else if (user.role === 'teacher') { roleClass = 'role-teacher'; roleText = 'Intervenant'; }
-        
-        row.innerHTML = `
-            <td><strong>${escapeHtml(user.name)}</strong></td>
-            <td><span class="user-type ${typeClass}">${typeText}</span></td>
-            <td>${roleText ? `<span class="role-tag ${roleClass}">${roleText}</span>` : ''}</td>
-            <td>${createdAt}</td>
-            <td class="${timerClass}">${timerInfo}</td>
-            <td class="credit-cell">${renderCreditCell(user)}</td>
-            <td>${user.email || '-'}</td>
-            <td>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-family: monospace; background: #f0f0f0; padding: 4px 8px; border-radius: 4px;">${user.password || '—'}</span>
-                    ${user.password ? `<button class="copy-password-btn" data-password="${escapeHtml(user.password)}" style="background: none; border: none; color: var(--primary-blue); cursor: pointer;"><i class="fas fa-copy"></i></button>` : ''}
-                </div>
-            </td>
-            <td>
-                <div class="action-buttons">
-                    <button class="action-btn edit-btn" data-id="${user.id}"><i class="fas fa-edit"></i> Modifier</button>
-                    <button class="action-btn delete-btn" data-id="${user.id}" ${user.role === 'admin' && user.id === currentAdmin?.id ? 'disabled' : ''}><i class="fas fa-trash"></i> Supprimer</button>
-                </div>
-            </td>
-        `;
-        usersTableBody.appendChild(row);
-    });
-    
-    document.querySelectorAll('.edit-btn').forEach(btn => {
+
+        return { success: true, sentCount: sentCount };
+    } catch (err) {
+        console.error('❌ 邮件发送异常:', err);
+        return { success: true };
+    }
+}
+
+// ============================================================
+// 初始化
+// ============================================================
+async function init() {
+    const tokenData = parseToken();
+    if (!tokenData || !validateToken(tokenData)) {
+        showToast('Accès refusé', 'error');
+        setTimeout(() => window.location.href = 'index.html', 2000);
+        return;
+    }
+
+    currentAdmin = tokenData;
+    document.getElementById('currentAdminName').textContent = tokenData.name || 'Admin';
+
+    const params = new URLSearchParams(window.location.search);
+    currentMode = params.get('from') || 'all';
+
+    applyMode();
+    bindTabs();
+    bindGlobalEvents();
+
+    await loadAllData();
+    loadEmailJS();
+    applyLanguage();
+    bindLanguageButtons();
+}
+
+function bindLanguageButtons() {
+    document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            openEditUserModal(this.dataset.id);
-        });
-    });
-    
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-        if (!btn.disabled) {
-            btn.addEventListener('click', function() {
-                showDeleteConfirmation(this.dataset.id);
-            });
-        }
-    });
-    
-    document.querySelectorAll('.copy-password-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const password = this.dataset.password;
-            if (!password) return;
-            navigator.clipboard.writeText(password).then(() => {
-                showToast('Mot de passe copié!', 'success');
-            }).catch(() => {
-                showToast('Erreur lors de la copie', 'error');
-            });
+            setLang(this.dataset.lang);
         });
     });
 }
 
-// ==============================
-// 统计功能
-// ==============================
-function updateStats() {
+function applyLanguage() {
+    document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'fr';
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        const val = t(key);
+        if (val && val !== key) el.textContent = val;
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.dataset.i18nPlaceholder;
+        const val = t(key);
+        if (val && val !== key) el.placeholder = val;
+    });
+
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === currentLang);
+    });
+
+    if (typeof renderCalendar === 'function' && allCiviqueCourses.length + allFrenchCourses.length > 0) renderCalendar();
+    if (typeof updateUserStats === 'function' && allUsers.length) updateUserStats();
+    if (typeof applyUserFilters === 'function' && allUsers.length) applyUserFilters();
+    if (typeof renderPreRegTable === 'function' && allPreRegs.length) renderPreRegTable();
+    if (typeof renderCiviqueCourses === 'function' && allCiviqueCourses.length) renderCiviqueCourses();
+    if (typeof renderFrenchCourses === 'function' && allFrenchCourses.length) renderFrenchCourses();
+    if (typeof renderStudentExams === 'function' && allStudentExams.length) renderStudentExams();
+}
+
+function applyMode() {
+    const backLink = document.getElementById('backHomeLink');
+    const backHomeText = document.getElementById('backHomeText');
+    const headerTitle = document.getElementById('headerTitle');
+
+    if (currentMode === 'francais') {
+        if (backLink) backLink.href = 'francais.html';
+        if (backHomeText) backHomeText.textContent = 'Retour Français';
+        document.body.setAttribute('data-theme', 'francais');
+        if (headerTitle) headerTitle.textContent = 'Admin Français';
+    } else if (currentMode === 'civique') {
+        if (backLink) backLink.href = 'examen-civique.html';
+        if (backHomeText) backHomeText.textContent = 'Retour Civique';
+        document.body.setAttribute('data-theme', 'civique');
+        if (headerTitle) headerTitle.textContent = 'Admin Civique';
+    } else {
+        if (backLink) backLink.href = 'examen-civique.html';
+    }
+
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+        const scope = tab.dataset.scope;
+        const visible = scope === 'both' || currentMode === 'all' || scope === currentMode;
+        tab.classList.toggle('hidden', !visible);
+    });
+}
+
+function bindTabs() {
+    document.querySelectorAll('.admin-tab').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tab = this.dataset.tab;
+            currentTab = tab;
+            document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            const content = document.getElementById('tab-' + tab);
+            if (content) content.classList.add('active');
+            if (tab.startsWith('french-')) document.body.setAttribute('data-theme', 'francais');
+            else document.body.setAttribute('data-theme', 'civique');
+
+            if (tab === 'calendar') renderCalendar();
+        });
+    });
+}
+
+function bindGlobalEvents() {
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        sessionStorage.clear();
+        window.location.href = 'examen-civique.html';
+    });
+
+    // 用户
+    document.getElementById('searchBtn').addEventListener('click', handleUserSearch);
+    document.getElementById('searchInput').addEventListener('keyup', e => { if (e.key === 'Enter') handleUserSearch(); });
+    document.querySelectorAll('#userFilters .filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('#userFilters .filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            userFilter = this.dataset.filter;
+            applyUserFilters();
+        });
+    });
+    document.getElementById('addUserBtn').addEventListener('click', () => openUserModal());
+    document.getElementById('userForm').addEventListener('submit', handleUserSubmit);
+    document.getElementById('userRole').addEventListener('change', updateUserModalFields);
+    document.getElementById('userModuleCivique').addEventListener('change', updateUserModalFields);
+    document.getElementById('userModuleFrancais').addEventListener('change', updateUserModalFields);
+
+    // 预注册
+    document.getElementById('editPreRegForm').addEventListener('submit', handleEditPreRegSubmit);
+
+    // 课程
+    document.getElementById('courseForm').addEventListener('submit', handleCourseSubmit);
+    document.getElementById('addCiviqueCourseBtn').addEventListener('click', () => openCourseModal('civique'));
+    document.getElementById('addFrenchCourseBtn').addEventListener('click', () => openCourseModal('francais'));
+    document.getElementById('courseTeacher').addEventListener('change', autoFillMeetingLink);
+    document.getElementById('groupSearchInput').addEventListener('input', filterGroupStudents);
+
+    // 公民课筛选
+    document.getElementById('civiqueFilterType').addEventListener('change', function() { civiqueFilter.type = this.value; renderCiviqueCourses(); });
+    document.getElementById('civiqueFilterTeacher').addEventListener('change', function() { civiqueFilter.teacherId = this.value; renderCiviqueCourses(); });
+    document.getElementById('civiqueShowUpcoming').addEventListener('click', () => toggleCourseFilter('civique', true));
+    document.getElementById('civiqueShowPast').addEventListener('click', () => toggleCourseFilter('civique', false));
+    document.getElementById('civiqueRefreshBtn').addEventListener('click', loadAllData);
+    document.getElementById('civiqueSearchInput').addEventListener('input', function() { civiqueFilter.search = this.value.toLowerCase(); renderCiviqueCourses(); });
+
+    // 法语课筛选
+    document.getElementById('frenchFilterType').addEventListener('change', function() { frenchFilter.type = this.value; renderFrenchCourses(); });
+    document.getElementById('frenchFilterTeacher').addEventListener('change', function() { frenchFilter.teacherId = this.value; renderFrenchCourses(); });
+    document.getElementById('frenchShowUpcoming').addEventListener('click', () => toggleCourseFilter('francais', true));
+    document.getElementById('frenchShowPast').addEventListener('click', () => toggleCourseFilter('francais', false));
+    document.getElementById('frenchRefreshBtn').addEventListener('click', loadAllData);
+    document.getElementById('frenchSearchInput').addEventListener('input', function() { frenchFilter.search = this.value.toLowerCase(); renderFrenchCourses(); });
+
+    // 学生考试
+    document.getElementById('addStudentExamBtn').addEventListener('click', () => openStudentExamModal());
+    document.getElementById('studentExamForm').addEventListener('submit', handleStudentExamSubmit);
+    document.getElementById('studentExamCategory').addEventListener('change', updateStudentExamTypes);
+    document.getElementById('studentExamSearchInput').addEventListener('input', function() {
+        studentExamSearch = this.value.toLowerCase().trim();
+        renderStudentExams();
+    });
+    document.querySelectorAll('#studentExamFilters .filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('#studentExamFilters .filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            studentExamFilter = this.dataset.filter;
+            renderStudentExams();
+        });
+    });
+
+    // 取消原因
+    document.getElementById('confirmCancelReasonBtn').addEventListener('click', confirmCancelReason);
+    document.getElementById('cancelReasonModalBtn').addEventListener('click', () => {
+        closeModal('cancelReasonModal');
+        pendingCancelData = null;
+    });
+    document.querySelectorAll('.cancel-reason-option').forEach(opt => {
+        opt.addEventListener('click', function() {
+            const radio = this.querySelector('input[type="radio"]');
+            radio.checked = true;
+            document.querySelectorAll('.cancel-reason-option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+            if (this.dataset.reason === 'other') {
+                document.getElementById('customReasonContainer').classList.add('show');
+            } else {
+                document.getElementById('customReasonContainer').classList.remove('show');
+            }
+        });
+    });
+
+    // 删除确认
+    document.getElementById('cancelDeleteCourseBtn').addEventListener('click', () => {
+        document.getElementById('deleteConfirmOverlay').classList.remove('active');
+        pendingDeleteCourse = { id: null, category: null };
+    });
+    document.getElementById('confirmDeleteCourseBtn').addEventListener('click', confirmDeleteCourse);
+
+    // 评价星星
+    document.querySelectorAll('#ratingStars .star').forEach(star => {
+        star.addEventListener('click', function() {
+            const val = parseInt(this.dataset.value);
+            document.getElementById('studentRating').value = val;
+            document.querySelectorAll('#ratingStars .star').forEach((s, i) => {
+                s.classList.toggle('active', i < val);
+            });
+        });
+    });
+
+    // 🔥 日历筛选
+    const calFilterCat = document.getElementById('calFilterCategory');
+    const calFilterTeacher = document.getElementById('calFilterTeacher');
+    const calFilterStudent = document.getElementById('calFilterStudent');
+    const calFilterStatus = document.getElementById('calFilterStatus');
+
+    if (calFilterCat) calFilterCat.addEventListener('change', function() {
+        calendarFilter.category = this.value; renderCalendar();
+    });
+    if (calFilterTeacher) calFilterTeacher.addEventListener('change', function() {
+        calendarFilter.teacherId = this.value; renderCalendar();
+    });
+    if (calFilterStudent) calFilterStudent.addEventListener('change', function() {
+        calendarFilter.studentId = this.value; renderCalendar();
+    });
+    if (calFilterStatus) calFilterStatus.addEventListener('change', function() {
+        calendarFilter.status = this.value; renderCalendar();
+    });
+
+    // 点击遮罩关闭
+    window.addEventListener('click', function(e) {
+        ['userModal', 'detailModal', 'editPreRegModal', 'courseModal', 'cancelReasonModal', 'evaluationModal', 'studentExamModal', 'courseDetailModal'].forEach(id => {
+            const m = document.getElementById(id);
+            if (e.target === m) closeModal(id);
+        });
+    });
+}
+
+// ============================================================
+// 加载所有数据
+// ============================================================
+async function loadAllData() {
+    showLoading('Chargement des données...');
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+
+        const [usersRes, preRegsRes, coursesRes, studentExamsRes] = await Promise.all([
+            supabase.from('users').select('*').order('created_at', { ascending: false }),
+            supabase.from('pre_registrations').select('*').order('created_at', { ascending: false }),
+            supabase.from('courses_v2').select('*').order('start_time', { ascending: true }),
+            supabase.from('student_exams').select('*, student:student_id(id,name)').order('exam_date', { ascending: false })
+        ]);
+
+        allUsers = usersRes.data || [];
+        allPreRegs = preRegsRes.data || [];
+        const allCourses = coursesRes.data || [];
+        allCiviqueCourses = allCourses.filter(c => c.category === 'civique');
+        allFrenchCourses = allCourses.filter(c => c.category === 'francais');
+        allStudentExams = studentExamsRes.data || [];
+
+        await attachUsersToCourses();
+
+        updateUserStats();
+        applyUserFilters();
+        renderPreRegTable();
+        updatePreRegCount();
+        buildCiviqueFilterOptions();
+        buildFrenchFilterOptions();
+        renderCiviqueCourses();
+        renderFrenchCourses();
+        renderStudentExams();
+        buildCalendarFilterOptions();
+        renderCalendar();
+
+    } catch (err) {
+        console.error('加载数据失败:', err);
+        showToast('Erreur de chargement: ' + err.message, 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+async function attachUsersToCourses() {
+    const allCourses = [...allCiviqueCourses, ...allFrenchCourses];
+    const ids = new Set();
+    allCourses.forEach(c => {
+        if (c.teacher_id) ids.add(c.teacher_id);
+        if (c.student_id) ids.add(c.student_id);
+    });
+    if (ids.size === 0) return;
+
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const { data } = await supabase.from('users').select('id, name').in('id', Array.from(ids));
+    const userMap = {};
+    (data || []).forEach(u => { userMap[u.id] = u; });
+
+    allCourses.forEach(c => {
+        if (c.teacher_id) c.teacher = userMap[c.teacher_id];
+        if (c.student_id) c.student = userMap[c.student_id];
+    });
+}
+
+// ============================================================
+// 用户管理
+// ============================================================
+function updateUserStats() {
     const total = allUsers.length;
-    const stuCount = allUsers.filter(u => u.role === 'stu').length;
-    const typeN = allUsers.filter(u => u.type === 'n').length;
-    const typeR = allUsers.filter(u => u.type === 'r').length;
-    const typeM = allUsers.filter(u => u.type === 'm').length;
-    const typeT = allUsers.filter(u => u.type === 't').length;
-    
-    totalUsersEl.textContent = total;
-    stuCountEl.textContent = stuCount;
-    typeNCountEl.textContent = typeN;
-    typeRCountEl.textContent = typeR;
-    typeMCountEl.textContent = typeM;
-    typeTCountEl.textContent = typeT;
+    const teachers = allUsers.filter(u => u.role === 'teacher').length;
+    const stuCivique = allUsers.filter(u => u.role === 'stu').length;
+    const stuFrench = allUsers.filter(u => u.role === 'stu_fr').length;
+    const members = allUsers.filter(u => u.role === 'user').length;
+    const admins = allUsers.filter(u => u.role === 'admin').length;
+
+    document.getElementById('statTotalUsers').textContent = total;
+    document.getElementById('statTeachers').textContent = teachers;
+    document.getElementById('statStuCivique').textContent = stuCivique;
+    document.getElementById('statStuFrench').textContent = stuFrench;
+    document.getElementById('statMembers').textContent = members;
+    document.getElementById('statAdmins').textContent = admins;
 }
 
-// ==============================
-// 搜索和过滤
-// ==============================
-function handleSearch() {
-    currentSearchTerm = searchInput.value.toLowerCase().trim();
-    applyFilters();
+function handleUserSearch() {
+    userSearchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+    applyUserFilters();
 }
 
-function applyFilters() {
-    filteredUsers = allUsers.filter(user => {
-        if (currentSearchTerm && !user.name.toLowerCase().includes(currentSearchTerm)) {
-            return false;
-        }
-        if (currentFilter !== 'all') {
-            if (currentFilter === 'role-user') return user.role === 'user';
-            else if (currentFilter === 'role-stu') return user.role === 'stu';
-            else if (currentFilter === 'role-teacher') return user.role === 'teacher';
-            else if (currentFilter === 'expired') return isExpired(user);
-            else if (currentFilter === 'admin' || currentFilter === 'role-admin') return user.role === 'admin';
-            else {
-                const type = currentFilter.split('-')[1];
-                return user.type === type;
+function applyUserFilters() {
+    filteredUsers = allUsers.filter(u => {
+        if (userSearchTerm && !(u.name || '').toLowerCase().includes(userSearchTerm)) return false;
+        if (userFilter !== 'all') {
+            if (userFilter === 'expired') return isExpired(u);
+            if (userFilter.startsWith('role-')) {
+                const role = userFilter.replace('role-', '');
+                return u.role === role;
             }
         }
         return true;
     });
-    
-    filteredUsers.sort((a, b) => (isExpired(a) === isExpired(b)) ? 0 : isExpired(a) ? 1 : -1);
+    filteredUsers.sort((a, b) => {
+        if (isExpired(a) === isExpired(b)) return 0;
+        return isExpired(a) ? 1 : -1;
+    });
     renderUsersTable();
 }
+function getUserTypeHtml(user) {
+    const role = user.role;
 
-// ==============================
-// 用户编辑功能
-// ==============================
-function openEditUserModal(userId) {
-    const user = allUsers.find(u => u.id.toString() === userId.toString());
-    if (!user) return;
-    
-    document.getElementById('editUserId').value = user.id;
-    document.getElementById('editUserName').value = user.name;
-    document.getElementById('editUserEmail').value = user.email || '';
-    document.getElementById('editUserType').value = user.type || 'n';
-    document.getElementById('editUserRole').value = user.role || '';
-    
-    const createdAt = user.created_at ? new Date(user.created_at).toLocaleDateString('fr-FR', {
-        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
-    }) : 'Date non disponible';
-    document.getElementById('editUserCreatedAt').textContent = createdAt;
-    
-    if (user.timer) {
-        const timerDate = new Date(user.timer);
-        const localDate = new Date(timerDate.getTime() - (timerDate.getTimezoneOffset() * 60000))
-            .toISOString().slice(0, 16);
-        document.getElementById('editUserTimer').value = localDate;
-    } else {
-        document.getElementById('editUserTimer').value = '';
+    // 公民课 type 映射（中法双语）
+    const civiqueMap = {
+        'n': 'N · 入籍 Naturalisation',
+        'r': 'R · 十年卡 Carte 10 ans',
+        'm': 'M · 多年卡 Pluriannuelle',
+        't': 'T · 全部权限 Tous droits'
+    };
+    // 法语课 french_type 映射
+    const frenchMap = {
+        'n': 'N · DELF',
+        'r': 'R · DALF',
+        'm': 'M · TCF',
+        't': 'T · TCF IRN'
+    };
+
+    let html = '';
+
+    // 公民课 type（学员 stu/stu_all + 会员 user）
+    const showCivique = (role === 'stu' || role === 'stu_all' || role === 'user') && user.type;
+    if (showCivique) {
+        const label = civiqueMap[user.type] || user.type;
+        html += '<span class="user-type type-' + user.type + '">' + label + '</span>';
     }
-    
-    const creditGroup = document.getElementById('editCreditGroup');
-    const creditInput = document.getElementById('editUserCredit');
-    
-    if (user.role === 'stu') {
-        creditGroup.style.display = 'block';
-        creditInput.value = (user.credit !== undefined && user.credit !== null) ? user.credit : 0;
-    } else {
-        creditGroup.style.display = 'none';
-        creditInput.value = '';
+
+    // 法语课 french_type（只有法语学员 + 双课学员）
+    const showFrancais = (role === 'stu_fr' || role === 'stu_all') && user.french_type;
+    if (showFrancais) {
+        const label = frenchMap[user.french_type] || user.french_type;
+        html += '<span class="user-type type-' + user.french_type + '" style="margin-left:4px;background:rgba(230,126,34,0.12);color:#d35400;">🇫🇷 ' + label + '</span>';
     }
-    
-    document.getElementById('modalTitle').textContent = `Modifier ${user.name}`;
-    editUserModal.style.display = 'flex';
+
+    return html || '—';
 }
+function renderUsersTable() {
+    const tbody = document.getElementById('usersTableBody');
+    if (!tbody) return;
 
-async function handleEditUser(e) {
-    e.preventDefault();
-    
-    const userId = document.getElementById('editUserId').value;
-    const username = document.getElementById('editUserName').value.trim();
-    const password = document.getElementById('editUserPassword').value;
-    const userType = document.getElementById('editUserType').value;
-    const userRole = document.getElementById('editUserRole').value;
-    const timer = document.getElementById('editUserTimer').value;
-    const email = document.getElementById('editUserEmail').value.trim();
-    
-    if (!username || !userType) {
-        showToast('Veuillez remplir tous les champs obligatoires', 'error');
+    if (filteredUsers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" class="empty-state"><i class="fas fa-users"></i><p>Aucun utilisateur</p></td></tr>';
         return;
     }
-    
-    const updateData = { 
-        name: username, 
-        type: userType,
-        email: email || null
-    };
-    if (password.trim()) updateData.password = password;
-    if (userRole) updateData.role = userRole;
-    else updateData.role = null;
-    
-    if (timer) {
-        try {
-            const date = new Date(timer);
-            if (!isNaN(date.getTime())) updateData.timer = date.toISOString();
-        } catch (error) { console.warn('日期格式错误，跳过timer字段'); }
-    } else {
-        updateData.timer = null;
-    }
-    
-    if (userRole === 'stu') {
-        const creditValue = document.getElementById('editUserCredit').value;
-        if (creditValue !== '' && creditValue !== null) {
-            const creditNum = parseInt(creditValue);
-            if (!isNaN(creditNum)) updateData.credit = creditNum;
+
+    tbody.innerHTML = filteredUsers.map(u => {
+        const rowClass = isExpired(u) ? 'expired-row' : '';
+        const roleBadge = getRoleBadge(u.role);
+
+        const modules = u.modules || [];
+        let moduleHtml = '';
+        if (modules.includes('civique') && modules.includes('francais')) {
+            moduleHtml = '<span class="badge badge-both">📘🇫🇷 Double</span>';
+        } else if (modules.includes('civique')) {
+            moduleHtml = '<span class="badge badge-civique">📘 Civique</span>';
+        } else if (modules.includes('francais')) {
+            moduleHtml = '<span class="badge badge-francais">🇫🇷 Français</span>';
         } else {
-            updateData.credit = 0;
+            moduleHtml = '<span style="color:#999;">—</span>';
         }
-    }
-    
-    try {
-        const supabase = window.supabaseAuth.getSupabaseClient();
-        const { error } = await supabase.from('students').update(updateData).eq('id', userId);
-        if (error) throw error;
-        closeModal(editUserModal);
-        await loadUsers();
-        showToast('Utilisateur modifié avec succès', 'success');
-    } catch (error) {
-        console.error('修改用户错误:', error);
-        let errorMessage = 'Erreur lors de la modification';
-        if (error.code === '23505') errorMessage = 'Ce nom d\'utilisateur existe déjà';
-        else if (error.code === '23514') errorMessage = 'Type d\'utilisateur invalide';
-        showToast(errorMessage, 'error');
-    }
-}
-// ==============================
-// 添加用户功能
-// ==============================
-function showAddUserModal() {
-    addUserForm.reset();
-    document.getElementById('addUserType').value = 'n';
-    document.getElementById('addUserRole').value = '';
-    document.getElementById('addUserTimer').value = '';
-    document.getElementById('addCreditGroup').style.display = 'none';
-    addUserModal.style.display = 'flex';
+
+        const typeHtml = getUserTypeHtml(u);
+        const levelHtml = u.level || '—';
+                // 只有学员才显示 credit
+        const isStudent = (u.role === 'stu' || u.role === 'stu_fr' || u.role === 'stu_all');
+
+       // 只有学员才显示 credit（会员 user 不显示）
+        let civiqueCreditHtml = '—';
+        if (u.role === 'stu' || u.role === 'stu_all') {
+            const c = u.credit || 0;
+            const cls = c <= 0 ? 'credit-zero' : (c <= 3 ? 'credit-low' : 'credit-normal');
+            civiqueCreditHtml = '<span class="' + cls + '">' + c + ' h</span>';
+        }
+
+        let frenchCreditHtml = '—';
+        if (u.role === 'stu_fr' || u.role === 'stu_all') {
+            const f = u.french_credit || 0;
+            const cls = f <= 0 ? 'credit-zero' : (f <= 3 ? 'credit-low' : 'credit-normal');
+            frenchCreditHtml = '<span class="' + cls + '">' + f + ' h</span>';
+        }
+
+     
+
+       let timerText = '—';
+        if (u.timer && (u.role === 'stu' || u.role === 'stu_all' || u.role === 'user')) {
+            timerText = formatDateShort(u.timer) + (isExpired(u) ? ' ⚠️' : '');
+        } else if (u.french_timer && (u.role === 'stu_fr' || u.role === 'stu_all')) {
+            const frExpired = new Date(u.french_timer) < new Date();
+            timerText = formatDateShort(u.french_timer) + (frExpired ? ' ⚠️' : '');
+        }
+
+        return '<tr class="' + rowClass + '">' +
+            '<td><strong>' + escapeHtml(u.name) + '</strong></td>' +
+            '<td>' + roleBadge + '</td>' +
+            '<td>' + moduleHtml + '</td>' +
+            '<td>' + typeHtml + '</td>' +
+            '<td>' + levelHtml + '</td>' +
+            '<td class="credit-cell">' + civiqueCreditHtml + '</td>' +
+            '<td class="credit-cell">' + frenchCreditHtml + '</td>' +
+            '<td>' + timerText + '</td>' +
+            '<td>' + escapeHtml(u.email || '—') + '</td>' +
+            '<td><div class="password-cell"><span class="pwd">' + escapeHtml(u.password || '—') + '</span>' +
+            (u.password ? '<button class="copy-password-btn" data-pwd="' + escapeHtml(u.password) + '"><i class="fas fa-copy"></i></button>' : '') +
+            '</div></td>' +
+            '<td><div class="action-buttons">' +
+            '<button class="action-btn edit-btn" data-id="' + u.id + '"><i class="fas fa-edit"></i></button>' +
+            '<button class="action-btn delete-btn" data-id="' + u.id + '"' + (u.role === 'admin' && u.id === currentAdmin.userId ? ' disabled' : '') + '><i class="fas fa-trash"></i></button>' +
+            '</div></td>' +
+            '</tr>';
+    }).join('');
+
+    tbody.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => openUserModal(btn.dataset.id));
+    });
+    tbody.querySelectorAll('.delete-btn:not([disabled])').forEach(btn => {
+        btn.addEventListener('click', () => confirmDeleteUser(btn.dataset.id));
+    });
+    tbody.querySelectorAll('.copy-password-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            navigator.clipboard.writeText(this.dataset.pwd).then(() => showToast('Copié!', 'success'));
+        });
+    });
 }
 
-async function handleAddUser(e) {
-    e.preventDefault();
-    
-    const username = document.getElementById('addUserName').value.trim();
-    const password = document.getElementById('addUserPassword').value;
-    const userType = document.getElementById('addUserType').value;
-    const userRole = document.getElementById('addUserRole').value;
-    const timer = document.getElementById('addUserTimer').value;
-    const email = document.getElementById('addUserEmail').value.trim();
-    
-    if (!username || !password || !userType) {
-        showToast('Veuillez remplir tous les champs obligatoires', 'error');
-        return;
-    }
-    
-    const validTypes = ['n', 'r', 'm', 't'];
-    if (!validTypes.includes(userType)) {
-        showToast('Type d\'utilisateur invalide', 'error');
-        return;
-    }
-    
-    const existingUser = allUsers.find(u => u.name === username);
-    if (existingUser) {
-        showToast('Ce nom d\'utilisateur existe déjà', 'error');
-        return;
-    }
-    
-    const newUser = {
-        name: username,
-        password: password,
-        type: userType,
-        email: email || null,
-        created_at: new Date().toISOString()
+function getRoleBadge(role) {
+    const map = {
+        'admin': '<span class="badge badge-admin">👑 Admin</span>',
+        'teacher': '<span class="badge badge-teacher">👨‍🏫 Intervenant</span>',
+        'stu': '<span class="badge badge-stu">📘 Élève Civique</span>',
+        'stu_fr': '<span class="badge badge-stu_fr">🇫🇷 Élève Français</span>',
+        'stu_all': '<span class="badge badge-stu_all">📘🇫🇷 Élève Double</span>',
+        'user': '<span class="badge badge-user">👤 Membre</span>'
     };
-    
-    if (userRole) newUser.role = userRole;
-    if (userRole === 'stu') {
-        const creditValue = document.getElementById('addUserCredit').value;
-        newUser.credit = (creditValue && creditValue !== '') ? parseInt(creditValue) || 0 : 0;
+    return map[role] || role || '—';
+}
+
+// ============================================================
+// 用户模态框
+// ============================================================
+function openUserModal(userId) {
+    const form = document.getElementById('userForm');
+    form.reset();
+
+    if (userId) {
+        const u = allUsers.find(x => x.id === userId);
+        if (!u) return;
+        document.getElementById('userModalTitle').textContent = 'Modifier ' + u.name;
+        document.getElementById('userId').value = u.id;
+        document.getElementById('userName').value = u.name;
+        document.getElementById('userEmail').value = u.email || '';
+        document.getElementById('userPassword').value = '';
+        document.getElementById('userRole').value = u.role || 'user';
+        document.getElementById('userType').value = u.type || '';
+        document.getElementById('userFrenchType').value = u.french_type || '';
+        document.getElementById('userLevel').value = u.level || '';
+        document.getElementById('userCredit').value = u.credit || 0;
+        document.getElementById('userFrenchCredit').value = u.french_credit || 0;
+        document.getElementById('userCreatedAt').textContent = formatDateTime(u.created_at);
+
+        if (u.timer) {
+            const d = new Date(u.timer);
+            const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            document.getElementById('userTimer').value = local;
+        }
+        if (u.french_timer) {
+            const d = new Date(u.french_timer);
+            const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            document.getElementById('userFrenchTimer').value = local;
+        }
+
+        const mods = u.modules || [];
+        document.getElementById('userModuleCivique').checked = mods.includes('civique');
+        document.getElementById('userModuleFrancais').checked = mods.includes('francais');
+    } else {
+        document.getElementById('userModalTitle').textContent = t('um.title.add');
+        document.getElementById('userId').value = '';
+        document.getElementById('userCreatedAt').textContent = '—';
+        document.getElementById('userModuleCivique').checked = true;
+        document.getElementById('userRole').value = 'user';
+        document.getElementById('userFrenchType').value = '';
     }
-    if (timer) {
+
+    updateUserModalFields();
+    openModal('userModal');
+}
+
+function updateUserModalFields() {
+    const role = document.getElementById('userRole').value;
+
+    // 根据角色决定 modules 勾选
+    if (role === 'stu') {
+        document.getElementById('userModuleCivique').checked = true;
+        document.getElementById('userModuleFrancais').checked = false;
+    } else if (role === 'stu_fr') {
+        document.getElementById('userModuleCivique').checked = false;
+        document.getElementById('userModuleFrancais').checked = true;
+    } else if (role === 'stu_all') {
+        document.getElementById('userModuleCivique').checked = true;
+        document.getElementById('userModuleFrancais').checked = true;
+    } else if (role === 'teacher') {
+        const civ = document.getElementById('userModuleCivique');
+        const fr = document.getElementById('userModuleFrancais');
+        if (!civ.checked && !fr.checked) civ.checked = true;
+    } else if (role === 'user') {
+        document.getElementById('userModuleCivique').checked = true;
+        document.getElementById('userModuleFrancais').checked = false;
+    } else {
+        document.getElementById('userModuleCivique').checked = false;
+        document.getElementById('userModuleFrancais').checked = false;
+    }
+
+    const showCivique = document.getElementById('userModuleCivique').checked;
+    const showFrancais = document.getElementById('userModuleFrancais').checked;
+
+    // === 能选 type 的角色：学员 + 会员 ===
+    const canHaveType = role === 'stu' || role === 'stu_fr' || role === 'stu_all' || role === 'user';
+    // === 能选 credit 的角色：只有学员 ===
+    const canHaveCredit = role === 'stu' || role === 'stu_fr' || role === 'stu_all';
+
+    // ===== 公民课字段 =====
+    // 会员：显示 type + timer，但不显示 credit
+    const showCiviqueType = (role === 'user') || (canHaveType && showCivique);
+    const showCiviqueCredit = canHaveCredit && showCivique;
+
+    document.getElementById('civiqueFields').style.display = showCiviqueType ? 'grid' : 'none';
+    document.getElementById('civiqueTimerRow').style.display = showCiviqueType ? 'block' : 'none';
+
+    const creditGroup = document.getElementById('civiqueCreditGroup');
+    if (creditGroup) {
+        creditGroup.style.display = showCiviqueCredit ? 'block' : 'none';
+    }
+
+    // ===== 法语课字段（会员不显示）=====
+    const showFrancaisFields = (role === 'stu_fr' || role === 'stu_all') && showFrancais;
+
+    document.getElementById('francaisFields').style.display = showFrancaisFields ? 'grid' : 'none';
+    document.getElementById('francaisTimerRow').style.display = showFrancaisFields ? 'block' : 'none';
+
+    // 动态改 modules label
+    const modulesLabel = document.getElementById('modulesLabel');
+    if (modulesLabel) {
+        modulesLabel.textContent = (role === 'teacher') ? 'Enseigne (教什么课)' : (t('form.modules') || 'Modules autorisés');
+    }
+}
+
+async function handleUserSubmit(e) {
+    e.preventDefault();
+    const id = document.getElementById('userId').value;
+    const name = document.getElementById('userName').value.trim();
+    const email = document.getElementById('userEmail').value.trim();
+    const password = document.getElementById('userPassword').value;
+    const role = document.getElementById('userRole').value;
+
+    if (!name) { showToast('Nom requis', 'error'); return; }
+
+    const modules = [];
+    if (document.getElementById('userModuleCivique').checked) modules.push('civique');
+    if (document.getElementById('userModuleFrancais').checked) modules.push('francais');
+
+    const data = {
+    name: name,
+    email: email || null,
+    role: role,
+    modules: modules,
+    type: document.getElementById('userType').value || null,
+    french_type: document.getElementById('userFrenchType').value || null,
+    level: document.getElementById('userLevel').value || null,
+    credit: parseInt(document.getElementById('userCredit').value) || 0,
+    french_credit: parseInt(document.getElementById('userFrenchCredit').value) || 0
+};
+    if (password) data.password = password;
+
+    const timer = document.getElementById('userTimer').value;
+    data.timer = timer ? new Date(timer).toISOString() : null;
+    const frenchTimer = document.getElementById('userFrenchTimer').value;
+    data.french_timer = frenchTimer ? new Date(frenchTimer).toISOString() : null;
+
+    showLoading(id ? 'Modification...' : 'Création...');
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        let result;
+        if (id) {
+            result = await supabase.from('users').update(data).eq('id', id).select().single();
+        } else {
+            if (!password) { showToast('Mot de passe requis', 'error'); hideLoading(); return; }
+            data.created_at = new Date().toISOString();
+            result = await supabase.from('users').insert([data]).select().single();
+        }
+        if (result.error) throw result.error;
+        closeModal('userModal');
+        await loadAllData();
+        showToast(id ? 'Utilisateur modifié ✓' : 'Utilisateur créé ✓', 'success');
+    } catch (err) {
+        console.error(err);
+        showToast('Erreur: ' + err.message, 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+function confirmDeleteUser(id) {
+    const u = allUsers.find(x => x.id === id);
+    if (!u) return;
+    if (!confirm('Supprimer ' + u.name + ' ?\n\nCette action est irréversible.')) return;
+
+    showLoading('Suppression...');
+    (async () => {
         try {
-            const date = new Date(timer);
-            if (!isNaN(date.getTime())) newUser.timer = date.toISOString();
-        } catch (error) { console.warn('日期格式错误，跳过timer字段'); }
-    }
-    
-    try {
-        const supabase = window.supabaseAuth.getSupabaseClient();
-        const { error } = await supabase.from('students').insert([newUser]);
-        if (error) {
-            console.error('Supabase插入错误:', error);
-            let errorMessage = 'Erreur lors de la création';
-            if (error.code === '23505') errorMessage = 'Ce nom d\'utilisateur existe déjà';
-            else if (error.code === '23514') errorMessage = 'Type d\'utilisateur invalide';
-            showToast(errorMessage, 'error');
-            return;
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            const { error } = await supabase.from('users').delete().eq('id', id);
+            if (error) throw error;
+            await loadAllData();
+            showToast('Supprimé ✓', 'success');
+        } catch (err) {
+            showToast('Erreur: ' + err.message, 'error');
+        } finally {
+            hideLoading();
         }
-        closeModal(addUserModal);
-        await loadUsers();
-        showToast('Utilisateur créé avec succès', 'success');
-    } catch (error) {
-        console.error('创建用户错误:', error);
-        showToast('Erreur technique lors de la création', 'error');
-    }
+    })();
 }
-// ==============================
-// 删除用户功能
-// ==============================
-function showDeleteConfirmation(userId) {
-    const user = allUsers.find(u => u.id.toString() === userId.toString());
-    if (!user) return;
-    userToDelete = user;
-    document.getElementById('deleteUserName').textContent = user.name;
-    deleteConfirmDialog.style.display = 'flex';
-}
-
-async function handleDeleteUser() {
-    if (!userToDelete) return;
-    try {
-        const supabase = window.supabaseAuth.getSupabaseClient();
-        const { error } = await supabase.from('students').delete().eq('id', userToDelete.id);
-        if (error) throw error;
-        closeModal(deleteConfirmDialog);
-        await loadUsers();
-        showToast('Utilisateur supprimé avec succès', 'success');
-        userToDelete = null;
-    } catch (error) {
-        console.error('删除用户错误:', error);
-        showToast('Erreur lors de la suppression', 'error');
-    }
-}
-
-// ==============================
-// PRÉ-INSCRIPTIONS - GESTION
-// ==============================
-
-async function loadPreRegistrations() {
-    if (preRegLoading) {
-        preRegLoading.style.display = 'block';
-    }
-    
-    try {
-        console.log('📋 Chargement des pré-inscriptions...');
-        const supabase = window.supabaseAuth.getSupabaseClient();
-        
-        const { data, error } = await supabase
-            .from('pre_registrations')
-            .select('*')
-            .order('created_at', { ascending: false });
-        
-        if (error) {
-            console.error('❌ Erreur Supabase:', error);
-            throw error;
-        }
-        
-        console.log('✅ Pré-inscriptions chargées:', data ? data.length : 0);
-        allPreRegs = data || [];
-        renderPreRegTable();
-        updatePreRegCount();
-        
-        if (preRegLoading) {
-            preRegLoading.style.display = 'none';
-        }
-        
-    } catch (error) {
-        console.error('❌ 加载预注册错误:', error);
-        showToast('Erreur lors du chargement des pré-inscriptions', 'error');
-        if (preRegLoading) {
-            preRegLoading.style.display = 'none';
-        }
-        if (preRegTableBody) {
-            preRegTableBody.innerHTML = `
-                <tr>
-                    <td colspan="8" style="text-align: center; padding: 40px;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: var(--red); margin-bottom: 15px;"></i>
-                        <p style="color: var(--red);">Erreur de chargement</p>
-                        <p style="color: var(--medium-gray); font-size: 0.85rem; margin-top: 8px;">${error.message || 'Veuillez vérifier la table pre_registrations'}</p>
-                    </td>
-                </tr>
-            `;
-        }
-    }
+// ============================================================
+// 预注册管理
+// ============================================================
+function updatePreRegCount() {
+    const pending = allPreRegs.filter(r => r.status === 'pending').length;
+    const el1 = document.getElementById('preRegCount');
+    const el2 = document.getElementById('preRegCount2');
+    if (el1) el1.textContent = pending;
+    if (el2) el2.textContent = pending;
 }
 
 function renderPreRegTable() {
-    if (!preRegTableBody) return;
-    
-    if (!allPreRegs || allPreRegs.length === 0) {
-        preRegTableBody.innerHTML = `
-            <tr>
-                <td colspan="11" style="text-align: center; padding: 40px;">
-                    <i class="fas fa-user-plus" style="font-size: 3rem; color: #ddd; margin-bottom: 15px;"></i>
-                    <p style="color: var(--medium-gray);">Aucune pré-inscription trouvée</p>
-                </td>
-            </tr>
-        `;
+    const tbody = document.getElementById('preRegTableBody');
+    if (!tbody) return;
+
+    if (allPreRegs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><i class="fas fa-user-plus"></i><p>Aucune pré-inscription</p></td></tr>';
         return;
     }
-    
-    preRegTableBody.innerHTML = '';
-    
-    allPreRegs.forEach(reg => {
-        const row = document.createElement('tr');
-        if (reg.status === 'pending') row.style.background = 'rgba(255,214,51,0.08)';
-        
-        const created = reg.created_at ? new Date(reg.created_at).toLocaleDateString('fr-FR', {
-            day: '2-digit', month: '2-digit', year: 'numeric'
-        }) : 'N/A';
-        
-        const timer = reg.timer ? new Date(reg.timer).toLocaleDateString('fr-FR', {
-            day: '2-digit', month: '2-digit', year: 'numeric'
-        }) : 'Pas de date';
-        
-        let typeText = '';
-        switch(reg.type) {
-            case 'n': typeText = 'Type N (Naturalisation)'; break;
-            case 'r': typeText = 'Type R (10 ans)'; break;
-            case 'm': typeText = 'Type M (Pluriannuelle)'; break;
-            default: typeText = reg.type;
-        }
-        
-        let roleText = '';
-        if (reg.role === 'user') roleText = 'Membre';
-        else if (reg.role === 'stu') roleText = 'Élève';
-        else roleText = reg.role;
-        
-        let statusText = '', statusClass = '';
-        if (reg.status === 'pending') { statusText = 'En attente'; statusClass = 'badge-pending'; }
-        else if (reg.status === 'validated') { statusText = 'Validé'; statusClass = 'badge-validated'; }
-        else if (reg.status === 'rejected') { statusText = 'Rejeté'; statusClass = 'badge-rejected'; }
-        else { statusText = reg.status; statusClass = ''; }
-        
-        const credit = reg.credit || 0;
-        
-        let paymentDisplay = '-';
-        if (reg.payment_method) {
-            const paymentMap = {
-                'wechat': 'WeChat 微信',
-                'alipay': 'Alipay 支付宝',
-                'xiaohongshu': 'Xiaohongshu 小红书',
-                'cb': 'CB 银行卡'
-            };
-            paymentDisplay = paymentMap[reg.payment_method] || reg.payment_method;
-        }
-        
-        const orderNumber = reg.order_number || '-';
-        
-        // 判断是否可编辑（只有 pending 状态可编辑）
+
+    tbody.innerHTML = allPreRegs.map(reg => {
+        const statusMap = {
+            'pending': '<span class="badge badge-pending">⏳ En attente</span>',
+            'validated': '<span class="badge badge-validated">✅ Validé</span>',
+            'rejected': '<span class="badge badge-rejected">❌ Rejeté</span>'
+        };
+        const paymentMap = {
+            'wechat': '<span class="payment-badge payment-wechat">WeChat</span>',
+            'alipay': '<span class="payment-badge payment-alipay">Alipay</span>',
+            'xiaohongshu': '<span class="payment-badge payment-xiaohongshu">Xiaohongshu</span>',
+            'cb': '<span class="payment-badge payment-cb">CB</span>'
+        };
+        const civiqueTypeLabels = {
+            'n': 'N · 入籍',
+            'r': 'R · 十年卡',
+            'm': 'M · 多年卡',
+            't': 'T · 全部权限'
+        };
+        const typeText = civiqueTypeLabels[reg.type] || reg.type || '—';
+        const roleText = { 'user': 'Membre', 'stu': 'Élève', 'teacher': 'Intervenant' }[reg.role] || reg.role || '—';
         const isEditable = reg.status === 'pending';
-        
-        row.innerHTML = `
-            <td><strong>${escapeHtml(reg.name)}</strong></td>
-            <td><span class="user-type">${typeText}</span></td>
-            <td>${roleText}</td>
-            <td>${created}</td>
-            <td>${timer}</td>
-            <td>${credit > 0 ? `📚 ${credit} h` : '—'}</td>
-            <td style="font-size:0.8rem; max-width:100px; word-break:break-word;">${orderNumber}</td>
-            <td style="font-size:0.8rem;">${paymentDisplay}</td>
-            <td><span class="pre-reg-badge ${statusClass}">${statusText}</span></td>
-            <td>
-                <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-                    ${isEditable ? `
-                        <button class="action-btn-edit-pre" data-id="${reg.id}"><i class="fas fa-pen"></i> Modifier</button>
-                    ` : ''}
-                    ${reg.status === 'pending' ? `
-                        <button class="action-btn-validate" data-id="${reg.id}"><i class="fas fa-check"></i> Valider</button>
-                        <button class="action-btn-reject" data-id="${reg.id}"><i class="fas fa-times"></i> Rejeter</button>
-                    ` : ''}
-                    <button class="action-btn-detail" data-id="${reg.id}"><i class="fas fa-eye"></i> Détail</button>
-                </div>
-            </td>
-        `;
-        preRegTableBody.appendChild(row);
+
+        return '<tr' + (reg.status === 'pending' ? ' style="background:rgba(255,214,51,0.06);"' : '') + '>' +
+            '<td><strong>' + escapeHtml(reg.name) + '</strong></td>' +
+            '<td><span class="user-type type-' + (reg.type || 'n') + '">' + typeText + '</span></td>' +
+            '<td>' + roleText + '</td>' +
+            '<td>' + formatDateShort(reg.created_at) + '</td>' +
+            '<td>' + formatDateShort(reg.timer) + '</td>' +
+            '<td>' + (reg.credit ? reg.credit + ' h' : '—') + '</td>' +
+            '<td style="font-size:0.78rem;">' + escapeHtml(reg.order_number || '—') + '</td>' +
+            '<td>' + (paymentMap[reg.payment_method] || '—') + '</td>' +
+            '<td>' + (statusMap[reg.status] || reg.status) + '</td>' +
+            '<td><div class="action-buttons">' +
+            (isEditable ? '<button class="action-btn edit-btn" data-action="edit-prereg" data-id="' + reg.id + '"><i class="fas fa-pen"></i></button>' : '') +
+            (reg.status === 'pending' ? '<button class="action-btn-validate" data-action="validate" data-id="' + reg.id + '"><i class="fas fa-check"></i></button>' +
+                '<button class="action-btn-reject" data-action="reject" data-id="' + reg.id + '"><i class="fas fa-times"></i></button>' : '') +
+            '<button class="action-btn-detail" data-action="detail" data-id="' + reg.id + '"><i class="fas fa-eye"></i></button>' +
+            '</div></td>' +
+            '</tr>';
+    }).join('');
+
+    tbody.querySelectorAll('[data-action="edit-prereg"]').forEach(btn => {
+        btn.addEventListener('click', () => openEditPreRegModal(parseInt(btn.dataset.id)));
     });
-    
-    // 事件绑定：编辑按钮
-    document.querySelectorAll('.action-btn-edit-pre').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const id = parseInt(this.dataset.id);
-            openEditPreRegModal(id);
-        });
+    tbody.querySelectorAll('[data-action="validate"]').forEach(btn => {
+        btn.addEventListener('click', () => validatePreReg(parseInt(btn.dataset.id)));
     });
-    
-    // 事件绑定：验证按钮
-    document.querySelectorAll('.action-btn-validate').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const id = parseInt(this.dataset.id);
-            validatePreRegistration(id);
-        });
+    tbody.querySelectorAll('[data-action="reject"]').forEach(btn => {
+        btn.addEventListener('click', () => rejectPreReg(parseInt(btn.dataset.id)));
     });
-    
-    // 事件绑定：拒绝按钮
-    document.querySelectorAll('.action-btn-reject').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const id = parseInt(this.dataset.id);
-            rejectPreRegistration(id);
-        });
-    });
-    
-    // 事件绑定：详情按钮
-    document.querySelectorAll('.action-btn-detail').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const id = parseInt(this.dataset.id);
-            showPreRegistrationDetail(id);
-        });
+    tbody.querySelectorAll('[data-action="detail"]').forEach(btn => {
+        btn.addEventListener('click', () => showPreRegDetail(parseInt(btn.dataset.id)));
     });
 }
+
+function showPreRegDetail(id) {
+    const reg = allPreRegs.find(r => r.id === id);
+    if (!reg) return;
+
+   const typeMap = {
+    'n': 'N — Naturalisation (入籍)',
+    'r': 'R — Carte 10 ans (十年卡)',
+    'm': 'M — Carte pluriannuelle (多年卡)',
+    't': 'T — Tous droits (全部权限)'
+};
+    const roleMap = { 'user': 'Membre / 会员', 'stu': 'Élève / 学员', 'teacher': 'Intervenant' };
+    const paymentMap = { 'wechat': 'WeChat 微信', 'alipay': 'Alipay 支付宝', 'xiaohongshu': 'Xiaohongshu 小红书', 'cb': 'CB 银行卡' };
+    const statusMap = { 'pending': 'En attente / 等待中', 'validated': 'Validé / 已通过', 'rejected': 'Rejeté / 已拒绝' };
+
+    document.getElementById('dName').textContent = reg.name || '—';
+    document.getElementById('dType').textContent = typeMap[reg.type] || reg.type || '—';
+    document.getElementById('dRole').textContent = roleMap[reg.role] || reg.role || '—';
+    document.getElementById('dCreated').textContent = formatDateTime(reg.created_at);
+    document.getElementById('dTimer').textContent = formatDateTime(reg.timer);
+    document.getElementById('dCredit').textContent = reg.credit || 0;
+    document.getElementById('dPrice').textContent = reg.estimated_price ? reg.estimated_price + ' €' : '—';
+    document.getElementById('dOrderNumber').textContent = reg.order_number || '—';
+    document.getElementById('dPaymentMethod').textContent = paymentMap[reg.payment_method] || '—';
+    document.getElementById('dStatus').textContent = statusMap[reg.status] || reg.status;
+    document.getElementById('dEmail').textContent = reg.email || '—';
+    document.getElementById('dBirth').textContent = reg.birth_date || '—';
+    document.getElementById('dBirthPlace').textContent = reg.birth_place || '—';
+    document.getElementById('dAddress').textContent = reg.address || '—';
+    document.getElementById('dPhone').textContent = reg.phone || '—';
+    document.getElementById('dPack').textContent = reg.pack_hours ? (reg.pack_hours + ' h' + (reg.pack_price ? ' (' + reg.pack_price + ' €)' : '')) : '—';
+
+    openModal('detailModal');
+}
+
 function openEditPreRegModal(id) {
     const reg = allPreRegs.find(r => r.id === id);
-    if (!reg) {
-        showToast('Erreur', 'Pré-inscription non trouvée', 'error');
+    if (!reg || reg.status !== 'pending') {
+        showToast('Impossible: déjà traité', 'warning');
         return;
     }
-    
-    if (reg.status !== 'pending') {
-        showToast('Impossible', 'Cette pré-inscription a déjà été traitée', 'warning');
-        return;
-    }
-    
+
     document.getElementById('editPreRegId').value = reg.id;
     document.getElementById('editPreRegName').value = reg.name || '';
     document.getElementById('editPreRegEmail').value = reg.email || '';
@@ -919,394 +1753,1264 @@ function openEditPreRegModal(id) {
     document.getElementById('editPreRegOrderNumber').value = reg.order_number || '';
     document.getElementById('editPreRegPaymentMethod').value = reg.payment_method || '';
     document.getElementById('editPreRegPhone').value = reg.phone || '';
-    document.getElementById('editPreRegPack').value = reg.pack_hours ? `${reg.pack_hours}h` : '';
+    document.getElementById('editPreRegPack').value = reg.pack_hours ? reg.pack_hours + 'h' : '';
     document.getElementById('editPreRegAddress').value = reg.address || '';
     document.getElementById('editPreRegBirth').value = reg.birth_date || '';
     document.getElementById('editPreRegBirthPlace').value = reg.birth_place || '';
-    
+
     if (reg.timer) {
-        const timerDate = new Date(reg.timer);
-        const localDate = new Date(timerDate.getTime() - (timerDate.getTimezoneOffset() * 60000))
-            .toISOString().slice(0, 16);
-        document.getElementById('editPreRegTimer').value = localDate;
+        const d = new Date(reg.timer);
+        const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        document.getElementById('editPreRegTimer').value = local;
     } else {
         document.getElementById('editPreRegTimer').value = '';
     }
-    
-    editPreRegModal.style.display = 'flex';
+
+    openModal('editPreRegModal');
 }
-async function handleEditPreRegistration(e) {
+
+async function handleEditPreRegSubmit(e) {
     e.preventDefault();
-    
     const id = parseInt(document.getElementById('editPreRegId').value);
-    const name = document.getElementById('editPreRegName').value.trim();
-    const email = document.getElementById('editPreRegEmail').value.trim();
-    const password = document.getElementById('editPreRegPassword').value.trim();
-    const type = document.getElementById('editPreRegType').value;
-    const role = document.getElementById('editPreRegRole').value;
-    const timer = document.getElementById('editPreRegTimer').value;
-    const credit = parseInt(document.getElementById('editPreRegCredit').value) || 0;
-    const price = parseInt(document.getElementById('editPreRegPrice').value) || 0;
-    const orderNumber = document.getElementById('editPreRegOrderNumber').value.trim();
-    const paymentMethod = document.getElementById('editPreRegPaymentMethod').value;
-    const phone = document.getElementById('editPreRegPhone').value.trim();
-    const pack = document.getElementById('editPreRegPack').value.trim();
-    const address = document.getElementById('editPreRegAddress').value.trim();
-    const birth = document.getElementById('editPreRegBirth').value;
-    const birthPlace = document.getElementById('editPreRegBirthPlace').value.trim();
-    
-    if (!name || !type) {
-        showToast('Veuillez remplir tous les champs obligatoires', 'error');
-        return;
-    }
-    
-    // 检查是否已被处理
     const reg = allPreRegs.find(r => r.id === id);
     if (!reg || reg.status !== 'pending') {
-        showToast('Impossible', 'Cette pré-inscription a déjà été traitée', 'warning');
-        closeModal(editPreRegModal);
+        showToast('Déjà traité', 'warning');
+        closeModal('editPreRegModal');
         return;
     }
-    
-    const updateData = {
+
+    const name = document.getElementById('editPreRegName').value.trim();
+    if (!name) { showToast('Nom requis', 'error'); return; }
+
+    const data = {
         name: name,
-        email: email || null,
-        type: type,
-        role: role || null,
-        credit: credit,
-        estimated_price: price,
-        order_number: orderNumber || null,
-        payment_method: paymentMethod || null,
-        phone: phone || null,
-        address: address || null,
-        birth_date: birth || null,
-        birth_place: birthPlace || null,
+        email: document.getElementById('editPreRegEmail').value.trim() || null,
+        type: document.getElementById('editPreRegType').value,
+        role: document.getElementById('editPreRegRole').value || null,
+        credit: parseInt(document.getElementById('editPreRegCredit').value) || 0,
+        estimated_price: parseInt(document.getElementById('editPreRegPrice').value) || 0,
+        order_number: document.getElementById('editPreRegOrderNumber').value.trim() || null,
+        payment_method: document.getElementById('editPreRegPaymentMethod').value || null,
+        phone: document.getElementById('editPreRegPhone').value.trim() || null,
+        address: document.getElementById('editPreRegAddress').value.trim() || null,
+        birth_date: document.getElementById('editPreRegBirth').value || null,
+        birth_place: document.getElementById('editPreRegBirthPlace').value.trim() || null,
         updated_at: new Date().toISOString()
     };
-    
-    // 提取 pack_hours
+
+    const password = document.getElementById('editPreRegPassword').value.trim();
+    if (password) data.password = password;
+
+    const pack = document.getElementById('editPreRegPack').value.trim();
     if (pack) {
-        const hoursMatch = pack.match(/\d+/);
-        updateData.pack_hours = hoursMatch ? parseInt(hoursMatch[0]) : null;
+        const m = pack.match(/\d+/);
+        data.pack_hours = m ? parseInt(m[0]) : null;
     } else {
-        updateData.pack_hours = null;
+        data.pack_hours = null;
     }
-    
-    // 如果填写了密码，更新密码
-    if (password) {
-        updateData.password = password;
-    }
-    
-    if (timer) {
-        try {
-            const date = new Date(timer);
-            if (!isNaN(date.getTime())) updateData.timer = date.toISOString();
-        } catch (error) { console.warn('日期格式错误'); }
-    } else {
-        updateData.timer = null;
-    }
-    
+
+    const timer = document.getElementById('editPreRegTimer').value;
+    data.timer = timer ? new Date(timer).toISOString() : null;
+
+    showLoading('Modification...');
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
-        
-        const { error } = await supabase
-            .from('pre_registrations')
-            .update(updateData)
-            .eq('id', id);
-        
+        const { error } = await supabase.from('pre_registrations').update(data).eq('id', id);
         if (error) throw error;
-        
-        closeModal(editPreRegModal);
-        await loadPreRegistrations();
-        showToast('✅ Pré-inscription modifiée avec succès', 'success');
-        
-    } catch (error) {
-        console.error('❌ Erreur modification:', error);
-        showToast('Erreur lors de la modification: ' + error.message, 'error');
+        closeModal('editPreRegModal');
+        await loadAllData();
+        showToast('Pré-inscription modifiée ✓', 'success');
+    } catch (err) {
+        showToast('Erreur: ' + err.message, 'error');
+    } finally {
+        hideLoading();
     }
 }
-function updatePreRegCount() {
-    const pending = allPreRegs ? allPreRegs.filter(r => r.status === 'pending').length : 0;
-    if (preRegCountEl) preRegCountEl.textContent = pending;
-    if (preRegCountEl2) preRegCountEl2.textContent = pending;
-}
 
-function getTypeLabel(type) {
-    const map = { 
-        'n': 'Type N (Naturalisation / 入籍)', 
-        'r': 'Type R (Carte 10 ans / 十年居留)', 
-        'm': 'Type M (Pluriannuelle / 多年居留)' 
-    };
-    return map[type] || type;
-}
-
-function getRoleLabel(role) {
-    const map = { 'user': 'Membre / 会员', 'stu': 'Élève / 学员' };
-    return map[role] || role;
-}
-
-function showPreRegistrationDetail(id) {
+async function validatePreReg(id) {
     const reg = allPreRegs.find(r => r.id === id);
-    if (!reg) {
-        showToast('Erreur', 'Pré-inscription non trouvée', 'error');
+    if (!reg || reg.status !== 'pending') {
+        showToast('Déjà traité', 'warning');
         return;
     }
-    
-    document.getElementById('dName').textContent = reg.name || '-';
-    document.getElementById('dType').textContent = getTypeLabel(reg.type) || '-';
-    document.getElementById('dRole').textContent = getRoleLabel(reg.role) || '-';
-    document.getElementById('dCreated').textContent = reg.created_at ? new Date(reg.created_at).toLocaleString('fr-FR') : '-';
-    document.getElementById('dTimer').textContent = reg.timer ? new Date(reg.timer).toLocaleString('fr-FR') : 'Pas de date';
-    document.getElementById('dCredit').textContent = reg.credit || '0';
-    document.getElementById('dPrice').textContent = reg.estimated_price ? reg.estimated_price + ' €' : '-';
-    
-    // 订单编号
-    document.getElementById('dOrderNumber').textContent = reg.order_number || '-';
-    
-    // 付款方式
-    let paymentDisplay = '-';
-    if (reg.payment_method) {
-        const paymentMap = {
-            'wechat': 'WeChat 微信支付',
-            'alipay': 'Alipay 支付宝',
-            'xiaohongshu': 'Xiaohongshu 小红书',
-            'cb': 'CB 银行卡'
-        };
-        paymentDisplay = paymentMap[reg.payment_method] || reg.payment_method;
-    }
-    document.getElementById('dPaymentMethod').textContent = paymentDisplay;
-    
-    let statusText = '';
-    if (reg.status === 'pending') statusText = 'En attente / 等待中';
-    else if (reg.status === 'validated') statusText = 'Validé / 已通过';
-    else if (reg.status === 'rejected') statusText = 'Rejeté / 已拒绝';
-    else statusText = reg.status;
-    document.getElementById('dStatus').textContent = statusText;
-    
-    document.getElementById('dEmail').textContent = reg.email || '-';
-    document.getElementById('dBirth').textContent = reg.birth_date || '-';
-    document.getElementById('dBirthPlace').textContent = reg.birth_place || '-';
-    document.getElementById('dAddress').textContent = reg.address || '-';
-    document.getElementById('dPhone').textContent = reg.phone || '-';
-    
-    let packInfo = '';
-    if (reg.pack_hours) {
-        packInfo = `${reg.pack_hours} h`;
-        if (reg.pack_price) packInfo += ` (${reg.pack_price} €)`;
-    } else {
-        packInfo = '-';
-    }
-    document.getElementById('dPack').textContent = packInfo;
-    
-    detailModal.style.display = 'flex';
-}
 
-// ==============================
-// VALIDATION PRÉ-INSCRIPTION AVEC EMAIL
-// ==============================
-async function validatePreRegistration(id) {
-    const reg = allPreRegs.find(r => r.id === id);
-    if (!reg) {
-        showToast('Erreur', 'Pré-inscription non trouvée', 'error');
-        return;
-    }
-    
-    if (reg.status !== 'pending') {
-        showToast('Déjà traité', 'Cette pré-inscription a déjà été traitée', 'warning');
-        return;
-    }
-    
-    if (!confirm(`Valider la pré-inscription de ${reg.name} ?\n\nL'utilisateur sera ajouté à la base students.`)) {
-        return;
-    }
-    
+    if (!confirm('Valider la pré-inscription de ' + reg.name + ' ?\n\nL\'utilisateur sera ajouté à la base.')) return;
+
+    showLoading('Validation...');
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
-        
-        // 1. Copier dans students (包括邮箱)
+
+        const roleToModules = {
+            'stu': ['civique'],
+            'stu_fr': ['francais'],
+            'stu_all': ['civique', 'francais'],
+            'teacher': ['civique'],
+            'admin': ['civique'],
+            'user': []
+        };
+        const modules = roleToModules[reg.role] || ['civique'];
+
         const studentData = {
             name: reg.name,
             password: reg.password,
-            type: reg.type,
-            role: reg.role,
             email: reg.email || null,
-            created_at: reg.created_at || new Date().toISOString(),
+            role: reg.role || 'stu',
+            type: reg.type || null,
+            credit: reg.credit || 0,
+            french_credit: 0,
             timer: reg.timer || null,
-            credit: reg.credit || 0
+            french_timer: null,
+            level: null,
+            modules: modules,
+            created_at: reg.created_at || new Date().toISOString()
         };
-        
-        console.log('📤 Insertion dans students:', studentData);
-        
-        const { error: insertError } = await supabase
-            .from('students')
-            .insert([studentData]);
-        
-        if (insertError) {
-            console.error('❌ Erreur insertion student:', insertError);
-            if (insertError.code === '23505') {
-                showToast('Erreur', 'Ce nom d\'utilisateur existe déjà dans la base', 'error');
+
+        const { error: insertErr } = await supabase.from('users').insert([studentData]);
+        if (insertErr) {
+            if (insertErr.code === '23505') {
+                showToast('Ce nom existe déjà', 'error');
                 return;
             }
-            throw insertError;
+            throw insertErr;
         }
-        
-        console.log('✅ Utilisateur ajouté à students avec email:', reg.email);
-        
-        // 2. Mettre à jour le statut
-        const { error: updateError } = await supabase
-            .from('pre_registrations')
-            .update({
-                status: 'validated',
-                validated_at: new Date().toISOString(),
-                validated_by: currentAdmin?.name || 'admin'
-            })
-            .eq('id', id);
-        
-        if (updateError) {
-            console.error('❌ Erreur mise à jour statut:', updateError);
-            throw updateError;
-        }
-        
-        console.log('✅ Statut pré-inscription mis à jour');
-        
-        // 3. Envoyer l'email d'activation
+
+        await supabase.from('pre_registrations').update({
+            status: 'validated',
+            validated_at: new Date().toISOString(),
+            validated_by: currentAdmin.name || 'admin'
+        }).eq('id', id);
+
         if (reg.email) {
             try {
-                const emailResult = await sendActivationEmail(
-                    reg.email,
-                    reg.name,
-                    reg.type,
-                    reg.role,
-                    reg.password
-                );
-                
-                if (emailResult.success) {
-                    console.log('✅ Email d\'activation envoyé à', reg.email);
-                    showToast(
-                        '📧 Email envoyé',
-                        `Un email d'activation a été envoyé à ${reg.email}`,
-                        'success'
-                    );
-                } else {
-                    console.warn('⚠️ Échec envoi email:', emailResult.error);
-                    showToast(
-                        '⚠️ Email non envoyé',
-                        `L'utilisateur a été validé mais l'email n'a pas pu être envoyé.`,
-                        'warning'
-                    );
-                }
-            } catch (emailError) {
-                console.warn('⚠️ Erreur lors de l\'envoi de l\'email:', emailError);
-                showToast(
-                    '⚠️ Email non envoyé',
-                    'L\'utilisateur a été validé mais l\'email n\'a pas pu être envoyé.',
-                    'warning'
-                );
+                await sendActivationEmail(reg.email, reg.name, reg.type, reg.role, reg.password);
+                showToast('✅ Validé + email envoyé', 'success');
+            } catch (e) {
+                showToast('✅ Validé (email non envoyé)', 'warning');
             }
         } else {
-            console.log('ℹ️ Pas d\'email pour cet utilisateur');
-            showToast(
-                'ℹ️ Pas d\'email',
-                `L'utilisateur ${reg.name} a été validé mais n'a pas d'adresse email.`,
-                'info'
-            );
+            showToast('✅ Validé (pas d\'email)', 'info');
         }
-        
-        // 4. Recharger les données
-        await loadUsers();
-        await loadPreRegistrations();
-        
-        showToast('✅ Pré-inscription validée', `L'utilisateur ${reg.name} a été ajouté à la base`, 'success');
-        
-    } catch (error) {
-        console.error('❌ Erreur validation:', error);
-        showToast('Erreur', 'Une erreur est survenue lors de la validation: ' + error.message, 'error');
+
+        await loadAllData();
+    } catch (err) {
+        console.error(err);
+        showToast('Erreur: ' + err.message, 'error');
+    } finally {
+        hideLoading();
     }
 }
-async function rejectPreRegistration(id) {
+
+async function rejectPreReg(id) {
     const reg = allPreRegs.find(r => r.id === id);
-    if (!reg) {
-        showToast('Erreur', 'Pré-inscription non trouvée', 'error');
-        return;
-    }
-    
-    if (reg.status !== 'pending') {
-        showToast('Déjà traité', 'Cette pré-inscription a déjà été traitée', 'warning');
-        return;
-    }
-    
-    if (!confirm(`Êtes-vous sûr de vouloir rejeter la pré-inscription de ${reg.name} ?`)) {
-        return;
-    }
-    
+    if (!reg || reg.status !== 'pending') return;
+    if (!confirm('Rejeter la pré-inscription de ' + reg.name + ' ?')) return;
+
+    showLoading('Rejet...');
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
-        
-        const { error } = await supabase
-            .from('pre_registrations')
-            .update({
-                status: 'rejected',
-                validated_at: new Date().toISOString(),
-                validated_by: currentAdmin?.name || 'admin'
-            })
-            .eq('id', id);
-        
+        const { error } = await supabase.from('pre_registrations').update({
+            status: 'rejected',
+            validated_at: new Date().toISOString(),
+            validated_by: currentAdmin.name || 'admin'
+        }).eq('id', id);
         if (error) throw error;
-        
-        await loadPreRegistrations();
-        showToast('❌ Pré-inscription rejetée', `La demande de ${reg.name} a été rejetée`, 'warning');
-        
-    } catch (error) {
-        console.error('Erreur rejet:', error);
-        showToast('Erreur', 'Une erreur est survenue lors du rejet', 'error');
+        await loadAllData();
+        showToast('Pré-inscription rejetée', 'warning');
+    } catch (err) {
+        showToast('Erreur: ' + err.message, 'error');
+    } finally {
+        hideLoading();
     }
 }
 
-// ==============================
-// 辅助函数
-// ==============================
-function showLoading(show) {
-    if (tableLoading) {
-        tableLoading.style.display = show ? 'block' : 'none';
+// ============================================================
+// 课程管理 - 过滤器
+// ============================================================
+let groupSelectedStudents = [];
+
+function buildCiviqueFilterOptions() {
+    const typeSelect = document.getElementById('civiqueFilterType');
+    const codes = getAllCiviqueTypeCodes();
+    typeSelect.innerHTML = '<option value="">Tous les types</option>' +
+        codes.map(c => '<option value="' + c + '">' + getCiviqueTypeText(c) + '</option>').join('');
+
+    const teacherSelect = document.getElementById('civiqueFilterTeacher');
+    const teachers = allUsers.filter(u => u.role === 'teacher' && (u.modules || []).includes('civique'));
+    teacherSelect.innerHTML = '<option value="">Tous les intervenants</option>' +
+        teachers.map(t2 => '<option value="' + t2.id + '">' + escapeHtml(t2.name) + '</option>').join('');
+}
+
+function buildFrenchFilterOptions() {
+    const typeSelect = document.getElementById('frenchFilterType');
+    typeSelect.innerHTML = '<option value="">Tous les types</option>' +
+        FRENCH_TYPES.map(t2 => '<option value="' + t2.code + '">' + t2.name + '</option>').join('');
+
+    const teacherSelect = document.getElementById('frenchFilterTeacher');
+    const teachers = allUsers.filter(u => u.role === 'teacher' && (u.modules || []).includes('francais'));
+    teacherSelect.innerHTML = '<option value="">Tous les intervenants</option>' +
+        teachers.map(t2 => '<option value="' + t2.id + '">' + escapeHtml(t2.name) + '</option>').join('');
+}
+
+function toggleCourseFilter(category, upcoming) {
+    if (category === 'civique') {
+        civiqueFilter.showUpcoming = upcoming;
+        document.getElementById('civiqueShowUpcoming').classList.toggle('active', upcoming);
+        document.getElementById('civiqueShowPast').classList.toggle('active', !upcoming);
+        renderCiviqueCourses();
+    } else {
+        frenchFilter.showUpcoming = upcoming;
+        document.getElementById('frenchShowUpcoming').classList.toggle('active', upcoming);
+        document.getElementById('frenchShowPast').classList.toggle('active', !upcoming);
+        renderFrenchCourses();
     }
 }
 
-function closeModal(modal) {
-    if (modal) {
-        modal.style.display = 'none';
+function renderCiviqueCourses() {
+    const container = document.getElementById('civiqueCoursesList');
+    if (!container) return;
+    let list = allCiviqueCourses.slice();
+    if (civiqueFilter.showUpcoming) {
+        list = list.filter(c => c.status !== 'completed' && c.status !== 'cancelled');
+    } else {
+        list = list.filter(c => c.status === 'completed' || c.status === 'cancelled');
     }
+    if (civiqueFilter.type) list = list.filter(c => c.course_type === civiqueFilter.type);
+    if (civiqueFilter.teacherId) list = list.filter(c => c.teacher_id === civiqueFilter.teacherId);
+    if (civiqueFilter.search) {
+        const s = civiqueFilter.search;
+        list = list.filter(c => (c.teacher?.name || '').toLowerCase().includes(s) || (c.student?.name || '').toLowerCase().includes(s));
+    }
+    if (list.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Aucun cours</p></div>';
+        return;
+    }
+    container.innerHTML = list.map(c => renderCourseCard(c, 'civique')).join('');
+    bindCourseCardEvents(container, 'civique');
 }
 
-function escapeHtml(s) {
-    if (!s) return '';
-    return s.replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
+function renderFrenchCourses() {
+    const container = document.getElementById('frenchCoursesList');
+    if (!container) return;
+    let list = allFrenchCourses.slice();
+    if (frenchFilter.showUpcoming) {
+        list = list.filter(c => c.status !== 'completed' && c.status !== 'cancelled');
+    } else {
+        list = list.filter(c => c.status === 'completed' || c.status === 'cancelled');
+    }
+    if (frenchFilter.type) list = list.filter(c => c.course_type === frenchFilter.type);
+    if (frenchFilter.teacherId) list = list.filter(c => c.teacher_id === frenchFilter.teacherId);
+    if (frenchFilter.search) {
+        const s = frenchFilter.search;
+        list = list.filter(c => (c.teacher?.name || '').toLowerCase().includes(s) || (c.student?.name || '').toLowerCase().includes(s));
+    }
+    if (list.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Aucun cours</p></div>';
+        return;
+    }
+    container.innerHTML = list.map(c => renderCourseCard(c, 'francais')).join('');
+    bindCourseCardEvents(container, 'francais');
+}
+
+function renderCourseCard(c, category) {
+    const typeText = category === 'civique' ? getCiviqueTypeText(c.course_type) : getFrenchTypeText(c.course_type);
+    const teacherName = c.teacher?.name || '—';
+    const studentName = c.student?.name || '—';
+
+    const statusMap = {
+        'scheduled': '<span class="status-badge status-scheduled">📅 Planifié</span>',
+        'in_progress': '<span class="status-badge status-in_progress">🔄 En cours</span>',
+        'completed': '<span class="status-badge status-completed">✅ Terminé</span>',
+        'cancelled': '<span class="status-badge status-cancelled">❌ Annulé</span>'
+    };
+
+    const modeBadge = c.course_mode === 'group'
+        ? '<span class="mode-indicator mode-group"><i class="fas fa-users"></i> Groupe</span>'
+        : '<span class="mode-indicator mode-solo"><i class="fas fa-user"></i> Individuel</span>';
+
+    const startStr = formatDateTime(c.start_time);
+
+    let studentsHtml = '';
+    if (c.course_mode === 'group') {
+        studentsHtml = '<div class="detail-item"><i class="fas fa-users"></i> Groupe de ' + (c.max_students || '?') + ' élèves max</div>';
+    } else {
+        studentsHtml = '<div class="detail-item"><i class="fas fa-user-graduate"></i> Élève: ' + escapeHtml(studentName) + '</div>';
+    }
+
+    return '<div class="course-card" data-id="' + c.id + '" data-category="' + category + '">' +
+        '<div class="course-header">' +
+        '<span class="course-title">' + typeText + ' — ' + startStr + '</span>' +
+        '<div>' + modeBadge + ' ' + (statusMap[c.status] || c.status) + '</div>' +
+        '</div>' +
+        '<div class="course-details">' +
+        studentsHtml +
+        '<div class="detail-item"><i class="fas fa-chalkboard-user"></i> ' + escapeHtml(teacherName) + '</div>' +
+        '<div class="detail-item"><i class="fas fa-clock"></i> ' + (c.duration || 2) + ' h</div>' +
+        '<div class="detail-item"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(c.location || 'À définir') + '</div>' +
+        (c.meeting_link ? '<div class="detail-item"><i class="fas fa-video"></i> <a href="' + c.meeting_link + '" target="_blank">Lien visio</a></div>' : '') +
+        (c.cancel_reason ? '<div class="detail-item"><i class="fas fa-ban"></i> Motif: ' + escapeHtml(c.cancel_reason) + '</div>' : '') +
+        '</div>' +
+        '<div class="course-actions">' +
+        '<button class="action-btn edit-btn" data-action="edit"><i class="fas fa-edit"></i> Modifier</button>' +
+        (c.status !== 'cancelled' && c.status !== 'completed' ?
+            '<button class="action-btn cancel-btn-icon" data-action="cancel"><i class="fas fa-ban"></i> Annuler</button>' : '') +
+        '<button class="action-btn delete-btn" data-action="delete"><i class="fas fa-trash"></i> Supprimer</button>' +
+        '</div>' +
+        '</div>';
+}
+
+function bindCourseCardEvents(container, category) {
+    container.querySelectorAll('[data-action="edit"]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const card = this.closest('.course-card');
+            openCourseModal(category, card.dataset.id);
+        });
+    });
+    container.querySelectorAll('[data-action="cancel"]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const card = this.closest('.course-card');
+            const id = card.dataset.id;
+            pendingCancelData = { id: id, category: category };
+            document.querySelectorAll('.cancel-reason-option').forEach(o => o.classList.remove('selected'));
+            document.querySelectorAll('input[name="cancelReason"]').forEach(r => r.checked = false);
+            document.getElementById('customReason').value = '';
+            document.getElementById('customReasonContainer').classList.remove('show');
+            openModal('cancelReasonModal');
+        });
+    });
+    container.querySelectorAll('[data-action="delete"]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const card = this.closest('.course-card');
+            const id = card.dataset.id;
+            showDeleteCourseConfirm(id, category);
+        });
     });
 }
 
-function showToast(message, type = 'success') {
-    const existingToast = document.querySelector('.toast');
-    if (existingToast) existingToast.remove();
-    
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
-        <span>${message}</span>
-    `;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        if (toast.parentNode) {
-            toast.style.animation = 'slideInRight 0.3s reverse';
-            setTimeout(() => {
-                if (toast.parentNode) toast.remove();
-            }, 300);
+// ============================================================
+// 课程模态框
+// ============================================================
+function openCourseModal(category, courseId) {
+    const form = document.getElementById('courseForm');
+    form.reset();
+    document.getElementById('courseCategory').value = category;
+    document.getElementById('courseMode').value = 'solo';
+    groupSelectedStudents = [];
+
+    document.querySelectorAll('.mode-card').forEach(m => {
+        m.classList.toggle('active', m.dataset.mode === 'solo');
+    });
+    document.getElementById('soloStudentGroup').style.display = 'block';
+    document.getElementById('groupStudentsGroup').style.display = 'none';
+    document.getElementById('courseMeetingLink').value = DEFAULT_MEETING_LINK;
+    document.getElementById('courseDuration').value = 2;
+    document.getElementById('courseConflictWarning').classList.remove('show');
+
+    const soloSelect = document.getElementById('courseStudentSolo');
+    let students;
+    if (category === 'civique') {
+        students = allUsers.filter(u => u.role === 'stu' || u.role === 'stu_all');
+    } else {
+        students = allUsers.filter(u => u.role === 'stu_fr' || u.role === 'stu_all');
+    }
+    soloSelect.innerHTML = '<option value="">Sélectionner...</option>' +
+        students.map(s => '<option value="' + s.id + '">' + escapeHtml(s.name) + ' (' + (category === 'civique' ? (s.credit || 0) : (s.french_credit || 0)) + 'h)</option>').join('');
+
+    const teacherSelect = document.getElementById('courseTeacher');
+    const teachers = allUsers.filter(u => u.role === 'teacher' && (u.modules || []).includes(category));
+    teacherSelect.innerHTML = '<option value="">Sélectionner...</option>' +
+        teachers.map(t2 => '<option value="' + t2.id + '">' + escapeHtml(t2.name) + '</option>').join('');
+
+    renderGroupStudentsList(students, category);
+
+    if (category === 'civique') {
+        renderCiviqueTypeSelector('');
+    } else {
+        renderFrenchTypeSelector('');
+    }
+
+    if (courseId) {
+        const course = category === 'civique'
+            ? allCiviqueCourses.find(c => c.id === courseId)
+            : allFrenchCourses.find(c => c.id === courseId);
+        if (!course) return;
+
+        document.getElementById('courseModalTitle').textContent = 'Modifier le cours';
+        document.getElementById('courseId').value = course.id;
+        document.getElementById('courseMode').value = course.course_mode || 'solo';
+        document.getElementById('courseMeetingLink').value = course.meeting_link || '';
+        document.getElementById('courseDuration').value = course.duration || 2;
+        document.getElementById('courseLocation').value = course.location || '';
+        document.getElementById('courseMaterialLink').value = course.material_link || '';
+        document.getElementById('courseNotes').value = course.notes || '';
+        document.getElementById('courseStatus').value = course.status || 'scheduled';
+
+        if (course.start_time) {
+            const d = new Date(course.start_time);
+            const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            document.getElementById('courseStartTime').value = local;
         }
-    }, 3000);
+
+        if (course.course_mode === 'group') {
+            document.querySelectorAll('.mode-card').forEach(m => {
+                m.classList.toggle('active', m.dataset.mode === 'group');
+            });
+            document.getElementById('soloStudentGroup').style.display = 'none';
+            document.getElementById('groupStudentsGroup').style.display = 'block';
+
+            const supabase = window.supabaseAuth.getSupabaseClient();
+            supabase.from('course_students').select('student_id').eq('course_id', courseId).then(res => {
+                const ids = (res.data || []).map(x => x.student_id);
+                groupSelectedStudents = ids.slice();
+                ids.forEach(id => {
+                    const cb = document.querySelector('#groupStudentsList input[value="' + id + '"]');
+                    if (cb) { cb.checked = true; cb.closest('.student-checkbox').classList.add('selected'); }
+                });
+                updateSelectedStudentsSummary();
+            });
+        } else {
+            soloSelect.value = course.student_id || '';
+        }
+
+        document.getElementById('courseTeacher').value = course.teacher_id || '';
+
+        if (category === 'civique') {
+            renderCiviqueTypeSelector(course.course_type || '');
+        } else {
+            renderFrenchTypeSelector(course.course_type || '');
+        }
+    } else {
+        document.getElementById('courseModalTitle').textContent = t('cm.title.add');
+        document.getElementById('courseId').value = '';
+    }
+
+    openModal('courseModal');
 }
 
-console.log('管理后台初始化完成');
+function selectCourseMode(mode) {
+    document.getElementById('courseMode').value = mode;
+    document.querySelectorAll('.mode-card').forEach(m => {
+        m.classList.toggle('active', m.dataset.mode === mode);
+    });
+    document.getElementById('soloStudentGroup').style.display = mode === 'solo' ? 'block' : 'none';
+    document.getElementById('groupStudentsGroup').style.display = mode === 'group' ? 'block' : 'none';
+}
+
+function renderGroupStudentsList(students, category) {
+    const list = document.getElementById('groupStudentsList');
+    list.innerHTML = students.map(s => {
+        const credit = category === 'civique' ? (s.credit || 0) : (s.french_credit || 0);
+        return '<label class="student-checkbox" data-name="' + escapeHtml(s.name).toLowerCase() + '">' +
+            '<input type="checkbox" value="' + s.id + '" data-credit="' + credit + '">' +
+            '<span class="student-name">' + escapeHtml(s.name) + '</span>' +
+            '<span class="student-credit">' + credit + 'h</span>' +
+            '</label>';
+    }).join('');
+
+    list.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', function() {
+            if (this.checked) {
+                groupSelectedStudents.push(this.value);
+                this.closest('.student-checkbox').classList.add('selected');
+            } else {
+                groupSelectedStudents = groupSelectedStudents.filter(id => id !== this.value);
+                this.closest('.student-checkbox').classList.remove('selected');
+            }
+            updateSelectedStudentsSummary();
+        });
+    });
+
+    updateSelectedStudentsSummary();
+}
+
+function updateSelectedStudentsSummary() {
+    const hint = document.getElementById('selectedCountHint');
+    const summary = document.getElementById('selectedStudentsSummary');
+    const chips = document.getElementById('selectedStudentsChips');
+
+    if (hint) hint.textContent = '(' + groupSelectedStudents.length + ' sélectionné' + (groupSelectedStudents.length > 1 ? 's' : '') + ')';
+
+    if (groupSelectedStudents.length === 0) {
+        summary.style.display = 'none';
+        return;
+    }
+    summary.style.display = 'block';
+    chips.innerHTML = groupSelectedStudents.map(id => {
+        const u = allUsers.find(x => x.id === id);
+        return '<span class="student-chip">' + escapeHtml(u?.name || '?') + '<span class="remove" data-id="' + id + '">×</span></span>';
+    }).join('');
+
+    chips.querySelectorAll('.remove').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.dataset.id;
+            groupSelectedStudents = groupSelectedStudents.filter(x => x !== id);
+            const cb = document.querySelector('#groupStudentsList input[value="' + id + '"]');
+            if (cb) { cb.checked = false; cb.closest('.student-checkbox').classList.remove('selected'); }
+            updateSelectedStudentsSummary();
+        });
+    });
+}
+
+function filterGroupStudents() {
+    const term = document.getElementById('groupSearchInput').value.toLowerCase();
+    document.querySelectorAll('#groupStudentsList .student-checkbox').forEach(el => {
+        el.style.display = el.dataset.name.includes(term) ? 'flex' : 'none';
+    });
+}
+
+function autoFillMeetingLink() {
+    const teacherId = document.getElementById('courseTeacher').value;
+    const t2 = allUsers.find(u => u.id === teacherId);
+    if (!t2) return;
+    const link = t2.name === 'HE' ? HE_TEACHER_LINK : (t2.name === 'ZHOU' ? ZHOU_TEACHER_LINK : DEFAULT_MEETING_LINK);
+    document.getElementById('courseMeetingLink').value = link;
+}
+
+// ============================================================
+// 课程类型选择器
+// ============================================================
+function renderCiviqueTypeSelector(selectedCode) {
+    const container = document.getElementById('courseTypeSelector');
+    const cfg = CIVIQUE_TYPES;
+    const isRootExpanded = selectedCode && selectedCode !== 'ec';
+
+    let html = '<div class="course-type-container">';
+    html += '<div class="level1-item">' +
+        '<div class="level1-header ' + (!isRootExpanded ? 'collapsed' : '') + '" data-level1="root">' +
+        '<i class="fas fa-star"></i><span>' + cfg.rootName + '</span>' +
+        '<i class="fas fa-chevron-down chevron"></i>' +
+        '</div>' +
+        '<div class="level2-container ' + (!isRootExpanded ? 'hidden' : '') + '" id="level2-root">';
+
+    for (const g of cfg.children) {
+        const isExpanded = selectedCode && (g.code === selectedCode || g.children.some(c => c.code === selectedCode));
+        html += '<div class="level2-item">' +
+            '<div class="level2-header ' + (!isExpanded ? 'collapsed' : '') + '" data-level2="' + g.code + '">' +
+            '<i class="fas fa-list"></i><span>' + g.name + '</span>' +
+            '<i class="fas fa-chevron-down chevron2"></i>' +
+            '</div>' +
+            '<div class="level3-container ' + (!isExpanded ? 'hidden' : '') + '" id="level3-' + g.code + '">';
+        for (const c of g.children) {
+            html += '<div class="type-option ' + (selectedCode === c.code ? 'selected' : '') + '" data-code="' + c.code + '">' + c.name + '</div>';
+        }
+        html += '</div></div>';
+    }
+    html += '</div></div></div>';
+    container.innerHTML = html;
+    bindTypeSelectorEvents(container);
+
+    if (selectedCode && selectedCode !== 'ec') {
+        document.getElementById('courseTypeValue').value = selectedCode;
+        const display = document.getElementById('selectedTypeDisplay');
+        display.style.display = 'inline-block';
+        display.textContent = '已选: ' + getCiviqueTypeText(selectedCode);
+    }
+}
+
+function renderFrenchTypeSelector(selectedCode) {
+    const container = document.getElementById('courseTypeSelector');
+    let html = '<div class="course-type-container">';
+    html += '<div class="level1-item">' +
+        '<div class="level1-header" data-level1="root">' +
+        '<i class="fas fa-language"></i><span>🇫🇷 Cours de français</span>' +
+        '<i class="fas fa-chevron-down chevron"></i>' +
+        '</div>' +
+        '<div class="level2-container" id="level2-root">' +
+        '<div class="level3-container">';
+
+    for (const t2 of FRENCH_TYPES) {
+        html += '<div class="type-option ' + (selectedCode === t2.code ? 'selected' : '') + '" data-code="' + t2.code + '">' + t2.name + '</div>';
+    }
+    html += '</div></div></div></div>';
+    container.innerHTML = html;
+
+    container.querySelectorAll('.type-option').forEach(opt => {
+        opt.addEventListener('click', function() {
+            container.querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+            document.getElementById('courseTypeValue').value = this.dataset.code;
+            const display = document.getElementById('selectedTypeDisplay');
+            display.style.display = 'inline-block';
+            display.textContent = '已选: ' + getFrenchTypeText(this.dataset.code);
+        });
+    });
+
+    if (selectedCode) {
+        document.getElementById('courseTypeValue').value = selectedCode;
+        const display = document.getElementById('selectedTypeDisplay');
+        display.style.display = 'inline-block';
+        display.textContent = '已选: ' + getFrenchTypeText(selectedCode);
+    }
+}
+
+function bindTypeSelectorEvents(container) {
+    container.querySelectorAll('.level1-header').forEach(h => {
+        h.addEventListener('click', function() {
+            const l2 = document.getElementById('level2-root');
+            l2.classList.toggle('hidden');
+            this.classList.toggle('collapsed');
+        });
+    });
+    container.querySelectorAll('.level2-header').forEach(h => {
+        h.addEventListener('click', function() {
+            const code = this.dataset.level2;
+            const l3 = document.getElementById('level3-' + code);
+            l3.classList.toggle('hidden');
+            this.classList.toggle('collapsed');
+        });
+    });
+    container.querySelectorAll('.type-option').forEach(opt => {
+        opt.addEventListener('click', function() {
+            container.querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+            document.getElementById('courseTypeValue').value = this.dataset.code;
+            const display = document.getElementById('selectedTypeDisplay');
+            display.style.display = 'inline-block';
+            display.textContent = '已选: ' + getCiviqueTypeText(this.dataset.code);
+        });
+    });
+}
+
+// ============================================================
+// 课程提交
+// ============================================================
+async function handleCourseSubmit(e) {
+    e.preventDefault();
+    const id = document.getElementById('courseId').value;
+    const category = document.getElementById('courseCategory').value;
+    const mode = document.getElementById('courseMode').value;
+    const teacherId = document.getElementById('courseTeacher').value;
+    const startTimeLocal = document.getElementById('courseStartTime').value;
+    const duration = parseFloat(document.getElementById('courseDuration').value) || 2;
+    const courseType = document.getElementById('courseTypeValue').value;
+    const status = document.getElementById('courseStatus').value;
+
+    if (!teacherId) { showToast('Intervenant requis', 'error'); return; }
+    if (!startTimeLocal) { showToast('Date/heure requise', 'error'); return; }
+    if (!courseType) { showToast('Type de cours requis', 'error'); return; }
+
+    const startTimeStr = normalizeLocalDateTime(startTimeLocal);
+    if (!startTimeStr) { showToast('Format date invalide', 'error'); return; }
+
+    const allCourses = [...allCiviqueCourses, ...allFrenchCourses];
+    const startTs = new Date(startTimeStr).getTime();
+    const endTs = startTs + duration * 3600000;
+    const hasConflict = allCourses.some(c => {
+        if (c.teacher_id !== teacherId) return false;
+        if (id && c.id === id) return false;
+        if (c.status === 'cancelled') return false;
+        const cs = new Date(c.start_time).getTime();
+        const ce = cs + (c.duration || 2) * 3600000;
+        return startTs < ce && endTs > cs;
+    });
+    if (hasConflict) {
+        document.getElementById('courseConflictWarning').classList.add('show');
+        showToast('Conflit horaire!', 'error');
+        return;
+    }
+
+    let studentId = null;
+    let studentIds = [];
+    if (mode === 'solo') {
+        studentId = document.getElementById('courseStudentSolo').value;
+        if (!studentId) { showToast('Élève requis', 'error'); return; }
+        studentIds = [studentId];
+    } else {
+        if (groupSelectedStudents.length === 0) { showToast('Sélectionnez au moins un élève', 'error'); return; }
+        studentId = groupSelectedStudents[0];
+        studentIds = groupSelectedStudents.slice();
+    }
+
+    const data = {
+        category: category,
+        course_mode: mode,
+        course_type: courseType,
+        student_id: studentId,
+        teacher_id: teacherId,
+        start_time: startTimeStr,
+        duration: duration,
+        location: document.getElementById('courseLocation').value.trim() || null,
+        material_link: document.getElementById('courseMaterialLink').value.trim() || null,
+        meeting_link: document.getElementById('courseMeetingLink').value.trim() || null,
+        notes: document.getElementById('courseNotes').value.trim() || null,
+        status: status,
+        max_students: mode === 'group' ? studentIds.length : 1
+    };
+
+    if (status === 'cancelled') {
+        pendingCancelData = { id: id, category: category, data: data, isNew: !id };
+        openModal('cancelReasonModal');
+        return;
+    }
+
+    showLoading(id ? 'Modification...' : 'Création...');
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        let courseResult;
+
+        if (id) {
+            const updateRes = await supabase.from('courses_v2').update(data).eq('id', id).select().single();
+            if (updateRes.error) throw updateRes.error;
+            courseResult = updateRes.data;
+
+            await supabase.from('course_students').delete().eq('course_id', id);
+        } else {
+            data.created_at = new Date().toISOString();
+            const insertRes = await supabase.from('courses_v2').insert([data]).select().single();
+            if (insertRes.error) throw insertRes.error;
+            courseResult = insertRes.data;
+        }
+
+        const csData = studentIds.map(sid => ({ course_id: courseResult.id, student_id: sid }));
+        await supabase.from('course_students').insert(csData);
+
+        for (const sid of studentIds) {
+            await deductStudentCredit(sid, duration, category);
+        }
+
+        const action = id ? 'update' : 'create';
+        try {
+            await sendCourseEmailNotification(courseResult.id, action);
+        } catch (emailErr) {
+            console.warn('⚠️ 邮件发送失败（不影响课程）:', emailErr.message);
+        }
+
+        closeModal('courseModal');
+        await loadAllData();
+        showToast(id ? 'Cours modifié ✓' : 'Cours créé ✓', 'success');
+    } catch (err) {
+        console.error(err);
+        showToast('Erreur: ' + err.message, 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+// ============================================================
+// 课时扣减/退还
+// ============================================================
+async function deductStudentCredit(studentId, hours, category) {
+    if (!studentId || !hours) return true;
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const field = category === 'civique' ? 'credit' : 'french_credit';
+    const { data: u } = await supabase.from('users').select(field).eq('id', studentId).single();
+    const current = u?.[field] || 0;
+    const newVal = Math.max(0, current - hours);
+    await supabase.from('users').update({ [field]: newVal }).eq('id', studentId);
+    return true;
+}
+
+async function refundStudentCredit(studentId, hours, category) {
+    if (!studentId || !hours) return true;
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const field = category === 'civique' ? 'credit' : 'french_credit';
+    const { data: u } = await supabase.from('users').select(field).eq('id', studentId).single();
+    const current = u?.[field] || 0;
+    const newVal = current + hours;
+    await supabase.from('users').update({ [field]: newVal }).eq('id', studentId);
+    return true;
+}
+
+// ============================================================
+// 取消原因
+// ============================================================
+async function confirmCancelReason() {
+    if (!pendingCancelData) return;
+    let reason = null;
+    document.querySelectorAll('input[name="cancelReason"]').forEach(r => { if (r.checked) reason = r.value; });
+    if (reason === '其他') {
+        const custom = document.getElementById('customReason').value.trim();
+        if (custom) reason = custom;
+    }
+    if (!reason) { showToast('Sélectionnez un motif', 'error'); return; }
+
+    showLoading('Annulation...');
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        const { id, category, data, isNew } = pendingCancelData;
+
+        if (isNew) {
+            const insertRes = await supabase.from('courses_v2').insert([{ ...data, cancel_reason: reason }]).select().single();
+            if (!insertRes.error) {
+                try { await sendCourseEmailNotification(insertRes.data.id, 'cancel'); } catch (e) {}
+            }
+        } else {
+            await supabase.from('courses_v2').update({ status: 'cancelled', cancel_reason: reason }).eq('id', id);
+            const { data: csList } = await supabase.from('course_students').select('student_id').eq('course_id', id);
+            const ids = (csList || []).map(cs => cs.student_id);
+            const course = category === 'civique'
+                ? allCiviqueCourses.find(c => c.id === id)
+                : allFrenchCourses.find(c => c.id === id);
+            const dur = course?.duration || 2;
+            for (const sid of ids) {
+                await refundStudentCredit(sid, dur, category);
+            }
+            try { await sendCourseEmailNotification(id, 'cancel'); } catch (e) {}
+        }
+
+        closeModal('cancelReasonModal');
+        closeModal('courseModal');
+        await loadAllData();
+        showToast('Cours annulé ✓', 'success');
+        pendingCancelData = null;
+    } catch (err) {
+        showToast('Erreur: ' + err.message, 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+// ============================================================
+// 删除课程
+// ============================================================
+function showDeleteCourseConfirm(id, category) {
+    const course = category === 'civique'
+        ? allCiviqueCourses.find(c => c.id === id)
+        : allFrenchCourses.find(c => c.id === id);
+    if (!course) return;
+
+    pendingDeleteCourse = { id, category };
+
+    const typeText = category === 'civique' ? getCiviqueTypeText(course.course_type) : getFrenchTypeText(course.course_type);
+    document.getElementById('deleteCourseType').textContent = typeText;
+    document.getElementById('deleteCourseDate').textContent = formatDateTime(course.start_time);
+    document.getElementById('deleteCourseTeacher').textContent = course.teacher?.name || '—';
+    document.getElementById('deleteCourseStudent').textContent = course.student?.name || '—';
+
+    document.getElementById('deleteConfirmOverlay').classList.add('active');
+}
+
+async function confirmDeleteCourse() {
+    if (!pendingDeleteCourse.id) return;
+    const { id, category } = pendingDeleteCourse;
+    const course = category === 'civique'
+        ? allCiviqueCourses.find(c => c.id === id)
+        : allFrenchCourses.find(c => c.id === id);
+
+    showLoading('Suppression...');
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+
+        const { data: csList } = await supabase.from('course_students').select('student_id').eq('course_id', id);
+        const ids = (csList || []).map(cs => cs.student_id);
+        const dur = course?.duration || 2;
+        for (const sid of ids) {
+            await refundStudentCredit(sid, dur, category);
+        }
+
+        try { await sendCourseEmailNotification(id, 'cancel'); } catch (e) {}
+
+        await supabase.from('courses_v2').delete().eq('id', id);
+        document.getElementById('deleteConfirmOverlay').classList.remove('active');
+        pendingDeleteCourse = { id: null, category: null };
+        await loadAllData();
+        showToast('Cours supprimé ✓', 'success');
+    } catch (err) {
+        showToast('Erreur: ' + err.message, 'error');
+    } finally {
+        hideLoading();
+    }
+}
+// ============================================================
+// 🔥 学生考试管理
+// ============================================================
+function updateStudentExamTypes() {
+    const category = document.getElementById('studentExamCategory').value;
+    const types = STUDENT_EXAM_TYPES[category] || [];
+    const typeSelect = document.getElementById('studentExamType');
+    typeSelect.innerHTML = types.map(t2 => '<option value="' + t2.code + '">' + t2.label + '</option>').join('');
+}
+
+function renderStudentExams() {
+    const tbody = document.getElementById('studentExamsTableBody');
+    if (!tbody) return;
+
+    let list = allStudentExams.slice();
+
+    if (studentExamFilter !== 'all') {
+        if (studentExamFilter.startsWith('cat-')) {
+            const cat = studentExamFilter.replace('cat-', '');
+            list = list.filter(e => e.exam_category === cat);
+        } else if (studentExamFilter.startsWith('status-')) {
+            const st = studentExamFilter.replace('status-', '');
+            list = list.filter(e => e.status === st);
+        }
+    }
+
+    if (studentExamSearch) {
+        list = list.filter(e => (e.student?.name || '').toLowerCase().includes(studentExamSearch));
+    }
+
+    if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><i class="fas fa-file-signature"></i><p>Aucun examen enregistré</p></td></tr>';
+        return;
+    }
+
+    const statusMap = {
+        'planned': '<span class="badge badge-scheduled">📅 Planifié</span>',
+        'passed': '<span class="badge badge-validated">✅ Réussi</span>',
+        'failed': '<span class="badge badge-rejected">❌ Échoué</span>',
+        'absent': '<span class="badge badge-cancelled">🚫 Absent</span>'
+    };
+
+    const catMap = {
+        'civique': '<span class="badge badge-civique">📘 Civique</span>',
+        'francais': '<span class="badge badge-francais">🇫🇷 Français</span>'
+    };
+
+    tbody.innerHTML = list.map(e => {
+        const scoreText = e.score !== null && e.score !== undefined
+            ? (e.total ? e.score + ' / ' + e.total : e.score)
+            : '—';
+
+        return '<tr>' +
+            '<td><strong>' + escapeHtml(e.student?.name || '—') + '</strong></td>' +
+            '<td>' + (catMap[e.exam_category] || e.exam_category || '—') + '</td>' +
+            '<td>' + getStudentExamTypeLabel(e.exam_type) + '</td>' +
+            '<td>' + formatDateShort(e.exam_date) + '</td>' +
+            '<td>' + scoreText + '</td>' +
+            '<td>' + (statusMap[e.status] || e.status || '—') + '</td>' +
+            '<td>' + escapeHtml(e.notes || '—') + '</td>' +
+            '<td><div class="action-buttons">' +
+            '<button class="action-btn edit-btn" data-id="' + e.id + '" data-action="edit-exam"><i class="fas fa-edit"></i></button>' +
+            '<button class="action-btn delete-btn" data-id="' + e.id + '" data-action="delete-exam"><i class="fas fa-trash"></i></button>' +
+            '</div></td>' +
+            '</tr>';
+    }).join('');
+
+    tbody.querySelectorAll('[data-action="edit-exam"]').forEach(btn => {
+        btn.addEventListener('click', () => openStudentExamModal(btn.dataset.id));
+    });
+    tbody.querySelectorAll('[data-action="delete-exam"]').forEach(btn => {
+        btn.addEventListener('click', () => deleteStudentExam(btn.dataset.id));
+    });
+}
+
+function openStudentExamModal(id) {
+    const form = document.getElementById('studentExamForm');
+    form.reset();
+
+    const studentSelect = document.getElementById('studentExamStudent');
+    const students = allUsers.filter(u => u.role === 'stu' || u.role === 'stu_fr' || u.role === 'stu_all');
+    studentSelect.innerHTML = '<option value="">Sélectionner...</option>' +
+        students.map(s => '<option value="' + s.id + '">' + escapeHtml(s.name) + '</option>').join('');
+
+    updateStudentExamTypes();
+
+    if (id) {
+        const e = allStudentExams.find(x => x.id === id);
+        if (!e) return;
+        document.getElementById('studentExamModalTitle').textContent = 'Modifier l\'examen';
+        document.getElementById('studentExamId').value = e.id;
+        document.getElementById('studentExamStudent').value = e.student_id || '';
+        document.getElementById('studentExamCategory').value = e.exam_category || 'civique';
+        updateStudentExamTypes();
+        document.getElementById('studentExamType').value = e.exam_type || '';
+        document.getElementById('studentExamDate').value = e.exam_date || '';
+        document.getElementById('studentExamScore').value = e.score !== null ? e.score : '';
+        document.getElementById('studentExamTotal').value = e.total !== null ? e.total : '';
+        document.getElementById('studentExamStatus').value = e.status || 'planned';
+        document.getElementById('studentExamNotes').value = e.notes || '';
+    } else {
+        document.getElementById('studentExamModalTitle').textContent = t('se.title.add');
+        document.getElementById('studentExamId').value = '';
+        const today = new Date().toISOString().slice(0, 10);
+        document.getElementById('studentExamDate').value = today;
+    }
+
+    openModal('studentExamModal');
+}
+
+async function handleStudentExamSubmit(e) {
+    e.preventDefault();
+    const id = document.getElementById('studentExamId').value;
+    const studentId = document.getElementById('studentExamStudent').value;
+    const category = document.getElementById('studentExamCategory').value;
+    const examType = document.getElementById('studentExamType').value;
+    const examDate = document.getElementById('studentExamDate').value;
+    const score = document.getElementById('studentExamScore').value;
+    const total = document.getElementById('studentExamTotal').value;
+    const status = document.getElementById('studentExamStatus').value;
+    const notes = document.getElementById('studentExamNotes').value.trim();
+
+    if (!studentId) { showToast('Élève requis', 'error'); return; }
+    if (!examType) { showToast('Type requis', 'error'); return; }
+    if (!examDate) { showToast('Date requise', 'error'); return; }
+
+    const scoreNum = score === '' ? null : parseInt(score);
+    const totalNum = total === '' ? null : parseInt(total);
+
+    const data = {
+        student_id: studentId,
+        exam_category: category,
+        exam_type: examType,
+        exam_date: examDate,
+        score: scoreNum,
+        total: totalNum,
+        passed: status === 'passed',
+        status: status,
+        notes: notes || null,
+        updated_at: new Date().toISOString()
+    };
+
+    showLoading(id ? 'Modification...' : 'Création...');
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        let result;
+        if (id) {
+            result = await supabase.from('student_exams').update(data).eq('id', id).select().single();
+        } else {
+            data.created_at = new Date().toISOString();
+            result = await supabase.from('student_exams').insert([data]).select().single();
+        }
+        if (result.error) throw result.error;
+        closeModal('studentExamModal');
+        await loadAllData();
+        showToast(id ? 'Examen modifié ✓' : 'Examen ajouté ✓', 'success');
+    } catch (err) {
+        showToast('Erreur: ' + err.message, 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+async function deleteStudentExam(id) {
+    const e = allStudentExams.find(x => x.id === id);
+    if (!e) return;
+    if (!confirm('Supprimer cet examen ?')) return;
+
+    showLoading('Suppression...');
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        const { error } = await supabase.from('student_exams').delete().eq('id', id);
+        if (error) throw error;
+        await loadAllData();
+        showToast('Examen supprimé ✓', 'success');
+    } catch (err) {
+        showToast('Erreur: ' + err.message, 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+// ============================================================
+// 🔥 日历视图
+// ============================================================
+function changeWeek(delta) {
+    if (delta === 0) {
+        calendarWeekStart = getMonday(new Date());
+    } else {
+        calendarWeekStart = new Date(calendarWeekStart);
+        calendarWeekStart.setDate(calendarWeekStart.getDate() + delta * 7);
+    }
+    renderCalendar();
+}
+window.changeWeek = changeWeek;
+
+function buildCalendarFilterOptions() {
+    const teacherSelect = document.getElementById('calFilterTeacher');
+    if (teacherSelect) {
+        const cur = teacherSelect.value;
+        const teachers = allUsers.filter(u => u.role === 'teacher');
+        teacherSelect.innerHTML = '<option value="">' + t('cal.filter.allTeachers') + '</option>' +
+            teachers.map(x => '<option value="' + x.id + '">' + escapeHtml(x.name) + '</option>').join('');
+        if (cur) teacherSelect.value = cur;
+    }
+
+    const studentSelect = document.getElementById('calFilterStudent');
+    if (studentSelect) {
+        const cur = studentSelect.value;
+        const students = allUsers.filter(u => u.role === 'stu' || u.role === 'stu_fr' || u.role === 'stu_all');
+        studentSelect.innerHTML = '<option value="">' + t('cal.filter.allStudents') + '</option>' +
+            students.map(x => '<option value="' + x.id + '">' + escapeHtml(x.name) + '</option>').join('');
+        if (cur) studentSelect.value = cur;
+    }
+}
+
+function getCoursesForCalendar() {
+    let list = [...allCiviqueCourses, ...allFrenchCourses];
+
+    if (calendarFilter.category !== 'all') {
+        list = list.filter(c => c.category === calendarFilter.category);
+    }
+    if (calendarFilter.teacherId) {
+        list = list.filter(c => c.teacher_id === calendarFilter.teacherId);
+    }
+    if (calendarFilter.studentId) {
+        list = list.filter(c => c.student_id === calendarFilter.studentId);
+    }
+    if (calendarFilter.status !== 'all') {
+        list = list.filter(c => c.status === calendarFilter.status);
+    }
+    return list;
+}
+
+function renderCalendar() {
+    const weekView = document.getElementById('weekView');
+    const mobileList = document.getElementById('calendarMobileList');
+    const label = document.getElementById('calendarWeekLabel');
+    if (!weekView) return;
+
+    // 标题
+    const weekEnd = new Date(calendarWeekStart);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    const fmt = d => d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+    if (label) label.textContent = fmt(calendarWeekStart) + ' → ' + fmt(weekEnd);
+
+    const courses = getCoursesForCalendar();
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(calendarWeekStart);
+        d.setDate(d.getDate() + i);
+        days.push(d);
+    }
+    const todayStr = new Date().toDateString();
+
+    // ============ 桌面网格 ============
+    let html = '';
+    html += '<div class="cal-header-row">';
+    html += '<div class="cal-time-col"></div>';
+    days.forEach((d, i) => {
+        const isToday = d.toDateString() === todayStr;
+        html += '<div class="cal-day-header' + (isToday ? ' today' : '') + '">' +
+            '<div class="cal-day-name">' + t('days')[i] + '</div>' +
+            '<div class="cal-day-date">' + d.getDate() + '</div>' +
+            '</div>';
+    });
+    html += '</div>';
+
+    const START_H = 8, END_H = 24;
+    html += '<div class="cal-body">';
+    html += '<div class="cal-time-col">';
+    for (let h = START_H; h <= END_H; h++) {
+        html += '<div class="cal-time-slot">' + String(h).padStart(2, '0') + ':00</div>';
+    }
+    html += '</div>';
+
+    days.forEach(d => {
+        html += '<div class="cal-day-col">';
+        for (let h = START_H; h <= END_H; h++) {
+            html += '<div class="cal-hour-cell"></div>';
+        }
+        const dayCourses = courses.filter(c => {
+            const cd = new Date(c.start_time);
+            return cd.toDateString() === d.toDateString();
+        });
+        dayCourses.forEach(c => {
+            const cd = new Date(c.start_time);
+            const h = cd.getHours() + cd.getMinutes() / 60;
+            const dur = c.duration || 2;
+            if (h + dur < START_H || h > END_H) return;
+            const top = Math.max(0, (h - START_H)) * 60;
+            const height = Math.min(dur * 60, (END_H - h + 1) * 60);
+            const typeText = c.category === 'civique' ? getCiviqueTypeText(c.course_type) : getFrenchTypeText(c.course_type);
+            const cancelled = c.status === 'cancelled';
+            const completed = c.status === 'completed';
+            html += '<div class="cal-course-card ' + (cancelled ? 'cancelled' : '') + (completed ? ' completed' : '') +
+                '" data-id="' + c.id + '" data-category="' + c.category + '"' +
+                ' style="top:' + top + 'px;height:' + height + 'px;">' +
+                '<div class="cal-course-time">' + String(cd.getHours()).padStart(2, '0') + ':' + String(cd.getMinutes()).padStart(2, '0') + '</div>' +
+                '<div class="cal-course-title">' + typeText + '</div>' +
+                '<div class="cal-course-sub">' + escapeHtml(c.teacher?.name || '—') + '</div>' +
+                '</div>';
+        });
+        html += '</div>';
+    });
+    html += '</div>';
+    weekView.innerHTML = html;
+
+    weekView.querySelectorAll('.cal-course-card').forEach(card => {
+        card.addEventListener('click', () => openCourseDetailModal(card.dataset.id, card.dataset.category));
+    });
+
+    renderCalendarMobile(courses, days);
+}
+
+function renderCalendarMobile(courses, days) {
+    const list = document.getElementById('calendarMobileList');
+    if (!list) return;
+    const todayStr = new Date().toDateString();
+    let html = '';
+    days.forEach((d, i) => {
+        const isToday = d.toDateString() === todayStr;
+        const dayCourses = courses.filter(c => new Date(c.start_time).toDateString() === d.toDateString())
+            .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+        html += '<div class="cal-mobile-day' + (isToday ? ' today' : '') + '">' +
+            '<div class="cal-mobile-day-header">' + t('daysFull')[i] + ' ' + d.getDate() + '/' + (d.getMonth() + 1) + '</div>';
+        if (dayCourses.length === 0) {
+            html += '<div class="cal-mobile-empty">—</div>';
+        } else {
+            dayCourses.forEach(c => {
+                const cd = new Date(c.start_time);
+                const typeText = c.category === 'civique' ? getCiviqueTypeText(c.course_type) : getFrenchTypeText(c.course_type);
+                html += '<div class="cal-mobile-course" data-id="' + c.id + '" data-category="' + c.category + '">' +
+                    '<div class="cal-mobile-time">' + String(cd.getHours()).padStart(2, '0') + ':' + String(cd.getMinutes()).padStart(2, '0') + '</div>' +
+                    '<div class="cal-mobile-info">' +
+                    '<div class="cal-mobile-title">' + typeText + '</div>' +
+                    '<div class="cal-mobile-sub">' + escapeHtml(c.teacher?.name || '—') + ' · ' + (c.duration || 2) + 'h</div>' +
+                    '</div></div>';
+            });
+        }
+        html += '</div>';
+    });
+    list.innerHTML = html;
+    list.querySelectorAll('.cal-mobile-course').forEach(card => {
+        card.addEventListener('click', () => openCourseDetailModal(card.dataset.id, card.dataset.category));
+    });
+}
+
+// ============================================================
+// 🔥 只读课程详情弹窗
+// ============================================================
+function openCourseDetailModal(courseId, category) {
+    const course = category === 'civique'
+        ? allCiviqueCourses.find(c => c.id === courseId)
+        : allFrenchCourses.find(c => c.id === courseId);
+    if (!course) return;
+
+    const typeText = category === 'civique' ? getCiviqueTypeText(course.course_type) : getFrenchTypeText(course.course_type);
+    const statusMap = {
+        'scheduled': '📅 ' + t('filter.scheduled'),
+        'in_progress': '🔄 ' + t('cal.filter.inProgress'),
+        'completed': '✅ ' + t('filter.completed'),
+        'cancelled': '❌ ' + t('filter.cancelled')
+    };
+    const modeText = course.course_mode === 'group' ? t('cm.mode.group') : t('cm.mode.solo');
+    const studentText = course.course_mode === 'group'
+        ? modeText + ' (' + (course.max_students || '?') + ')'
+        : (course.student?.name || '—');
+
+    const titleEl = document.getElementById('courseDetailTitle');
+    if (titleEl) titleEl.textContent = t('cd.title') + ' — ' + typeText;
+
+    const body = document.getElementById('courseDetailBody');
+    if (!body) return;
+
+    body.innerHTML =
+        '<div class="detail-grid">' +
+        '<div class="detail-item"><span class="label">' + t('th.type') + '</span><div class="value">' + typeText + '</div></div>' +
+        '<div class="detail-item"><span class="label">' + t('th.date') + '</span><div class="value">' + formatDateTime(course.start_time) + '</div></div>' +
+        '<div class="detail-item"><span class="label">' + t('cm.duration') + '</span><div class="value">' + (course.duration || 2) + ' h</div></div>' +
+        '<div class="detail-item"><span class="label">' + t('cm.teacher') + '</span><div class="value">' + escapeHtml(course.teacher?.name || '—') + '</div></div>' +
+        '<div class="detail-item"><span class="label">' + t('cm.student') + '</span><div class="value">' + escapeHtml(studentText) + '</div></div>' +
+        '<div class="detail-item"><span class="label">' + t('th.status') + '</span><div class="value">' + (statusMap[course.status] || course.status || '—') + '</div></div>' +
+        '<div class="detail-item"><span class="label">' + t('cm.location') + '</span><div class="value">' + escapeHtml(course.location || '—') + '</div></div>' +
+        '<div class="detail-item detail-full"><span class="label">🔗 Visio</span><div class="value">' +
+        (course.meeting_link ? '<a href="' + course.meeting_link + '" target="_blank">' + escapeHtml(course.meeting_link) + '</a>' : '—') +
+        '</div></div>' +
+        '<div class="detail-item detail-full"><span class="label">' + t('th.notes') + '</span><div class="value">' + escapeHtml(course.notes || '—') + '</div></div>' +
+        (course.cancel_reason ? '<div class="detail-item detail-full"><span class="label">❌ ' + t('cr.title') + '</span><div class="value" style="color:#e74c3c;">' + escapeHtml(course.cancel_reason) + '</div></div>' : '') +
+        '</div>';
+
+    openModal('courseDetailModal');
+}
+
+// ============================================================
+// 启动
+// ============================================================
+document.addEventListener('DOMContentLoaded', init);
+
+window.closeModal = closeModal;
+window.selectCourseMode = selectCourseMode;
+window.openCourseDetailModal = openCourseDetailModal;
+window.changeWeek = changeWeek;
+window.setLang = setLang;

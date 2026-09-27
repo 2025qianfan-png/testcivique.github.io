@@ -89,7 +89,7 @@ function initPageCloseDetection() {
 
 // ==================== 验证学生登录 ====================
 async function validateStudent(name, password) {
-    return await window.supabaseAuth.validateStudent(name, password);
+    return await window.supabaseAuth.validateUser(name, password);
 }
 
 // ==================== 更新学生密码 ====================
@@ -97,7 +97,7 @@ async function updateStudentPassword(userId, currentPassword, newPassword) {
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         const { data: user, error: fetchError } = await supabase
-            .from('students')
+            .from('users')
             .select('password')
             .eq('id', userId)
             .single();
@@ -108,7 +108,7 @@ async function updateStudentPassword(userId, currentPassword, newPassword) {
             return { success: false, message: 'Mot de passe actuel incorrect' };
         }
         const { data, error } = await supabase
-            .from('students')
+            .from('users')
             .update({ password: newPassword })
             .eq('id', userId)
             .select()
@@ -133,11 +133,15 @@ async function updateStudentEmailWrapper(userId, currentPassword, newEmail) {
 }
 
 // ==================== 检查访问权限 ====================
-function checkAccess(student) {
-    if (!student.timer) {
+function checkAccess(student, category) {
+    category = category || 'civique';
+    if (!student) return { valid: false, daysLeft: 0 };
+    const timerField = category === 'francais' ? 'french_timer' : 'timer';
+    const timer = student[timerField];
+    if (!timer) {
         return { valid: true, daysLeft: -1 };
     }
-    const expiryDate = new Date(student.timer);
+    const expiryDate = new Date(timer);
     const currentDate = new Date();
     if (expiryDate < currentDate) {
         return { valid: false, daysLeft: 0 };
@@ -710,7 +714,7 @@ async function loginUser(name, password) {
         if (!student) {
             return { success: false, message: translations[currentLang].errorMessage };
         }
-        const accessCheck = checkAccess(student);
+        const accessCheck = checkAccess(student, 'civique');
         if (!accessCheck.valid) {
             return { 
                 success: false, 
@@ -725,7 +729,8 @@ async function loginUser(name, password) {
             type: student.type || 'etudiant',
             role: student.role || 'user',
             expiryDate: student.timer,
-            email: student.email || '',  // 【新增】保存邮箱
+            email: student.email || '',
+            modules: student.modules || [],
             accessValid: accessCheck.valid,
             daysLeft: accessCheck.daysLeft
         };
@@ -758,6 +763,7 @@ function generatePageToken(page, user) {
         role: user.role || 'user',
         daysLeft: user.daysLeft,
         expiry: expiryTimestamp,
+        modules: user.modules || [],
         timestamp: Date.now()
     };
     const jsonString = JSON.stringify(data);
@@ -785,14 +791,12 @@ function initAuthUI() {
             const userToken = generatePageToken('dashboard', user);
             let menuItems = '';
             
-            // 1. 我的资料
             menuItems += `
                 <a href="#" onclick="showProfileModal()">
                     <i class="fas fa-user-cog"></i> <span>${t.profileMenuItem || 'Mon profil'}</span>
                 </a>
             `;
             
-            // 2. 我的学习进度
             const studentTypes = ['t', 'm', 'r', 'n', 'etudiant', 'stu'];
             if (studentTypes.includes(user.type) || studentTypes.includes(user.role)) {
                 const dashboardToken = generatePageToken('dashboard', user);
@@ -806,7 +810,6 @@ function initAuthUI() {
                 `;
             }
             
-            // 3. 角色菜单
             if (roleMenuContainer) {
                 roleMenuContainer.innerHTML = '';
                 const userRole = user.role || user.type || '';
@@ -814,26 +817,25 @@ function initAuthUI() {
                 
                 if (userRole === 'admin') {
                     roleMenuHtml = `
-                        <a href="admin.html?token=${userToken}" style="border-bottom: 1px solid var(--light-gray);">
-                            <i class="fas fa-shield-alt"></i> 
+                        <a href="admin.html?token=${userToken}" style="border-bottom: 1px solid var(--light-gray);">    <i class="fas fa-shield-alt"></i> 
                             <span>${t.adminSpace || 'Administration'}</span>
                         </a>
                     `;
                 } else if (userRole === 'teacher') {
                     roleMenuHtml = `
-                        <a href="teacher.html?token=${userToken}" style="border-bottom: 1px solid var(--light-gray);">
+                        <a href="teacher.html?token=${encodeURIComponent(userToken)}" style="border-bottom: 1px solid var(--light-gray);">
                             <i class="fas fa-chalkboard-user"></i> 
                             <span>${t.teacherSpace || 'Espace intervenant'}</span>
                         </a>
                     `;
-                } else if (userRole === 'stu') {
-                    roleMenuHtml = `
-                        <a href="student.html?token=${userToken}" style="border-bottom: 1px solid var(--light-gray);">
-                            <i class="fas fa-user-graduate"></i> 
-                            <span>${t.studentSpace || 'Espace étudiant'}</span>
-                        </a>
-                    `;
-                }
+               } else if (userRole === 'stu' || userRole === 'stu_all' || userRole === 'stu_fr') {
+                roleMenuHtml = `
+                    <a href="student.html?token=${encodeURIComponent(userToken)}" style="border-bottom: 1px solid var(--light-gray);">
+                        <i class="fas fa-user-graduate"></i> 
+                        <span>${t.studentSpace || 'Espace étudiant'}</span>
+                    </a>
+                `;
+            }
                 
                 if (roleMenuHtml) {
                     roleMenuContainer.innerHTML = roleMenuHtml;
@@ -841,7 +843,6 @@ function initAuthUI() {
                 }
             }
             
-            // 4. 退出登录
             menuItems += `
                 <a href="#" onclick="logout()" class="logout-link" style="border-top: 1px solid var(--light-gray); margin-top: 4px; padding-top: 14px;">
                     <i class="fas fa-sign-out-alt" style="color: var(--red);"></i> 
@@ -927,7 +928,7 @@ async function handleLogin(event) {
     loginBtn.disabled = true;
     loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (currentLang === 'fr' ? 'Connexion...' : '登录中...');
     try {
-        const student = await window.supabaseAuth.validateStudent(name, password);
+        const student = await window.supabaseAuth.validateUser(name, password);
         if (!student) {
             errorMessageSpan.textContent = translations[currentLang].errorMessage;
             errorDiv.style.display = 'flex';
@@ -935,7 +936,7 @@ async function handleLogin(event) {
             loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> ' + translations[currentLang].loginBtnText;
             return;
         }
-        const accessCheck = window.supabaseAuth.checkAccess(student);
+        const accessCheck = window.supabaseAuth.checkAccess(student, 'civique');
         if (!accessCheck.valid) {
             errorMessageSpan.textContent = currentLang === 'fr' 
                 ? 'Votre compte a expiré. Veuillez contacter l\'association.' 
@@ -951,7 +952,8 @@ async function handleLogin(event) {
             type: student.type || 'etudiant',
             role: student.role || 'user',
             expiryDate: student.timer,
-            email: student.email || '',  // 【新增】保存邮箱
+            email: student.email || '',
+            modules: student.modules || [],
             accessValid: accessCheck.valid,
             daysLeft: accessCheck.daysLeft
         };
@@ -975,7 +977,7 @@ async function handleLogin(event) {
     }
 }
 
-// ==================== 【修改】显示个人资料模态框 ====================
+// ==================== 显示个人资料模态框 ====================
 function showProfileModal() {
     const user = getCurrentUser();
     if (!user) return;
@@ -985,7 +987,7 @@ function showProfileModal() {
         new Date(user.expiryDate).toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'zh-CN') : 
         (currentLang === 'fr' ? 'Illimité' : '无限期');
     document.getElementById('profileUsername').value = user.name;
-    document.getElementById('profileEmail').value = user.email || '';  // 【新增】显示邮箱
+    document.getElementById('profileEmail').value = user.email || '';
     document.getElementById('profileModal').classList.add('show');
     document.getElementById('userDropdown').classList.remove('show');
 }
@@ -997,7 +999,7 @@ function closeProfileModal() {
     document.getElementById('profileSuccess').style.display = 'none';
 }
 
-// ==================== 【修改】更新个人资料 ====================
+// ==================== 更新个人资料 ====================
 async function updateProfile(event) {
     event.preventDefault();
     const user = getCurrentUser();
@@ -1015,7 +1017,6 @@ async function updateProfile(event) {
     errorDiv.style.display = 'none';
     successDiv.style.display = 'none';
     
-    // 检查是否至少修改一项
     if (!newPassword && !newEmail) {
         errorDiv.style.display = 'flex';
         errorMessage.textContent = currentLang === 'fr' ? 
@@ -1024,7 +1025,6 @@ async function updateProfile(event) {
         return;
     }
     
-    // 验证邮箱格式
     if (newEmail) {
         const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
         if (!emailRegex.test(newEmail)) {
@@ -1036,7 +1036,6 @@ async function updateProfile(event) {
         }
     }
     
-    // 验证密码
     if (newPassword && newPassword.length < 6) {
         errorDiv.style.display = 'flex';
         errorMessage.textContent = currentLang === 'fr' ? 
@@ -1059,7 +1058,6 @@ async function updateProfile(event) {
         let hasError = false;
         let errorMsg = '';
         
-        // 1. 更新邮箱
         if (newEmail && newEmail !== user.email) {
             const emailResult = await updateStudentEmailWrapper(user.id, currentPassword, newEmail);
             if (!emailResult.success) {
@@ -1071,7 +1069,6 @@ async function updateProfile(event) {
             }
         }
         
-        // 2. 更新密码
         if (newPassword && !hasError) {
             const pwdResult = await updateStudentPassword(user.id, currentPassword, newPassword);
             if (!pwdResult.success) {
@@ -1211,7 +1208,6 @@ function switchLanguage(lang) {
     fixTestButtons();
     toggleFAQAnswers(lang);
     
-    // 更新下拉菜单文本
     const user = getCurrentUser();
     if (user) {
         const t = translations[currentLang];
@@ -1236,7 +1232,6 @@ function switchLanguage(lang) {
         });
     }
     
-    // 更新教学评价标题
     const feedbackTitle = document.getElementById('feedbackShowcaseTitle');
     if (feedbackTitle) {
         feedbackTitle.textContent = data.feedbackShowcaseTitle || '⭐ Avis des étudiants';
@@ -1246,7 +1241,6 @@ function switchLanguage(lang) {
         feedbackSubtitle.textContent = data.feedbackShowcaseSubtitle || 'Ce que nos étudiants pensent de nos formations';
     }
     
-    // 更新登录按钮
     const navLogin = document.getElementById('navLogin');
     if (navLogin) {
         const span = navLogin.querySelector('span');
@@ -1255,7 +1249,6 @@ function switchLanguage(lang) {
         }
     }
     
-    // 更新导航栏
     const navSituation = document.getElementById('navSituation');
     if (navSituation) {
         navSituation.textContent = data.navSituation || (lang === 'fr' ? 'Mises en situation' : '情景题专项');
@@ -1266,7 +1259,6 @@ function switchLanguage(lang) {
         footerSituationLink.textContent = data.footerSituationLink || (lang === 'fr' ? 'Mises en situation' : '情景题专项');
     }
     
-    // 重新加载 KPI 和评价
     loadStats();
     loadFeedbacks();
     
@@ -1327,10 +1319,14 @@ async function loadFeedbacks() {
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         
+        // 🔥 只查公民课的评价
+        const civiqueExamTypes = ['carte_sejour_4ans', 'carte_resident_10ans', 'nationalite_francaise'];
+        
         const { data, error } = await supabase
             .from('student_feedback')
             .select('*')
             .eq('is_public', true)
+            .in('exam_type', civiqueExamTypes)
             .order('created_at', { ascending: false });
         
         if (error) throw error;
@@ -1589,8 +1585,9 @@ async function loadStats() {
         const supabase = window.supabaseAuth.getSupabaseClient();
         
         const { count: totalCount, error: totalError } = await supabase
-            .from('students')
-            .select('*', { count: 'exact', head: true });
+            .from('users')
+            .select('*', { count: 'exact', head: true })
+            .in('role', ['stu', 'stu_all']);
         if (totalError) throw totalError;
         
         const studentCount = totalCount || 0;
