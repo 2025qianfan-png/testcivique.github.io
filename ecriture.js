@@ -345,19 +345,33 @@ async function submitWriting() {
             selectedTopic.word_max
         );
 
-        const feedback = await window.supabaseAuth.callGeminiAI(prompt, text);
+        const feedback = await window.supabaseAuth.callAI(prompt, text);
 
-        // 解析分数
+                // ============================================================
+        // 解析分数（兼容 /10 和 /20，AI 现在按 TCF IRN 给 /20）
+        // ============================================================
         let score = null;
-        const maxScore = currentTask === 'tache1' ? 4 : currentTask === 'tache2' ? 6 : 10;
-        const scoreMatch = feedback.match(/Note\s*[:：]\s*([\d.]+)\s*\/\s*(\d+)/);
+        let maxScore = 20;
+        const scoreMatch = feedback.match(/Note\s*[:：]?\s*([\d.]+)\s*\/\s*(\d+)/);
         if (scoreMatch) {
             score = parseFloat(scoreMatch[1]);
+            maxScore = parseInt(scoreMatch[2], 10);
         }
-
-        // 解析水平
+        // 如果 AI 没给分，按等级兜底
+        if (score === null) {
+            const levelMatch0 = feedback.match(/Niveau\s*CECRL[^\n]*?([A-C][12])/i);
+            if (levelMatch0) {
+                const lv = levelMatch0[1].toUpperCase();
+                const fallback = { 'A1': 3, 'A2': 8, 'B1': 12, 'B2': 16 };
+                score = fallback[lv] || null;
+                maxScore = 20;
+            }
+        }
+                // ============================================================
+        // 解析等级（TCF IRN 只会是 A1 / A2 / B1 / B2）
+        // ============================================================
         let level = null;
-        const levelMatch = feedback.match(/Niveau\s*CECRL\s*estimé\s*[:：]\s*([A-C][1-2])/i);
+        const levelMatch = feedback.match(/Niveau\s*(?:CECRL)?[^\n]*?([A-C][12])/i);
         if (levelMatch) {
             level = levelMatch[1].toUpperCase();
         }
@@ -510,7 +524,7 @@ async function openHistory() {
                         ${item.word_count || 0} mots
                     </div>
                 </div>
-                <div class="h-score">${item.score !== null && item.score !== undefined ? item.score + '/10' : '-'}</div>
+                <div class="h-score">${item.score !== null && item.score !== undefined ? item.score + '/20' : '-'}</div>
                 <div class="h-actions">
                     <button onclick="viewHistoryItem('${item.id}')"><i class="fas fa-eye"></i></button>
                     <button onclick="deleteHistoryItem('${item.id}')"><i class="fas fa-trash"></i></button>
@@ -567,7 +581,7 @@ async function viewHistoryItem(id) {
                 <br>
                 <span style="color:var(--text-muted);font-size:0.82rem;">
                     ${item.task_type || ''} · ${new Date(item.created_at).toLocaleDateString('fr-FR')} · ${item.word_count || 0} mots
-                    ${item.score !== null ? ' · Note: ' + item.score + '/10' : ''}
+                    ${item.score !== null ? ' · Note: ' + item.score + '/20' : ''}
                 </span>
             </div>
 

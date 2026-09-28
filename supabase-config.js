@@ -1883,114 +1883,175 @@ async function deleteWritingHistory(id) {
 }
 
 // ============================================================
-// 【模块九】AI 批改（优先 Mistral，备用 Gemini）
+// 【模块九】AI 批改（Groq · TCF IRN 官方评分）
 // ============================================================
 
-async function callMistralAI(prompt, userText) {
-    try {
-        var supabase = getSupabaseClient();
-        var configResult = await supabase
-            .from('app_config')
-            .select('value')
-            .eq('key', 'mistral_api_key')
-            .single();
+var AI_SYSTEM_PROMPT = 'Tu es un correcteur officiel du TCF IRN (France Éducation International). Tu évalues les productions écrites selon le barème officiel A1-B2. Réponds toujours en français, de façon structurée et rigoureuse.';
 
-        if (configResult.error || !configResult.data) {
-            console.warn('⚠️ Mistral API Key 未配置，尝试 Gemini...');
-            return callGeminiAI(prompt, userText);
-        }
 
-        var apiKey = configResult.data.value;
-        var url = 'https://api.mistral.ai/v1/chat/completions';
+/**
+ * 唯一 AI 入口
+ * @param {string} prompt   评分规则 prompt
+ * @param {string} userText 学生原文
+ * @param {number} retries  429 重试次数
+ */
+async function callAI(prompt, userText, retries) {
+    retries = (retries === undefined) ? 2 : retries;
 
-        var response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + apiKey
-            },
-            body: JSON.stringify({
-                model: 'mistral-small-latest',
-                messages: [
-                    { role: 'system', content: 'Tu es un professeur de français expert DELF, spécialiste en évaluation des niveaux A1 à C2 du CECRL. Réponds toujours en français.' },
-                    { role: 'user', content: prompt + '\n\n' + userText }
-                ],
-                temperature: 0.7,
-                max_tokens: 2048
-            })
-        });
+    var supabase = getSupabaseClient();
+    var configResult = await supabase
+        .from('app_config')
+        .select('value')
+        .eq('key', 'groq_api_key')
+        .maybeSingle();
 
-        if (!response.ok) {
-            if (response.status === 429) {
-                return callGeminiAI(prompt, userText);
-            }
-            throw new Error('Mistral API 错误: ' + response.status);
-        }
-
-        var dataResponse = await response.json();
-        var result = (dataResponse.choices && dataResponse.choices[0] && dataResponse.choices[0].message && dataResponse.choices[0].message.content) || '';
-        if (!result) throw new Error('Mistral 未返回有效结果');
-        return result;
-    } catch (error) {
-        console.error('❌ Mistral 调用失败:', error.message);
-        return callGeminiAI(prompt, userText);
+    if (configResult.error || !configResult.data || !configResult.data.value) {
+        throw new Error('Groq API Key 未配置（app_config.groq_api_key）');
     }
+
+    var apiKey = configResult.data.value.trim();
+
+    var response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + apiKey
+        },
+        body: JSON.stringify({
+            model: 'openai/gpt-oss-120b',
+            messages: [
+                { role: 'system', content: AI_SYSTEM_PROMPT },
+                { role: 'user', content: prompt + '\n\n' + userText }
+            ],
+            temperature: 0.4,
+            max_tokens: 2500
+        })
+    });
+
+    // 429 → 退避重试
+    if (response.status === 429 && retries > 0) {
+        var wait = (3 - retries) * 3000;
+        console.warn('⏳ Groq 429，' + (wait / 1000) + ' 秒后重试...');
+        await new Promise(function(r) { setTimeout(r, wait); });
+        return await callAI(prompt, userText, retries - 1);
+    }
+
+    if (!response.ok) {
+        var errText = '';
+        try {
+            var errJson = await response.json();
+            errText = (errJson.error && errJson.error.message) || JSON.stringify(errJson);
+        } catch (e) {
+            errText = await response.text().catch(function() { return ''; });
+        }
+        if (response.status === 401) throw new Error('Groq API Key 无效（401）');
+        if (response.status === 429) throw new Error('Groq 配额已用完或请求过快（429），请稍后重试');
+        throw new Error('Groq API ' + response.status + ': ' + errText);
+    }
+
+    var data = await response.json();
+    var result = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+    if (!result) throw new Error('Groq 返回空');
+    return result;
 }
 
-async function callGeminiAI(prompt, userText) {
-    try {
-        var supabase = getSupabaseClient();
-        var configResult = await supabase
-            .from('app_config')
-            .select('value')
-            .eq('key', 'gemini_api_key')
-            .single();
 
-        if (configResult.error || !configResult.data) {
-            throw new Error('没有可用的 AI API Key');
-        }
-
-        var apiKey = configResult.data.value;
-        var MODEL = 'gemini-2.0-flash-lite-001';
-        var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + MODEL + ':generateContent?key=' + apiKey;
-
-        var response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt + '\n\n' + userText }] }],
-                generationConfig: { temperature: 0.7, maxOutputTokens: 2048 }
-            })
-        });
-
-        if (!response.ok) {
-            var errorJson = await response.json().catch(function() { return {}; });
-            throw new Error('Gemini API 错误: ' + ((errorJson.error && errorJson.error.message) || response.status));
-        }
-
-        var dataResponse = await response.json();
-        var result = (dataResponse.candidates && dataResponse.candidates[0] && dataResponse.candidates[0].content && dataResponse.candidates[0].content.parts && dataResponse.candidates[0].content.parts[0] && dataResponse.candidates[0].content.parts[0].text) || '';
-        if (!result) throw new Error('Gemini 未返回有效结果');
-        return result;
-    } catch (error) {
-        console.error('❌ Gemini 调用失败:', error);
-        throw error;
-    }
-}
-
+/**
+ * 生成 TCF IRN 官方评分 prompt
+ */
 function getWritingPrompt(taskType, topicTitle, wordMin, wordMax) {
-    var basePrompt = 'Tu es un professeur de français expert DELF.\n\n' +
-        '📌 SUJET : ' + topicTitle + '\n' +
-        '📏 NOMBRE DE MOTS : ' + wordMin + '-' + wordMax + ' mots\n\n' +
-        'À la fin, indique le niveau CECRL estimé (A1-C2) avec justification.\n\n' +
-        'RÉPONDS EN FRANÇAIS :\n\n' +
-        '📝 Évaluation\n' +
-        '✅ Ce qui est bien\n' +
-        '🔧 À améliorer\n' +
-        '💡 Conseils\n' +
-        '📄 Proposition de correction\n' +
-        '📊 Niveau CECRL estimé\n\n' +
-        '---\n\nTEXTE DE L\'ÉLÈVE :';
+    var taskLabel = taskType === 'tache1' ? 'Message personnel'
+                  : taskType === 'tache2' ? 'Récit / Compte rendu'
+                  : 'Argumentation / Opinion';
+
+    var basePrompt =
+        'Tu es un correcteur officiel du TCF IRN (Test de Connaissance du Français — Intégration, Résidence et Nationalité),' +
+        'délivré par France Éducation International.\n' +
+        'Tu évalues selon le barème officiel en vigueur (réforme 2025 : le niveau maximum évalué est B2).\n\n' +
+
+        '═══════════════════════════════════════════\n' +
+        '📌 SUJET\n' +
+        '═══════════════════════════════════════════\n' +
+        'Tâche : ' + taskLabel + '\n' +
+        'Sujet : ' + topicTitle + '\n' +
+        'Longueur exigée : ' + wordMin + '-' + wordMax + ' mots\n\n' +
+
+        '═══════════════════════════════════════════\n' +
+        '📊 GRILLE TCF IRN — A1 → B2 UNIQUEMENT\n' +
+        '═══════════════════════════════════════════\n' +
+        'Le TCF IRN évalue le français général JUSQU\'AU B2 (niveau requis pour la naturalisation depuis 2026).\n' +
+        '❌ NE PAS attribuer C1 ou C2. Si le texte dépasse le B2, noter B2.\n\n' +
+
+        'Deux compétences officielles évaluées :\n' +
+        '1. Compétence linguistique : étendue lexicale, correction grammaticale, orthographe, complexité syntaxique\n' +
+        '2. Compétence pragmatique : cohérence, cohésion, développement thématique, adaptation au destinataire et registre\n\n' +
+
+        '─────────────── DESCRIPTEURS DE NIVEAU ───────────────\n\n' +
+
+        '📌 A1 — Élémentaire\n' +
+        '• Phrases simples et isolées, vocabulaire très basique\n' +
+        '• Informations personnelles minimales\n' +
+        '• Erreurs fréquentes gênant la compréhension\n' +
+        '• Aucune structure textuelle identifiable\n\n' +
+
+        '📌 A2 — Élémentaire avancé\n' +
+        '• Phrases courtes, connecteurs simples (et, mais, parce que)\n' +
+        '• Décrit des situations familières, besoins concrets\n' +
+        '• Erreurs nombreuses mais compréhensibles\n' +
+        '• Structure minimale (début/fin), pas de paragraphes\n\n' +
+
+        '📌 B1 — Intermédiaire (seuil)\n' +
+        '• Discours simple et cohérent ; connecteurs basiques (d\'abord, ensuite, donc, par exemple)\n' +
+        '• Raconte une expérience, donne une opinion brève avec justification\n' +
+        '• Erreurs présentes mais sans gêne majeure\n' +
+        '• Structure reconnaissable : intro / développement / conclusion, quelques paragraphes\n' +
+        '• Registre globalement adapté\n\n' +
+
+        '📌 B2 — Intermédiaire avancé (NIVEAU REQUIS NATURALISATION)\n' +
+        '• Discours clair et détaillé ; connecteurs variés (cependant, néanmoins, par conséquent, en définitive)\n' +
+        '• Argumentation structurée avec exemples concrets\n' +
+        '• Nuances explicites (certes... mais, non seulement... mais aussi)\n' +
+        '• Lexique étendu ; tournures impersonnelles (force est de constater, il convient de)\n' +
+        '• Erreurs rares et mineures, sans gêne pour la compréhension\n' +
+        '• Structure claire : paragraphes distincts et transitions efficaces\n' +
+        '• Registre pleinement adapté : vouvoiement si formel, tutoiement si familier\n\n' +
+
+        '═══════════════════════════════════════════\n' +
+        '⚠️ POINTS CRITIQUES À PÉNALISER\n' +
+        '═══════════════════════════════════════════\n' +
+        '1. HORS SUJET → plafonner à A1/A2\n' +
+        '2. LONGUEUR NON RESPECTÉE → pénalité explicite (trop court ou trop long)\n' +
+        '3. REGISTRE INADAPTÉ (ex. « Salut » dans une argumentation formelle) → plafonner la compétence pragmatique\n' +
+        '4. AUCUNE STRUCTURE (bloc unique sans paragraphes) → plafonner la cohérence\n' +
+        '5. CONNECTEURS TROP BASIQUES en T2/T3 (et, mais, parce que uniquement) → plafonner à B1\n' +
+        '6. PHRASES PRÉ-FABRIQUÉES copiées-collées → détection et pénalité\n' +
+        '7. FAUTES D\'ACCORD ÉLÉMENTAIRES (relecture absente) → impact sur la note finale\n\n' +
+
+        '═══════════════════════════════════════════\n' +
+        '📝 FORMAT DE RÉPONSE (en français, structuré)\n' +
+        '═══════════════════════════════════════════\n\n' +
+
+        '📝 **Évaluation**\n' +
+        '[2-3 phrases : niveau atteint, points forts, points faibles]\n\n' +
+
+        '✅ **Ce qui est bien**\n' +
+        '[2-4 points positifs concrets, cités du texte]\n\n' +
+
+        '🔧 **À améliorer**\n' +
+        '[2-4 points précis avec corrections suggérées]\n\n' +
+
+        '💡 **Conseils pour viser le niveau supérieur**\n' +
+        '[Conseils TCF IRN : connecteurs, structures, registre]\n\n' +
+
+        '📄 **Proposition de correction (niveau B2 visé)**\n' +
+        '[Réécriture du texte : garder les idées, corriger langue et structure]\n\n' +
+
+        '📊 **Niveau CECRL estimé : [A1 / A2 / B1 / B2]**\n' +
+        '[Justification concise selon les descripteurs ci-dessus]\n' +
+        '**Note : X / 20** (barème : A1 = 1-5 · A2 = 6-9 · B1 = 10-13 · B2 = 14-17)\n\n' +
+
+        '---\n\n' +
+        'TEXTE DE L\'ÉLÈVE :';
 
     return basePrompt;
 }
@@ -2448,8 +2509,7 @@ window.supabaseAuth = {
     saveWritingHistory: saveWritingHistory,
     getWritingHistory: getWritingHistory,
     deleteWritingHistory: deleteWritingHistory,
-    callMistralAI: callMistralAI,
-    callGeminiAI: callGeminiAI,
+    callAI: callAI,
     getWritingPrompt: getWritingPrompt,
 
     // 语法
