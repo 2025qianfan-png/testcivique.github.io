@@ -732,10 +732,13 @@ function validateToken(data) {
 // ============================================================
 // 🔥 EMAILJS 邮件函数
 // ============================================================
+let emailjsLoaded = false;
+
 function loadEmailJS() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         if (typeof emailjs !== 'undefined') {
             try { emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY); } catch (e) {}
+            emailjsLoaded = true;
             resolve();
             return;
         }
@@ -743,9 +746,10 @@ function loadEmailJS() {
         script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
         script.onload = () => {
             try { emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY); } catch (e) {}
+            emailjsLoaded = true;
             resolve();
         };
-        script.onerror = () => reject(new Error('EmailJS load failed'));
+        script.onerror = () => resolve();  // 失败也 resolve，不要 reject
         document.head.appendChild(script);
     });
 }
@@ -830,25 +834,43 @@ function formatUpcomingCoursesForEmail(courses) {
     return formatted;
 }
 
-async function sendCourseEmailNotification(courseId, action) {
+async function sendCourseEmailNotification(courseId, action, overrideCourse) {
     try {
+        // ============================================================
+        // 1. 确保 emailjs 加载
+        // ============================================================
         if (typeof emailjs === 'undefined') {
-            console.warn('⚠️ EmailJS non disponible');
-            return { success: true, skipped: true };
+            await loadEmailJS();
+        }
+        if (typeof emailjs === 'undefined') {
+            console.warn('⚠️ EmailJS 不可用，跳过发送');
+            return { success: false, skipped: true, reason: 'emailjs_unavailable' };
         }
         try { emailjs.init(EMAILJS_COURSE.PUBLIC_KEY); } catch (e) {}
 
         const supabase = window.supabaseAuth.getSupabaseClient();
-        if (!supabase) return { success: true, skipped: true };
+        if (!supabase) return { success: false, skipped: true, reason: 'no_supabase' };
 
-        const { data: course, error } = await supabase
-            .from('courses_v2')
-            .select('*')
-            .eq('id', courseId)
-            .maybeSingle();
+        // ============================================================
+        // 2. 拿课程（优先用传入的 overrideCourse，比如删除前快照）
+        // ============================================================
+        let course = overrideCourse;
+        if (!course) {
+            const { data, error } = await supabase
+                .from('courses_v2')
+                .select('*')
+                .eq('id', courseId)
+                .maybeSingle();
+            if (error || !data) {
+                console.warn('⚠️ 课程查不到，跳过邮件:', courseId);
+                return { success: false, skipped: true, reason: 'course_not_found' };
+            }
+            course = data;
+        }
 
-        if (error || !course) return { success: true, skipped: true };
-
+        // ============================================================
+        // 3. 拿学生列表（course_students + legacy student_id）
+        // ============================================================
         const { data: courseStudents } = await supabase
             .from('course_students')
             .select('student_id')
@@ -860,6 +882,9 @@ async function sendCourseEmailNotification(courseId, action) {
         }
 
         const userIds = [course.teacher_id, ...studentIds].filter(Boolean);
+        if (userIds.length === 0) {
+            return { success: false, skipped: true, reason: 'no_users' };
+        }
 
         const { data: users } = await supabase
             .from('users')
@@ -872,17 +897,22 @@ async function sendCourseEmailNotification(courseId, action) {
         const teacher = userMap[course.teacher_id] || null;
         const students = studentIds.map(id => userMap[id]).filter(Boolean);
         const studentsWithEmail = students.filter(s => s.email && s.email.trim() !== '');
-
         const hasTeacherEmail = teacher && teacher.email && teacher.email.trim() !== '';
 
         if (!hasTeacherEmail && studentsWithEmail.length === 0) {
             console.log('ℹ️ 无邮箱，跳过发送');
-            return { success: true, skipped: true };
+            return { success: false, skipped: true, reason: 'no_email' };
         }
 
+        // ============================================================
+        // 4. 准备公共字段
+        // ============================================================
         const actionLabels = {
-            'create': 'créé', 'update': 'modifié',
-            'cancel': 'annulé', 'complete': 'terminé'
+            'create': 'créé',
+            'update': 'modifié',
+            'cancel': 'annulé',
+            'complete': 'terminé',
+            'delete': 'supprimé'
         };
         const actionLabel = actionLabels[action] || action;
 
@@ -890,14 +920,22 @@ async function sendCourseEmailNotification(courseId, action) {
         const courseTypeName = course.category === 'civique'
             ? getCiviqueTypeText(course.course_type)
             : getFrenchTypeText(course.course_type);
+        const categoryLabel = course.category === 'francais' ? '🇫🇷 Français' : '📘 Civique';
 
         const shouldExclude = (action !== 'create');
         let sentCount = 0;
+        const errors = [];
 
+        // ============================================================
+        // 5. 发老师
+        // ============================================================
         if (hasTeacherEmail) {
             let teacherCourses = '✅ Aucun cours à venir.';
             try {
-                const list = await getUpcomingCoursesForUser(teacher.id, 'teacher', shouldExclude ? courseId : null);
+                const list = await getUpcomingCoursesForUser(
+                    teacher.id, 'teacher',
+                    shouldExclude ? courseId : null
+                );
                 teacherCourses = formatUpcomingCoursesForEmail(list);
             } catch (e) {}
 
@@ -907,27 +945,41 @@ async function sendCourseEmailNotification(courseId, action) {
                 teacher_name: teacher.name || 'Enseignant',
                 action: actionLabel,
                 course_type: courseTypeName,
-                date: date, time: time,
+                course_category: categoryLabel,
+                date: date,
+                time: time,
                 duration: course.duration || 2,
                 student_name: students.map(s => s.name).join(', ') || '-',
                 student_email: studentsWithEmail.map(s => s.email).join(', ') || '-',
                 upcoming_courses: teacherCourses,
-                subject: '📚 [Enseignant] Cours ' + actionLabel + ' - ' + date
+                subject: `📚 [Enseignant] Cours ${actionLabel} - ${date}`
             };
 
             try {
-                await emailjs.send(EMAILJS_COURSE.SERVICE_ID, EMAILJS_COURSE.TEACHER_TEMPLATE_ID, teacherParams, EMAILJS_COURSE.PUBLIC_KEY);
+                await emailjs.send(
+                    EMAILJS_COURSE.SERVICE_ID,
+                    EMAILJS_COURSE.TEACHER_TEMPLATE_ID,
+                    teacherParams,
+                    EMAILJS_COURSE.PUBLIC_KEY
+                );
                 sentCount++;
                 console.log('✅ 邮件已发老师:', teacher.email);
             } catch (e) {
                 console.error('❌ 发老师邮件失败:', e.message);
+                errors.push('teacher: ' + e.message);
             }
         }
 
+        // ============================================================
+        // 6. 发每个学生
+        // ============================================================
         for (const student of studentsWithEmail) {
             let studentCourses = '✅ Aucun cours à venir.';
             try {
-                const list = await getUpcomingCoursesForUser(student.id, 'student', shouldExclude ? courseId : null);
+                const list = await getUpcomingCoursesForUser(
+                    student.id, 'student',
+                    shouldExclude ? courseId : null
+                );
                 studentCourses = formatUpcomingCoursesForEmail(list);
             } catch (e) {}
 
@@ -937,27 +989,41 @@ async function sendCourseEmailNotification(courseId, action) {
                 student_name: student.name || 'Élève',
                 action: actionLabel,
                 course_type: courseTypeName,
-                date: date, time: time,
+                course_category: categoryLabel,
+                date: date,
+                time: time,
                 duration: course.duration || 2,
                 teacher_name: teacher?.name || '-',
                 teacher_email: teacher?.email || '-',
                 upcoming_courses: studentCourses,
-                subject: '📚 [Élève] Cours ' + actionLabel + ' - ' + date
+                subject: `📚 [Élève] Cours ${actionLabel} - ${date}`
             };
 
             try {
-                await emailjs.send(EMAILJS_COURSE.SERVICE_ID, EMAILJS_COURSE.STUDENT_TEMPLATE_ID, studentParams, EMAILJS_COURSE.PUBLIC_KEY);
+                await emailjs.send(
+                    EMAILJS_COURSE.SERVICE_ID,
+                    EMAILJS_COURSE.STUDENT_TEMPLATE_ID,
+                    studentParams,
+                    EMAILJS_COURSE.PUBLIC_KEY
+                );
                 sentCount++;
                 console.log('✅ 邮件已发学生:', student.email);
             } catch (e) {
                 console.error('❌ 发学生邮件失败:', student.email, e.message);
+                errors.push('student ' + student.email + ': ' + e.message);
             }
         }
 
-        return { success: true, sentCount: sentCount };
+        return {
+            success: sentCount > 0,
+            sentCount,
+            skipped: false,
+            errors: errors.length > 0 ? errors : undefined
+        };
+
     } catch (err) {
         console.error('❌ 邮件发送异常:', err);
-        return { success: true };
+        return { success: false, error: err.message };
     }
 }
 
@@ -983,7 +1049,7 @@ async function init() {
     bindGlobalEvents();
 
     await loadAllData();
-    loadEmailJS();
+    await loadEmailJS();
     applyLanguage();
     bindLanguageButtons();
 }
@@ -2467,7 +2533,7 @@ async function handleCourseSubmit(e) {
     }
 
     // ============================================================
-    // 🔥 B 方案：老师建课时检查 credit
+    // B 方案：老师建课时检查 credit
     // ============================================================
     const field = category === 'civique' ? 'credit' : 'french_credit';
 
@@ -2637,7 +2703,10 @@ async function handleCourseSubmit(e) {
 
         // 写入新的 student 关联
         const csData = studentIds.map(sid => ({ course_id: courseResult.id, student_id: sid }));
-        await supabase.from('course_students').insert(csData);
+        const { error: csErr } = await supabase.from('course_students').insert(csData);
+        if (csErr) {
+            console.warn('⚠️ course_students 写入失败（不影响课程本身）:', csErr.message);
+        }
 
         // 先退还旧 credit，再扣新 credit
         if (oldCreditInfo && oldCreditInfo.studentIds.length > 0) {
@@ -2650,17 +2719,32 @@ async function handleCourseSubmit(e) {
             await deductStudentCredit(sid, duration, category);
         }
 
-        // 邮件通知
+        // ============================================================
+        // 🔥 邮件通知（可见结果）
+        // ============================================================
         const action = id ? 'update' : 'create';
+        let emailResult = null;
         try {
-            await sendCourseEmailNotification(courseResult.id, action);
+            emailResult = await sendCourseEmailNotification(courseResult.id, action);
         } catch (emailErr) {
-            console.warn('⚠️ 邮件发送失败（不影响课程）:', emailErr.message);
+            console.warn('⚠️ 邮件发送异常（不影响课程）:', emailErr.message);
         }
 
         closeModal('courseModal');
         await loadAllData();
-        showToast(id ? 'Cours modifié ✓' : 'Cours créé ✓', 'success');
+
+        // ============================================================
+        // 🔥 根据邮件结果给出更清晰的提示
+        // ============================================================
+        const savedMsg = id ? 'Cours modifié ✓' : 'Cours créé ✓';
+        if (emailResult?.skipped) {
+            showToast(savedMsg + ' — ⚠️ 邮件未发送（无邮箱或 EmailJS 不可用）', 'warning');
+        } else if (emailResult?.sentCount > 0) {
+            showToast(savedMsg + ` — 📧 ${emailResult.sentCount} 封邮件已发送`, 'success');
+        } else {
+            showToast(savedMsg, 'success');
+        }
+
     } catch (err) {
         console.error(err);
         showToast('Erreur: ' + err.message, 'error');
@@ -2753,6 +2837,7 @@ async function confirmCancelReason() {
     if (!reason) { showToast('Sélectionnez un motif', 'error'); return; }
 
     showLoading('Annulation...');
+    let emailResult = null;   // 🔥 声明
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         const { id, category, data, isNew } = pendingCancelData;
@@ -2768,11 +2853,15 @@ async function confirmCancelReason() {
                 .single();
 
             if (!insertRes.error) {
-                try { await sendCourseEmailNotification(insertRes.data.id, 'cancel'); } catch (e) {}
+                try {
+                    emailResult = await sendCourseEmailNotification(insertRes.data.id, 'cancel');
+                } catch (e) {
+                    console.warn('⚠️ 取消邮件失败:', e.message);
+                }
             }
         } else {
             // ============================================================
-            // 🔥 防重：先查当前状态，已取消就直接退出
+            // 防重：先查当前状态，已取消就直接退出
             // ============================================================
             const { data: currentCourse } = await supabase
                 .from('courses_v2')
@@ -2811,13 +2900,26 @@ async function confirmCancelReason() {
                 await refundStudentCredit(sid, dur, category);
             }
 
-            try { await sendCourseEmailNotification(id, 'cancel'); } catch (e) {}
+            // 3) 发邮件（状态已 cancelled，但 overrideCourse 可以传原 course）
+            try {
+                emailResult = await sendCourseEmailNotification(id, 'cancel');
+            } catch (e) {
+                console.warn('⚠️ 取消邮件失败:', e.message);
+            }
         }
 
         closeModal('cancelReasonModal');
         closeModal('courseModal');
         await loadAllData();
-        showToast('Cours annulé ✓', 'success');
+
+        // 邮件结果提示
+        if (emailResult?.sentCount > 0) {
+            showToast(`Cours annulé ✓ — 📧 ${emailResult.sentCount} 封邮件已发送`, 'success');
+        } else if (emailResult?.skipped) {
+            showToast('Cours annulé ✓ — ⚠️ 邮件未发送（无邮箱）', 'warning');
+        } else {
+            showToast('Cours annulé ✓', 'success');
+        }
         pendingCancelData = null;
     } catch (err) {
         showToast('Erreur: ' + err.message, 'error');
@@ -2858,7 +2960,7 @@ async function confirmDeleteCourse() {
         const supabase = window.supabaseAuth.getSupabaseClient();
 
         // ============================================================
-        // 🔥 先拿学生列表（删课程后 course_students 会被级联删）
+        // 1. 先拿学生列表（删课程后 course_students 会被级联删）
         // ============================================================
         const { data: csList } = await supabase
             .from('course_students')
@@ -2868,7 +2970,17 @@ async function confirmDeleteCourse() {
         const dur = course?.duration || 2;
 
         // ============================================================
-        // 🔥 先删课程（成功后再退 credit，避免删除失败时 credit 丢失）
+        // 2. 🔥 删除前：先发邮件（用 course 快照，因为马上要删了）
+        // ============================================================
+        let emailResult = null;
+        try {
+            emailResult = await sendCourseEmailNotification(id, 'delete', course);
+        } catch (e) {
+            console.warn('⚠️ 删除前邮件发送失败:', e.message);
+        }
+
+        // ============================================================
+        // 3. 删除课程
         // ============================================================
         const { error: delErr } = await supabase
             .from('courses_v2')
@@ -2877,7 +2989,7 @@ async function confirmDeleteCourse() {
         if (delErr) throw delErr;
 
         // ============================================================
-        // 删除成功后：退 credit
+        // 4. 删除成功后：退 credit
         // ============================================================
         for (const sid of ids) {
             try {
@@ -2887,13 +2999,15 @@ async function confirmDeleteCourse() {
             }
         }
 
-        // 邮件通知
-        try { await sendCourseEmailNotification(id, 'cancel'); } catch (e) {}
-
         document.getElementById('deleteConfirmOverlay').classList.remove('active');
         pendingDeleteCourse = { id: null, category: null };
         await loadAllData();
-        showToast('Cours supprimé ✓', 'success');
+
+        if (emailResult?.sentCount > 0) {
+            showToast(`Cours supprimé ✓ — 📧 ${emailResult.sentCount} 封邮件已发送`, 'success');
+        } else {
+            showToast('Cours supprimé ✓', 'success');
+        }
     } catch (err) {
         showToast('Erreur: ' + err.message, 'error');
     } finally {
