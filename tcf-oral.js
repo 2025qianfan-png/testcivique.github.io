@@ -1,5 +1,5 @@
 // ============================================================
-// TCF IRN 口语训练系统
+// TCF IRN 口语训练系统 v4 — 真人考官 + AI 自由开场
 // ============================================================
 
 let currentUser = null;
@@ -8,15 +8,27 @@ let currentTaskInfo = null;
 let allTopics = [];
 let selectedTopic = null;
 let selectedSamples = [];
-let chatMessages = [];      // [{role: 'user'|'ai', text}]
+let chatMessages = [];
 let mediaRecorder = null;
 let audioChunks = [];
 let isRecording = false;
 let practiceStartTime = null;
 let isProcessing = false;
+let ttsUnlocked = false;
+let currentExaminer = null;
+
+// 计时
+let timerInterval = null;
+let timerSeconds = 0;
+
+// 沉默检测
+let audioCtx = null;
+let silenceCheckInterval = null;
+let silenceTimer = null;
+let hasSpoken = false;
 
 // ============================================================
-// TOKEN / 用户
+// TOKEN
 // ============================================================
 function getToken() {
     const params = new URLSearchParams(window.location.search);
@@ -38,7 +50,7 @@ function verifyUser() {
 }
 
 // ============================================================
-// UI 工具
+// UI
 // ============================================================
 function showToast(msg, type = 'info') {
     let c = document.getElementById('toastContainer');
@@ -65,6 +77,106 @@ function hideLoading() {
 }
 
 // ============================================================
+// TTS
+// ============================================================
+function unlockTTS() {
+    if (!('speechSynthesis' in window)) return;
+    if (ttsUnlocked) return;
+    try {
+        const u = new SpeechSynthesisUtterance(' ');
+        u.volume = 0;
+        u.lang = 'fr-FR';
+        window.speechSynthesis.speak(u);
+        setTimeout(() => window.speechSynthesis.cancel(), 100);
+        ttsUnlocked = true;
+    } catch (e) {}
+}
+
+function speakFrench(text, examiner) {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+
+    const doSpeak = () => {
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'fr-FR';
+        u.rate = 0.92;
+        u.pitch = 1.0;
+        u.volume = 1.0;
+
+        const voices = window.speechSynthesis.getVoices();
+        const frVoices = voices.filter(v => v.lang.startsWith('fr'));
+        let chosen = null;
+
+        if (examiner && examiner.gender) {
+            const femaleHints = ['amelie', 'amélie', 'audrey', 'marie', 'julie', 'celine', 'céline', 'aurelie', 'aurélie', 'female', 'woman'];
+            const maleHints = ['thomas', 'daniel', 'alex', 'male', 'man', 'guillaume', 'henri'];
+
+            if (examiner.gender === 'F') {
+                chosen = frVoices.find(v => femaleHints.some(h => v.name.toLowerCase().includes(h)));
+                if (!chosen) u.pitch = 1.12;
+            } else {
+                chosen = frVoices.find(v => maleHints.some(h => v.name.toLowerCase().includes(h)));
+                if (!chosen) u.pitch = 0.88;
+            }
+        }
+
+        if (!chosen) chosen = frVoices.find(v => v.lang === 'fr-FR') || frVoices[0];
+        if (chosen) u.voice = chosen;
+
+        window.speechSynthesis.speak(u);
+    };
+
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length === 0) {
+        window.speechSynthesis.onvoiceschanged = () => {
+            window.speechSynthesis.onvoiceschanged = null;
+            doSpeak();
+        };
+        setTimeout(() => {
+            if (!window.speechSynthesis.speaking) {
+                window.speechSynthesis.onvoiceschanged = null;
+                doSpeak();
+            }
+        }, 700);
+    } else {
+        doSpeak();
+    }
+}
+
+// ============================================================
+// 计时
+// ============================================================
+function startTimer(taskCode) {
+    stopTimer();
+    const durations = { 'tache1': 180, 'tache2': 210, 'tache3': 210 };
+    const max = durations[taskCode] || 180;
+    timerSeconds = 0;
+    const bar = document.getElementById('timerBar');
+    if (bar) bar.style.display = 'flex';
+    const tEl = document.getElementById('timerTask');
+    if (tEl) tEl.textContent = 'Tâche ' + taskCode.slice(-1);
+
+    timerInterval = setInterval(() => {
+        timerSeconds++;
+        const m = Math.floor(timerSeconds / 60);
+        const s = timerSeconds % 60;
+        const tEl2 = document.getElementById('timerText');
+        if (tEl2) tEl2.textContent = m + ':' + String(s).padStart(2, '0');
+        const barEl = document.getElementById('timerBar');
+        if (barEl) {
+            barEl.classList.toggle('over', timerSeconds >= max);
+            barEl.classList.toggle('warning', timerSeconds >= max - 30 && timerSeconds < max);
+        }
+    }, 1000);
+}
+function stopTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+    const bar = document.getElementById('timerBar');
+    if (bar) { bar.classList.remove('warning', 'over'); bar.style.display = 'none'; }
+}
+
+// ============================================================
 // 初始化
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
@@ -73,18 +185,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentUser = user;
     document.getElementById('userName').textContent = user.name || 'Élève';
 
-    // 等 supabase 就绪
     let retries = 0;
     while (!window.supabaseAuth && retries < 20) {
         await new Promise(r => setTimeout(r, 200));
         retries++;
     }
 
+    if ('speechSynthesis' in window) window.speechSynthesis.getVoices();
+
     await loadTask('tache1');
 
-    // 绑定麦克风
     document.getElementById('micBtn').addEventListener('click', startRecording);
     document.getElementById('stopBtn').addEventListener('click', stopRecording);
+    document.body.addEventListener('click', () => unlockTTS());
 });
 
 // ============================================================
@@ -95,12 +208,11 @@ async function switchTask(task) {
     currentTask = task;
     selectedTopic = null;
     chatMessages = [];
+    currentExaminer = null;
     renderChat();
-
     document.querySelectorAll('.oral-tab').forEach(t => {
         t.classList.toggle('active', t.dataset.task === task);
     });
-
     await loadTask(task);
 }
 window.switchTask = switchTask;
@@ -110,12 +222,8 @@ async function loadTask(task) {
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
 
-        // Task info
         const { data: taskData } = await supabase
-            .from('tcf_oral_tasks')
-            .select('*')
-            .eq('task_code', task)
-            .single();
+            .from('tcf_oral_tasks').select('*').eq('task_code', task).single();
 
         currentTaskInfo = taskData;
         if (taskData) {
@@ -125,17 +233,12 @@ async function loadTask(task) {
             document.getElementById('taskFramework').textContent = taskData.framework_fr || '—';
         }
 
-        // Topics
         const { data: topics } = await supabase
-            .from('tcf_oral_topics')
-            .select('*')
-            .eq('task_code', task)
-            .order('sort_order');
+            .from('tcf_oral_topics').select('*').eq('task_code', task).order('sort_order');
 
         allTopics = topics || [];
         renderTopics();
 
-        // 自动选第一个
         if (allTopics.length > 0) {
             await selectTopic(allTopics[0].id);
         }
@@ -156,15 +259,12 @@ function renderTopics() {
         container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>Aucun sujet</p></div>';
         return;
     }
-
-    // 按 category 分组
     const groups = {};
     allTopics.forEach(t => {
         const key = t.category_fr;
-        if (!groups[key]) groups[key] = { fr: t.category_fr, zh: t.category_zh, items: [] };
+        if (!groups[key]) groups[key] = { fr: t.category_fr, items: [] };
         groups[key].items.push(t);
     });
-
     let html = '';
     for (const key in groups) {
         const g = groups[key];
@@ -181,7 +281,6 @@ function renderTopics() {
     }
     container.innerHTML = html;
 }
-
 function toggleCategory(el) {
     el.classList.toggle('collapsed');
     el.nextElementSibling.classList.toggle('collapsed');
@@ -189,32 +288,28 @@ function toggleCategory(el) {
 window.toggleCategory = toggleCategory;
 
 // ============================================================
-// 选择题目
+// 选择题目 → 考官开场
 // ============================================================
 async function selectTopic(topicId) {
     const topic = allTopics.find(t => t.id === topicId);
     if (!topic) return;
-
     selectedTopic = topic;
 
-    // 高亮
     document.querySelectorAll('.topic-item').forEach(el => {
         el.classList.toggle('active', parseInt(el.dataset.id) === topicId);
     });
 
-    // 清空对话
     chatMessages = [];
+    currentExaminer = null;
     renderChat();
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    practiceStartTime = null;
 
     showLoading('Chargement...');
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         const { data: samples } = await supabase
-            .from('tcf_oral_samples')
-            .select('*')
-            .eq('topic_id', topicId)
-            .order('sort_order');
-
+            .from('tcf_oral_samples').select('*').eq('topic_id', topicId).order('sort_order');
         selectedSamples = samples || [];
         renderDetail();
     } catch (e) {
@@ -222,26 +317,87 @@ async function selectTopic(topicId) {
     } finally {
         hideLoading();
     }
+
+    startExaminerOpening();
+    startTimer(currentTask);
 }
 window.selectTopic = selectTopic;
 
+// ============================================================
+// 考官开场（只用 AI 生成，不用数据库死模板）
+// ============================================================
+async function startExaminerOpening() {
+    const statusEl = document.getElementById('status');
+    statusEl.textContent = '🤖 L\'examinateur vous parle...';
+
+    try {
+        const scenarioFr = selectedTopic.scenario_fr || '';
+
+        const result = await window.supabaseAuth.examinerReplyOral(
+            currentTask,
+            selectedTopic.prompt_fr,
+            selectedTopic.title_fr,
+            scenarioFr,
+            '',
+            []
+        );
+
+        // 兼容旧版 string / 新版 {content, examiner}
+        const raw = (typeof result === 'string') ? result : (result.content || '');
+        const examiner = (typeof result === 'string') ? null : result.examiner;
+
+        currentExaminer = examiner;
+
+        const { mood, text } = parseMood(raw);
+
+        if (!text || text.trim().length < 5) {
+            throw new Error('Réponse IA vide');
+        }
+
+        chatMessages.push({ role: 'ai', text, mood });
+        renderChat();
+        speakFrench(text, examiner);
+        statusEl.textContent = '🎤 À vous de répondre. Appuyez sur le micro.';
+    } catch (e) {
+        console.error('Erreur opening:', e);
+        statusEl.textContent = '❌ Erreur: ' + e.message;
+        showToast('Erreur: ' + e.message, 'error');
+    }
+}
+
+function parseMood(raw) {
+    const m = raw.match(/^\[MOOD:(\w+)\]\s*/);
+    if (m) return { mood: m[1], text: raw.replace(/^\[MOOD:\w+\]\s*/, '').trim() };
+    return { mood: 'neutral', text: raw.trim() };
+}
+
+// ============================================================
+// 渲染题目详情
+// ============================================================
 function renderDetail() {
     const container = document.getElementById('detailPanel');
     if (!selectedTopic) {
         container.innerHTML = '<div class="empty-state"><i class="fas fa-hand-pointer"></i><p>Sélectionnez un sujet</p></div>';
         return;
     }
-
     let html = '';
 
-    // Prompt
+    if (selectedTopic.scenario_fr) {
+        html += '<div class="detail-scenario">';
+        html += '<div class="detail-prompt-label">🎭 Scénario</div>';
+        html += '<div class="detail-scenario-fr">' + escapeHtml(selectedTopic.scenario_fr) + '</div>';
+        if (selectedTopic.scenario_zh) {
+            html += '<div class="detail-scenario-zh">' + escapeHtml(selectedTopic.scenario_zh) + '</div>';
+        }
+        html += '</div>';
+    }
+
     html += '<div class="detail-prompt">';
-    html += '<div class="detail-prompt-label">📌 Question de l\'examinateur</div>';
+    html += '<div class="detail-prompt-label">📌 ' + (currentTask === 'tache2' ? 'Votre mission' : 'Question de l\'examinateur') + '</div>';
     html += '<div class="detail-prompt-fr">« ' + escapeHtml(selectedTopic.prompt_fr) + ' »</div>';
     html += '<div class="detail-prompt-zh">' + escapeHtml(selectedTopic.prompt_zh) + '</div>';
     html += '</div>';
 
-    // Focus
     if (selectedTopic.examiner_focus_fr) {
         html += '<div class="detail-focus">';
         html += '<i class="fas fa-bullseye"></i> <strong>Ce que l\'examinateur cherche :</strong><br>';
@@ -252,7 +408,6 @@ function renderDetail() {
         html += '</div>';
     }
 
-    // Samples
     html += '<div class="detail-samples">';
     const levelOrder = { 'A2': 1, 'B1': 2, 'B2': 3 };
     selectedSamples.sort((a, b) => (levelOrder[a.level] || 99) - (levelOrder[b.level] || 99));
@@ -272,30 +427,52 @@ function renderDetail() {
         html += '</div>';
     });
     html += '</div>';
-
     container.innerHTML = html;
 }
 
 // ============================================================
-// 麦克风 / 录音
+// 录音
 // ============================================================
 async function startRecording() {
+    unlockTTS();
     if (!selectedTopic) { showToast('Sélectionnez un sujet d\'abord', 'warning'); return; }
     if (isProcessing) return;
 
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm'
+                       : MediaRecorder.isTypeSupported('audio/mp4')  ? 'audio/mp4' : '';
+        mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
         audioChunks = [];
+        hasSpoken = false;
 
-        mediaRecorder.ondataavailable = e => {
-            if (e.data.size > 0) audioChunks.push(e.data);
-        };
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
         mediaRecorder.onstop = async () => {
-            const blob = new Blob(audioChunks, { type: 'audio/webm' });
+            const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
             stream.getTracks().forEach(t => t.stop());
+            cleanupAudioDetection();
             await processAudio(blob);
         };
+
+        // 沉默检测
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioCtx.createAnalyser();
+            const source = audioCtx.createMediaStreamSource(stream);
+            source.connect(analyser);
+            const arr = new Uint8Array(analyser.frequencyBinCount);
+            silenceCheckInterval = setInterval(() => {
+                analyser.getByteFrequencyData(arr);
+                const avg = arr.reduce((a, b) => a + b, 0) / arr.length;
+                if (avg > 15) hasSpoken = true;
+            }, 200);
+
+            silenceTimer = setTimeout(() => {
+                if (!hasSpoken) {
+                    document.getElementById('status').textContent = '🤫 L\'examinateur attend votre réponse...';
+                }
+            }, 5000);
+        } catch (e) { /* 有些浏览器不支持 AudioContext */ }
 
         mediaRecorder.start();
         isRecording = true;
@@ -310,6 +487,15 @@ async function startRecording() {
     }
 }
 
+function cleanupAudioDetection() {
+    if (silenceCheckInterval) clearInterval(silenceCheckInterval);
+    if (silenceTimer) clearTimeout(silenceTimer);
+    if (audioCtx) audioCtx.close().catch(() => {});
+    silenceCheckInterval = null;
+    silenceTimer = null;
+    audioCtx = null;
+}
+
 function stopRecording() {
     if (mediaRecorder && isRecording) {
         mediaRecorder.stop();
@@ -321,39 +507,34 @@ function stopRecording() {
 }
 
 // ============================================================
-// 处理音频：Whisper → 考官 LLM
+// 处理音频
 // ============================================================
 async function processAudio(blob) {
     isProcessing = true;
     try {
-        // 1. Whisper 转文字
         const userText = await window.supabaseAuth.transcribeAudioOral(blob);
-
         if (!userText || userText.trim().length < 2) {
             document.getElementById('status').textContent = '❌ Aucune parole détectée';
             isProcessing = false;
             return;
         }
 
-        // 加入对话
         chatMessages.push({ role: 'user', text: userText });
         renderChat();
 
-        // 2. 考官回应
         document.getElementById('status').textContent = '🤖 L\'examinateur répond...';
-        const aiReply = await window.supabaseAuth.examinerReplyOral(
-            currentTask,
-            selectedTopic.prompt_fr,
-            chatMessages
+        const result = await window.supabaseAuth.examinerReplyOral(
+            currentTask, selectedTopic.prompt_fr, selectedTopic.title_fr,
+            selectedTopic.scenario_fr || '', '', chatMessages
         );
 
-        chatMessages.push({ role: 'ai', text: aiReply });
+        const raw = (typeof result === 'string') ? result : (result.content || '');
+        const { mood, text } = parseMood(raw);
+
+        chatMessages.push({ role: 'ai', text, mood });
         renderChat();
-
-        // 3. TTS 朗读
-        speakFrench(aiReply);
-
-        document.getElementById('status').textContent = '✅ Prêt';
+        speakFrench(text, currentExaminer);
+        document.getElementById('status').textContent = '🎤 À vous. Appuyez sur le micro.';
     } catch (e) {
         console.error(e);
         document.getElementById('status').textContent = '❌ ' + e.message;
@@ -369,58 +550,46 @@ async function processAudio(blob) {
 function renderChat() {
     const box = document.getElementById('chatHistory');
     if (chatMessages.length === 0) {
-        box.innerHTML = '<div class="chat-empty"><i class="fas fa-comments"></i><p>Appuyez sur le micro pour commencer</p></div>';
+        box.innerHTML = '<div class="chat-empty"><i class="fas fa-comments"></i><p>L\'examinateur va commencer...</p></div>';
         return;
     }
     let html = '';
-    chatMessages.forEach(m => {
+    chatMessages.forEach((m, i) => {
         const cls = m.role === 'user' ? 'user' : 'ai';
+        const mood = m.mood ? ' mood-' + m.mood : '';
         const label = m.role === 'user' ? 'Vous' : 'Examinateur';
-        html += '<div class="chat-message ' + cls + '">';
+        html += '<div class="chat-message ' + cls + mood + '">';
         html += '<span class="msg-label">' + label + '</span>';
-        html += escapeHtml(m.text);
+        html += '<span class="msg-text">' + escapeHtml(m.text) + '</span>';
+        if (m.role === 'ai') {
+            html += '<button class="replay-btn" onclick="replayMessage(' + i + ')" title="Réécouter">🔊</button>';
+        }
         html += '</div>';
     });
     box.innerHTML = html;
     box.scrollTop = box.scrollHeight;
 }
 
-// ============================================================
-// TTS
-// ============================================================
-function speakFrench(text) {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'fr-FR';
-    u.rate = 0.95;
-    u.pitch = 1.0;
-    const voices = window.speechSynthesis.getVoices();
-    const fr = voices.find(v => v.lang.startsWith('fr'));
-    if (fr) u.voice = fr;
-    window.speechSynthesis.speak(u);
+function replayMessage(index) {
+    const msg = chatMessages[index];
+    if (msg && msg.role === 'ai') { unlockTTS(); speakFrench(msg.text, currentExaminer); }
 }
+window.replayMessage = replayMessage;
 
 // ============================================================
 // 结束 & 评分
 // ============================================================
 async function endPractice() {
-    if (chatMessages.length === 0) {
-        showToast('Parlez d\'abord avant d\'évaluer', 'warning');
-        return;
-    }
+    const userCount = chatMessages.filter(m => m.role === 'user').length;
+    if (userCount === 0) { showToast('Parlez d\'abord avant d\'évaluer', 'warning'); return; }
 
+    stopTimer();
     showLoading('Évaluation en cours...');
     try {
         const duration = practiceStartTime ? Math.round((Date.now() - practiceStartTime) / 1000) : 0;
         const result = await window.supabaseAuth.evaluateOralAnswer(
-            currentTask,
-            selectedTopic.prompt_fr,
-            chatMessages,
-            duration
+            currentTask, selectedTopic.prompt_fr, chatMessages, duration
         );
-
-        // 保存历史
         try {
             const supabase = window.supabaseAuth.getSupabaseClient();
             await supabase.from('tcf_oral_practice').insert([{
@@ -436,7 +605,6 @@ async function endPractice() {
                 duration_seconds: duration
             }]);
         } catch (e) { console.warn('历史保存失败', e); }
-
         showReport(result);
     } catch (e) {
         console.error(e);
@@ -448,7 +616,16 @@ async function endPractice() {
 window.endPractice = endPractice;
 
 function showReport(result) {
-    document.getElementById('reportScore').textContent = (result.score !== null ? result.score : '—') + ' / 20';
+    const score = result.score !== null ? result.score : 0;
+    const scoreEl = document.getElementById('reportScore');
+    scoreEl.textContent = (result.score !== null ? result.score : '—') + ' / 20';
+
+    let color = '#27ae60';       // B2 (10-20) 绿
+    if (score <= 1) color = '#e74c3c';        // A1
+    else if (score <= 5) color = '#e67e22';   // A2
+    else if (score <= 9) color = '#f39c12';   // B1
+    scoreEl.style.color = color;
+
     document.getElementById('reportLevel').textContent = result.level || '—';
     document.getElementById('reportBody').innerHTML = escapeHtml(result.feedback || '').replace(/\n/g, '<br>');
     document.getElementById('reportModal').classList.add('show');
@@ -469,19 +646,17 @@ function resetPractice() {
     if (chatMessages.length > 0 && !confirm('Effacer la conversation ?')) return;
     chatMessages = [];
     practiceStartTime = null;
+    currentExaminer = null;
     renderChat();
-    document.getElementById('status').textContent = '';
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    stopTimer();
+    if (selectedTopic) {
+        startExaminerOpening();
+        startTimer(currentTask);
+    }
 }
 window.resetPractice = resetPractice;
 
-function closeHistory() {
-    document.getElementById('historyModal').classList.remove('show');
-}
-window.closeHistory = closeHistory;
-
-// 点遮罩关闭
 document.querySelectorAll('.modal').forEach(m => {
-    m.addEventListener('click', e => {
-        if (e.target === m) m.classList.remove('show');
-    });
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
 });

@@ -2457,7 +2457,7 @@ async function transcribeAudioOral(audioBlob) {
 /**
  * 考官对话回复
  */
-async function examinerReplyOral(taskCode, topicPrompt, history) {
+async function examinerReplyOral(taskCode, topicPrompt, topicTitle, scenarioFr, openingLine, history) {
     var supabase = getSupabaseClient();
     var { data } = await supabase
         .from('app_config')
@@ -2467,23 +2467,207 @@ async function examinerReplyOral(taskCode, topicPrompt, history) {
 
     if (!data || !data.value) throw new Error('Clé API orale non configurée');
 
-    // 构造对话
-    var messages = [{ role: 'system', content: ORAL_SYSTEM_PROMPT }];
+    var messages = [];
+    var isOpening = (history.length === 0);
+
+    // ============================================================
+    // 0. 随机考官身份
+    // ============================================================
+    var EXAMINER_POOL = [
+        { name: 'Monsieur Leroy',   gender: 'M' },
+        { name: 'Madame Martin',    gender: 'F' },
+        { name: 'Monsieur Dubois',  gender: 'M' },
+        { name: 'Madame Bernard',   gender: 'F' },
+        { name: 'Monsieur Moreau',  gender: 'M' },
+        { name: 'Madame Petit',     gender: 'F' },
+        { name: 'Monsieur Laurent', gender: 'M' },
+        { name: 'Madame Rousseau',  gender: 'F' },
+        { name: 'Monsieur Garnier', gender: 'M' },
+        { name: 'Madame Fontaine',  gender: 'F' }
+    ];
+    var examiner = EXAMINER_POOL[Math.floor(Math.random() * EXAMINER_POOL.length)];
+    var genderWord = (examiner.gender === 'F') ? 'examinatrice' : 'examinateur';
+
+    // ============================================================
+    // 1. System prompt
+    // ============================================================
     messages.push({
         role: 'system',
-        content: 'Tâche en cours: ' + taskCode + '\nSujet: ' + topicPrompt + '\n\n' +
-                 'Pose des questions courtes et naturelles (1-2 phrases max). ' +
-                 'Rebondis sur ce que dit le candidat pour approfondir. ' +
-                 'Ne corrige pas. Ne donne pas de conseil.'
+        content:
+            'Tu es un examinateur RÉEL du TCF IRN (France Éducation International). ' +
+            'Tu fais passer l\'épreuve orale à un candidat. Tu parles français naturellement.\n\n' +
+
+            '═══════════════════════════\n' +
+            '🪪 TON IDENTITÉ\n' +
+            '═══════════════════════════\n' +
+            'Nom : ' + examiner.name + '\n' +
+            'Désignation : ' + genderWord + '\n' +
+            '⚠️ Utilise EXACTEMENT ce nom. JAMAIS « examinateuse » (mot inexistant).\n' +
+            '⚠️ Tu ne changes JAMAIS de nom pendant la session.\n' +
+            '⚠️ Tu ne révèles jamais que tu es une IA.\n\n' +
+
+            '═══════════════════════════\n' +
+            '🚫 RÈGLE ANTI-RÉPÉTITION (TRÈS IMPORTANTE)\n' +
+            '═══════════════════════════\n' +
+            'Tu ne dois JAMAIS répéter un marqueur oral dans la même réponse.\n' +
+            '- Marqueurs concernés : « Bon », « Alors », « Voilà », « Heu », « Hmm », « D\'accord »\n' +
+            '- Maximum 2 marqueurs au TOTAL par réponse (pas 3, pas 4)\n' +
+            '- Si tu utilises « Voilà » une fois, tu ne le remets JAMAIS\n' +
+            '- Si tu utilises « Bon » au début, tu ne le remets pas au milieu ou à la fin\n\n' +
+            '❌ EXEMPLE INTERDIT :\n' +
+            '« Bon... alors... Voilà. Moi c\'est M. Leroy. Bon... Voilà, on commence. Alors... »\n' +
+            '(Trop de Bon / Alors / Voilà → ça fait robot)\n\n' +
+            '✅ BON STYLE :\n' +
+            '« Bonjour. Moi c\'est M. Leroy, votre examinateur. On va commencer par la Tâche 1. Pouvez-vous me dire vos prénom et nom ? »\n' +
+            '(Aucun marqueur, propre, naturel)\n\n' +
+
+            '═══════════════════════════\n' +
+            '🗣️ STYLE HUMAIN (mais sobre)\n' +
+            '═══════════════════════════\n' +
+            '- Tu peux utiliser UN marqueur par réponse maximum (« Bon », « Alors », « Voilà »...)\n' +
+            '- Le reste de la phrase est normal, fluide\n' +
+            '- Les vrais humains ne bégayent pas à chaque phrase\n' +
+            '- Sois chaleureux mais professionnel\n\n' +
+
+            '═══════════════════════════\n' +
+            '🚫 PHRASES INTERDITES (jamais)\n' +
+            '═══════════════════════════\n' +
+            '- ❌ « Je vous fais confiance » (rôle de coach, pas d\'examinateur)\n' +
+            '- ❌ « Vous allez bien vous en sortir »\n' +
+            '- ❌ « Vous parlez comme à un ami »\n' +
+            '- ❌ « On ne compte pas la montre »\n' +
+            '- ❌ « Ne soyez pas stressé(e) » (cliché)\n' +
+            '- ❌ « C\'est facile » / « C\'est simple »\n' +
+            '- ❌ Toute promesse de réussite ou d\'échec\n\n' +
+
+            '═══════════════════════════\n' +
+            '🎯 STRATÉGIE DE QUESTIONNEMENT\n' +
+            '═══════════════════════════\n' +
+            'Quand le candidat parle, tu peux :\n' +
+            '1. Demander un DÉTAIL : « Quel genre ? » / « Depuis quand ? »\n' +
+            '2. Demander un EXEMPLE : « Vous pouvez me donner un exemple ? »\n' +
+            '3. Demander une ÉMOTION : « Comment vous sentez-vous ? »\n' +
+            '4. Demander une COMPARAISON : « Est-ce différent de votre pays ? »\n' +
+            '5. REFORMULER : « Si je comprends bien, ... ? »\n\n' +
+
+            '═══════════════════════════\n' +
+            '📝 FORMAT\n' +
+            '═══════════════════════════\n' +
+            'Commence par [MOOD:green] / [MOOD:neutral] / [MOOD:probe], puis ta réponse en français.'
     });
 
-    history.forEach(m => {
+    // ============================================================
+    // 2. 场景 + 角色
+    // ============================================================
+    var scenarioBlock =
+        '📋 TÂCHE : ' + taskCode + '\n' +
+        '📌 SUJET : ' + topicTitle + ' — « ' + topicPrompt + ' »\n\n' +
+        '🎭 SCÉNARIO : ' + (scenarioFr || 'Entretien oral TCF IRN.') + '\n\n';
+
+    if (taskCode === 'tache1') {
+        scenarioBlock +=
+            '🎯 RÔLE (Entretien dirigé, 3 minutes) :\n' +
+            '- Tu poses UNE seule question à la fois.\n' +
+            '- Tu écoutes, puis tu REBONDIS sur un détail précis.\n' +
+            '- Tu ne passes PAS au thème suivant tant que le candidat n\'a pas développé.\n' +
+            '- Ne pose JAMAIS deux questions d\'un coup.';
+    } else if (taskCode === 'tache2') {
+        scenarioBlock +=
+            '🎯 RÔLE (Exercice en interaction, 3min30) :\n' +
+            '- Tu joues le rôle décrit dans le scénario.\n' +
+            '- Le candidat doit TE POSER des questions.\n' +
+            '- Tu réponds naturellement et brièvement.';
+    } else {
+        scenarioBlock +=
+            '🎯 RÔLE (Expression argumentée, 3min30) :\n' +
+            '- Tu écoutes l\'opinion du candidat.\n' +
+            '- Tu poses UNE question pour l\'AIDER à DÉVELOPPER.\n' +
+            '- Tu restes bienveillant.';
+    }
+
+    messages.push({ role: 'system', content: scenarioBlock });
+
+    // ============================================================
+    // 3. 首轮 vs 后续
+    // ============================================================
+    if (isOpening) {
+        var openingContext = '';
+
+        if (taskCode === 'tache1') {
+            openingContext =
+                '🎬 PREMIÈRE INTERVENTION — Tu accueilles le candidat.\n\n' +
+                '📋 CONTENU (dans cet ordre, avec tes propres mots) :\n\n' +
+                '1. SALUTATION brève (1 phrase) — ex : « Bonjour ! Entrez, asseyez-vous. »\n\n' +
+                '2. PRÉSENTATION personnelle (1 phrase) — ex : « Moi c\'est ' + examiner.name + ', je suis votre ' + genderWord + '. »\n\n' +
+                '3. PRÉSENTATION de l\'épreuve (1-2 phrases) — dis que ça dure environ 10 minutes, en 3 tâches\n\n' +
+                '4. PRÉSENTATION de la Tâche 1 (1 phrase) — dis « entretien dirigé d\'environ 3 minutes »\n\n' +
+                '5. INSTRUCTION au candidat (1 phrase) — ex : « Répondez naturellement, en développant un peu. »\n\n' +
+                '6. PREMIÈRE QUESTION (1 phrase) — « Pouvez-vous me donner vos prénom et nom, s\'il vous plaît ? »\n\n' +
+
+                '⏱️ DURÉES EXACTES :\n' +
+                '- Tâche 1 : 3 minutes\n' +
+                '- Tâche 2 : 3 minutes 30\n' +
+                '- Tâche 3 : 3 minutes 30\n' +
+                '⚠️ NE DIS PAS que les 3 tâches durent toutes 3min30.\n\n' +
+
+                '✍️ STYLE :\n' +
+                '- Longueur : 6 à 8 phrases (PAS plus)\n' +
+                '- UN SEUL marqueur oral maximum (« Bon », « Alors » ou « Voilà »)\n' +
+                '- Aucune phrase interdite (voir liste)\n' +
+                '- Simple, clair, professionnel';
+        } else if (taskCode === 'tache2') {
+            openingContext =
+                '🎬 PREMIÈRE INTERVENTION — Tu commences la Tâche 2 (jeu de rôle).\n\n' +
+                '📋 CONTENU :\n\n' +
+                '1. TRANSITION (1 phrase) — ex : « On passe maintenant à la Tâche 2. »\n\n' +
+                '2. RAPPEL (1 phrase) — ex : « Cette fois, c\'est vous qui posez les questions. »\n\n' +
+                '3. SCÉNARIO (1-2 phrases) — « Voilà la situation : ' + (scenarioFr || '...') + ' »\n\n' +
+                '4. LANCEMENT (1 phrase) — ex : « Allez-y, je vous écoute. »\n\n' +
+
+                '✍️ STYLE :\n' +
+                '- Longueur : 4 à 6 phrases\n' +
+                '- UN SEUL marqueur oral maximum\n' +
+                '- Naturel, pas formel';
+        } else {
+            openingContext =
+                '🎬 PREMIÈRE INTERVENTION — Tu commences la Tâche 3 (opinion argumentée).\n\n' +
+                '📋 CONTENU :\n\n' +
+                '1. TRANSITION (1 phrase) — ex : « On passe à la dernière tâche. »\n\n' +
+                '2. RAPPEL (1-2 phrases) — « Je vais vous donner un sujet. Vous me donnerez votre opinion, avec des exemples. »\n\n' +
+                '3. INTRODUCTION DU SUJET (1 phrase) — « Voici le sujet : « ' + topicPrompt + ' » »\n\n' +
+                '4. LANCEMENT (1 phrase) — « Qu\'en pensez-vous ? »\n\n' +
+
+                '✍️ STYLE :\n' +
+                '- Longueur : 5 à 7 phrases\n' +
+                '- UN SEUL marqueur oral maximum\n' +
+                '- Naturel, engageant';
+        }
+
         messages.push({
-            role: m.role === 'user' ? 'user' : 'assistant',
-            content: m.text
+            role: 'user',
+            content:
+                '[DÉBUT DE L\'ENTRETIEN]\n\n' +
+                openingContext + '\n\n' +
+                '⚠️ Génère ta première intervention. ' +
+                'Rappel :\n' +
+                '- UN SEUL marqueur oral maximum (« Bon », « Alors » ou « Voilà », pas les trois)\n' +
+                '- Aucune phrase interdite\n' +
+                '- Nom exact : ' + examiner.name + '\n' +
+                '- Désignation exacte : ' + genderWord + '\n\n' +
+                'Commence par [MOOD:neutral].'
         });
-    });
+    } else {
+        history.forEach(m => {
+            messages.push({
+                role: m.role === 'user' ? 'user' : 'assistant',
+                content: m.text
+            });
+        });
+    }
 
+    // ============================================================
+    // 4. API
+    // ============================================================
     var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -2493,16 +2677,29 @@ async function examinerReplyOral(taskCode, topicPrompt, history) {
         body: JSON.stringify({
             model: 'openai/gpt-oss-120b',
             messages: messages,
-            temperature: 0.7,
-            max_tokens: 300
+            temperature: isOpening ? 0.7 : 0.75,
+            max_tokens: isOpening ? 600 : 250
         })
     });
 
-    if (!res.ok) throw new Error('Réponse IA échouée: ' + res.status);
-    var json = await res.json();
-    return json.choices[0].message.content;
-}
+    if (!res.ok) {
+        var errText = '';
+        try {
+            var errJson = await res.json();
+            errText = (errJson.error && errJson.error.message) || JSON.stringify(errJson);
+        } catch (e) {
+            errText = await res.text().catch(function() { return ''; });
+        }
+        throw new Error('Réponse IA échouée (' + res.status + '): ' + errText);
+    }
 
+    var json = await res.json();
+
+    return {
+        content: json.choices[0].message.content,
+        examiner: examiner
+    };
+}
 
 /**
  * 评分
