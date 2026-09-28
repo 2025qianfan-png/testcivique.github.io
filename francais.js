@@ -644,6 +644,8 @@ function handleResourceClick(event, type) {
         window.location.href = `lecture.html?token=${encodeURIComponent(token)}`;
     } else if (type === 'listening') {
         window.location.href = `ecoute.html?token=${encodeURIComponent(token)}`;
+    }else if (type === 'speaking') {
+    window.location.href = `tcf-oral.html?token=${encodeURIComponent(token)}`;
     } else {
         window.location.href = `developpement.html?token=${encodeURIComponent(token)}&type=${type}`;
     }

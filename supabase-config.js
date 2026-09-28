@@ -2408,7 +2408,182 @@ async function getPreRegistrations() {
         return [];
     }
 }
+// ============================================================
+// 【模块十四】TCF IRN 口语训练
+// ============================================================
 
+var ORAL_SYSTEM_PROMPT = 
+    'Tu es un examinateur officiel du TCF IRN (France Éducation International). ' +
+    'Tu conduis un entretien oral en français avec un candidat qui prépare le TCF IRN. ' +
+    'Tu poses des questions naturelles, tu écoutes attentivement et tu réagis aux réponses du candidat. ' +
+    'Tu ne corriges pas pendant l\'entretien. Tu réponds toujours en français.';
+
+
+/**
+ * Whisper 转写（口语专用 key）
+ */
+async function transcribeAudioOral(audioBlob) {
+    var supabase = getSupabaseClient();
+    var { data } = await supabase
+        .from('app_config')
+        .select('value')
+        .eq('key', 'groq_api_key_oral')
+        .single();
+
+    if (!data || !data.value) throw new Error('Clé API orale non configurée');
+
+    var formData = new FormData();
+    formData.append('file', audioBlob, 'audio.webm');
+    formData.append('model', 'whisper-large-v3');
+    formData.append('language', 'fr');
+    formData.append('response_format', 'json');
+    formData.append('temperature', '0');
+
+    var res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + data.value },
+        body: formData
+    });
+
+    if (!res.ok) {
+        var err = await res.text();
+        throw new Error('Transcription échouée: ' + res.status);
+    }
+    var json = await res.json();
+    return json.text || '';
+}
+
+
+/**
+ * 考官对话回复
+ */
+async function examinerReplyOral(taskCode, topicPrompt, history) {
+    var supabase = getSupabaseClient();
+    var { data } = await supabase
+        .from('app_config')
+        .select('value')
+        .eq('key', 'groq_api_key_oral')
+        .single();
+
+    if (!data || !data.value) throw new Error('Clé API orale non configurée');
+
+    // 构造对话
+    var messages = [{ role: 'system', content: ORAL_SYSTEM_PROMPT }];
+    messages.push({
+        role: 'system',
+        content: 'Tâche en cours: ' + taskCode + '\nSujet: ' + topicPrompt + '\n\n' +
+                 'Pose des questions courtes et naturelles (1-2 phrases max). ' +
+                 'Rebondis sur ce que dit le candidat pour approfondir. ' +
+                 'Ne corrige pas. Ne donne pas de conseil.'
+    });
+
+    history.forEach(m => {
+        messages.push({
+            role: m.role === 'user' ? 'user' : 'assistant',
+            content: m.text
+        });
+    });
+
+    var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + data.value
+        },
+        body: JSON.stringify({
+            model: 'openai/gpt-oss-120b',
+            messages: messages,
+            temperature: 0.7,
+            max_tokens: 300
+        })
+    });
+
+    if (!res.ok) throw new Error('Réponse IA échouée: ' + res.status);
+    var json = await res.json();
+    return json.choices[0].message.content;
+}
+
+
+/**
+ * 评分
+ */
+async function evaluateOralAnswer(taskCode, topicPrompt, history, durationSec) {
+    var supabase = getSupabaseClient();
+    var { data } = await supabase
+        .from('app_config')
+        .select('value')
+        .eq('key', 'groq_api_key_oral')
+        .single();
+
+    if (!data || !data.value) throw new Error('Clé API orale non configurée');
+
+    var transcript = history.map(m =>
+        (m.role === 'user' ? 'CANDIDAT: ' : 'EXAMINATEUR: ') + m.text
+    ).join('\n');
+
+    var evalPrompt =
+        'Tu es correcteur officiel du TCF IRN. Évalue la performance orale du candidat ci-dessous.\n\n' +
+        '📌 Tâche : ' + taskCode + '\n' +
+        '📌 Sujet : ' + topicPrompt + '\n' +
+        '⏱️ Durée : ' + durationSec + ' secondes\n\n' +
+        '═══════════════════════════\n' +
+        '📊 CRITÈRES OFFICIELS TCF IRN (A1 → B2)\n' +
+        '═══════════════════════════\n' +
+        '1. Interaction : capacité à échanger, rebondir, clarifier\n' +
+        '2. Réponse à la tâche : respect de la consigne\n' +
+        '3. Développement : richesse et longueur des réponses\n' +
+        '4. Vocabulaire : étendue et précision\n' +
+        '5. Grammaire : contrôle des structures\n' +
+        '6. Prononciation : intelligibilité (déduite du transcript)\n' +
+        '7. Fluidité : continuité du discours\n\n' +
+        'Niveau maximum : B2 (pas de C1/C2 au TCF IRN).\n\n' +
+        '═══════════════════════════\n' +
+        '📝 FORMAT DE RÉPONSE\n' +
+        '═══════════════════════════\n\n' +
+        '📊 **Niveau CECRL estimé : [A1/A2/B1/B2]**\n' +
+        '**Note : X / 20** (A1=1-5, A2=6-9, B1=10-13, B2=14-17)\n\n' +
+        '✅ **Points forts**\n[2-3 points concrets]\n\n' +
+        '🔧 **Axes d\'amélioration**\n[2-3 points précis avec suggestions]\n\n' +
+        '💡 **Conseils TCF IRN**\n[2-3 conseils spécifiques]\n\n' +
+        '📄 **Exemple de réponse visée B2**\n[Une réponse modèle au sujet posé, niveau B2]\n\n' +
+        '---\n\n' +
+        'TRANSCRIPTION DE L\'ENTRETIEN :\n' + transcript;
+
+    var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + data.value
+        },
+        body: JSON.stringify({
+            model: 'openai/gpt-oss-120b',
+            messages: [
+                { role: 'system', content: 'Tu es correcteur officiel TCF IRN.' },
+                { role: 'user', content: evalPrompt }
+            ],
+            temperature: 0.3,
+            max_tokens: 2500
+        })
+    });
+
+    if (!res.ok) throw new Error('Évaluation échouée: ' + res.status);
+    var json = await res.json();
+    var feedback = json.choices[0].message.content;
+
+    // 解析 score / level
+    var score = null, level = null;
+    var sm = feedback.match(/Note\s*[:：]?\s*([\d.]+)\s*\/\s*(\d+)/);
+    if (sm) score = parseFloat(sm[1]);
+    var lm = feedback.match(/Niveau\s*(?:CECRL)?[^\n]*?([A-C][12])/i);
+    if (lm) level = lm[1].toUpperCase();
+
+    if (score === null && level) {
+        var fallback = { 'A1': 3, 'A2': 8, 'B1': 12, 'B2': 16 };
+        score = fallback[level] || null;
+    }
+
+    return { score: score, level: level, feedback: feedback };
+}
 // ============================================================
 // 导出到 window.supabaseAuth
 // ============================================================
@@ -2534,7 +2709,11 @@ window.supabaseAuth = {
     getListeningProgress: getListeningProgress,
 
     // 预注册
-    getPreRegistrations: getPreRegistrations
+    getPreRegistrations: getPreRegistrations,
+        // TCF IRN 口语
+    transcribeAudioOral: transcribeAudioOral,
+    examinerReplyOral: examinerReplyOral,
+    evaluateOralAnswer: evaluateOralAnswer
 };
 
 console.log('✅ Supabase 配置 v3 已加载');
