@@ -1849,34 +1849,100 @@ async function loadAllData() {
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
 
-        const [coursesRes, availRes] = await Promise.all([
-            supabase
+        // ============================================================
+        // 1. 单人课：courses_v2.student_id = 我
+        // ============================================================
+        const soloRes = await supabase
+            .from('courses_v2')
+            .select('*, teacher:teacher_id(id, name)')
+            .eq('student_id', student.id)
+            .order('start_time', { ascending: true });
+
+        if (soloRes.error) throw soloRes.error;
+
+        // ============================================================
+        // 2. 小组课：course_students 里我所在的所有课程 + 我的 confirmed 状态
+        // ============================================================
+                const csRes = await supabase
+            .from('course_students')
+            .select('course_id, confirmed, teacher_comment, student_rating, student_comment')
+            .eq('student_id', student.id);
+
+        const csIds = (csRes.data || []).map(x => x.course_id);
+
+        // 🔥 建立"我在这门课是否确认 + 评语 + 我的评分"
+        const myConfirmedMap = {};
+        const myCommentMap = {};
+        const myRatingMap = {};
+        const myRatingCommentMap = {};
+        (csRes.data || []).forEach(cs => {
+            myConfirmedMap[cs.course_id] = cs.confirmed === true;
+            myCommentMap[cs.course_id]   = cs.teacher_comment || '';
+            myRatingMap[cs.course_id]    = cs.student_rating || 0;
+            myRatingCommentMap[cs.course_id] = cs.student_comment || '';
+        });
+
+        let groupCourses = [];
+        if (csIds.length > 0) {
+            const grpRes = await supabase
                 .from('courses_v2')
                 .select('*, teacher:teacher_id(id, name)')
-                .eq('student_id', student.id)
-                .order('start_time', { ascending: true }),
-            supabase
-                .from('teacher_availabilities')
-                .select('*, teacher:teacher_id(id, name)')
-                .eq('status', 'available')
-                .gt('start_time', new Date().toISOString())
-                .order('start_time', { ascending: true })
-        ]);
+                .in('id', csIds)
+                .order('start_time', { ascending: true });
+            if (!grpRes.error) groupCourses = grpRes.data || [];
+        }
 
-        if (coursesRes.error) throw coursesRes.error;
-        if (availRes.error) throw availRes.error;
+        // ============================================================
+        // 3. 合并去重 + 打上 myConfirmed 标记
+        // ============================================================
+        const allMap = {};
+        [...(soloRes.data || []), ...groupCourses].forEach(c => {
+            allMap[c.id] = c;
+        });
+     allCourses = Object.values(allMap).map(c => {
+            const isGroup = c.course_mode === 'group';
 
-        allCourses = coursesRes.data || [];
+            if (isGroup) {
+                c.myConfirmed      = myConfirmedMap[c.id] || false;
+                c.myTeacherComment = myCommentMap[c.id]   || '';
+                c.myRating         = myRatingMap[c.id]    || 0;
+                c.myRatingComment  = myRatingCommentMap[c.id] || '';
+            } else {
+                c.myConfirmed      = c.student_confirmed === true;
+                c.myTeacherComment = c.teacher_comment || '';
+                c.myRating         = c.student_rating || 0;
+                c.myRatingComment  = c.student_comment || '';
+            }
+            return c;
+        }).sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+ // ============================================================
+        // 4. 空闲时间段
+        // ============================================================
+        const availRes = await supabase
+            .from('teacher_availabilities')
+            .select('*, teacher:teacher_id(id, name)')
+            .eq('status', 'available')
+            .gt('start_time', new Date().toISOString())
+            .order('start_time', { ascending: true });
+
         allAvailabilities = availRes.data || [];
 
-        // 检查学员是否已提交评价
+        // ============================================================
+        // 5. 反馈检查
+        // ============================================================
         try {
-            const { data: fb } = await supabase
+            const { data: fb, error: fbErr } = await supabase
                 .from('student_feedback')
                 .select('id')
                 .eq('student_id', student.id)
                 .maybeSingle();
-            feedbackSubmitted = !!fb;
+
+            if (fbErr) {
+                console.warn('feedback 查询失败:', fbErr.message);
+                feedbackSubmitted = false;
+            } else {
+                feedbackSubmitted = !!fb;
+            }
         } catch (e) {
             feedbackSubmitted = false;
         }
@@ -2049,7 +2115,7 @@ function renderCourseCard(c) {
     const isCancelled = c.status === 'cancelled';
     const isCompleted = c.status === 'completed';
     const isStarted = c.teacher_started;
-    const isConfirmed = c.student_confirmed;
+    const isConfirmed = c.myConfirmed;   // 🔥 用我自己的确认状态
     const isStudentBooking = c.source === 'student_booking';
 
     const isFr = c.category === 'francais';
@@ -2057,25 +2123,43 @@ function renderCourseCard(c) {
     const teacherName = c.teacher?.name || t('noTeacher');
     const timeRange = formatTimeRange(c.start_time, c.duration);
 
-    // 状态
+    // ============================================================
+    // 状态文字和样式
+    // ============================================================
     let statusText, statusClass;
-    if (isCancelled) { statusText = t('statusCancelled'); statusClass = 'status-cancelled'; }
-    else if (isCompleted) { statusText = t('statusCompleted'); statusClass = 'status-completed'; }
-    else if (isStarted && isConfirmed) { statusText = t('statusInProgress'); statusClass = 'status-in_progress'; }
-    else if (isStarted && !isConfirmed) { statusText = t('clickToJoin'); statusClass = 'status-pending'; }
-    else if (isNow && !isStarted) { statusText = t('statusWaitingTeacher'); statusClass = 'status-pending'; }
-    else if (start > now) { statusText = t('statusScheduled'); statusClass = 'status-scheduled'; }
-    else { statusText = t('statusScheduled'); statusClass = 'status-scheduled'; }
+    if (isCancelled) {
+        statusText = t('statusCancelled'); statusClass = 'status-cancelled';
+    } else if (isCompleted) {
+        statusText = t('statusCompleted'); statusClass = 'status-completed';
+    } else if (isStarted && isConfirmed) {
+        statusText = t('statusInProgress'); statusClass = 'status-in_progress';
+    } else if (isStarted && !isConfirmed) {
+        statusText = t('clickToJoin'); statusClass = 'status-pending';
+    } else if (isNow && !isStarted) {
+        statusText = t('statusWaitingTeacher'); statusClass = 'status-pending';
+    } else if (start > now) {
+        statusText = t('statusScheduled'); statusClass = 'status-scheduled';
+    } else if (isExpired && !isStarted) {
+        statusText = '⏰ ' + (currentLang === 'zh' ? '已过期' : 'Délai dépassé');
+        statusClass = 'status-cancelled';
+    } else {
+        statusText = t('statusScheduled'); statusClass = 'status-scheduled';
+    }
 
+    // ============================================================
+    // 左边框颜色
+    // ============================================================
     let borderColor = isFr ? '#e67e22' : '#3498db';
     if (isCancelled) borderColor = '#7f8c8d';
     else if (isCompleted) borderColor = '#2ecc71';
     else if (isStarted) borderColor = '#f39c12';
 
-    // 按钮逻辑
+    // ============================================================
+    // 操作按钮
+    // ============================================================
     let actions = '';
 
-    // 1. 加入课堂（老师已开始，学生没确认）
+    // 1. 加入课堂（老师已开始，我没确认）
     if (!isCancelled && !isCompleted && isStarted && !isConfirmed) {
         actions += `<button class="action-btn btn-confirm btn-join-pulse" onclick="confirmAndJoinClass('${c.id}')" style="padding:10px 24px; font-size:0.95rem;">
             <i class="fas fa-video"></i> ${t('joinClass')}
@@ -2105,7 +2189,9 @@ function renderCourseCard(c) {
     }
 
     // 5. 评价
-    if (!isCancelled && isCompleted && !c.student_rating) {
+        // 5. 评价（用我自己的评分判断）
+    const myRating = c.course_mode === 'group' ? c.myRating : c.student_rating;
+    if (!isCancelled && isCompleted && !myRating) {
         actions += `<button class="action-btn btn-rate" onclick="openRatingModal('${c.id}')">
             <i class="fas fa-star"></i> ${t('evaluate')}
         </button>`;
@@ -2126,14 +2212,16 @@ function renderCourseCard(c) {
     }
 
     // 8. 查看评语
-    const hasTeacherComment = c.teacher_comment && c.teacher_comment.trim() !== '';
+    // 8. 查看评语
+    const myComment = c.course_mode === 'group' ? c.myTeacherComment : c.teacher_comment;
+    const hasTeacherComment = myComment && myComment.trim() !== '';
     if (hasTeacherComment) {
         actions += `<button class="action-btn btn-view" onclick="viewTeacherComment('${c.id}')">
             <i class="fas fa-comment"></i> ${t('viewComment')}
         </button>`;
     }
 
-    // 9. 已确认，无需操作
+    // 9. 兜底
     if (!actions && !isCancelled && !isCompleted) {
         actions = `<span class="btn-disabled"><i class="fas fa-check-circle"></i> ${t('alreadyJoined')}</span>`;
     }
@@ -2144,7 +2232,9 @@ function renderCourseCard(c) {
         actions = `<span class="btn-disabled"><i class="fas fa-star" style="color:#f1c40f;"></i> ${c.student_rating}/5</span>`;
     }
 
+    // ============================================================
     // 详情
+    // ============================================================
     let detailsHtml = '';
     detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-chalkboard-user"></i> ${t('teacher')}: ${escapeHtml(teacherName)}</div>`;
     detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-clock"></i> ${c.duration || 2} ${t('hours')}</div>`;
@@ -2154,10 +2244,14 @@ function renderCourseCard(c) {
     if (isCancelled && c.cancel_reason) detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-ban"></i> ${t('cancelReason')}: ${escapeHtml(c.cancel_reason)}</div>`;
     if (isStudentBooking) detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-calendar-check"></i> ${t('bookedViaAvailability')}</div>`;
 
+    // 来源徽章
     const sourceBadge = isStudentBooking
         ? `<span class="source-badge student">${t('sourceStudent')}</span>`
         : `<span class="source-badge teacher">${t('sourceTeacher')}</span>`;
 
+    // ============================================================
+    // 渲染
+    // ============================================================
     return `<div class="course-card ${isCancelled ? 'cancelled' : ''}" style="border-left: 4px solid ${borderColor};">
         <div class="course-header">
             <span class="course-title ${isFr ? 'francais' : ''}">${typeText} — ${formatDateTime(c.start_time)} (${timeRange})</span>
@@ -2170,7 +2264,6 @@ function renderCourseCard(c) {
         <div class="course-actions">${actions}</div>
     </div>`;
 }
-
 // ============================================================
 // 折叠
 // ============================================================
@@ -2358,19 +2451,28 @@ function startCountdownTimer() {
     if (countdownInterval) clearInterval(countdownInterval);
     countdownInterval = setInterval(updateCountdownTexts, 1000);
 }
-
 function updateCountdownTexts() {
     const now = new Date();
+    let needRefresh = false;
+
     document.querySelectorAll('[data-countdown-course-id]').forEach(el => {
         const id = el.dataset.countdownCourseId;
         const c = allCourses.find(x => x.id === id);
         if (!c) return;
+
         const start = new Date(c.start_time);
         const diffMs = start - now;
+
+        // 🔥 时间到 → 标记需要刷新
         if (diffMs <= 0) {
+            if (!el.dataset.refreshTriggered) {
+                el.dataset.refreshTriggered = '1';
+                needRefresh = true;
+            }
             el.textContent = '⏳ ...';
             return;
         }
+
         const totalSec = Math.floor(diffMs / 1000);
         const days = Math.floor(totalSec / 86400);
         const hours = Math.floor((totalSec % 86400) / 3600);
@@ -2386,60 +2488,108 @@ function updateCountdownTexts() {
         el.textContent = text;
         el.className = totalSec < 300 ? 'countdown-text soon' : 'countdown-text';
     });
-}
 
+    // 🔥 只要有一门课时间到，就重渲染一次列表
+    if (needRefresh) {
+        console.log('⏰ 课程时间到，重新渲染列表');
+        renderCourses();
+    }
+}
 // ============================================================
 // 实时订阅：老师开始上课时自动刷新
 // ============================================================
+// ============================================================
+// 实时订阅：老师开始上课 / 课程变化 / 小组课加人
+// ============================================================
 let courseSubscription = null;
+let courseStudentsSubscription = null;
+let reloadDebounceTimer = null;
+
+function scheduleReload(reason) {
+    if (reloadDebounceTimer) clearTimeout(reloadDebounceTimer);
+    reloadDebounceTimer = setTimeout(() => {
+        console.log('🔄 Realtime reload:', reason);
+        loadAllData();
+    }, 400);
+}
 
 function subscribeToCourseChanges() {
     const supabase = window.supabaseAuth.getSupabaseClient();
-    if (!supabase || !student) return;
-
-    if (courseSubscription) {
-        courseSubscription.unsubscribe();
-        courseSubscription = null;
+    if (!supabase || !student) {
+        console.warn('⚠️ 无法订阅：supabase 或 student 为空');
+        return;
     }
 
+    // 清理旧订阅
+    if (courseSubscription) { courseSubscription.unsubscribe(); courseSubscription = null; }
+    if (courseStudentsSubscription) { courseStudentsSubscription.unsubscribe(); courseStudentsSubscription = null; }
+
+    // ============ 1. courses_v2 全表监听（不加 filter） ============
     courseSubscription = supabase
-        .channel('student_course_changes_' + student.id)
+        .channel('student_courses_v2_' + student.id + '_' + Date.now())
         .on(
             'postgres_changes',
-            {
-                event: 'UPDATE',
-                schema: 'public',
-                table: 'courses_v2',
-                filter: `student_id=eq.${student.id}`
-            },
+            { event: '*', schema: 'public', table: 'courses_v2' },
             (payload) => {
-                const course = payload.new;
-                const old = payload.old || {};
+                const eventType = payload.eventType;
+                const newRow = payload.new || {};
+                const oldRow = payload.old || {};
 
-                // 老师开始上课
-                if (course.teacher_started === true && old.teacher_started !== true) {
-                    showToast(t('teacherStarted'), 'success');
-                    loadAllData();
+                // 判断是否和我相关
+                let relevant = false;
+                if (eventType === 'DELETE') {
+                    relevant = allCourses.some(c => c.id === oldRow.id);
+                } else {
+                    relevant =
+                        newRow.student_id === student.id ||
+                        allCourses.some(c => c.id === newRow.id);
+                }
+                if (!relevant) {
+                    console.log('⏭️ 无关课程事件，忽略:', newRow.id);
                     return;
                 }
 
-                // 状态变化
-                if (course.status !== old.status) {
-                    loadAllData();
+                // 🔥 老师刚点 Démarrer（用本地缓存对比，不依赖 old）
+                const local = allCourses.find(c => c.id === newRow.id);
+                if (
+                    newRow.teacher_started === true &&
+                    (!local || local.teacher_started !== true)
+                ) {
+                    showToast(t('teacherStarted'), 'success');
                 }
 
-                // 老师加了评语
-                if (course.teacher_comment && course.teacher_comment !== old.teacher_comment) {
-                    loadAllData();
+                scheduleReload('courses_v2 ' + eventType + ' ' + (newRow.id || oldRow.id));
+            }
+        )
+        .subscribe((status, err) => {
+            console.log('📡 courses_v2 订阅状态:', status);
+            if (err) console.error('❌ courses_v2 订阅错误:', err);
+        });
+
+    // ============ 2. course_students（小组课加人/移除） ============
+    courseStudentsSubscription = supabase
+        .channel('student_cs_' + student.id + '_' + Date.now())
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'course_students' },
+            (payload) => {
+                const newRow = payload.new || {};
+                const oldRow = payload.old || {};
+                const eventType = payload.eventType;
+
+                if (eventType === 'INSERT' && newRow.student_id === student.id) {
+                    scheduleReload('course_students INSERT');
+                }
+                if (eventType === 'DELETE' && oldRow.student_id === student.id) {
+                    scheduleReload('course_students DELETE');
                 }
             }
         )
         .subscribe((status, err) => {
-            if (status === 'SUBSCRIBED') console.log('✅ 已订阅课程变化');
-            if (err) console.error('❌ 订阅失败:', err);
+            console.log('📡 course_students 订阅状态:', status);
+            if (err) console.error('❌ course_students 订阅错误:', err);
         });
 }
-
 // ============================================================
 // 操作：确认出席并加入课堂
 // ============================================================
@@ -2447,7 +2597,9 @@ async function confirmAndJoinClass(courseId) {
     const c = allCourses.find(x => x.id === courseId);
     if (!c) return;
 
-    // 先打开会议链接（用户手势上下文）
+    // ============================================================
+    // 1. 先开会议链接（用户手势上下文里，避免被拦截）
+    // ============================================================
     if (c.meeting_link) {
         const w = window.open(c.meeting_link, '_blank');
         if (!w) showToast('⚠️ Popup bloqué - cliquez sur "Rejoindre"', 'warning');
@@ -2455,26 +2607,79 @@ async function confirmAndJoinClass(courseId) {
         showToast(t('noMeetingLink'), 'warning');
     }
 
+    // ============================================================
+    // 2. 更新数据库
+    // ============================================================
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
-        const { error } = await supabase
-            .from('courses_v2')
-            .update({
-                student_confirmed: true,
-                status: 'in_progress',
-                updated_at: new Date().toISOString()
-            })
-            .eq('id', courseId);
 
-        if (error) throw error;
+        const isGroup = c.course_mode === 'group';
+
+        if (isGroup) {
+            // ============================================================
+            // 小组课：只更新"我自己"在 course_students 里的 confirmed
+            // ============================================================
+            const { error: csErr } = await supabase
+                .from('course_students')
+                .update({ confirmed: true })
+                .eq('course_id', courseId)
+                .eq('student_id', student.id);
+
+            if (csErr) throw csErr;
+
+            // 检查是不是所有学生都确认了
+            const { data: csList } = await supabase
+                .from('course_students')
+                .select('student_id, confirmed')
+                .eq('course_id', courseId);
+
+            const allConfirmed = (csList || []).length > 0 &&
+                (csList || []).every(cs => cs.confirmed);
+
+            if (allConfirmed) {
+                // 所有人都确认了 → 课程状态变 in_progress
+                const { error: cErr } = await supabase
+                    .from('courses_v2')
+                    .update({
+                        student_confirmed: true,
+                        status: 'in_progress',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', courseId);
+                if (cErr) throw cErr;
+            } else {
+                // 还没全确认 → 只更新 updated_at
+                await supabase
+                    .from('courses_v2')
+                    .update({ updated_at: new Date().toISOString() })
+                    .eq('id', courseId);
+            }
+
+        } else {
+            // ============================================================
+            // 单人课：直接更新 courses_v2.student_confirmed
+            // ============================================================
+            const { error: cErr } = await supabase
+                .from('courses_v2')
+                .update({
+                    student_confirmed: true,
+                    status: 'in_progress',
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', courseId);
+            if (cErr) throw cErr;
+        }
+
         showToast(t('confirmedAttendance'), 'success');
         await loadAllData();
+
     } catch (err) {
         console.error(err);
         showToast(t('toastError') + ': ' + err.message, 'error');
     }
 }
 window.confirmAndJoinClass = confirmAndJoinClass;
+
 
 // ============================================================
 // 操作：查看老师评语
@@ -2484,7 +2689,7 @@ function viewTeacherComment(courseId) {
     if (!c) return;
 
     const content = document.getElementById('teacherCommentContent');
-    const comment = c.teacher_comment;
+    const comment = c.course_mode === 'group' ? c.myTeacherComment : c.teacher_comment;
 
     if (!comment || comment.trim() === '') {
         content.innerHTML = `<div style="padding:15px; background:#f5f5f5; border-radius:8px; text-align:center; color:#999;">
@@ -2526,17 +2731,39 @@ async function saveRating(e) {
 
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
-        const { error } = await supabase
-            .from('courses_v2')
-            .update({
-                student_rating: rating,
-                student_comment: comment || null,
-                evaluated_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-            })
-            .eq('id', courseId);
+        const c = allCourses.find(x => x.id === courseId);
+        if (!c) throw new Error('Cours introuvable');
 
-        if (error) throw error;
+        if (c.course_mode === 'group') {
+            // 小组课：写 course_students（每个学生独立）
+            const { data, error } = await supabase
+                .from('course_students')
+                .update({
+                    student_rating: rating,
+                    student_comment: comment || null,
+                    evaluated_at: new Date().toISOString()
+                })
+                .eq('course_id', courseId)
+                .eq('student_id', student.id)
+                .select();
+            if (error) throw error;
+            if (!data || data.length === 0) {
+                throw new Error('Aucune ligne mise à jour — vérifiez course_id / student_id');
+            }
+        } else {
+            // 单人课：写 courses_v2（保持原逻辑）
+            const { error } = await supabase
+                .from('courses_v2')
+                .update({
+                    student_rating: rating,
+                    student_comment: comment || null,
+                    evaluated_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', courseId);
+            if (error) throw error;
+        }
+
         closeAllModals();
         showToast(t('toastRating'), 'success');
         await loadAllData();
@@ -2545,7 +2772,6 @@ async function saveRating(e) {
         showToast(t('toastError') + ': ' + err.message, 'error');
     }
 }
-
 // ============================================================
 // 操作：取消课程（老师创建的）
 // ============================================================
@@ -3497,14 +3723,15 @@ function bindEvents() {
     });
 
     // 退出
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-        if (courseSubscription) { courseSubscription.unsubscribe(); courseSubscription = null; }
-        if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
-        sessionStorage.clear();
-        localStorage.removeItem('studentLang');
-        window.location.href = 'index.html';
-    });
-
+ document.getElementById('logoutBtn').addEventListener('click', () => {
+    if (courseSubscription) { courseSubscription.unsubscribe(); courseSubscription = null; }
+    if (courseStudentsSubscription) { courseStudentsSubscription.unsubscribe(); courseStudentsSubscription = null; }
+    if (reloadDebounceTimer) { clearTimeout(reloadDebounceTimer); reloadDebounceTimer = null; }
+    if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+    sessionStorage.clear();
+    localStorage.removeItem('studentLang');
+    window.location.href = 'index.html';
+});
     // 关闭按钮
     document.querySelectorAll('[data-close]').forEach(el => {
         el.addEventListener('click', () => {
@@ -3577,9 +3804,11 @@ function bindEvents() {
 
     // 页面关闭时清理
     window.addEventListener('beforeunload', () => {
-        if (courseSubscription) courseSubscription.unsubscribe();
-        if (countdownInterval) clearInterval(countdownInterval);
-    });
+    if (courseSubscription) courseSubscription.unsubscribe();
+    if (courseStudentsSubscription) courseStudentsSubscription.unsubscribe();
+    if (reloadDebounceTimer) clearTimeout(reloadDebounceTimer);
+    if (countdownInterval) clearInterval(countdownInterval);
+});
 }
 
 // ============================================================

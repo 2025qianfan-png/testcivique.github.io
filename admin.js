@@ -845,7 +845,7 @@ async function sendCourseEmailNotification(courseId, action) {
             .from('courses_v2')
             .select('*')
             .eq('id', courseId)
-            .single();
+            .maybeSingle();
 
         if (error || !course) return { success: true, skipped: true };
 
@@ -1251,9 +1251,27 @@ async function attachUsersToCourses() {
         if (c.teacher_id) ids.add(c.teacher_id);
         if (c.student_id) ids.add(c.student_id);
     });
-    if (ids.size === 0) return;
 
     const supabase = window.supabaseAuth.getSupabaseClient();
+    const courseIds = allCourses.map(c => c.id);
+
+    // 🔥 查询小组课学生
+    const csMap = {};
+    if (courseIds.length > 0) {
+        const { data: csList } = await supabase
+            .from('course_students')
+            .select('course_id, student_id')
+            .in('course_id', courseIds);
+
+        (csList || []).forEach(cs => {
+            if (!csMap[cs.course_id]) csMap[cs.course_id] = [];
+            csMap[cs.course_id].push(cs.student_id);
+            ids.add(cs.student_id);
+        });
+    }
+
+    if (ids.size === 0) return;
+
     const { data } = await supabase.from('users').select('id, name').in('id', Array.from(ids));
     const userMap = {};
     (data || []).forEach(u => { userMap[u.id] = u; });
@@ -1261,9 +1279,19 @@ async function attachUsersToCourses() {
     allCourses.forEach(c => {
         if (c.teacher_id) c.teacher = userMap[c.teacher_id];
         if (c.student_id) c.student = userMap[c.student_id];
+
+        // 🔥 补 students 数组（小组课会包含所有学生）
+        c.students = [];
+        if (c.student_id && userMap[c.student_id]) {
+            c.students.push(userMap[c.student_id]);
+        }
+        (csMap[c.id] || []).forEach(sid => {
+            if (userMap[sid] && !c.students.find(s => s.id === sid)) {
+                c.students.push(userMap[sid]);
+            }
+        });
     });
 }
-
 // ============================================================
 // 用户管理
 // ============================================================
@@ -1301,8 +1329,8 @@ function applyUserFilters() {
         return true;
     });
     filteredUsers.sort((a, b) => {
-        if (isExpired(a) === isExpired(b)) return 0;
-        return isExpired(a) ? 1 : -1;
+        if (isExpired(a) !== isExpired(b)) return isExpired(a) ? 1 : -1;
+        return (a.name || '').localeCompare(b.name || '');
     });
     renderUsersTable();
 }
@@ -1835,7 +1863,10 @@ async function validatePreReg(id) {
     }
 
     if (!confirm('Valider la pré-inscription de ' + reg.name + ' ?\n\nL\'utilisateur sera ajouté à la base.')) return;
-
+    if (!reg.password || reg.password.trim() === '') {
+        showToast('Pré-inscription sans mot de passe. Corrigez-la d\'abord.', 'error');
+        return;
+    }
     showLoading('Validation...');
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
@@ -1978,7 +2009,11 @@ function renderCiviqueCourses() {
     if (civiqueFilter.teacherId) list = list.filter(c => c.teacher_id === civiqueFilter.teacherId);
     if (civiqueFilter.search) {
         const s = civiqueFilter.search;
-        list = list.filter(c => (c.teacher?.name || '').toLowerCase().includes(s) || (c.student?.name || '').toLowerCase().includes(s));
+        list = list.filter(c =>
+            (c.teacher?.name || '').toLowerCase().includes(s) ||
+            (c.students || []).some(stu => (stu.name || '').toLowerCase().includes(s)) ||
+            (c.student?.name || '').toLowerCase().includes(s)
+        );
     }
     if (list.length === 0) {
         container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Aucun cours</p></div>';
@@ -2001,7 +2036,11 @@ function renderFrenchCourses() {
     if (frenchFilter.teacherId) list = list.filter(c => c.teacher_id === frenchFilter.teacherId);
     if (frenchFilter.search) {
         const s = frenchFilter.search;
-        list = list.filter(c => (c.teacher?.name || '').toLowerCase().includes(s) || (c.student?.name || '').toLowerCase().includes(s));
+        list = list.filter(c =>
+            (c.teacher?.name || '').toLowerCase().includes(s) ||
+            (c.students || []).some(stu => (stu.name || '').toLowerCase().includes(s)) ||
+            (c.student?.name || '').toLowerCase().includes(s)
+        );
     }
     if (list.length === 0) {
         container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Aucun cours</p></div>';
@@ -2014,7 +2053,7 @@ function renderFrenchCourses() {
 function renderCourseCard(c, category) {
     const typeText = category === 'civique' ? getCiviqueTypeText(c.course_type) : getFrenchTypeText(c.course_type);
     const teacherName = c.teacher?.name || '—';
-    const studentName = c.student?.name || '—';
+    const studentName = (c.students || []).map(s => s.name).join(', ') || c.student?.name || '—';
 
     const statusMap = {
         'scheduled': '<span class="status-badge status-scheduled">📅 Planifié</span>',
@@ -2373,6 +2412,7 @@ function bindTypeSelectorEvents(container) {
 // ============================================================
 // 课程提交
 // ============================================================
+
 async function handleCourseSubmit(e) {
     e.preventDefault();
     const id = document.getElementById('courseId').value;
@@ -2391,6 +2431,9 @@ async function handleCourseSubmit(e) {
     const startTimeStr = normalizeLocalDateTime(startTimeLocal);
     if (!startTimeStr) { showToast('Format date invalide', 'error'); return; }
 
+    // ============================================================
+    // 冲突检查
+    // ============================================================
     const allCourses = [...allCiviqueCourses, ...allFrenchCourses];
     const startTs = new Date(startTimeStr).getTime();
     const endTs = startTs + duration * 3600000;
@@ -2408,6 +2451,9 @@ async function handleCourseSubmit(e) {
         return;
     }
 
+    // ============================================================
+    // 收集 studentIds
+    // ============================================================
     let studentId = null;
     let studentIds = [];
     if (mode === 'solo') {
@@ -2420,6 +2466,107 @@ async function handleCourseSubmit(e) {
         studentIds = groupSelectedStudents.slice();
     }
 
+    // ============================================================
+    // 🔥 B 方案：老师建课时检查 credit
+    // ============================================================
+    const field = category === 'civique' ? 'credit' : 'french_credit';
+
+    if (!id) {
+        // ---------- 新建模式：每个学生都需要扣 duration ----------
+        const insufficient = [];
+        for (const sid of studentIds) {
+            const stu = allUsers.find(u => u.id === sid);
+            if (!stu) continue;
+            const current = stu[field] || 0;
+            if (current < duration) {
+                insufficient.push({
+                    name: stu.name,
+                    current: current,
+                    needed: duration,
+                    diff: duration - current
+                });
+            }
+        }
+
+        if (insufficient.length > 0) {
+            let msg = currentLang === 'fr'
+                ? '⚠️ Crédits insuffisants pour :\n\n'
+                : '⚠️ 以下学员课时不足：\n\n';
+            insufficient.forEach(s => {
+                msg += `• ${s.name} : ${s.current}h / ${s.needed}h ${currentLang === 'fr' ? '(manque ' + s.diff + 'h)' : '(缺 ' + s.diff + 'h)'}\n`;
+            });
+            msg += currentLang === 'fr'
+                ? '\nContinuer quand même ? Les crédits seront mis à 0.'
+                : '\n仍要继续吗？课时将被归零。';
+
+            if (!confirm(msg)) {
+                return;
+            }
+        }
+    } else {
+        // ---------- 更新模式：只检查"新增差额" ----------
+        const oldCourse = category === 'civique'
+            ? allCiviqueCourses.find(c => c.id === id)
+            : allFrenchCourses.find(c => c.id === id);
+
+        if (oldCourse) {
+            const oldDur = oldCourse.duration || 2;
+
+            const supabaseTmp = window.supabaseAuth.getSupabaseClient();
+            const { data: oldCsList } = await supabaseTmp
+                .from('course_students')
+                .select('student_id')
+                .eq('course_id', id);
+
+            let oldStudentIds = (oldCsList || []).map(cs => cs.student_id);
+            if (oldStudentIds.length === 0 && oldCourse.student_id) {
+                oldStudentIds = [oldCourse.student_id];
+            }
+
+            const insufficient = [];
+            for (const sid of studentIds) {
+                const stu = allUsers.find(u => u.id === sid);
+                if (!stu) continue;
+
+                const isNewlyAdded = !oldStudentIds.includes(sid);
+                const additionalHours = isNewlyAdded
+                    ? duration
+                    : Math.max(0, duration - oldDur);
+
+                if (additionalHours <= 0) continue;
+
+                const current = stu[field] || 0;
+                if (current < additionalHours) {
+                    insufficient.push({
+                        name: stu.name,
+                        current: current,
+                        needed: additionalHours,
+                        diff: additionalHours - current
+                    });
+                }
+            }
+
+            if (insufficient.length > 0) {
+                let msg = currentLang === 'fr'
+                    ? '⚠️ Crédits insuffisants pour les modifications :\n\n'
+                    : '⚠️ 以下学员课时不足以完成修改：\n\n';
+                insufficient.forEach(s => {
+                    msg += `• ${s.name} : ${s.current}h ${currentLang === 'fr' ? 'disponibles, ' + s.needed + 'h nécessaires (manque ' + s.diff + 'h)' : '可用, 需要 ' + s.needed + 'h (缺 ' + s.diff + 'h)'}\n`;
+                });
+                msg += currentLang === 'fr'
+                    ? '\nContinuer quand même ? Les crédits seront mis à 0.'
+                    : '\n仍要继续吗？课时将被归零。';
+
+                if (!confirm(msg)) {
+                    return;
+                }
+            }
+        }
+    }
+
+    // ============================================================
+    // 构造 data
+    // ============================================================
     const data = {
         category: category,
         course_mode: mode,
@@ -2442,11 +2589,39 @@ async function handleCourseSubmit(e) {
         return;
     }
 
+    // ============================================================
+    // 写入数据库
+    // ============================================================
     showLoading(id ? 'Modification...' : 'Création...');
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         let courseResult;
 
+        // 更新时：先读出旧课程的 credit 信息
+        let oldCreditInfo = null;
+        if (id) {
+            const oldCourse = category === 'civique'
+                ? allCiviqueCourses.find(c => c.id === id)
+                : allFrenchCourses.find(c => c.id === id);
+
+            const { data: oldCsList } = await supabase
+                .from('course_students')
+                .select('student_id')
+                .eq('course_id', id);
+
+            let oldStudentIds = (oldCsList || []).map(cs => cs.student_id);
+            if (oldStudentIds.length === 0 && oldCourse?.student_id) {
+                oldStudentIds = [oldCourse.student_id];
+            }
+
+            oldCreditInfo = {
+                studentIds: oldStudentIds,
+                duration: oldCourse?.duration || 2,
+                category: oldCourse?.category || category
+            };
+        }
+
+        // 写入 / 更新课程
         if (id) {
             const updateRes = await supabase.from('courses_v2').update(data).eq('id', id).select().single();
             if (updateRes.error) throw updateRes.error;
@@ -2460,13 +2635,22 @@ async function handleCourseSubmit(e) {
             courseResult = insertRes.data;
         }
 
+        // 写入新的 student 关联
         const csData = studentIds.map(sid => ({ course_id: courseResult.id, student_id: sid }));
         await supabase.from('course_students').insert(csData);
+
+        // 先退还旧 credit，再扣新 credit
+        if (oldCreditInfo && oldCreditInfo.studentIds.length > 0) {
+            for (const sid of oldCreditInfo.studentIds) {
+                await refundStudentCredit(sid, oldCreditInfo.duration, oldCreditInfo.category);
+            }
+        }
 
         for (const sid of studentIds) {
             await deductStudentCredit(sid, duration, category);
         }
 
+        // 邮件通知
         const action = id ? 'update' : 'create';
         try {
             await sendCourseEmailNotification(courseResult.id, action);
@@ -2492,21 +2676,66 @@ async function deductStudentCredit(studentId, hours, category) {
     if (!studentId || !hours) return true;
     const supabase = window.supabaseAuth.getSupabaseClient();
     const field = category === 'civique' ? 'credit' : 'french_credit';
-    const { data: u } = await supabase.from('users').select(field).eq('id', studentId).single();
-    const current = u?.[field] || 0;
+
+    const { data: u, error: fetchErr } = await supabase
+        .from('users')
+        .select(field)
+        .eq('id', studentId)
+        .maybeSingle();
+
+    if (fetchErr || !u) {
+        console.warn('⚠️ deductStudentCredit: 学生不存在', studentId);
+        return false;
+    }
+
+    const current = u[field] || 0;
+
+    // Credit 不足时警告（不阻止，只提示）
+    if (current < hours) {
+        console.warn('⚠️ Credit 不足: 学生', studentId, '— 当前', current, 'h，需要', hours, 'h');
+    }
+
     const newVal = Math.max(0, current - hours);
-    await supabase.from('users').update({ [field]: newVal }).eq('id', studentId);
+
+    const { error: updErr } = await supabase
+        .from('users')
+        .update({ [field]: newVal })
+        .eq('id', studentId);
+
+    if (updErr) {
+        console.error('❌ 扣 credit 失败:', updErr.message);
+        return false;
+    }
     return true;
 }
-
 async function refundStudentCredit(studentId, hours, category) {
     if (!studentId || !hours) return true;
     const supabase = window.supabaseAuth.getSupabaseClient();
     const field = category === 'civique' ? 'credit' : 'french_credit';
-    const { data: u } = await supabase.from('users').select(field).eq('id', studentId).single();
-    const current = u?.[field] || 0;
+
+    const { data: u, error: fetchErr } = await supabase
+        .from('users')
+        .select(field)
+        .eq('id', studentId)
+        .maybeSingle();
+
+    if (fetchErr || !u) {
+        console.warn('⚠️ refundStudentCredit: 学生不存在', studentId);
+        return false;
+    }
+
+    const current = u[field] || 0;
     const newVal = current + hours;
-    await supabase.from('users').update({ [field]: newVal }).eq('id', studentId);
+
+    const { error: updErr } = await supabase
+        .from('users')
+        .update({ [field]: newVal })
+        .eq('id', studentId);
+
+    if (updErr) {
+        console.error('❌ refund credit 失败:', updErr.message);
+        return false;
+    }
     return true;
 }
 
@@ -2529,21 +2758,59 @@ async function confirmCancelReason() {
         const { id, category, data, isNew } = pendingCancelData;
 
         if (isNew) {
-            const insertRes = await supabase.from('courses_v2').insert([{ ...data, cancel_reason: reason }]).select().single();
+            // ============================================================
+            // 新建一个已取消的课程：不需要退 credit（因为还没扣过）
+            // ============================================================
+            const insertRes = await supabase
+                .from('courses_v2')
+                .insert([{ ...data, cancel_reason: reason, status: 'cancelled' }])
+                .select()
+                .single();
+
             if (!insertRes.error) {
                 try { await sendCourseEmailNotification(insertRes.data.id, 'cancel'); } catch (e) {}
             }
         } else {
-            await supabase.from('courses_v2').update({ status: 'cancelled', cancel_reason: reason }).eq('id', id);
-            const { data: csList } = await supabase.from('course_students').select('student_id').eq('course_id', id);
+            // ============================================================
+            // 🔥 防重：先查当前状态，已取消就直接退出
+            // ============================================================
+            const { data: currentCourse } = await supabase
+                .from('courses_v2')
+                .select('status')
+                .eq('id', id)
+                .maybeSingle();
+
+            if (currentCourse?.status === 'cancelled') {
+                showToast('Cours déjà annulé', 'warning');
+                closeModal('cancelReasonModal');
+                closeModal('courseModal');
+                pendingCancelData = null;
+                return;
+            }
+
+            // 1) 先更新状态为 cancelled
+            const { error: updErr } = await supabase
+                .from('courses_v2')
+                .update({ status: 'cancelled', cancel_reason: reason })
+                .eq('id', id);
+            if (updErr) throw updErr;
+
+            // 2) 拿学生列表 + 退 credit
+            const { data: csList } = await supabase
+                .from('course_students')
+                .select('student_id')
+                .eq('course_id', id);
+
             const ids = (csList || []).map(cs => cs.student_id);
             const course = category === 'civique'
                 ? allCiviqueCourses.find(c => c.id === id)
                 : allFrenchCourses.find(c => c.id === id);
             const dur = course?.duration || 2;
+
             for (const sid of ids) {
                 await refundStudentCredit(sid, dur, category);
             }
+
             try { await sendCourseEmailNotification(id, 'cancel'); } catch (e) {}
         }
 
@@ -2590,16 +2857,39 @@ async function confirmDeleteCourse() {
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
 
-        const { data: csList } = await supabase.from('course_students').select('student_id').eq('course_id', id);
+        // ============================================================
+        // 🔥 先拿学生列表（删课程后 course_students 会被级联删）
+        // ============================================================
+        const { data: csList } = await supabase
+            .from('course_students')
+            .select('student_id')
+            .eq('course_id', id);
         const ids = (csList || []).map(cs => cs.student_id);
         const dur = course?.duration || 2;
+
+        // ============================================================
+        // 🔥 先删课程（成功后再退 credit，避免删除失败时 credit 丢失）
+        // ============================================================
+        const { error: delErr } = await supabase
+            .from('courses_v2')
+            .delete()
+            .eq('id', id);
+        if (delErr) throw delErr;
+
+        // ============================================================
+        // 删除成功后：退 credit
+        // ============================================================
         for (const sid of ids) {
-            await refundStudentCredit(sid, dur, category);
+            try {
+                await refundStudentCredit(sid, dur, category);
+            } catch (e) {
+                console.warn('⚠️ 退 credit 失败:', sid, e.message);
+            }
         }
 
+        // 邮件通知
         try { await sendCourseEmailNotification(id, 'cancel'); } catch (e) {}
 
-        await supabase.from('courses_v2').delete().eq('id', id);
         document.getElementById('deleteConfirmOverlay').classList.remove('active');
         pendingDeleteCourse = { id: null, category: null };
         await loadAllData();

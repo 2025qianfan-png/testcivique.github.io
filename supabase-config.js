@@ -445,66 +445,165 @@ async function getCourses(options) {
 
     try {
         var supabase = getSupabaseClient();
-        var query = supabase
-            .from('courses_v2')
-            .select('*')
-            .order('start_time', { ascending: true });
+        var data = [];
 
         if (userRole === 'teacher') {
-            query = query.eq('teacher_id', userId);
+            // ============================================================
+            // 老师：查自己作为 teacher_id 的所有课（单人 + 小组都有）
+            // ============================================================
+            var tQuery = supabase
+                .from('courses_v2')
+                .select('*')
+                .eq('teacher_id', userId)
+                .order('start_time', { ascending: true });
+
+            if (category) tQuery = tQuery.eq('category', category);
+
+            var tRes = await tQuery;
+            if (tRes.error) throw tRes.error;
+            data = tRes.data || [];
+
         } else if (userRole === 'stu' || userRole === 'stu_fr' || userRole === 'stu_all') {
-            query = query.eq('student_id', userId);
-        }
+            // ============================================================
+            // 学生：合并「单人课 student_id = 我」+「小组课 course_students 有我」
+            // ============================================================
 
-        if (category) {
-            query = query.eq('category', category);
-        }
+            // 1) 单人课
+            var soloQuery = supabase
+                .from('courses_v2')
+                .select('*')
+                .eq('student_id', userId)
+                .order('start_time', { ascending: true });
 
-        var result = await query;
-        if (result.error) throw result.error;
-        var data = result.data || [];
+            if (category) soloQuery = soloQuery.eq('category', category);
 
-        // 手动关联老师/学生名字
-        if (data.length > 0) {
-            var userIds = [];
-            var seen = {};
-            data.forEach(function(c) {
-                if (c.teacher_id && !seen[c.teacher_id]) {
-                    seen[c.teacher_id] = true;
-                    userIds.push(c.teacher_id);
-                }
-                if (c.student_id && !seen[c.student_id]) {
-                    seen[c.student_id] = true;
-                    userIds.push(c.student_id);
-                }
+            var soloRes = await soloQuery;
+            if (soloRes.error) throw soloRes.error;
+            var soloCourses = soloRes.data || [];
+
+            // 2) 小组课：先拿我所在的所有 course_id
+            var csRes = await supabase
+                .from('course_students')
+                .select('course_id')
+                .eq('student_id', userId);
+
+            var csIds = (csRes.data || []).map(function(x) { return x.course_id; });
+
+            var groupCourses = [];
+            if (csIds.length > 0) {
+                var grpQuery = supabase
+                    .from('courses_v2')
+                    .select('*')
+                    .in('id', csIds)
+                    .order('start_time', { ascending: true });
+
+                if (category) grpQuery = grpQuery.eq('category', category);
+
+                var grpRes = await grpQuery;
+                if (!grpRes.error) groupCourses = grpRes.data || [];
+            }
+
+            // 3) 合并去重
+            var allMap = {};
+            soloCourses.concat(groupCourses).forEach(function(c) {
+                allMap[c.id] = c;
+            });
+            data = Object.keys(allMap).map(function(k) { return allMap[k]; });
+            data.sort(function(a, b) {
+                return new Date(a.start_time) - new Date(b.start_time);
             });
 
-            if (userIds.length > 0) {
-                var usersResult = await supabase
+        } else {
+            // ============================================================
+            // 其他角色（admin 等）：拿全部
+            // ============================================================
+            var aQuery = supabase
+                .from('courses_v2')
+                .select('*')
+                .order('start_time', { ascending: true });
+
+            if (category) aQuery = aQuery.eq('category', category);
+
+            var aRes = await aQuery;
+            if (aRes.error) throw aRes.error;
+            data = aRes.data || [];
+        }
+
+        // ============================================================
+        // 关联用户信息（teacher + student + students 数组）
+        // ============================================================
+        if (data.length > 0) {
+            var courseIds = data.map(function(c) { return c.id; });
+
+            // 先收集所有涉及的 user id
+            var userIdsSet = {};
+            data.forEach(function(c) {
+                if (c.teacher_id) userIdsSet[c.teacher_id] = true;
+                if (c.student_id) userIdsSet[c.student_id] = true;
+            });
+
+            // 顺便把小组课的 student_id 也收集起来
+            var csMap = {};   // { courseId: [studentId, ...] }
+            if (courseIds.length > 0) {
+                var csListRes = await supabase
+                    .from('course_students')
+                    .select('course_id, student_id')
+                    .in('course_id', courseIds);
+
+                (csListRes.data || []).forEach(function(cs) {
+                    if (!csMap[cs.course_id]) csMap[cs.course_id] = [];
+                    csMap[cs.course_id].push(cs.student_id);
+                    userIdsSet[cs.student_id] = true;
+                });
+            }
+
+            // 拿所有用户
+            var userIdsArr = Object.keys(userIdsSet);
+            var userMap = {};
+            if (userIdsArr.length > 0) {
+                var usersRes = await supabase
                     .from('users')
                     .select('id, name, email')
-                    .in('id', userIds);
+                    .in('id', userIdsArr);
 
-                if (usersResult.data) {
-                    var userMap = {};
-                    usersResult.data.forEach(function(u) {
-                        userMap[u.id] = u;
-                    });
-                    data.forEach(function(c) {
-                        if (c.teacher_id) c.teacher = userMap[c.teacher_id] || null;
-                        if (c.student_id) c.student = userMap[c.student_id] || null;
-                    });
-                }
+                (usersRes.data || []).forEach(function(u) {
+                    userMap[u.id] = u;
+                });
             }
+
+            // 挂到每门课
+            data.forEach(function(c) {
+                // 老师
+                c.teacher = c.teacher_id ? (userMap[c.teacher_id] || null) : null;
+
+                // 兼容旧代码：c.student = 第一个人
+                c.student = c.student_id ? (userMap[c.student_id] || null) : null;
+
+                // 新增：完整 students 数组（单人 + 小组）
+                c.students = [];
+                if (c.student_id && userMap[c.student_id]) {
+                    c.students.push(userMap[c.student_id]);
+                }
+                (csMap[c.id] || []).forEach(function(sid) {
+                    if (userMap[sid] && !c.students.find(function(s) { return s.id === sid; })) {
+                        c.students.push(userMap[sid]);
+                    }
+                });
+
+                // 如果 c.student 为空但 students 有 → 用第一个
+                if (!c.student && c.students.length > 0) {
+                    c.student = c.students[0];
+                }
+            });
         }
 
         return data;
+
     } catch (error) {
         console.error('获取课程失败:', error);
         return [];
     }
 }
-
 function getFrenchCourses(userId, userRole) {
     return getCourses({ userId: userId, userRole: userRole, category: 'francais' });
 }
@@ -566,23 +665,38 @@ async function updateCourse(id, newData) {
     try {
         var supabase = getSupabaseClient();
 
+        // ============================================================
+        // 1. 先读出旧课程
+        // ============================================================
         var fetchResult = await supabase
             .from('courses_v2')
             .select('*')
             .eq('id', id)
-            .single();
+            .maybeSingle();
 
-        if (fetchResult.error) throw fetchResult.error;
+        if (fetchResult.error || !fetchResult.data) {
+            throw new Error('Cours introuvable');
+        }
         var oldCourse = fetchResult.data;
 
-        var category = newData.category || oldCourse.category;
+        // ============================================================
+        // 2. 收集所有"旧/新"字段
+        // ============================================================
+        var oldCategory = oldCourse.category || 'civique';
+        var newCategory = newData.category || oldCategory;
+
         var oldStatus = oldCourse.status;
         var newStatus = newData.status || oldStatus;
+
         var oldDuration = oldCourse.duration || 2;
         var newDuration = newData.duration !== undefined ? newData.duration : oldDuration;
-        var oldStudentId = oldCourse.student_id;
+
+        var oldStudentId = oldCourse.student_id || null;
         var newStudentId = newData.student_id !== undefined ? newData.student_id : oldStudentId;
 
+        // ============================================================
+        // 3. 判断"是否占用 credit"
+        // ============================================================
         function isConsuming(s) {
             return s === 'scheduled' || s === 'in_progress' || s === 'completed';
         }
@@ -590,27 +704,57 @@ async function updateCourse(id, newData) {
         var oldConsumes = isConsuming(oldStatus);
         var newConsumes = isConsuming(newStatus);
 
-        if (oldStudentId !== newStudentId) {
-            if (oldConsumes) await refundCredit(oldStudentId, oldDuration, category);
-            if (newConsumes) await deductCredit(newStudentId, newDuration, category);
-        } else {
+        // ============================================================
+        // 4. 处理 credit
+        // ============================================================
+
+        // ---- 情况 A：学生换了 或 category 换了 → 全额退旧的，全额扣新的 ----
+        if (oldStudentId !== newStudentId || oldCategory !== newCategory) {
+
+            if (oldConsumes && oldStudentId) {
+                await refundCredit(oldStudentId, oldDuration, oldCategory);
+            }
+
+            if (newConsumes && newStudentId) {
+                await deductCredit(newStudentId, newDuration, newCategory);
+            }
+
+        }
+        // ---- 情况 B：同学生、同 category → 只处理时长差 ----
+        else {
+
             if (oldConsumes && !newConsumes) {
-                await refundCredit(oldStudentId, oldDuration, category);
+                // 原来占用，现在不占用（比如改成 cancelled） → 退旧的
+                if (oldStudentId) {
+                    await refundCredit(oldStudentId, oldDuration, oldCategory);
+                }
+
             } else if (!oldConsumes && newConsumes) {
-                await deductCredit(oldStudentId, newDuration, category);
+                // 原来不占用，现在占用（比如从 cancelled 改回 scheduled） → 扣新的
+                if (oldStudentId) {
+                    await deductCredit(oldStudentId, newDuration, newCategory);
+                }
+
             } else if (oldConsumes && newConsumes) {
+                // 前后都占用 → 只处理时长差
                 var diff = newDuration - oldDuration;
-                if (diff > 0) {
-                    await deductCredit(oldStudentId, diff, category);
-                } else if (diff < 0) {
-                    await refundCredit(oldStudentId, -diff, category);
+                if (diff > 0 && oldStudentId) {
+                    await deductCredit(oldStudentId, diff, oldCategory);
+                } else if (diff < 0 && oldStudentId) {
+                    await refundCredit(oldStudentId, -diff, oldCategory);
                 }
             }
+            // else：前后都不占用 → 什么都不做
         }
 
+        // ============================================================
+        // 5. 更新数据库
+        // ============================================================
         var updateData = {};
         for (var k in newData) {
-            if (newData.hasOwnProperty(k)) updateData[k] = newData[k];
+            if (newData.hasOwnProperty(k)) {
+                updateData[k] = newData[k];
+            }
         }
         updateData.updated_at = new Date().toISOString();
 
@@ -619,10 +763,11 @@ async function updateCourse(id, newData) {
             .update(updateData)
             .eq('id', id)
             .select()
-            .single();
+            .maybeSingle();
 
         if (result.error) throw result.error;
         return result.data;
+
     } catch (error) {
         console.error('更新课程失败:', error);
         throw error;
@@ -823,9 +968,7 @@ async function createTeacherAvailability(availabilityData) {
             .from('teacher_availabilities')
             .select('id, start_time, end_time')
             .eq('teacher_id', availabilityData.teacher_id)
-            .in('status', ['available', 'booked'])
-            .or('start_time.lt.' + availabilityData.end_time + ',end_time.gt.' + availabilityData.start_time);
-
+            .in('status', ['available', 'booked']);
         if (checkResult.error) throw checkResult.error;
         var existing = checkResult.data;
 
@@ -867,13 +1010,16 @@ async function createTeacherAvailability(availabilityData) {
 async function deleteTeacherAvailability(id) {
     try {
         var supabase = getSupabaseClient();
+
         var checkResult = await supabase
             .from('teacher_availabilities')
             .select('status')
             .eq('id', id)
-            .single();
+            .maybeSingle();
 
-        if (checkResult.error) throw checkResult.error;
+        if (checkResult.error || !checkResult.data) {
+            throw new Error('Créneau introuvable');
+        }
         if (checkResult.data.status === 'booked') {
             throw new Error('Impossible de supprimer un créneau déjà réservé');
         }
@@ -894,15 +1040,22 @@ async function deleteTeacherAvailability(id) {
 async function bookTeacherAvailability(slotId, studentId, studentName) {
     try {
         var supabase = getSupabaseClient();
+
         var slotResult = await supabase
             .from('teacher_availabilities')
             .select('*')
             .eq('id', slotId)
-            .single();
+            .maybeSingle();
 
-        if (slotResult.error) throw slotResult.error;
-        if (slotResult.data.status !== 'available') throw new Error('Ce créneau n\'est plus disponible');
-        if (new Date(slotResult.data.start_time) < new Date()) throw new Error('Ce créneau a déjà expiré');
+        if (slotResult.error || !slotResult.data) {
+            throw new Error('Créneau introuvable');
+        }
+        if (slotResult.data.status !== 'available') {
+            throw new Error('Ce créneau n\'est plus disponible');
+        }
+        if (new Date(slotResult.data.start_time) < new Date()) {
+            throw new Error('Ce créneau a déjà expiré');
+        }
 
         var result = await supabase
             .from('teacher_availabilities')
@@ -935,13 +1088,14 @@ async function cancelBooking(slotId) {
                 status: 'available',
                 student_id: null,
                 student_name: null,
+                course_id: null,
                 booked_at: null,
                 updated_at: new Date().toISOString()
             })
             .eq('id', slotId)
             .eq('status', 'booked')
             .select()
-            .single();
+            .maybeSingle();
 
         if (result.error) throw result.error;
         return result.data;
@@ -957,18 +1111,20 @@ async function bookSlotAndCreateCourse(slotId, studentId, studentName, courseTyp
 
     try {
         var supabase = getSupabaseClient();
-
         var slotResult = await supabase
             .from('teacher_availabilities')
             .select('*')
             .eq('id', slotId)
-            .single();
+            .maybeSingle();
 
-        if (slotResult.error) throw slotResult.error;
+        if (slotResult.error || !slotResult.data) {
+            throw new Error('Créneau introuvable');
+        }
         var slot = slotResult.data;
         if (slot.status !== 'available') throw new Error('Ce créneau n\'est plus disponible');
         if (new Date(slot.start_time) < new Date()) throw new Error('Ce créneau a déjà expiré');
 
+  
         var studentResult = await supabase
             .from('users')
             .select('credit, french_credit')
@@ -1054,9 +1210,11 @@ async function cancelStudentBooking(courseId) {
             .from('courses_v2')
             .select('*')
             .eq('id', courseId)
-            .single();
+            .maybeSingle();
 
-        if (courseResult.error) throw courseResult.error;
+        if (courseResult.error || !courseResult.data) {
+            throw new Error('Cours introuvable');
+        }
         var course = courseResult.data;
         if (course.source !== 'student_booking') throw new Error('Ce cours n\'a pas été créé par une réservation');
         if (course.status === 'cancelled') throw new Error('Ce cours est déjà annulé');
@@ -1117,43 +1275,104 @@ async function cancelStudentBooking(courseId) {
 // ============================================================
 
 async function recordMistakeToDB(studentInfo, question, userAnswer, testType) {
-    if (userAnswer === null || userAnswer === undefined || userAnswer < 0) {
-        userAnswer = 0;
-    }
+    // ============================================================
+    // 1. 校验 question
+    // ============================================================
     if (!question || !question.question || !question.options || !Array.isArray(question.options)) {
-        console.error('问题数据不完整');
+        console.error('❌ 记录错题失败：问题数据不完整', question);
         return null;
     }
 
-    var questionId = question.question_id || question.id || ('local_' + Date.now());
+    // ============================================================
+    // 2. 把 answer 统一转成数字索引（支持 0-3 数字 / "A"-"D" 字母 / "0"-"3" 字符串）
+    // ============================================================
+    function normalizeAnswer(val) {
+        if (val === null || val === undefined) return null;
 
+        // 已是数字
+        if (typeof val === 'number') {
+            return (val >= 0 && val < question.options.length) ? val : null;
+        }
+
+        // 字符串：可能是 "A" / "a" / "B" ...
+        if (typeof val === 'string') {
+            var s = val.trim();
+            if (s.length === 1) {
+                var code = s.toUpperCase().charCodeAt(0);
+                if (code >= 65 && code <= 68) {  // A-D
+                    var idx = code - 65;
+                    return (idx < question.options.length) ? idx : null;
+                }
+            }
+            // 也可能是 "0" / "1" / "2" / "3"
+            var n = parseInt(s, 10);
+            if (!isNaN(n) && n >= 0 && n < question.options.length) {
+                return n;
+            }
+        }
+
+        return null;
+    }
+
+    var correctAnswer = normalizeAnswer(question.answer);
+    var userAnswerIdx = normalizeAnswer(userAnswer);
+
+    // 用户没选 → 默认 0
+    if (userAnswerIdx === null) {
+        userAnswerIdx = 0;
+    }
+
+    // 正确答案取不到 → 记录但警告
+    if (correctAnswer === null) {
+        console.warn('⚠️ 记录错题：无法解析正确答案', question.answer, '，默认为 0');
+        correctAnswer = 0;
+    }
+
+    // ============================================================
+    // 3. 生成稳定的 question_id（用于去重）
+    // ============================================================
+    var questionId = question.question_id
+        || question.id
+        || ('local_' + studentInfo.name + '_' + (question.question || '').substring(0, 40));
+
+    // ============================================================
+    // 4. 写入数据库
+    // ============================================================
     try {
         var supabase = getSupabaseClient();
 
+        // 先查这个学生是否已经错过这道题
         var findResult = await supabase
             .from('mistakes')
-            .select('id, times_wrong, mastered')
+            .select('id, times_wrong')
             .eq('student_name', studentInfo.name)
             .eq('question_id', questionId)
             .maybeSingle();
 
+        // 已有记录 → 更新
         if (findResult.data) {
+            var newTimes = (findResult.data.times_wrong || 0) + 1;
             var updateResult = await supabase
                 .from('mistakes')
                 .update({
-                    times_wrong: findResult.data.times_wrong + 1,
-                    user_answer: userAnswer,
+                    times_wrong: newTimes,
+                    user_answer: userAnswerIdx,
+                    correct_answer: correctAnswer,   // 🔥 顺便纠正
                     updated_at: new Date().toISOString(),
                     mastered: false
                 })
                 .eq('id', findResult.data.id)
-                .select()
+                .select('id')
                 .single();
 
-            if (updateResult.error) return null;
+            if (updateResult.error) {
+                console.error('❌ 更新错题失败:', updateResult.error.message);
+                return null;
+            }
             return updateResult.data.id;
         }
 
+        // 没有记录 → 插入新错题
         var mistakeData = {
             student_name: studentInfo.name,
             question_id: questionId,
@@ -1161,9 +1380,9 @@ async function recordMistakeToDB(studentInfo, question, userAnswer, testType) {
             category: question.category || question.theme || question['主题'] || 'Autre',
             difficulty: question['难度'] || question.difficulty || '中等',
             options: question.options,
-            correct_answer: question.answer,
-            user_answer: userAnswer,
-            test_type: testType,
+            correct_answer: correctAnswer,
+            user_answer: userAnswerIdx,
+            test_type: testType || null,
             explanation: question.explanation || question['解释'] || '',
             times_wrong: 1,
             mastered: false,
@@ -1174,13 +1393,17 @@ async function recordMistakeToDB(studentInfo, question, userAnswer, testType) {
         var insertResult = await supabase
             .from('mistakes')
             .insert([mistakeData])
-            .select()
+            .select('id')
             .single();
 
-        if (insertResult.error) return null;
+        if (insertResult.error) {
+            console.error('❌ 插入错题失败:', insertResult.error.message);
+            return null;
+        }
         return insertResult.data.id;
+
     } catch (error) {
-        console.error('记录错题失败:', error);
+        console.error('❌ 记录错题异常:', error);
         return null;
     }
 }

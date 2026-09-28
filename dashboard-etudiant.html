@@ -1066,7 +1066,11 @@ function setLang(lang) {
     renderMistakesList();
     renderStatsTab();
     renderChart();
+    if (quizQuestions.length === 0 || quizIndex >= quizQuestions.length) {
     renderQuiz();
+        } else {
+            renderQuizQuestion();
+        }   
     updateFilterOptionsText();
     updateStatsLabels();
     updateQuizBadge();
@@ -1397,10 +1401,10 @@ function updateStats() {
     }
 
     const uniqueMistakes = new Set();
-    allMistakes.forEach(m => {
-        const key = m.question_id || m.question || 'unknown';
-        uniqueMistakes.add(key);
-    });
+        allMistakes.forEach(m => {
+            const key = m.id || m.question_id || m.question || 'unknown';
+            uniqueMistakes.add(key);
+        });
 
     document.getElementById('totalTests').textContent = total;
     document.getElementById('passedTests').textContent = passed;
