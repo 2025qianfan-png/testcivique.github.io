@@ -29,7 +29,7 @@ const urlsToCache = [
   '/french-teacher.html',
   '/ia.html',
   '/chinois.html',
- '/ developpement.html',
+ '/developpement.html',
    '/grammaire.html',
    '/lecture.html',
    '/ecoute.html',
