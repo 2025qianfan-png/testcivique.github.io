@@ -1,4 +1,4 @@
-const CACHE_NAME = 'civique-exam-v2.50';
+const CACHE_NAME = 'civique-exam-v2.51';
 const urlsToCache = [
   '/',
   '/video.html',
@@ -44,6 +44,8 @@ const urlsToCache = [
    '/test-situation.html',
   '/dashboard-etudiant.html',
    '/supabase-config.js'
+  '/tcf-oral.html',
+   '/tcf-oral.js',
   
 ];
 
