@@ -1,5 +1,5 @@
 // ============================================================
-// TCF IRN 口语训练系统 v4 — 真人考官 + AI 自由开场
+// TCF IRN 口语训练系统 v5 — 全面修复
 // ============================================================
 
 let currentUser = null;
@@ -17,11 +17,9 @@ let isProcessing = false;
 let ttsUnlocked = false;
 let currentExaminer = null;
 
-// 计时
 let timerInterval = null;
 let timerSeconds = 0;
 
-// 沉默检测
 let audioCtx = null;
 let silenceCheckInterval = null;
 let silenceTimer = null;
@@ -77,6 +75,42 @@ function hideLoading() {
 }
 
 // ============================================================
+// 从 AI 返回中提取纯文本（不管有没有 [MOOD:xxx] tag）
+// ============================================================
+function extractTextAndMood(result) {
+    // 1. 兼容 string / {content, examiner}
+    let raw = '';
+    let examiner = null;
+
+    if (typeof result === 'string') {
+        raw = result;
+    } else if (result && typeof result === 'object') {
+        raw = result.content || '';
+        examiner = result.examiner || null;
+    }
+
+    if (!raw || typeof raw !== 'string') {
+        console.warn('⚠️ extractTextAndMood: raw 为空或非字符串', result);
+        return { text: '', mood: 'neutral', examiner: examiner };
+    }
+
+    // 2. 剥 mood tag（只在开头）
+    let mood = 'neutral';
+    let text = raw;
+
+    const match = raw.match(/^\s*\[MOOD\s*:\s*(green|neutral|probe)\s*\]\s*/i);
+    if (match) {
+        mood = match[1].toLowerCase();
+        text = raw.slice(match[0].length);
+    }
+
+    // 3. 清理所有 [MOOD:xxx]（如果AI在中间也写了）
+    text = text.replace(/\[MOOD\s*:\s*\w+\]/gi, '').trim();
+
+    return { text, mood, examiner };
+}
+
+// ============================================================
 // TTS
 // ============================================================
 function unlockTTS() {
@@ -94,6 +128,8 @@ function unlockTTS() {
 
 function speakFrench(text, examiner) {
     if (!('speechSynthesis' in window)) return;
+    if (!text || !text.trim()) return;
+
     window.speechSynthesis.cancel();
 
     const doSpeak = () => {
@@ -324,7 +360,7 @@ async function selectTopic(topicId) {
 window.selectTopic = selectTopic;
 
 // ============================================================
-// 考官开场（只用 AI 生成，不用数据库死模板）
+// 考官开场
 // ============================================================
 async function startExaminerOpening() {
     const statusEl = document.getElementById('status');
@@ -332,6 +368,8 @@ async function startExaminerOpening() {
 
     try {
         const scenarioFr = selectedTopic.scenario_fr || '';
+
+        console.log('🚀 startExaminerOpening — 调用 examinerReplyOral...');
 
         const result = await window.supabaseAuth.examinerReplyOral(
             currentTask,
@@ -342,33 +380,28 @@ async function startExaminerOpening() {
             []
         );
 
-        // 兼容旧版 string / 新版 {content, examiner}
-        const raw = (typeof result === 'string') ? result : (result.content || '');
-        const examiner = (typeof result === 'string') ? null : result.examiner;
+        console.log('🚀 examinerReplyOral 返回:', JSON.stringify(result).slice(0, 300));
+
+        const { text, mood, examiner } = extractTextAndMood(result);
+
+        console.log('🚀 提取后 — text 长度:', text.length, '| mood:', mood, '| examiner:', examiner);
+
+        if (!text || text.trim().length < 3) {
+            console.error('❌ text 为空，result =', result);
+            throw new Error('Réponse IA vide — vérifier la console');
+        }
 
         currentExaminer = examiner;
-
-        const { mood, text } = parseMood(raw);
-
-        if (!text || text.trim().length < 5) {
-            throw new Error('Réponse IA vide');
-        }
 
         chatMessages.push({ role: 'ai', text, mood });
         renderChat();
         speakFrench(text, examiner);
         statusEl.textContent = '🎤 À vous de répondre. Appuyez sur le micro.';
     } catch (e) {
-        console.error('Erreur opening:', e);
-        statusEl.textContent = '❌ Erreur: ' + e.message;
+        console.error('❌ Erreur opening:', e);
+        statusEl.textContent = '❌ ' + e.message;
         showToast('Erreur: ' + e.message, 'error');
     }
-}
-
-function parseMood(raw) {
-    const m = raw.match(/^\[MOOD:(\w+)\]\s*/);
-    if (m) return { mood: m[1], text: raw.replace(/^\[MOOD:\w+\]\s*/, '').trim() };
-    return { mood: 'neutral', text: raw.trim() };
 }
 
 // ============================================================
@@ -454,7 +487,6 @@ async function startRecording() {
             await processAudio(blob);
         };
 
-        // 沉默检测
         try {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const analyser = audioCtx.createAnalyser();
@@ -472,7 +504,7 @@ async function startRecording() {
                     document.getElementById('status').textContent = '🤫 L\'examinateur attend votre réponse...';
                 }
             }, 5000);
-        } catch (e) { /* 有些浏览器不支持 AudioContext */ }
+        } catch (e) { /* ignore */ }
 
         mediaRecorder.start();
         isRecording = true;
@@ -507,7 +539,7 @@ function stopRecording() {
 }
 
 // ============================================================
-// 处理音频
+// 处理音频 → Whisper → AI 追问
 // ============================================================
 async function processAudio(blob) {
     isProcessing = true;
@@ -523,20 +555,26 @@ async function processAudio(blob) {
         renderChat();
 
         document.getElementById('status').textContent = '🤖 L\'examinateur répond...';
+
         const result = await window.supabaseAuth.examinerReplyOral(
             currentTask, selectedTopic.prompt_fr, selectedTopic.title_fr,
             selectedTopic.scenario_fr || '', '', chatMessages
         );
 
-        const raw = (typeof result === 'string') ? result : (result.content || '');
-        const { mood, text } = parseMood(raw);
+        console.log('🚀 examinerReplyOral (follow-up) 返回:', JSON.stringify(result).slice(0, 300));
+
+        const { text, mood } = extractTextAndMood(result);
+
+        if (!text || text.trim().length < 3) {
+            throw new Error('Réponse IA vide (follow-up)');
+        }
 
         chatMessages.push({ role: 'ai', text, mood });
         renderChat();
         speakFrench(text, currentExaminer);
         document.getElementById('status').textContent = '🎤 À vous. Appuyez sur le micro.';
     } catch (e) {
-        console.error(e);
+        console.error('❌ Erreur processAudio:', e);
         document.getElementById('status').textContent = '❌ ' + e.message;
         showToast(e.message, 'error');
     } finally {
@@ -620,10 +658,10 @@ function showReport(result) {
     const scoreEl = document.getElementById('reportScore');
     scoreEl.textContent = (result.score !== null ? result.score : '—') + ' / 20';
 
-    let color = '#27ae60';       // B2 (10-20) 绿
-    if (score <= 1) color = '#e74c3c';        // A1
-    else if (score <= 5) color = '#e67e22';   // A2
-    else if (score <= 9) color = '#f39c12';   // B1
+    let color = '#27ae60';
+    if (score <= 1) color = '#e74c3c';
+    else if (score <= 5) color = '#e67e22';
+    else if (score <= 9) color = '#f39c12';
     scoreEl.style.color = color;
 
     document.getElementById('reportLevel').textContent = result.level || '—';
