@@ -2908,24 +2908,43 @@ async function confirmCancelBooking() {
         if (error) throw error;
 
         // 释放空闲时间段
-        const { data: slots } = await supabase
+        // 先按 course_id 查
+        const { data: slotsByCourse } = await supabase
             .from('teacher_availabilities')
             .select('id')
             .eq('course_id', pendingCancelBookingId);
-        if (slots && slots.length > 0) {
-            await supabase
+
+        let slotIds = (slotsByCourse || []).map(s => s.id);
+
+        // 查不到就按 student_id + start_time 兜底
+        if (slotIds.length === 0) {
+            const { data: slotsByStudent } = await supabase
                 .from('teacher_availabilities')
-                .update({
-                    status: 'available',
-                    student_id: null,
-                    student_name: null,
-                    course_id: null,
-                    booked_at: null,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', slots[0].id);
+                .select('id')
+                .eq('student_id', student.id)
+                .eq('status', 'booked')
+                .eq('start_time', c.start_time);
+            slotIds = (slotsByStudent || []).map(s => s.id);
         }
 
+        if (slotIds.length > 0) {
+                const { error: releaseErr } = await supabase
+                    .from('teacher_availabilities')
+                    .update({
+                        status: 'available',
+                        student_id: null,
+                        student_name: null,
+                        course_id: null,
+                        booked_at: null,
+                        updated_at: new Date().toISOString()
+                    })
+                    .in('id', slotIds);
+
+                if (releaseErr) {
+                    console.error('❌ 释放时间段失败:', releaseErr);
+                    showToast('⚠️ 时间段未释放: ' + releaseErr.message, 'warning');
+                }
+            }
                 // 🔥 发邮件给老师（取消预约）
         try {
             await sendCourseEmailNotificationToTeacher(pendingCancelBookingId, 'cancel_booking', student.name);
@@ -3261,7 +3280,7 @@ async function confirmBooking() {
         }
 
         // 4. 更新空闲时间段
-        const { error: slotUpdErr } = await supabase
+       const { data: updatedSlots, error: slotUpdErr } = await supabase
             .from('teacher_availabilities')
             .update({
                 status: 'booked',
@@ -3272,12 +3291,14 @@ async function confirmBooking() {
                 updated_at: new Date().toISOString()
             })
             .eq('id', slot.id)
-            .eq('status', 'available');
+            .eq('status', 'available')
+            .select();   // 🔥 就加这一行
 
-        if (slotUpdErr) {
+        if (slotUpdErr || !updatedSlots || updatedSlots.length === 0) {
+            // 回滚：删课程 + 退课时
             await supabase.from('courses_v2').delete().eq('id', course.id);
             await supabase.from('users').update({ [field]: credit }).eq('id', student.id);
-            throw slotUpdErr;
+            throw new Error('Ce créneau n\'est plus disponible');
         }
 
                // 5. 更新本地 credit

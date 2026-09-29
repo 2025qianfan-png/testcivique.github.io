@@ -1195,6 +1195,7 @@ async function loadAllData() {
             .from('teacher_availabilities')
             .select('*')
             .eq('teacher_id', teacher.id)
+            .gte('end_time', new Date().toISOString())   // 🔥 只看未结束的
             .order('start_time', { ascending: true });
 
         allAvailabilities = availRes.data || [];
@@ -1476,6 +1477,28 @@ function renderAvailabilities() {
     if (!container) return;
     const now = new Date();
     const slots = allAvailabilities.filter(s => new Date(s.end_time) >= now);
+
+    // 🔥 自动修复：completed 课程但 slot 还是 booked → 释放
+    const completedBooked = slots.filter(s =>
+        s.status === 'booked' &&
+        s.course_id &&
+        allCourses.find(c => c.id === s.course_id && c.status === 'completed')
+    );
+    if (completedBooked.length > 0) {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        supabase
+            .from('teacher_availabilities')
+            .update({
+                status: 'available',
+                student_id: null,
+                student_name: null,
+                course_id: null,
+                booked_at: null,
+                updated_at: new Date().toISOString()
+            })
+            .in('id', completedBooked.map(s => s.id))
+            .then(() => console.log('🔧 自动释放', completedBooked.length, '个已完成课程的 slot'));
+}
 
     if (slots.length === 0) {
         container.innerHTML = `<div class="empty-state">
@@ -2373,14 +2396,14 @@ function bindEvents() {
     document.getElementById('addAvailBtn').addEventListener('click', openAvailModal);
 
     // 退出
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-        if (teacherCourseSubscription) { teacherCourseSubscription.unsubscribe(); teacherCourseSubscription = null; }
-        if (teacherCSSubscription) { teacherCSSubscription.unsubscribe(); teacherCSSubscription = null; }
-        if (teacherReloadTimer) { clearTimeout(teacherReloadTimer); teacherReloadTimer = null; }
-        sessionStorage.clear();
-        window.location.href = 'index.html';
-    });
-
+   document.getElementById('logoutBtn').addEventListener('click', () => {
+    if (teacherCourseSubscription) { teacherCourseSubscription.unsubscribe(); teacherCourseSubscription = null; }
+    if (teacherCSSubscription) { teacherCSSubscription.unsubscribe(); teacherCSSubscription = null; }
+    if (teacherAvailSubscription) { teacherAvailSubscription.unsubscribe(); teacherAvailSubscription = null; }  // 🔥 新增
+    if (teacherReloadTimer) { clearTimeout(teacherReloadTimer); teacherReloadTimer = null; }
+    sessionStorage.clear();
+    window.location.href = 'index.html';
+});
     // 关闭 modal（× 和取消按钮）
     document.querySelectorAll('[data-close]').forEach(el => {
         el.addEventListener('click', () => {
@@ -2436,6 +2459,7 @@ function bindEvents() {
 // ============================================================
 let teacherCourseSubscription = null;
 let teacherCSSubscription = null;
+let teacherAvailSubscription = null;   // 🔥 新增这一行
 let teacherReloadTimer = null;
 
 function scheduleTeacherReload(reason) {
@@ -2450,42 +2474,77 @@ function subscribeToTeacherCourses() {
     const supabase = window.supabaseAuth.getSupabaseClient();
     if (!supabase || !teacher) return;
 
+    // 清理旧订阅
     if (teacherCourseSubscription) { teacherCourseSubscription.unsubscribe(); teacherCourseSubscription = null; }
     if (teacherCSSubscription) { teacherCSSubscription.unsubscribe(); teacherCSSubscription = null; }
+    if (teacherAvailSubscription) { teacherAvailSubscription.unsubscribe(); teacherAvailSubscription = null; }
 
-  teacherCourseSubscription = supabase
-    .channel('teacher_courses_' + teacher.id + '_' + Date.now())
-    .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'courses_v2' },
-        (payload) => {
-            const eventType = payload.eventType;
-            const newRow = payload.new || {};
-            const oldRow = payload.old || {};
+    // ============ 1. courses_v2 ============
+    teacherCourseSubscription = supabase
+        .channel('teacher_courses_' + teacher.id + '_' + Date.now())
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'courses_v2' },
+            (payload) => {
+                const eventType = payload.eventType;
+                const newRow = payload.new || {};
+                const oldRow = payload.old || {};
 
-            // DELETE：new 为空，old 只有 id → 用本地 allCourses 判断
-            if (eventType === 'DELETE') {
-                if (allCourses.some(c => c.id === oldRow.id)) {
-                    scheduleTeacherReload('courses_v2 DELETE');
+                // DELETE：new 为空，old 只有 id → 用本地 allCourses 判断
+                if (eventType === 'DELETE') {
+                    if (allCourses.some(c => c.id === oldRow.id)) {
+                        scheduleTeacherReload('courses_v2 DELETE');
+                    }
+                    return;
                 }
-                return;
-            }
 
-            // INSERT / UPDATE：new 有完整数据
-            if (newRow.teacher_id === teacher.id) {
-                scheduleTeacherReload('courses_v2 ' + eventType);
+                // INSERT / UPDATE：new 有完整数据
+                if (newRow.teacher_id === teacher.id) {
+                    scheduleTeacherReload('courses_v2 ' + eventType);
+                }
             }
-        }
-    )
-    .subscribe((status) => console.log('📡 teacher courses_v2:', status));
+        )
+        .subscribe((status) => console.log('📡 teacher courses_v2:', status));
+
+    // ============ 2. course_students（小组课加人/移除） ============
     teacherCSSubscription = supabase
         .channel('teacher_cs_' + teacher.id + '_' + Date.now())
         .on(
             'postgres_changes',
             { event: '*', schema: 'public', table: 'course_students' },
-            () => scheduleTeacherReload('course_students')
+            (payload) => {
+                const newRow = payload.new || {};
+                const oldRow = payload.old || {};
+
+                // 只关心和自己课程相关的
+                const courseId = newRow.course_id || oldRow.course_id;
+                if (courseId && allCourses.some(c => c.id === courseId)) {
+                    scheduleTeacherReload('course_students');
+                }
+            }
         )
         .subscribe((status) => console.log('📡 teacher course_students:', status));
+
+    // ============ 3. teacher_availabilities（学生预约/取消 slot） ============
+    teacherAvailSubscription = supabase
+        .channel('teacher_avail_' + teacher.id + '_' + Date.now())
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'teacher_availabilities' },
+            (payload) => {
+                const eventType = payload.eventType;
+                const newRow = payload.new || {};
+                const oldRow = payload.old || {};
+
+                // DELETE：old 里有 teacher_id
+                // INSERT / UPDATE：new 里有 teacher_id
+                const tid = newRow.teacher_id || oldRow.teacher_id;
+                if (tid === teacher.id) {
+                    scheduleTeacherReload('teacher_availabilities ' + eventType);
+                }
+            }
+        )
+        .subscribe((status) => console.log('📡 teacher teacher_availabilities:', status));
 }
 // ============================================================
 // 
