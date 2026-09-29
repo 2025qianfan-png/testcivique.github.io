@@ -557,7 +557,7 @@ const STUDENT_EXAM_TYPES = {
 };
 
 const DEFAULT_MEETING_LINK = 'https://meet.google.com/bof-kzvo-ndh';
-const HE_TEACHER_LINK = 'https://meet.google.com/gkv-cirp-iqo';
+const HE_TEACHER_LINK = 'https://meet.google.com/akd-ydea-tmm';
 const ZHOU_TEACHER_LINK = 'https://meet.google.com/bof-kzvo-ndh';
 // ============================================================
 // 工具函数
