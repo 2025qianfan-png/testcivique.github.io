@@ -37,6 +37,75 @@
 .lang-switch .lang-btn:hover:not(.active) {
     background: rgba(255,255,255,0.15);
 }
+
+/* ============ Meet 链接 Tab ============ */
+#tab-meeting-links .section {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.meeting-link-row {
+    display: grid;
+    grid-template-columns: 220px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid #eef2f7;
+    transition: background 0.2s;
+}
+.meeting-link-row:last-child { border-bottom: none; }
+.meeting-link-row:hover { background: #fafbfc; }
+
+.meeting-link-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: var(--civique, #004080);
+}
+.meeting-link-name i { color: var(--civique, #004080); font-size: 1.1rem; }
+
+.meeting-link-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.meeting-link-field {
+    flex: 1;
+    padding: 9px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.meeting-link-field:focus {
+    outline: none;
+    border-color: var(--civique, #004080);
+    box-shadow: 0 0 0 3px rgba(0,64,128,0.08);
+}
+
+.meeting-link-warning {
+    font-size: 0.78rem;
+    color: #e74c3c;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.meeting-link-actions {
+    display: flex;
+    gap: 6px;
+}
+
+@media (max-width: 768px) {
+    .meeting-link-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    .meeting-link-actions { justify-content: flex-end; }
+}
 </style>
 </head>
 <body data-theme="civique">
@@ -66,7 +135,7 @@
 </header>
 
 <!-- ============================================================
-     TABS (6 个)
+     TABS
      ============================================================ -->
 <nav class="admin-tabs"><div class="container">
 <button class="admin-tab active" data-tab="users" data-scope="both"><i class="fas fa-users"></i> <span data-i18n="tab.users">Utilisateurs</span></button>
@@ -74,6 +143,7 @@
 <button class="admin-tab" data-tab="civique-courses" data-scope="civique"><i class="fas fa-graduation-cap"></i> <span data-i18n="tab.civique">Cours Civique</span></button>
 <button class="admin-tab" data-tab="french-courses" data-scope="francais"><i class="fas fa-language"></i> <span data-i18n="tab.french">Cours Français</span></button>
 <button class="admin-tab" data-tab="student-exams" data-scope="both"><i class="fas fa-file-signature"></i> <span data-i18n="tab.exams">Examens élèves</span></button>
+<button class="admin-tab" data-tab="meeting-links" data-scope="both"><i class="fas fa-video"></i> <span data-i18n="tab.meetingLinks">Meet 链接</span></button>
 <button class="admin-tab" data-tab="calendar" data-scope="both"><i class="fas fa-calendar-alt"></i> <span data-i18n="tab.calendar">Calendrier</span></button>
 </div></nav>
 
@@ -254,7 +324,29 @@
 </div>
 </section>
 
-<!-- ============ TAB 6: CALENDAR ============ -->
+<!-- ============ TAB 6: MEETING LINKS ============ -->
+<section class="tab-content" id="tab-meeting-links" data-theme="civique">
+<div class="card">
+<div class="card-header">
+<h2>
+<i class="fas fa-video"></i>
+<span data-i18n="meeting.title">Liens Meet des intervenants</span>
+<span class="subtitle" data-i18n="meeting.subtitle">Configurez le lien Google Meet pour chaque intervenant</span>
+</h2>
+<button class="btn btn-secondary" id="refreshMeetingLinksBtn">
+<i class="fas fa-sync-alt"></i> <span data-i18n="meeting.refresh">Rafraîchir</span>
+</button>
+</div>
+<div id="meetingLinksList">
+<div class="empty-state">
+<i class="fas fa-spinner fa-spin"></i>
+<p data-i18n="loading">Chargement...</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ============ TAB 7: CALENDAR ============ -->
 <section class="tab-content" id="tab-calendar" data-theme="civique">
 <div class="card">
 <div class="card-header">
@@ -287,12 +379,10 @@
 </select>
 </div>
 
-<!-- 桌面端：周视图 -->
 <div class="week-view" id="weekView">
 <div class="empty-state" data-i18n="loading">Chargement...</div>
 </div>
 
-<!-- 移动端：列表视图 -->
 <div class="calendar-mobile-list" id="calendarMobileList">
 <div class="empty-state" data-i18n="loading">Chargement...</div>
 </div>
@@ -305,7 +395,7 @@
 <footer class="main-footer"><div class="container"><p data-i18n="footer">© 2025-2026 Association Mille Voiles / 千帆协会</p></div></footer>
 
 <!-- ============================================================
-     MODAL: COURSE DETAIL (只读弹窗)
+     MODAL: COURSE DETAIL
      ============================================================ -->
 <div class="modal" id="courseDetailModal">
 <div class="modal-content">
@@ -313,9 +403,7 @@
 <h3 id="courseDetailTitle" data-i18n="cd.title">Détails du cours</h3>
 <button class="close-modal" onclick="closeModal('courseDetailModal')">&times;</button>
 </div>
-<div id="courseDetailBody">
-<!-- 动态填充 -->
-</div>
+<div id="courseDetailBody"></div>
 <div class="form-actions">
 <button class="cancel-action-btn" onclick="closeModal('courseDetailModal')" data-i18n="btn.close">Fermer</button>
 </div>
@@ -362,7 +450,6 @@
 </div>
 </div>
 
-<!-- ===== CIVIQUE FIELDS ===== -->
 <div id="civiqueFields" class="form-row" style="display:none;">
 <div class="form-group">
 <label data-i18n="form.typeCivique">Type de cours</label>
@@ -384,7 +471,6 @@
 <input type="datetime-local" id="userTimer">
 </div>
 
-<!-- ===== FRANÇAIS FIELDS ===== -->
 <div id="francaisFields" class="form-row" style="display:none;">
 <div class="form-group">
 <label data-i18n="form.typeFrench">Type d'examen français</label>
@@ -541,7 +627,7 @@
 </div>
 
 <!-- ============================================================
-     MODAL: COURSE (Ajout/Édition)
+     MODAL: COURSE
      ============================================================ -->
 <div class="modal" id="courseModal">
 <div class="modal-content modal-lg">

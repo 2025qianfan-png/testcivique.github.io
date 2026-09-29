@@ -268,7 +268,20 @@ const I18N = {
         'loading': 'Chargement...',
 
         days: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-        daysFull: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+        daysFull: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'],
+        'tab.meetingLinks': 'Liens Meet',
+        'meeting.title': 'Liens Meet des intervenants',
+        'meeting.subtitle': 'Configurez le lien Google Meet pour chaque intervenant',
+        'meeting.refresh': 'Rafraîchir',
+        'meeting.save': 'Enregistrer',
+        'meeting.saved': 'Lien enregistré ✓',
+        'meeting.empty': 'Aucun intervenant',
+        'meeting.missing': '⚠️ Manquant',
+        'meeting.placeholder': 'https://meet.google.com/...',
+        'meeting.errEmpty': '⚠️ Lien vide',
+        'meeting.errHttp': '⚠️ Le lien doit commencer par http',
+        'meeting.errSave': 'Erreur lors de l\'enregistrement',
+        'meeting.refreshed': 'Liens rafraîchis ✓',
     },
 
     zh: {
@@ -476,7 +489,20 @@ const I18N = {
         'loading': '加载中...',
 
         days: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
-        daysFull: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日']
+        daysFull: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
+        'tab.meetingLinks': 'Meet 链接',
+        'meeting.title': '教师 Meet 链接',
+        'meeting.subtitle': '为每位教师配置 Google Meet 链接',
+        'meeting.refresh': '刷新',
+        'meeting.save': '保存',
+        'meeting.saved': '链接已保存 ✓',
+        'meeting.empty': '暂无教师',
+        'meeting.missing': '⚠️ 缺失',
+        'meeting.placeholder': 'https://meet.google.com/...',
+        'meeting.errEmpty': '⚠️ 链接为空',
+        'meeting.errHttp': '⚠️ 链接必须以 http 开头',
+        'meeting.errSave': '保存失败',
+        'meeting.refreshed': '链接已刷新 ✓',
     }
 };
 
@@ -556,9 +582,8 @@ const STUDENT_EXAM_TYPES = {
     ]
 };
 
-const DEFAULT_MEETING_LINK = 'https://meet.google.com/bof-kzvo-ndh';
-const HE_TEACHER_LINK = 'https://meet.google.com/akd-ydea-tmm';
-const ZHOU_TEACHER_LINK = 'https://meet.google.com/bof-kzvo-ndh';
+// 🔥 老师 Meet 链接缓存（teacher_id -> link）
+let teacherMeetingLinks = {};
 // ============================================================
 // 工具函数
 // ============================================================
@@ -1087,8 +1112,11 @@ function applyLanguage() {
     if (typeof renderPreRegTable === 'function' && allPreRegs.length) renderPreRegTable();
     if (typeof renderCiviqueCourses === 'function' && allCiviqueCourses.length) renderCiviqueCourses();
     if (typeof renderFrenchCourses === 'function' && allFrenchCourses.length) renderFrenchCourses();
+  
     if (typeof renderStudentExams === 'function' && allStudentExams.length) renderStudentExams();
+    if (typeof renderMeetingLinksList === 'function' && allUsers.length) renderMeetingLinksList();   // 🔥 加这一行
 }
+
 
 function applyMode() {
     const backLink = document.getElementById('backHomeLink');
@@ -1130,6 +1158,7 @@ function bindTabs() {
             else document.body.setAttribute('data-theme', 'civique');
 
             if (tab === 'calendar') renderCalendar();
+            if (tab === 'meeting-links') renderMeetingLinksList();   // 🔥 加这一行
         });
     });
 }
@@ -1264,8 +1293,139 @@ function bindGlobalEvents() {
             if (e.target === m) closeModal(id);
         });
     });
+        // 🔥 Meet 链接刷新按钮
+    const refreshMeetingLinksBtn = document.getElementById('refreshMeetingLinksBtn');
+    if (refreshMeetingLinksBtn) {
+        refreshMeetingLinksBtn.addEventListener('click', async () => {
+            await loadTeacherMeetingLinks();
+            renderMeetingLinksList();
+            showToast(t('meeting.refreshed'), 'success');
+        });
+    }
 }
 
+async function loadTeacherMeetingLinks() {
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        const { data, error } = await supabase
+            .from('teacher_meeting_links')
+            .select('teacher_id, meeting_link');
+        if (error) throw error;
+        teacherMeetingLinks = {};
+        (data || []).forEach(row => {
+            teacherMeetingLinks[row.teacher_id] = row.meeting_link;
+        });
+        console.log('✅ 已加载', Object.keys(teacherMeetingLinks).length, '个老师的 Meet 链接');
+    } catch (e) {
+        console.warn('⚠️ 加载老师 Meet 链接失败:', e.message);
+        teacherMeetingLinks = {};
+    }
+}
+function renderMeetingLinksList() {
+    const container = document.getElementById('meetingLinksList');
+    if (!container) return;
+
+    const teachers = allUsers.filter(u => u.role === 'teacher');
+
+    if (teachers.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-user-slash"></i><p>' + t('meeting.empty') + '</p></div>';
+        return;
+    }
+
+    container.innerHTML = teachers.map(t2 => {
+        const link = teacherMeetingLinks[t2.id] || '';
+        const hasLink = link.trim() !== '';
+        return `
+            <div class="meeting-link-row" data-teacher-id="${t2.id}">
+                <div class="meeting-link-name">
+                    <i class="fas fa-chalkboard-user"></i>
+                    <strong>${escapeHtml(t2.name)}</strong>
+                </div>
+                <div class="meeting-link-input">
+                    <input type="url"
+                           class="meeting-link-field"
+                           data-teacher-id="${t2.id}"
+                           value="${escapeHtml(link)}"
+                           placeholder="${t('meeting.placeholder')}"
+                    />
+                    ${hasLink ? '' : '<span class="meeting-link-warning">' + t('meeting.missing') + '</span>'}
+                </div>
+                <div class="meeting-link-actions">
+                    <button class="action-btn save-meeting-link-btn"
+                            data-teacher-id="${t2.id}"
+                            style="background:#27ae60;color:white;">
+                        <i class="fas fa-save"></i> ${t('meeting.save')}
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.querySelectorAll('.save-meeting-link-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const teacherId = this.dataset.teacherId;
+            const input = container.querySelector(`.meeting-link-field[data-teacher-id="${teacherId}"]`);
+            saveTeacherMeetingLink(teacherId, input.value.trim());
+        });
+    });
+
+    container.querySelectorAll('.meeting-link-field').forEach(input => {
+        updateInputBorder(input);
+        input.addEventListener('input', function() {
+            updateInputBorder(this);
+        });
+    });
+}
+
+function updateInputBorder(input) {
+    const val = input.value.trim();
+    if (!val) {
+        input.style.borderColor = '#e74c3c';
+    } else if (!val.startsWith('http')) {
+        input.style.borderColor = '#f39c12';
+    } else {
+        input.style.borderColor = '#27ae60';
+    }
+}
+
+async function saveTeacherMeetingLink(teacherId, link) {
+    if (!link) {
+        showToast(t('meeting.errEmpty'), 'error');
+        return;
+    }
+    if (!link.startsWith('http')) {
+        showToast(t('meeting.errHttp'), 'error');
+        return;
+    }
+
+    showLoading('...');
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+
+        const { error } = await supabase
+            .from('teacher_meeting_links')
+            .upsert({
+                teacher_id: teacherId,
+                meeting_link: link,
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'teacher_id' });
+
+        if (error) throw error;
+
+        teacherMeetingLinks[teacherId] = link;
+        renderMeetingLinksList();
+
+        showToast(t('meeting.saved'), 'success');
+    } catch (err) {
+        console.error(err);
+        showToast(t('meeting.errSave') + ': ' + err.message, 'error');
+    } finally {
+        hideLoading();
+    }
+}
+function getTeacherMeetingLink(teacherId) {
+    return teacherMeetingLinks[teacherId] || null;
+}
 // ============================================================
 // 加载所有数据
 // ============================================================
@@ -1273,6 +1433,7 @@ async function loadAllData() {
     showLoading('Chargement des données...');
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
+          await loadTeacherMeetingLinks();
 
         const [usersRes, preRegsRes, coursesRes, studentExamsRes] = await Promise.all([
             supabase.from('users').select('*').order('created_at', { ascending: false }),
@@ -1301,6 +1462,7 @@ async function loadAllData() {
         renderStudentExams();
         buildCalendarFilterOptions();
         renderCalendar();
+        renderMeetingLinksList();
 
     } catch (err) {
         console.error('加载数据失败:', err);
@@ -2206,7 +2368,7 @@ function openCourseModal(category, courseId) {
     });
     document.getElementById('soloStudentGroup').style.display = 'block';
     document.getElementById('groupStudentsGroup').style.display = 'none';
-    document.getElementById('courseMeetingLink').value = DEFAULT_MEETING_LINK;
+    document.getElementById('courseMeetingLink').value = '';
     document.getElementById('courseDuration').value = 2;
     document.getElementById('courseConflictWarning').classList.remove('show');
 
@@ -2242,7 +2404,7 @@ function openCourseModal(category, courseId) {
         document.getElementById('courseModalTitle').textContent = 'Modifier le cours';
         document.getElementById('courseId').value = course.id;
         document.getElementById('courseMode').value = course.course_mode || 'solo';
-        document.getElementById('courseMeetingLink').value = course.meeting_link || '';
+        document.getElementById('courseMeetingLink').value = course.meeting_link || getTeacherMeetingLink(course.teacher_id) || '';
         document.getElementById('courseDuration').value = course.duration || 2;
         document.getElementById('courseLocation').value = course.location || '';
         document.getElementById('courseMaterialLink').value = course.material_link || '';
@@ -2364,10 +2526,21 @@ function filterGroupStudents() {
 
 function autoFillMeetingLink() {
     const teacherId = document.getElementById('courseTeacher').value;
-    const t2 = allUsers.find(u => u.id === teacherId);
-    if (!t2) return;
-    const link = t2.name === 'HE' ? HE_TEACHER_LINK : (t2.name === 'ZHOU' ? ZHOU_TEACHER_LINK : DEFAULT_MEETING_LINK);
-    document.getElementById('courseMeetingLink').value = link;
+    const linkInput = document.getElementById('courseMeetingLink');
+
+    if (!teacherId) {
+        linkInput.value = '';
+        return;
+    }
+
+    const link = getTeacherMeetingLink(teacherId);
+
+    if (link) {
+        linkInput.value = link;
+    } else {
+        linkInput.value = '';
+        showToast('⚠️ Ce professeur n\'a pas de lien Meet configuré. Ajoutez-le dans la table teacher_meeting_links.', 'warning');
+    }
 }
 
 // ============================================================
@@ -2630,6 +2803,15 @@ async function handleCourseSubmit(e) {
         }
     }
 
+      // ============================================================
+    // 🔥 校验老师 Meet 链接
+    // ============================================================
+    const meetingLink = document.getElementById('courseMeetingLink').value.trim();
+    if (!meetingLink) {
+        showToast('⚠️ Ce professeur n\'a pas de lien Meet configuré', 'error');
+        return;
+    }
+
     // ============================================================
     // 构造 data
     // ============================================================
@@ -2643,7 +2825,7 @@ async function handleCourseSubmit(e) {
         duration: duration,
         location: document.getElementById('courseLocation').value.trim() || null,
         material_link: document.getElementById('courseMaterialLink').value.trim() || null,
-        meeting_link: document.getElementById('courseMeetingLink').value.trim() || null,
+        meeting_link: meetingLink,
         notes: document.getElementById('courseNotes').value.trim() || null,
         status: status,
         max_students: mode === 'group' ? studentIds.length : 1

@@ -3245,7 +3245,23 @@ async function confirmBooking() {
         }
 
         // 2. 创建课程
+                // 2. Create course
         const startLocal = slot.start_time.replace('T', ' ').substring(0, 19);
+
+        // 🔥 Look up this teacher's Meet link (required — no default)
+        const { data: linkRow, error: linkErr } = await supabase
+            .from('teacher_meeting_links')
+            .select('meeting_link')
+            .eq('teacher_id', slotCheck.teacher_id)
+            .maybeSingle();
+
+        if (linkErr) throw linkErr;
+        if (!linkRow || !linkRow.meeting_link || linkRow.meeting_link.trim() === '') {
+            throw new Error('Ce professeur n\'a pas de lien Meet configuré. Contactez l\'administration.');
+        }
+
+        const meetingLink = linkRow.meeting_link.trim();
+
         const courseData = {
             category: cat,
             course_type: type,
@@ -3256,8 +3272,12 @@ async function confirmBooking() {
             status: 'scheduled',
             source: 'student_booking',
             course_mode: 'solo',
+            meeting_link: meetingLink,
             created_at: new Date().toISOString()
         };
+
+
+
 
         const { data: course, error: courseErr } = await supabase
             .from('courses_v2')
