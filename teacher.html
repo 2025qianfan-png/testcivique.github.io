@@ -2160,10 +2160,81 @@ async function deleteSlot(id) {
 window.deleteSlot = deleteSlot;
 
 async function releaseSlot(id) {
-    if (!confirm('Libérer ce créneau ?')) return;
+    if (!confirm('Libérer ce créneau ? Le cours associé sera annulé.')) return;
+
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
-        const { error } = await supabase
+
+        // ============================================================
+        // 1. 先读 slot，拿到 course_id（更新后就没了）
+        // ============================================================
+        const { data: slot, error: fetchErr } = await supabase
+            .from('teacher_availabilities')
+            .select('id, status, course_id, student_id, start_time')
+            .eq('id', id)
+            .maybeSingle();
+
+        if (fetchErr) throw fetchErr;
+        if (!slot) {
+            showToast('Créneau introuvable', 'error');
+            return;
+        }
+
+        const courseId = slot.course_id;
+
+        // ============================================================
+        // 2. 如果 slot 关联了课程 → 先取消课程 + 退学生 credit
+        // ============================================================
+        if (courseId) {
+            // 2a. 查课程信息（决定退哪个 credit）
+            const { data: course, error: courseErr } = await supabase
+                .from('courses_v2')
+                .select('id, category, duration, student_id, status')
+                .eq('id', courseId)
+                .maybeSingle();
+
+            if (courseErr) throw courseErr;
+
+            if (course && course.status !== 'cancelled') {
+                // 2b. 退学生 credit
+                if (course.student_id && course.duration) {
+                    const field = course.category === 'francais' ? 'french_credit' : 'credit';
+                    const { data: stu } = await supabase
+                        .from('users')
+                        .select(field)
+                        .eq('id', course.student_id)
+                        .maybeSingle();
+
+                    if (stu) {
+                        const newVal = (stu[field] || 0) + course.duration;
+                        const upd = {}; upd[field] = newVal;
+                        await supabase.from('users').update(upd).eq('id', course.student_id);
+                        console.log(`↩️ 已退 ${course.duration}h ${field} 给 ${course.student_id}`);
+                    }
+                }
+
+                // 2c. 更新课程状态为 cancelled
+                const { error: cancelErr } = await supabase
+                    .from('courses_v2')
+                    .update({
+                        status: 'cancelled',
+                        cancel_reason: 'Créneau libéré par l\'intervenant',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', courseId);
+
+                if (cancelErr) {
+                    console.warn('⚠️ 取消课程失败:', cancelErr.message);
+                } else {
+                    console.log('✅ 课程已取消:', courseId);
+                }
+            }
+        }
+
+        // ============================================================
+        // 3. 释放 slot
+        // ============================================================
+        const { error: releaseErr } = await supabase
             .from('teacher_availabilities')
             .update({
                 status: 'available',
@@ -2174,13 +2245,24 @@ async function releaseSlot(id) {
                 updated_at: new Date().toISOString()
             })
             .eq('id', id);
-        if (error) throw error;
-        showToast('Créneau libéré ✓');
+
+        if (releaseErr) throw releaseErr;
+
+        showToast(
+            courseId
+                ? '✅ Créneau libéré + cours annulé (crédits restitués)'
+                : '✅ Créneau libéré',
+            'success'
+        );
+
         await loadAllData();
+
     } catch (err) {
+        console.error(err);
         showToast('Erreur: ' + err.message, 'error');
     }
 }
+window.releaseSlot = releaseSlot;
 window.releaseSlot = releaseSlot;
 
 

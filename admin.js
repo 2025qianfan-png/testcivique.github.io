@@ -1402,6 +1402,9 @@ async function saveTeacherMeetingLink(teacherId, link) {
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
 
+        // ============================================================
+        // 1. 保存老师链接到 teacher_meeting_links
+        // ============================================================
         const { error } = await supabase
             .from('teacher_meeting_links')
             .upsert({
@@ -1412,10 +1415,52 @@ async function saveTeacherMeetingLink(teacherId, link) {
 
         if (error) throw error;
 
+        // ============================================================
+        // 2. 🔥 同步更新该老师所有"未来 + 未取消"课程的 meeting_link
+        // ============================================================
+        const nowISO = new Date().toISOString();
+        const { data: updatedCourses, error: syncErr } = await supabase
+            .from('courses_v2')
+            .update({
+                meeting_link: link,
+                updated_at: nowISO
+            })
+            .eq('teacher_id', teacherId)
+            .gt('start_time', nowISO)                                    // 只改未来的
+            .in('status', ['scheduled', 'in_progress'])                  // 未取消、未完成
+            .select('id');                                               // 返回更新行数
+
+        let syncCount = 0;
+        if (syncErr) {
+            console.warn('⚠️ 同步未来课程链接失败:', syncErr.message);
+        } else {
+            syncCount = (updatedCourses || []).length;
+            console.log(`🔗 已同步 ${syncCount} 门未来课程的 Meet 链接`);
+        }
+
+        // ============================================================
+        // 3. 更新本地缓存 + 重渲染
+        // ============================================================
         teacherMeetingLinks[teacherId] = link;
         renderMeetingLinksList();
 
-        showToast(t('meeting.saved'), 'success');
+        // ============================================================
+        // 4. 提示信息
+        // ============================================================
+        if (syncErr) {
+            showToast(
+                t('meeting.saved') + ' — ⚠️ ' + syncCount + ' cours synchronisés (partiel)',
+                'warning'
+            );
+        } else if (syncCount > 0) {
+            showToast(
+                t('meeting.saved') + ' — 🔗 ' + syncCount + ' cours mis à jour',
+                'success'
+            );
+        } else {
+            showToast(t('meeting.saved'), 'success');
+        }
+
     } catch (err) {
         console.error(err);
         showToast(t('meeting.errSave') + ': ' + err.message, 'error');
