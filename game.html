@@ -387,7 +387,7 @@
 </div>
 
 <script>
-    // ============ 未登录 → 404（优先执行）============
+    // ============ 1. 未登录 → 404（优先执行）============
 (function() {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
@@ -396,7 +396,60 @@
         window.location.replace('404.html');
     }
 })();
-    // ======================= 完整30个事件库（包含第五共和国改革、巴黎圣母院等，无删减） =======================
+
+// ============ 2. 内部链接白名单：自动带 token ============
+(function() {
+    const token = new URLSearchParams(window.location.search).get('token');
+    if (!token) return;
+
+    const TOKEN_PAGES = [
+        'thematique-valeurs.html',
+        'thematique-institutions.html',
+        'thematique-droits.html',
+        'thematique-culture.html',
+        'thematique-societe.html',
+        'flashcards-unit1.html',
+        'flashcards-unit2.html',
+        'flashcards-unit3.html',
+        'flashcards-unit4.html',
+        'flashcards-unit5.html',
+        'astuces-examen-culture.html',
+        'astuces-examen-droits.html',
+        'astuces-examen-valeur.html',
+        'astuces-examen-institutions.html',
+        'astuces-examen-societe.html',
+        'test-rapide-histoire.html',
+        'test-rapide-droits.html',
+        'test-rapide-valeurs.html',
+        'test-rapide-installation.html',
+        'test-rapide-institutions.html',
+        'test-etudiant.html',
+        'test-situation.html',
+        'test-annales.html',
+        'annales.html',
+        'game.html'
+    ];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('a[href]').forEach(a => {
+            const href = a.getAttribute('href');
+            if (!href || href === '#' || href.startsWith('#') ||
+                href.startsWith('http') ||
+                href.startsWith('mailto') ||
+                href.startsWith('tel') ||
+                href.startsWith('javascript')) return;
+            if (href.includes('token=')) return;
+
+            const pathPart = href.split('?')[0].split('#')[0];
+            if (!TOKEN_PAGES.includes(pathPart)) return;
+
+            const sep = href.includes('?') ? '&' : '?';
+            a.href = href + sep + 'token=' + token;
+        });
+    });
+})();
+
+    // ======================= 完整30个事件库... =========================================== 完整30个事件库（包含第五共和国改革、巴黎圣母院等，无删减） =======================
     const FULL_EVENTS = [
         { name: "Révolution française / 法国大革命", rawDate: "1789", descFR: "1789 Prise de la Bastille, Déclaration des Droits de l'Homme, fin de l'Ancien Régime.", descZH: "1789年攻占巴士底狱，发布《人权宣言》，推翻封建专制。", funFactFR: "Les femmes marchèrent sur Versailles. La devise 'Liberté, Égalité, Fraternité' s'impose.", funFactZH: "凡尔赛妇女大游行，迫使国王迁回巴黎。‘自由、平等、博爱’成为法国格言。" },
         { name: "Déclaration des droits de l'homme / 人权宣言", rawDate: "1789", descFR: "Texte fondamental des droits naturels, influencé par les Lumières.", descZH: "《人权和公民权宣言》，17条核心原则，现代宪法精神。", funFactFR: "Rédigé par La Fayette avec l'aide de Thomas Jefferson.", funFactZH: "拉法耶特侯爵起草，美国杰斐逊参与建议。" },

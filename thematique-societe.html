@@ -1197,7 +1197,7 @@
         });
 
         // 初始化页面
-       document.addEventListener('DOMContentLoaded', function() {
+ document.addEventListener('DOMContentLoaded', function() {
     // ============ 未登录 → 404 ============
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
@@ -1212,10 +1212,22 @@
     // 设置默认语言
     switchLanguage('fr');
     
-    // 有 token：设置测试按钮的真实链接
+    // 有 token：设置所有按钮的真实链接
     const testBtn = document.getElementById('testBtn');
     if (testBtn) {
         testBtn.href = `test-rapide-installation.html?token=${token}`;
+    }
+    
+    const astuceBtn = document.getElementById('astuceBtn');
+    if (astuceBtn) {
+        // ⚠️ 改这里：确认 astuce 按钮指向哪个文件
+        astuceBtn.href = `astuces-examen-installation.html?token=${token}`;
+    }
+    
+    const flashcardBtn = document.getElementById('flashcardBtn');
+    if (flashcardBtn) {
+        // ⚠️ 改这里：确认 flashcards 按钮指向哪个文件
+        flashcardBtn.href = `flashcards-unit5.html?token=${token}`;
     }
     
     // 平滑滚动

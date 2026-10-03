@@ -1454,6 +1454,17 @@
     </footer>
 
     <script>
+        
+        // ============ 未登录 → 404（优先执行）============
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            if (!token) {
+                console.log("无 token，跳转到 404");
+                window.location.replace('404.html');
+            }
+        })();
+        // ============ 404 逻辑结束 ============
         // 页面保护代码 - 保持不变
         document.addEventListener('contextmenu', function (e) {
             e.preventDefault();
@@ -1593,7 +1604,9 @@
         const mindmapContainer3 = document.getElementById('mindmapContainer3');
         
         // 页面加载时
-window.addEventListener('load', function() {
+window.addEventListener('load', 
+
+function() {
     console.log("历史页面加载完成");
     
     // ============ 未登录 → 404 ============
@@ -1638,7 +1651,9 @@ window.addEventListener('load', function() {
         });
     });
 });
-        // 语言切换功能 - 保持不变
+       
+
+// 语言切换功能 - 保持不变
         langButtons.forEach(btn => {
             btn.addEventListener('click', function() {
                 // 更新活动按钮

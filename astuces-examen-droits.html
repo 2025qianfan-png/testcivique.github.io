@@ -1865,7 +1865,7 @@
         const mindmapContainer2 = document.getElementById('mindmapContainer2');
         // 页面加载时 - 保持不变
            // 页面加载时
-        window.addEventListener('load', function() {
+     window.addEventListener('load', function() {
             console.log("历史页面加载完成");
             
             // 检查Supabase是否已加载
@@ -1884,6 +1884,18 @@
             if (mindmapContainer1) mindmapContainer1.style.cursor = 'grab';
             if (mindmapContainer2) mindmapContainer2.style.cursor = 'grab';
             if (mindmapContainer3) mindmapContainer3.style.cursor = 'grab';
+            
+            // ⭐ 返回按钮带 token
+            const token = new URLSearchParams(window.location.search).get('token');
+            if (token) {
+                document.querySelectorAll('.back-home').forEach(a => {
+                    const href = a.getAttribute('href');
+                    if (!href || href === '#' || href.startsWith('http')) return;
+                    if (href.includes('token=')) return;
+                    const sep = href.includes('?') ? '&' : '?';
+                    a.href = href + sep + 'token=' + token;
+                });
+            }
             
             // 为关键词块添加悬停效果
             document.querySelectorAll('.keyword-block').forEach(item => {

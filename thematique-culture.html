@@ -1298,7 +1298,7 @@
             });
         });
 
-     document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     // ============ 未登录 → 404 ============
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
@@ -1313,10 +1313,25 @@
     // 设置默认语言
     switchLanguage('fr');
     
-    // 有 token：设置测试按钮的真实链接
+    // 给所有按钮传 token
     const testBtn = document.getElementById('testBtn');
     if (testBtn) {
         testBtn.href = `test-rapide-histoire.html?token=${token}`;
+    }
+    
+    const astuceBtn = document.getElementById('astuceBtn');
+    if (astuceBtn) {
+        astuceBtn.href = `astuces-examen-culture.html?token=${token}`;
+    }
+    
+    const gameBtn = document.getElementById('gameBtn');
+    if (gameBtn) {
+        gameBtn.href = `game.html?token=${token}`;
+    }
+    
+    const flashcardBtn = document.getElementById('flashcardBtn');
+    if (flashcardBtn) {
+        flashcardBtn.href = `flashcards-unit4.html?token=${token}`;
     }
     
     // 平滑滚动

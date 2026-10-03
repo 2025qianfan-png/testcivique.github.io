@@ -1093,9 +1093,7 @@
                 behavior: 'smooth'
             });
         });
-
-        // 初始化页面
-     // 初始化页面
+// 初始化页面
 document.addEventListener('DOMContentLoaded', function() {
     // ============ 未登录 → 404 ============
     const urlParams = new URLSearchParams(window.location.search);
@@ -1111,10 +1109,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // 设置默认语言
     switchLanguage('fr');
     
-    // 有 token：设置测试按钮的真实链接
+    // 给所有按钮传 token
     const testBtn = document.getElementById('testBtn');
     if (testBtn) {
         testBtn.href = `test-rapide-valeurs.html?token=${token}`;
+    }
+    
+    const astuceBtn = document.getElementById('astuceBtn');
+    if (astuceBtn) {
+        astuceBtn.href = `astuces-examen-valeur.html?token=${token}`;
+    }
+    
+    const flashcardBtn = document.getElementById('flashcardBtn');
+    if (flashcardBtn) {
+        flashcardBtn.href = `flashcards-unit1.html?token=${token}`;
     }
     
     // 平滑滚动
@@ -1134,6 +1142,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-    </script>
+   </script>
 </body>
 </html>

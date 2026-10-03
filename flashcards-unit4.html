@@ -856,7 +856,70 @@
 </div>
 
 <script>
+    // ============ 1. 未登录 → 404（优先执行）============
 (function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    if (!token) {
+        console.log("无 token，跳转到 404");
+        window.location.replace('404.html');
+    }
+})();
+
+// ============ 2. 内部链接白名单：自动带 token ============
+(function() {
+    const token = new URLSearchParams(window.location.search).get('token');
+    if (!token) return;
+
+    const TOKEN_PAGES = [
+        'thematique-valeurs.html',
+        'thematique-institutions.html',
+        'thematique-droits.html',
+        'thematique-culture.html',
+        'thematique-societe.html',
+        'flashcards-unit1.html',
+        'flashcards-unit2.html',
+        'flashcards-unit3.html',
+        'flashcards-unit4.html',
+        'flashcards-unit5.html',
+        'astuces-examen-culture.html',
+        'astuces-examen-droits.html',
+        'astuces-examen-valeur.html',
+        'astuces-examen-institutions.html',
+        'astuces-examen-societe.html',
+        'test-rapide-histoire.html',
+        'test-rapide-droits.html',
+        'test-rapide-valeurs.html',
+        'test-rapide-installation.html',
+        'test-rapide-institutions.html',
+        'test-etudiant.html',
+        'test-situation.html',
+        'test-annales.html',
+        'annales.html',
+        'game.html'
+    ];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('a[href]').forEach(a => {
+            const href = a.getAttribute('href');
+            if (!href || href === '#' || href.startsWith('#') ||
+                href.startsWith('http') ||
+                href.startsWith('mailto') ||
+                href.startsWith('tel') ||
+                href.startsWith('javascript')) return;
+            if (href.includes('token=')) return;
+
+            const pathPart = href.split('?')[0].split('#')[0];
+            if (!TOKEN_PAGES.includes(pathPart)) return;
+
+            const sep = href.includes('?') ? '&' : '?';
+            a.href = href + sep + 'token=' + token;
+        });
+    });
+})();
+
+(function() {
+    // ===== 模块四 词汇 =====
     // ===== 模块四 词汇 =====
     const words = [
         { type:"Date", french:"1789 - Révolution française", chinese:"1789年 - 法国大革命" },
