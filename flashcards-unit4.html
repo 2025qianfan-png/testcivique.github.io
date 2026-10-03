@@ -43,7 +43,6 @@
             margin: 0 auto;
         }
 
-        /* ===== Header ===== */
         .main-header {
             background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-light-blue) 100%);
             color: var(--white);
@@ -117,7 +116,6 @@
             font-size: 1rem;
         }
 
-        /* ===== Navigation ===== */
         .main-nav {
             background-color: var(--white);
             padding: 12px 30px;
@@ -179,7 +177,6 @@
             width: 100%;
         }
 
-        /* ===== Breadcrumb ===== */
         .breadcrumb {
             padding: 15px 30px;
             background-color: var(--white);
@@ -213,7 +210,6 @@
             font-weight: 600;
         }
 
-        /* ===== App Card ===== */
         .app-card {
             background: var(--white);
             border-radius: 0 0 var(--border-radius) var(--border-radius);
@@ -256,7 +252,6 @@
             color: var(--primary-blue);
         }
 
-        /* Mode Switch */
         .mode-switch {
             display: flex;
             gap: 0.5rem;
@@ -293,7 +288,6 @@
             margin-right: 6px;
         }
 
-        /* ===== Flashcard ===== */
         .flashcard {
             width: 100%;
             max-width: 600px;
@@ -368,7 +362,6 @@
             margin-right: 6px;
         }
 
-        /* Nav Buttons */
         .nav-buttons {
             display: flex;
             justify-content: center;
@@ -410,7 +403,6 @@
             color: var(--primary-blue);
         }
 
-        /* ===== Sentence View ===== */
         .sentence-viewport {
             background: var(--light-gray);
             border-radius: 1.5rem;
@@ -546,7 +538,6 @@
             flex-wrap: wrap;
         }
 
-        /* ===== Footer ===== */
         .main-footer {
             background-color: var(--primary-blue);
             color: var(--white);
@@ -602,130 +593,40 @@
             text-decoration: none;
         }
 
-        /* ===== Responsive ===== */
         @media (max-width: 768px) {
-            body {
-                padding: 1rem 0.5rem;
-            }
-
-            .main-header {
-                padding: 20px;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .main-header .logo-area h1 {
-                font-size: 1.3rem;
-            }
-
-            .main-nav {
-                padding: 12px 20px;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .nav-links {
-                gap: 15px;
-                flex-wrap: wrap;
-            }
-
-            .breadcrumb {
-                padding: 12px 20px;
-            }
-
-            .app-card {
-                padding: 1.2rem 1rem 1.8rem;
-                border-radius: 0 0 var(--border-radius) var(--border-radius);
-            }
-
-            .flashcard {
-                padding: 2rem 1.2rem;
-                min-height: 220px;
-            }
-
-            .flashcard .card-word {
-                font-size: 1.8rem;
-            }
-
-            .flashcard .card-translation {
-                font-size: 1.4rem;
-            }
-
-            .mode-btn {
-                padding: 0.4rem 1rem;
-                font-size: 0.8rem;
-            }
-
-            .nav-buttons {
-                gap: 1rem;
-            }
-
-            .nav-btn {
-                width: 2.8rem;
-                height: 2.8rem;
-                font-size: 1.2rem;
-            }
-
-            .sentence-item {
-                padding: 0.3rem 0.5rem;
-            }
-
-            .word-chip {
-                font-size: 0.85rem;
-                padding: 0.15rem 0.6rem;
-            }
-
-            .app-card .unit-banner {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+            body { padding: 1rem 0.5rem; }
+            .main-header { padding: 20px; flex-direction: column; align-items: flex-start; }
+            .main-header .logo-area h1 { font-size: 1.3rem; }
+            .main-nav { padding: 12px 20px; flex-direction: column; align-items: flex-start; }
+            .nav-links { gap: 15px; flex-wrap: wrap; }
+            .breadcrumb { padding: 12px 20px; }
+            .app-card { padding: 1.2rem 1rem 1.8rem; border-radius: 0 0 var(--border-radius) var(--border-radius); }
+            .flashcard { padding: 2rem 1.2rem; min-height: 220px; }
+            .flashcard .card-word { font-size: 1.8rem; }
+            .flashcard .card-translation { font-size: 1.4rem; }
+            .mode-btn { padding: 0.4rem 1rem; font-size: 0.8rem; }
+            .nav-buttons { gap: 1rem; }
+            .nav-btn { width: 2.8rem; height: 2.8rem; font-size: 1.2rem; }
+            .sentence-item { padding: 0.3rem 0.5rem; }
+            .word-chip { font-size: 0.85rem; padding: 0.15rem 0.6rem; }
+            .app-card .unit-banner { flex-direction: column; align-items: flex-start; }
         }
 
         @media (max-width: 480px) {
-            .main-header .logo-area h1 {
-                font-size: 1.1rem;
-            }
-
-            .header-btn {
-                padding: 6px 12px;
-                font-size: 0.75rem;
-            }
-
-            .flashcard .card-word {
-                font-size: 1.4rem;
-            }
-
-            .flashcard .card-translation {
-                font-size: 1.1rem;
-            }
-
-            .mode-switch {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .mode-btn {
-                font-size: 0.7rem;
-                padding: 0.3rem 0.8rem;
-                flex: 1;
-                text-align: center;
-            }
-
-            .sentence-controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .btn-group {
-                justify-content: center;
-            }
+            .main-header .logo-area h1 { font-size: 1.1rem; }
+            .header-btn { padding: 6px 12px; font-size: 0.75rem; }
+            .flashcard .card-word { font-size: 1.4rem; }
+            .flashcard .card-translation { font-size: 1.1rem; }
+            .mode-switch { width: 100%; justify-content: center; }
+            .mode-btn { font-size: 0.7rem; padding: 0.3rem 0.8rem; flex: 1; text-align: center; }
+            .sentence-controls { flex-direction: column; align-items: stretch; }
+            .btn-group { justify-content: center; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Header -->
     <header class="main-header">
         <div class="logo-area">
             <i class="fas fa-landmark"></i>
@@ -733,11 +634,11 @@
         </div>
         <div class="header-actions">
             <a href="examen-civique.html" class="header-btn"><i class="fas fa-home"></i> Accueil</a>
+            <a href="flashcards-unit3.html" class="header-btn"><i class="fas fa-arrow-left"></i> Module 3</a>
             <a href="flashcards-unit5.html" class="header-btn"><i class="fas fa-arrow-right"></i> Module 5</a>
         </div>
     </header>
 
-    <!-- Navigation -->
     <nav class="main-nav">
         <a href="examen-civique.html" class="logo">
             <i class="fas fa-sailboat"></i>
@@ -751,7 +652,6 @@
         </div>
     </nav>
 
-    <!-- Breadcrumb -->
     <div class="breadcrumb">
         <div class="breadcrumb-links">
             <a href="examen-civique.html">Accueil</a>
@@ -762,10 +662,8 @@
         </div>
     </div>
 
-    <!-- App Card -->
     <div class="app-card" id="flashcards">
 
-        <!-- Unit Banner -->
         <div class="unit-banner">
             <h2><i class="fas fa-scroll"></i> 模块四 · Histoire et Géographie</h2>
             <div class="unit-stats">
@@ -774,13 +672,11 @@
             </div>
         </div>
 
-        <!-- Mode Switch -->
         <div class="mode-switch">
             <button id="btnFlashcard" class="mode-btn active"><i class="fas fa-layer-group"></i> 单词闪卡</button>
             <button id="btnSentence" class="mode-btn"><i class="fas fa-paragraph"></i> 句子练习</button>
         </div>
 
-        <!-- Flashcard View -->
         <div id="flashcardView">
             <div class="flashcard" id="flashcardElement">
                 <div class="card-number" id="cardNumber">1 / 0</div>
@@ -800,12 +696,11 @@
             </div>
         </div>
 
-        <!-- Sentence View -->
         <div id="sentenceView" style="display:none;">
             <div class="sentence-viewport" id="sentenceContainer"></div>
 
             <div class="sentence-controls">
-                <span class="hint"><i class="fas fa-info-circle"></i> Cliquez un mot → voir traduction · Re-cliquez → marquer « inconnu »</span>
+                <span class="hint"><i class="fas fa-info-circle"></i> Cliquez un mot → voir traduction · Re-cliquez → marquer « inconnu »</span>
                 <div class="btn-group">
                     <button id="prevPageBtn" class="action-small"><i class="fas fa-chevron-left"></i> Précédent</button>
                     <button id="nextPageBtn" class="action-small">Suivant <i class="fas fa-chevron-right"></i></button>
@@ -825,7 +720,6 @@
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="main-footer">
         <div class="footer-content">
             <div class="footer-column">
@@ -919,7 +813,6 @@
 })();
 
 (function() {
-    // ===== 模块四 词汇 =====
     // ===== 模块四 词汇 =====
     const words = [
         { type:"Date", french:"1789 - Révolution française", chinese:"1789年 - 法国大革命" },
@@ -1051,7 +944,6 @@
     const unknownDisplay = document.getElementById('unknownDisplay');
     const flashcardEl = document.getElementById('flashcardElement');
 
-    // ===== FUNCTIONS =====
     function updateCard() {
         if (words.length === 0) return;
         const w = words[currentCardIndex];
@@ -1144,7 +1036,6 @@
         renderPage();
     }
 
-    // ===== EVENT LISTENERS =====
     document.getElementById('prevCard').addEventListener('click', prevCard);
     document.getElementById('nextCard').addEventListener('click', nextCard);
 
@@ -1166,7 +1057,6 @@
 
     document.getElementById('resetUnknownBtn').addEventListener('click', resetUnknown);
 
-    // ===== KEYBOARD SHORTCUTS =====
     document.addEventListener('keydown', function(e) {
         if (flashcardView.style.display !== 'none') {
             if (e.key === 'ArrowRight') { e.preventDefault(); nextCard(); }
@@ -1175,7 +1065,6 @@
         }
     });
 
-    // ===== INIT =====
     totalWordsSpan.textContent = words.length;
     totalSentencesSpan.textContent = sentences.length;
     totalCardsSpan.textContent = words.length;
