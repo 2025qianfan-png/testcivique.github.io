@@ -2565,6 +2565,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log("URL参数:", { token, type });
     
+    // ============ 未登录 → 404 ============
+    if (!token) {
+        console.log("无 token，跳转到 404");
+        window.location.replace('404.html');
+        return;
+    }
+    // ============ 404 逻辑结束 ============
+    
     if (token) {
         try {
             // 解析token
@@ -2573,10 +2581,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const utf8String = atob(token);
                 const jsonString = decodeURIComponent(utf8String);
                 userData = JSON.parse(jsonString);
-                console.log("使用新方式解析token成功:", userData);
             } catch (e) {
                 userData = JSON.parse(atob(token));
-                console.log("使用旧方式解析token成功:", userData);
             }
             
             // 填充学生信息
@@ -2589,50 +2595,15 @@ document.addEventListener('DOMContentLoaded', function() {
             
             console.log("学生信息:", studentInfo);
             
-      
-            
             // 直接显示培训信息窗口
             showTrainingInfo();
             
         } catch (e) {
             console.error("Token解析失败:", e);
-            showAlert("Erreur de connexion", "Impossible de charger les informations. Utilisation du mode visiteur.", 'warning');
-            
-            // 使用默认访客信息
-            studentInfo = {
-                name: "Visiteur",
-                testDate: new Date().toLocaleString('fr-FR'),
-                type: "t",
-                daysLeft: -1
-            };
-            
-      
-            showTrainingInfo();
+            // token 无效 → 也跳 404
+            window.location.replace('404.html');
         }
-    } else {
-        // 如果没有token，使用默认访客信息
-        console.log("没有token，使用访客模式");
-        
-        studentInfo = {
-            name: "Visiteur",
-            testDate: new Date().toLocaleString('fr-FR'),
-            type: "t",
-            daysLeft: -1
-        };
-        
-        const loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.style.display = 'none';
-        
-        showTrainingInfo();
     }
-    
-    // 保留回车键监听（但登录框已隐藏，可以删除）
-    // document.getElementById('studentPassword').addEventListener('keypress', function(e) {
-    //     if (e.key === 'Enter') {
-    //         e.preventDefault();
-    //         validateLogin();
-    //     }
-    // });
 });
 </script>
 </body>

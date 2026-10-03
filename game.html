@@ -387,6 +387,15 @@
 </div>
 
 <script>
+    // ============ 未登录 → 404（优先执行）============
+(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    if (!token) {
+        console.log("无 token，跳转到 404");
+        window.location.replace('404.html');
+    }
+})();
     // ======================= 完整30个事件库（包含第五共和国改革、巴黎圣母院等，无删减） =======================
     const FULL_EVENTS = [
         { name: "Révolution française / 法国大革命", rawDate: "1789", descFR: "1789 Prise de la Bastille, Déclaration des Droits de l'Homme, fin de l'Ancien Régime.", descZH: "1789年攻占巴士底狱，发布《人权宣言》，推翻封建专制。", funFactFR: "Les femmes marchèrent sur Versailles. La devise 'Liberté, Égalité, Fraternité' s'impose.", funFactZH: "凡尔赛妇女大游行，迫使国王迁回巴黎。‘自由、平等、博爱’成为法国格言。" },

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Test - Travail, Santé, Éducation et Résidence en France</title>
+<title>Test - Travail, Santé, Éducation et Résidence en France<link rel="icon" href="icons/icon-192x192.png" type="image/png">
 <link rel="icon" href="icons/icon-192x192.png" type="image/png">
 <!-- 添加Supabase库和配置文件 -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2550,73 +2550,45 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log("URL参数:", { token, type });
     
-    if (token) {
+    // ============ 未登录 → 404 ============
+    if (!token) {
+        console.log("无 token，跳转到 404");
+        window.location.replace('404.html');
+        return;
+    }
+    // ============ 404 逻辑结束 ============
+    
+    try {
+        // 解析token
+        let userData;
         try {
-            // 解析token
-            let userData;
-            try {
-                const utf8String = atob(token);
-                const jsonString = decodeURIComponent(utf8String);
-                userData = JSON.parse(jsonString);
-                console.log("使用新方式解析token成功:", userData);
-            } catch (e) {
-                userData = JSON.parse(atob(token));
-                console.log("使用旧方式解析token成功:", userData);
-            }
-            
-            // 填充学生信息
-            studentInfo = {
-                name: userData.name || userData.userId || "Étudiant",
-                testDate: new Date().toLocaleString('fr-FR'),
-                type: type || userData.type || "t",
-                daysLeft: userData.daysLeft || -1
-            };
-            
-            console.log("学生信息:", studentInfo);
-            
-           
-            
-            // 直接显示培训信息窗口
-            showTrainingInfo();
-            
+            const utf8String = atob(token);
+            const jsonString = decodeURIComponent(utf8String);
+            userData = JSON.parse(jsonString);
+            console.log("使用新方式解析token成功:", userData);
         } catch (e) {
-            console.error("Token解析失败:", e);
-            showAlert("Erreur de connexion", "Impossible de charger les informations. Utilisation du mode visiteur.", 'warning');
-            
-            // 使用默认访客信息
-            studentInfo = {
-                name: "Visiteur",
-                testDate: new Date().toLocaleString('fr-FR'),
-                type: "t",
-                daysLeft: -1
-            };
-            
-         
-            showTrainingInfo();
+            userData = JSON.parse(atob(token));
+            console.log("使用旧方式解析token成功:", userData);
         }
-    } else {
-        // 如果没有token，使用默认访客信息
-        console.log("没有token，使用访客模式");
         
+        // 填充学生信息（只从 token 读 type，不接受 URL 参数）
         studentInfo = {
-            name: "Visiteur",
+            name: userData.name || userData.userId || "Étudiant",
             testDate: new Date().toLocaleString('fr-FR'),
-            type: "t",
-            daysLeft: -1
+            type: userData.type || "t",
+            daysLeft: userData.daysLeft || -1
         };
         
-     
+        console.log("学生信息:", studentInfo);
         
+        // 直接显示培训信息窗口
         showTrainingInfo();
+        
+    } catch (e) {
+        console.error("Token解析失败:", e);
+        // token 无效 → 也跳 404
+        window.location.replace('404.html');
     }
-    
-    // 保留回车键监听（但登录框已隐藏，可以删除）
-    // document.getElementById('studentPassword').addEventListener('keypress', function(e) {
-    //     if (e.key === 'Enter') {
-    //         e.preventDefault();
-    //         validateLogin();
-    //     }
-    // });
 });
 </script>
 </body>

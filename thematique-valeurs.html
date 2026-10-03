@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Valeurs de la République - Association Mille Voiles</title>
-    <link rel="icon" href="icons/icon-192x192.png" type="image/png">
+     <link rel="icon" href="icons/icon-192x192.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -1095,39 +1095,45 @@
         });
 
         // 初始化页面
-        document.addEventListener('DOMContentLoaded', function() {
-            // 设置默认语言
-            switchLanguage('fr');
-            
-            // 从URL获取token
-            const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('token');
-            
-            // 如果有token，添加到测试链接中
-            if (token) {
-                const testBtn = document.getElementById('testBtn');
-                testBtn.href = `test-rapide-valeurs.html?token=${token}`;
+     // 初始化页面
+document.addEventListener('DOMContentLoaded', function() {
+    // ============ 未登录 → 404 ============
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    
+    if (!token) {
+        console.log("无 token，跳转到 404");
+        window.location.replace('404.html');
+        return;
+    }
+    // ============ 404 逻辑结束 ============
+    
+    // 设置默认语言
+    switchLanguage('fr');
+    
+    // 有 token：设置测试按钮的真实链接
+    const testBtn = document.getElementById('testBtn');
+    if (testBtn) {
+        testBtn.href = `test-rapide-valeurs.html?token=${token}`;
+    }
+    
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            if (this.getAttribute('href') !== '#') {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
             }
-            
-            // 平滑滚动
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    if (this.getAttribute('href') !== '#') {
-                        e.preventDefault();
-                        
-                        const targetId = this.getAttribute('href');
-                        const targetElement = document.querySelector(targetId);
-                        
-                        if (targetElement) {
-                            window.scrollTo({
-                                top: targetElement.offsetTop - 80,
-                                behavior: 'smooth'
-                            });
-                        }
-                    }
-                });
-            });
         });
+    });
+});
     </script>
 </body>
 </html>

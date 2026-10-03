@@ -1723,6 +1723,19 @@
 
     <script>
         // 页面保护代码
+    
+        // ============ 未登录 → 404（优先执行）============
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            if (!token) {
+                console.log("无 token，跳转到 404");
+                window.location.replace('404.html');
+            }
+        })();
+        // ============ 404 逻辑结束 ============
+
+        // 页面保护代码
         document.addEventListener('contextmenu', function (e) {
             e.preventDefault();
         });
@@ -1736,7 +1749,6 @@
                 e.preventDefault();
             }
         });
-         
 
 
         // 语言数据

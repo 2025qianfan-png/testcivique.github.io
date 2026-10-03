@@ -5210,86 +5210,63 @@ function initializeTest() {
     document.getElementById('testContainer').style.display = 'block';
     document.getElementById('resultsContainer').style.display = 'none';
 }
-// ==================== 页面加载完成 ====================
-// ==================== 页面加载完成 ====================
 document.addEventListener('DOMContentLoaded', function() {
     console.log("页面加载完成");
     console.log("Supabase功能检查:", window.supabaseAuth ? "可用" : "不可用");
     
-    // 从URL获取参数
+    // ============ 未登录 → 404 ============
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
     const type = urlParams.get('type');
     
-    console.log("URL参数:", { token, type });
-    
-    if (token) {
-        try {
-            // 尝试新方式解码（支持中文）
-            let userData;
-            try {
-                const utf8String = atob(token);
-                const jsonString = decodeURIComponent(utf8String);
-                userData = JSON.parse(jsonString);
-                console.log("使用新方式解析token成功:", userData);
-            } catch (e) {
-                // 如果新方式失败，尝试旧方式（兼容性）
-                console.log("新方式解析失败，尝试旧方式:", e);
-                userData = JSON.parse(atob(token));
-                console.log("使用旧方式解析token成功:", userData);
-            }
-            
-            // 按照您原来的格式填充 studentInfo
-            studentInfo.name = userData.name || userData.userId || "Étudiant";
-            studentInfo.type = type || userData.type || "t";
-            
-            // 读取剩余天数
-            if (userData.daysLeft !== undefined) {
-                studentInfo.daysLeft = userData.daysLeft;
-            } else if (userData.expiry) {
-                const now = Date.now();
-                const diffTime = userData.expiry - now;
-                studentInfo.daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            } else {
-                studentInfo.daysLeft = -1;
-            }
-            
-            studentInfo.testDate = "";
-            studentInfo.testType = "";
-            
-            console.log("学生信息:", studentInfo);
-            
-            // 隐藏登录模态框（如果存在）
-            const loginModal = document.getElementById('loginModal');
-            if (loginModal) loginModal.style.display = 'none';
-            
-            // 显示选择界面
-            document.getElementById('selectionModal').style.display = 'flex';
-            
-            // 更新卡片权限
-            updateTestCardPermissions();
-            
-            // 显示天数信息
-            showDaysLeftInfo();
-            
-        } catch (e) {
-            console.error("Token解析失败:", e);
-            alert("登录信息错误，请重新登录");
-            window.location.href = 'examen-civique.html';
-        }
-    } else {
-        // 如果没有token，返回主页
-        alert("请先登录");
-        window.location.href = 'examen-civique.html';
+    if (!token) {
+        console.log("无 token，跳转到 404");
+        window.location.replace('404.html');
+        return;
     }
+    // ============ 404 逻辑结束 ============
     
-    // 检查题库是否加载
-    setTimeout(() => {
-        if (typeof question_multi === 'undefined') {
-            console.error("错误: question_multia.js 未正确加载");
-            showAlert("Erreur de chargement / 加载错误", "Le fichier de questions n'a pas pu être chargé. Veuillez vérifier la console. / 题目文件无法加载，请检查控制台。", 'error');
+    try {
+        let userData;
+        try {
+            const utf8String = atob(token);
+            const jsonString = decodeURIComponent(utf8String);
+            userData = JSON.parse(jsonString);
+        } catch (e) {
+            userData = JSON.parse(atob(token));
         }
-    }, 2000);
+        
+        if (!userData) throw new Error("无法解析用户数据");
+        
+        studentInfo.name = userData.name || userData.userId || "Étudiant";
+        // ⚠️ 只用 token 里的 type，忽略 URL 参数（安全）
+        studentInfo.type = userData.type || "t";
+        
+        if (userData.daysLeft !== undefined) {
+            studentInfo.daysLeft = userData.daysLeft;
+        } else if (userData.expiry) {
+            const now = Date.now();
+            const diffTime = userData.expiry - now;
+            studentInfo.daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        } else {
+            studentInfo.daysLeft = -1;
+        }
+        
+        studentInfo.testDate = "";
+        studentInfo.testType = "";
+        
+        const loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.style.display = 'none';
+        
+        document.getElementById('selectionModal').style.display = 'flex';
+        updateTestCardPermissions();
+        showDaysLeftInfo();
+        
+    } catch (e) {
+        console.error("Token解析失败:", e);
+        // token 无效 → 也跳 404
+        window.location.replace('404.html');
+    }
 });
 </script>
 </body>

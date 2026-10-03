@@ -2077,81 +2077,53 @@ function goBackToHome() {
     }, 100);
 }
 
-// ==================== 页面加载完成 ====================
-// ==================== 页面加载完成 ====================
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Page annales chargée");
     
-    // 从URL获取参数
+    // ============ 未登录 → 跳转到 404 ============
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
     
+    if (!token) {
+        console.log("无 token，跳转到 404");
+        // 用 replace 而不是 href，避免用户按返回键又回到这里
+        window.location.replace('404.html');
+        return;
+    }
+    // ============ 404 逻辑结束 ============
+    
+    // 原来的逻辑（有 token 才执行）
     console.log("URL参数:", { token });
     
-    if (token) {
+    try {
+        let userData;
         try {
-            // 解析token
-            let userData;
-            try {
-                const utf8String = atob(token);
-                const jsonString = decodeURIComponent(utf8String);
-                userData = JSON.parse(jsonString);
-                console.log("使用新方式解析token成功:", userData);
-            } catch (e) {
-                userData = JSON.parse(atob(token));
-                console.log("使用旧方式解析token成功:", userData);
-            }
-            
-            // 确保 userData 存在且有数据
-            if (userData) {
-                // 获取用户类型，默认为 't'
-                let userType = userData.type || 't';
-                
-                console.log("从token解析出的用户类型:", userType);
-                
-                // 填充学生信息
-                studentInfo = {
-                    name: userData.name || userData.userId || "Étudiant",
-                    testDate: new Date().toLocaleString('fr-FR'),
-                    type: userType,
-                    daysLeft: userData.daysLeft || -1
-                };
-                
-                console.log("学生信息:", studentInfo);
-                console.log("用户类型:", studentInfo.type);
-                
-                // 直接显示培训信息窗口
-                showTrainingInfo();
-            } else {
-                throw new Error("无法解析用户数据");
-            }
-            
+            const utf8String = atob(token);
+            const jsonString = decodeURIComponent(utf8String);
+            userData = JSON.parse(jsonString);
+            console.log("使用新方式解析token成功:", userData);
         } catch (e) {
-            console.error("Token解析失败:", e);
-            showAlert("Erreur de connexion", "Impossible de charger les informations. Utilisation du mode visiteur.", 'warning');
-            
-            // 使用默认访客信息
-            studentInfo = {
-                name: "Admin",
-                testDate: new Date().toLocaleString('fr-FR'),
-                type: "t",
-                daysLeft: -1
-            };
-            
-            showTrainingInfo();
+            userData = JSON.parse(atob(token));
+            console.log("使用旧方式解析token成功:", userData);
         }
-    } else {
-        // 如果没有token，使用默认访客信息
-        console.log("没有token，使用访客模式");
         
-        studentInfo = {
-            name: "Visiteur",
-            testDate: new Date().toLocaleString('fr-FR'),
-            type: "t",
-            daysLeft: -1
-        };
+        if (userData) {
+            let userType = userData.type || 't';
+            studentInfo = {
+                name: userData.name || userData.userId || "Étudiant",
+                testDate: new Date().toLocaleString('fr-FR'),
+                type: userType,
+                daysLeft: userData.daysLeft || -1
+            };
+            showTrainingInfo();
+        } else {
+            throw new Error("无法解析用户数据");
+        }
         
-        showTrainingInfo();
+    } catch (e) {
+        console.error("Token解析失败:", e);
+        // token 无效 → 也跳 404
+        window.location.replace('404.html');
     }
 });
 </script>
