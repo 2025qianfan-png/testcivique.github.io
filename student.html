@@ -2239,7 +2239,6 @@ function renderCourseCard(c) {
     detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-chalkboard-user"></i> ${t('teacher')}: ${escapeHtml(teacherName)}</div>`;
     detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-clock"></i> ${c.duration || 2} ${t('hours')}</div>`;
     if (c.location) detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(c.location)}</div>`;
-    if (c.meeting_link) detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-video"></i> <a href="${escapeHtml(c.meeting_link)}" target="_blank">${t('meetLink')}</a></div>`;
     if (c.material_link) detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-paperclip"></i> <a href="${escapeHtml(c.material_link)}" target="_blank">${t('support')}</a></div>`;
     if (isCancelled && c.cancel_reason) detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-ban"></i> ${t('cancelReason')}: ${escapeHtml(c.cancel_reason)}</div>`;
     if (isStudentBooking) detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-calendar-check"></i> ${t('bookedViaAvailability')}</div>`;

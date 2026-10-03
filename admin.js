@@ -1468,6 +1468,76 @@ async function saveTeacherMeetingLink(teacherId, link) {
         hideLoading();
     }
 }
+// ============================================================
+// 🔥 删除老师「未被预定」的冲突空闲时间段
+// - 只删除 status = 'available' 的
+// - status = 'booked' 的（已被学生预定）不动
+// - 只处理未来的时间段
+// ============================================================
+async function removeConflictingAvailabilities(teacherId, startTimeStr, duration) {
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        if (!supabase) return { removed: 0 };
+
+        // 新课程的时间范围
+        const newStart = new Date(startTimeStr).getTime();
+        const newEnd = newStart + (duration || 2) * 3600000;
+
+        // 1. 查该老师所有「未来 + 未被预定」的空闲时间段
+        const nowISO = new Date().toISOString();
+        const { data: slots, error } = await supabase
+            .from('teacher_availabilities')
+            .select('id, start_time, end_time, status, course_id')
+            .eq('teacher_id', teacherId)
+            .eq('status', 'available')          // 🔥 关键：只看未预定的
+            .gt('end_time', nowISO);            // 只看未来的
+
+        if (error) {
+            console.warn('⚠️ 查询老师空闲失败:', error.message);
+            return { removed: 0, error: error.message };
+        }
+
+        if (!slots || slots.length === 0) return { removed: 0 };
+
+        // 2. 找出与新课程时间冲突的 slot
+        const conflicts = slots.filter(slot => {
+            // 🔥 双重保险：跳过任何已被预定的（防止数据异常）
+            if (slot.status !== 'available') return false;
+            if (slot.course_id) return false;   // 有 course_id 说明被占了
+
+            const slotStart = new Date(slot.start_time).getTime();
+            const slotEnd = new Date(slot.end_time).getTime();
+            // 时间重叠：新课程开始 < slot结束 && 新课程结束 > slot开始
+            return newStart < slotEnd && newEnd > slotStart;
+        });
+
+        if (conflicts.length === 0) return { removed: 0 };
+
+        // 3. 只删除「未被预定」的冲突 slot
+        const conflictIds = conflicts.map(s => s.id);
+        const { data: deleted, error: delErr } = await supabase
+            .from('teacher_availabilities')
+            .delete()
+            .in('id', conflictIds)
+            .eq('status', 'available')          // 🔥 再保险一次：只删 available
+            .select('id');
+
+        if (delErr) {
+            console.warn('⚠️ 删除冲突空闲失败:', delErr.message);
+            return { removed: 0, error: delErr.message };
+        }
+
+        const removedCount = (deleted || []).length;
+        if (removedCount > 0) {
+            console.log(`🗑️ 已删除 ${removedCount} 个未被预定的冲突空闲时间段`);
+        }
+        return { removed: removedCount };
+
+    } catch (e) {
+        console.warn('⚠️ removeConflictingAvailabilities 异常:', e.message);
+        return { removed: 0, error: e.message };
+    }
+}
 function getTeacherMeetingLink(teacherId) {
     return teacherMeetingLinks[teacherId] || null;
 }
@@ -2708,6 +2778,7 @@ async function handleCourseSubmit(e) {
     const courseType = document.getElementById('courseTypeValue').value;
     const status = document.getElementById('courseStatus').value;
 
+    // ---------- 1. 基础校验 ----------
     if (!teacherId) { showToast('Intervenant requis', 'error'); return; }
     if (!startTimeLocal) { showToast('Date/heure requise', 'error'); return; }
     if (!courseType) { showToast('Type de cours requis', 'error'); return; }
@@ -2715,13 +2786,11 @@ async function handleCourseSubmit(e) {
     const startTimeStr = normalizeLocalDateTime(startTimeLocal);
     if (!startTimeStr) { showToast('Format date invalide', 'error'); return; }
 
-    // ============================================================
-    // 冲突检查
-    // ============================================================
-    const allCourses = [...allCiviqueCourses, ...allFrenchCourses];
+    // ---------- 2. 冲突检查（老师已有课程） ----------
+    const allCoursesForCheck = [...allCiviqueCourses, ...allFrenchCourses];
     const startTs = new Date(startTimeStr).getTime();
     const endTs = startTs + duration * 3600000;
-    const hasConflict = allCourses.some(c => {
+    const hasConflict = allCoursesForCheck.some(c => {
         if (c.teacher_id !== teacherId) return false;
         if (id && c.id === id) return false;
         if (c.status === 'cancelled') return false;
@@ -2735,9 +2804,7 @@ async function handleCourseSubmit(e) {
         return;
     }
 
-    // ============================================================
-    // 收集 studentIds
-    // ============================================================
+    // ---------- 3. 收集 studentIds ----------
     let studentId = null;
     let studentIds = [];
     if (mode === 'solo') {
@@ -2745,33 +2812,27 @@ async function handleCourseSubmit(e) {
         if (!studentId) { showToast('Élève requis', 'error'); return; }
         studentIds = [studentId];
     } else {
-        if (groupSelectedStudents.length === 0) { showToast('Sélectionnez au moins un élève', 'error'); return; }
+        if (groupSelectedStudents.length === 0) {
+            showToast('Sélectionnez au moins un élève', 'error');
+            return;
+        }
         studentId = groupSelectedStudents[0];
         studentIds = groupSelectedStudents.slice();
     }
 
-    // ============================================================
-    // B 方案：老师建课时检查 credit
-    // ============================================================
+    // ---------- 4. Credit 检查 ----------
     const field = category === 'civique' ? 'credit' : 'french_credit';
 
     if (!id) {
-        // ---------- 新建模式：每个学生都需要扣 duration ----------
         const insufficient = [];
         for (const sid of studentIds) {
             const stu = allUsers.find(u => u.id === sid);
             if (!stu) continue;
             const current = stu[field] || 0;
             if (current < duration) {
-                insufficient.push({
-                    name: stu.name,
-                    current: current,
-                    needed: duration,
-                    diff: duration - current
-                });
+                insufficient.push({ name: stu.name, current, needed: duration, diff: duration - current });
             }
         }
-
         if (insufficient.length > 0) {
             let msg = currentLang === 'fr'
                 ? '⚠️ Crédits insuffisants pour :\n\n'
@@ -2782,20 +2843,15 @@ async function handleCourseSubmit(e) {
             msg += currentLang === 'fr'
                 ? '\nContinuer quand même ? Les crédits seront mis à 0.'
                 : '\n仍要继续吗？课时将被归零。';
-
-            if (!confirm(msg)) {
-                return;
-            }
+            if (!confirm(msg)) return;
         }
     } else {
-        // ---------- 更新模式：只检查"新增差额" ----------
         const oldCourse = category === 'civique'
             ? allCiviqueCourses.find(c => c.id === id)
             : allFrenchCourses.find(c => c.id === id);
 
         if (oldCourse) {
             const oldDur = oldCourse.duration || 2;
-
             const supabaseTmp = window.supabaseAuth.getSupabaseClient();
             const { data: oldCsList } = await supabaseTmp
                 .from('course_students')
@@ -2811,25 +2867,14 @@ async function handleCourseSubmit(e) {
             for (const sid of studentIds) {
                 const stu = allUsers.find(u => u.id === sid);
                 if (!stu) continue;
-
                 const isNewlyAdded = !oldStudentIds.includes(sid);
-                const additionalHours = isNewlyAdded
-                    ? duration
-                    : Math.max(0, duration - oldDur);
-
+                const additionalHours = isNewlyAdded ? duration : Math.max(0, duration - oldDur);
                 if (additionalHours <= 0) continue;
-
                 const current = stu[field] || 0;
                 if (current < additionalHours) {
-                    insufficient.push({
-                        name: stu.name,
-                        current: current,
-                        needed: additionalHours,
-                        diff: additionalHours - current
-                    });
+                    insufficient.push({ name: stu.name, current, needed: additionalHours, diff: additionalHours - current });
                 }
             }
-
             if (insufficient.length > 0) {
                 let msg = currentLang === 'fr'
                     ? '⚠️ Crédits insuffisants pour les modifications :\n\n'
@@ -2840,26 +2885,19 @@ async function handleCourseSubmit(e) {
                 msg += currentLang === 'fr'
                     ? '\nContinuer quand même ? Les crédits seront mis à 0.'
                     : '\n仍要继续吗？课时将被归零。';
-
-                if (!confirm(msg)) {
-                    return;
-                }
+                if (!confirm(msg)) return;
             }
         }
     }
 
-      // ============================================================
-    // 🔥 校验老师 Meet 链接
-    // ============================================================
+    // ---------- 5. 校验老师 Meet 链接 ----------
     const meetingLink = document.getElementById('courseMeetingLink').value.trim();
     if (!meetingLink) {
         showToast('⚠️ Ce professeur n\'a pas de lien Meet configuré', 'error');
         return;
     }
 
-    // ============================================================
-    // 构造 data
-    // ============================================================
+    // ---------- 6. 构造 data ----------
     const data = {
         category: category,
         course_mode: mode,
@@ -2876,21 +2914,19 @@ async function handleCourseSubmit(e) {
         max_students: mode === 'group' ? studentIds.length : 1
     };
 
+    // ---------- 7. 状态 = cancelled → 走取消流程 ----------
     if (status === 'cancelled') {
         pendingCancelData = { id: id, category: category, data: data, isNew: !id };
         openModal('cancelReasonModal');
         return;
     }
 
-    // ============================================================
-    // 写入数据库
-    // ============================================================
+    // ---------- 8. 写入数据库 ----------
     showLoading(id ? 'Modification...' : 'Création...');
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         let courseResult;
 
-        // 更新时：先读出旧课程的 credit 信息
         let oldCreditInfo = null;
         if (id) {
             const oldCourse = category === 'civique'
@@ -2906,7 +2942,6 @@ async function handleCourseSubmit(e) {
             if (oldStudentIds.length === 0 && oldCourse?.student_id) {
                 oldStudentIds = [oldCourse.student_id];
             }
-
             oldCreditInfo = {
                 studentIds: oldStudentIds,
                 duration: oldCourse?.duration || 2,
@@ -2914,62 +2949,84 @@ async function handleCourseSubmit(e) {
             };
         }
 
-        // 写入 / 更新课程
         if (id) {
-            const updateRes = await supabase.from('courses_v2').update(data).eq('id', id).select().single();
+            const updateRes = await supabase
+                .from('courses_v2')
+                .update(data)
+                .eq('id', id)
+                .select()
+                .single();
             if (updateRes.error) throw updateRes.error;
             courseResult = updateRes.data;
-
             await supabase.from('course_students').delete().eq('course_id', id);
         } else {
             data.created_at = new Date().toISOString();
-            const insertRes = await supabase.from('courses_v2').insert([data]).select().single();
+            const insertRes = await supabase
+                .from('courses_v2')
+                .insert([data])
+                .select()
+                .single();
             if (insertRes.error) throw insertRes.error;
             courseResult = insertRes.data;
         }
 
-        // 写入新的 student 关联
-        const csData = studentIds.map(sid => ({ course_id: courseResult.id, student_id: sid }));
+        const csData = studentIds.map(sid => ({
+            course_id: courseResult.id,
+            student_id: sid
+        }));
         const { error: csErr } = await supabase.from('course_students').insert(csData);
         if (csErr) {
-            console.warn('⚠️ course_students 写入失败（不影响课程本身）:', csErr.message);
+            console.warn('⚠️ course_students 写入失败:', csErr.message);
         }
 
-        // 先退还旧 credit，再扣新 credit
+        // ---------- 9. 退旧 credit + 扣新 credit ----------
         if (oldCreditInfo && oldCreditInfo.studentIds.length > 0) {
             for (const sid of oldCreditInfo.studentIds) {
                 await refundStudentCredit(sid, oldCreditInfo.duration, oldCreditInfo.category);
             }
         }
-
         for (const sid of studentIds) {
             await deductStudentCredit(sid, duration, category);
         }
 
-        // ============================================================
-        // 🔥 邮件通知（可见结果）
-        // ============================================================
+        // ---------- 10. 🔥 删除老师「未被预定」的冲突空闲 ----------
+        let availRemoved = 0;
+        try {
+            const availResult = await removeConflictingAvailabilities(
+                teacherId,
+                startTimeStr,
+                duration
+            );
+            availRemoved = availResult.removed || 0;
+        } catch (e) {
+            console.warn('⚠️ 清理冲突空闲失败:', e.message);
+        }
+
+        // ---------- 11. 邮件通知 ----------
         const action = id ? 'update' : 'create';
         let emailResult = null;
         try {
             emailResult = await sendCourseEmailNotification(courseResult.id, action);
         } catch (emailErr) {
-            console.warn('⚠️ 邮件发送异常（不影响课程）:', emailErr.message);
+            console.warn('⚠️ 邮件发送异常:', emailErr.message);
         }
 
+        // ---------- 12. 关闭 + 刷新 + Toast ----------
         closeModal('courseModal');
         await loadAllData();
 
-        // ============================================================
-        // 🔥 根据邮件结果给出更清晰的提示
-        // ============================================================
         const savedMsg = id ? 'Cours modifié ✓' : 'Cours créé ✓';
+        let extraMsg = '';
+        if (availRemoved > 0) {
+            extraMsg += ` — 🗑️ ${availRemoved} 个冲突空闲已删除`;
+        }
+
         if (emailResult?.skipped) {
-            showToast(savedMsg + ' — ⚠️ 邮件未发送（无邮箱或 EmailJS 不可用）', 'warning');
+            showToast(savedMsg + extraMsg + ' — ⚠️ 邮件未发送', 'warning');
         } else if (emailResult?.sentCount > 0) {
-            showToast(savedMsg + ` — 📧 ${emailResult.sentCount} 封邮件已发送`, 'success');
+            showToast(savedMsg + extraMsg + ` — 📧 ${emailResult.sentCount} 封邮件已发送`, 'success');
         } else {
-            showToast(savedMsg, 'success');
+            showToast(savedMsg + extraMsg, 'success');
         }
 
     } catch (err) {
@@ -2979,7 +3036,6 @@ async function handleCourseSubmit(e) {
         hideLoading();
     }
 }
-
 // ============================================================
 // 课时扣减/退还
 // ============================================================

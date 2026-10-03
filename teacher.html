@@ -1451,7 +1451,7 @@ function renderCourseCard(c) {
     detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-clock"></i> ${c.duration || 2} h</div>`;
 
     if (c.location) detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(c.location)}</div>`;
-    if (c.meeting_link) detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-video"></i> <a href="${escapeHtml(c.meeting_link)}" target="_blank">Lien Meet</a></div>`;
+   
     if (c.material_link) detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-paperclip"></i> <a href="${escapeHtml(c.material_link)}" target="_blank">Support</a></div>`;
     if (c.cancel_reason) detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-ban"></i> Motif: ${escapeHtml(c.cancel_reason)}</div>`;
 
