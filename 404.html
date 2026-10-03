@@ -35,9 +35,14 @@
     .error-page p {
       color: var(--text-light);
       font-size: 1rem;
-      max-width: 500px;
-      margin: 0 auto 28px;
+      max-width: 520px;
+      margin: 0 auto 20px;
       line-height: 1.7;
+    }
+    .error-page p.zh {
+      font-size: 0.92rem;
+      color: #999;
+      margin-bottom: 28px;
     }
     .error-page .btn-primary {
       display: inline-flex;
@@ -56,6 +61,34 @@
     .error-page .btn-primary:hover {
       transform: translateY(-3px);
       box-shadow: 0 12px 36px rgba(26, 42, 92, 0.30);
+    }
+    /* 自动跳转倒计时提示 */
+    .redirect-notice {
+      margin-top: 24px;
+      font-size: 0.9rem;
+      color: var(--text-light);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(0, 64, 128, 0.06);
+      border-radius: 50px;
+      border-left: 3px solid var(--brand);
+    }
+    .redirect-notice i {
+      color: var(--brand);
+    }
+    .redirect-notice .countdown {
+      font-weight: 700;
+      color: var(--brand);
+      font-size: 1.05rem;
+      min-width: 20px;
+      text-align: center;
+      display: inline-block;
+    }
+    @media (max-width: 480px) {
+      .error-code { font-size: 4.5rem; }
+      .error-page h1 { font-size: 1.4rem; }
     }
   </style>
 </head>
@@ -79,10 +112,31 @@
   <div>
     <div class="error-code">404</div>
     <h1>Page introuvable</h1>
-    <p>La page que vous recherchez n'existe pas, a été déplacée ou est temporairement indisponible.</p>
+
+    <p>
+      La page que vous recherchez n'existe pas, a été déplacée ou est temporairement indisponible.
+    </p>
+    <p>
+      <strong>Vous n'avez peut-être pas les droits d'accès à cette page.</strong><br>
+      Veuillez vous connecter ou contacter l'association si vous pensez qu'il s'agit d'une erreur.
+    </p>
+    <p class="zh">
+      您可能没有访问此页面的权限。<br>
+      请先登录，或联系协会。如果您认为这是错误，请联系我们。
+    </p>
+
     <a href="index.html" class="btn-primary">
       <i class="fas fa-home"></i> Retour à l'accueil
     </a>
+
+    <div class="redirect-notice">
+      <i class="fas fa-hourglass-half"></i>
+      <span>
+        Redirection automatique dans
+        <span class="countdown" id="countdown">5</span>
+        s...
+      </span>
+    </div>
   </div>
 </section>
 
@@ -97,6 +151,31 @@
     </div>
   </div>
 </footer>
+
+<script>
+  // ============ 自动跳转倒计时 ============
+  (function() {
+    const REDIRECT_URL = 'index.html';
+    const REDIRECT_DELAY = 5;  // 秒
+    let secondsLeft = REDIRECT_DELAY;
+    
+    const countdownEl = document.getElementById('countdown');
+    if (countdownEl) {
+      countdownEl.textContent = secondsLeft;
+    }
+    
+    const interval = setInterval(function() {
+      secondsLeft--;
+      if (countdownEl) {
+        countdownEl.textContent = secondsLeft > 0 ? secondsLeft : 0;
+      }
+      if (secondsLeft <= 0) {
+        clearInterval(interval);
+        window.location.replace(REDIRECT_URL);
+      }
+    }, 1000);
+  })();
+</script>
 
 </body>
 </html>
