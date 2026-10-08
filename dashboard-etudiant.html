@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📊 Tableau de bord · Mille Voiles</title>
-    <link rel="icon" href="icons/icon-192x192.png" type="image/png">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -1848,7 +1847,6 @@ function renderQuizQuestion() {
         </div>
     `;
 }
-
 async function selectQuizOption(selectedIndex) {
     if (quizAnswered) return;
     
@@ -1856,6 +1854,7 @@ async function selectQuizOption(selectedIndex) {
     const isCorrect = selectedIndex === q.correct_answer;
     const optionLetters = ['A', 'B', 'C', 'D'];
     
+    // 锁定所有选项 + 标出对错
     document.querySelectorAll('#quizOptions .option-btn').forEach(btn => {
         btn.classList.add('disabled');
         const idx = parseInt(btn.dataset.index);
@@ -1873,6 +1872,9 @@ async function selectQuizOption(selectedIndex) {
     feedback.classList.add('show');
     
     if (isCorrect) {
+        // ============================================================
+        // ✅ 答对：标记为已掌握（不删除）
+        // ============================================================
         feedback.className = 'quiz-feedback show success';
         feedback.innerHTML = `
             <div class="feedback-title">${t('quizCorrect')}</div>
@@ -1880,32 +1882,35 @@ async function selectQuizOption(selectedIndex) {
         `;
         
         try {
-            if (window.supabaseAuth && window.supabaseAuth.deleteMistake) {
-                await window.supabaseAuth.deleteMistake(q.id);
-                console.log('✅ 已从 Supabase 删除错题:', q.id);
+            if (window.supabaseAuth && window.supabaseAuth.markMistakeAsMastered) {
+                await window.supabaseAuth.markMistakeAsMastered(q.id, true);
+                console.log('✅ 已标记为掌握:', q.id);
             }
         } catch (e) {
-            console.warn('⚠️ Supabase 删除失败:', e.message);
+            console.warn('⚠️ 标记失败:', e.message);
         }
         
-        const mistakeIndex = allMistakes.findIndex(m => m.id === q.id);
-        if (mistakeIndex !== -1) {
-            allMistakes.splice(mistakeIndex, 1);
-        }
-        const filteredIdx = filteredMistakes.findIndex(m => m.id === q.id);
-        if (filteredIdx !== -1) {
-            filteredMistakes.splice(filteredIdx, 1);
-        }
+        // 本地同步
+        const mi = allMistakes.findIndex(m => m.id === q.id);
+        if (mi !== -1) allMistakes[mi].mastered = true;
+        const fi = filteredMistakes.findIndex(m => m.id === q.id);
+        if (fi !== -1) filteredMistakes[fi].mastered = true;
+        q.mastered = true;
+        
+        // 从当前 quiz 队列移除
         quizQuestions.splice(quizIndex, 1);
         quizIndex--;
         
         saveMistakesToLocal();
-        
         updateStats();
         updateQuizBadge();
         checkStreak();
+        renderMistakesList();     // 🔥 同步"我的错题" tab
         
     } else {
+        // ============================================================
+        // ❌ 答错：重新 insert 一条，触发器自动 +1
+        // ============================================================
         feedback.className = 'quiz-feedback show error';
         feedback.innerHTML = `
             <div class="feedback-title">${t('quizWrong')}</div>
@@ -1914,33 +1919,48 @@ async function selectQuizOption(selectedIndex) {
         `;
         
         try {
-            if (window.supabaseAuth && window.supabaseAuth.updateMistakeCount) {
-                await window.supabaseAuth.updateMistakeCount(q.id, (q.times_wrong || 0) + 1);
-                console.log('✅ 已更新 Supabase 错题次数:', q.id);
+            if (window.supabaseAuth && window.supabaseAuth.recordMistake) {
+                // 构造一个符合 recordMistakeToDB 期望的 question 对象
+                const questionForSave = {
+                    question_id: q.question_id || q.id,   // 用错题表里的 question_id
+                    question:    q.question,
+                    category:    q.category || q.theme || 'Autre',
+                    difficulty:  q.difficulty || 'moyen',
+                    options:     q.options,
+                    answer:      q.correct_answer,
+                    explanation: q.explanation || ''
+                };
+
+                await window.supabaseAuth.recordMistake(
+                    studentInfo,
+                    questionForSave,
+                    selectedIndex,               // 用户这次选的（错的）
+                    q.test_type || 'quiz_elimination'
+                );
+                console.log('✅ 答错已记录，触发器自动 +1');
+            } else {
+                console.warn('⚠️ recordMistake 不可用');
             }
         } catch (e) {
-            console.warn('⚠️ Supabase 更新失败:', e.message);
+            console.warn('⚠️ 记录失败:', e.message);
         }
         
-        const mistakeIndex = allMistakes.findIndex(m => m.id === q.id);
-        if (mistakeIndex !== -1) {
-            allMistakes[mistakeIndex].times_wrong = (allMistakes[mistakeIndex].times_wrong || 0) + 1;
-        }
-        const filteredIdx = filteredMistakes.findIndex(m => m.id === q.id);
-        if (filteredIdx !== -1) {
-            filteredMistakes[filteredIdx].times_wrong = (filteredMistakes[filteredIdx].times_wrong || 0) + 1;
-        }
+        // 本地同步（只为 UI 立即反映，数据库已经通过触发器 +1）
         q.times_wrong = (q.times_wrong || 0) + 1;
+        const mi = allMistakes.findIndex(m => m.id === q.id);
+        if (mi !== -1) allMistakes[mi].times_wrong = q.times_wrong;
+        const fi = filteredMistakes.findIndex(m => m.id === q.id);
+        if (fi !== -1) filteredMistakes[fi].times_wrong = q.times_wrong;
         
         saveMistakesToLocal();
         updateStats();
         updateQuizBadge();
+        renderMistakesList();     // 🔥 同步"我的错题" tab
     }
     
     quizAnswered = true;
     document.getElementById('quizNextBtn').style.display = 'inline-flex';
 }
-
 function nextQuizQuestion() {
     quizIndex++;
     quizAnswered = false;
