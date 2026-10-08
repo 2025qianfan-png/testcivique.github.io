@@ -969,7 +969,7 @@ const i18n = {
         type_unknown: 'Test',
         quizTitle: '🎮 Éliminez vos erreurs',
         quizProgress: 'Question {current}/{total}',
-        quizCorrect: '✅ Bravo ! Question supprimée de votre liste d\'erreurs !',
+        quizCorrect: '✅ Bravo ! Question marquée comme maîtrisée !',
         quizWrong: '❌ Oups ! Réessayez plus tard. +1 erreur',
         quizEmpty: '🎉 Plus aucune erreur à réviser !',
         quizEmptySub: 'Vous avez éliminé toutes vos erreurs. Continuez comme ça !',
@@ -1011,9 +1011,9 @@ const i18n = {
         type_ten_year: '10年居留卡',
         type_multi_year: '2-4年居留',
         type_unknown: '测试',
-        quizTitle: '🎮 消灭错题',
+        quizTitle: '🎮 错题消消乐',
         quizProgress: '第 {current}/{total} 题',
-        quizCorrect: '✅ 太棒了！本题已从错题集删除！',
+       quizCorrect: '✅ 太棒了！本题已标记为已掌握！',
         quizWrong: '❌ 哎呀！再练练吧。错误次数 +1',
         quizEmpty: '🎉 没有需要复习的错题了！',
         quizEmptySub: '您已消灭所有错题，继续保持！',
@@ -1849,11 +1849,11 @@ function renderQuizQuestion() {
 }
 async function selectQuizOption(selectedIndex) {
     if (quizAnswered) return;
-    
+
     const q = quizQuestions[quizIndex];
     const isCorrect = selectedIndex === q.correct_answer;
     const optionLetters = ['A', 'B', 'C', 'D'];
-    
+
     // 锁定所有选项 + 标出对错
     document.querySelectorAll('#quizOptions .option-btn').forEach(btn => {
         btn.classList.add('disabled');
@@ -1867,49 +1867,51 @@ async function selectQuizOption(selectedIndex) {
             btn.querySelector('.result-icon').textContent = '❌';
         }
     });
-    
+
     const feedback = document.getElementById('quizFeedback');
     feedback.classList.add('show');
-    
+
     if (isCorrect) {
         // ============================================================
-        // ✅ 答对：标记为已掌握（不删除）
+        // ✅ 答对：标记为已掌握
         // ============================================================
         feedback.className = 'quiz-feedback show success';
         feedback.innerHTML = `
             <div class="feedback-title">${t('quizCorrect')}</div>
             ${q.explanation ? `<div class="feedback-detail">💡 ${q.explanation}</div>` : ''}
         `;
-        
+
+        // ---- 数据库 ----
         try {
             if (window.supabaseAuth && window.supabaseAuth.markMistakeAsMastered) {
                 await window.supabaseAuth.markMistakeAsMastered(q.id, true);
                 console.log('✅ 已标记为掌握:', q.id);
             }
         } catch (e) {
-            console.warn('⚠️ 标记失败:', e.message);
+            console.warn('⚠️ Supabase 标记失败:', e.message);
         }
-        
-        // 本地同步
+
+        // ---- 本地同步 ----
         const mi = allMistakes.findIndex(m => m.id === q.id);
         if (mi !== -1) allMistakes[mi].mastered = true;
         const fi = filteredMistakes.findIndex(m => m.id === q.id);
         if (fi !== -1) filteredMistakes[fi].mastered = true;
         q.mastered = true;
-        
-        // 从当前 quiz 队列移除
+
+        // 从 quiz 队列移除（已掌握，本轮不用再答）
         quizQuestions.splice(quizIndex, 1);
         quizIndex--;
-        
+
         saveMistakesToLocal();
         updateStats();
         updateQuizBadge();
         checkStreak();
-        renderMistakesList();     // 🔥 同步"我的错题" tab
-        
+
+        renderMistakesList();   // 🔥 同步"我的错题" tab
+
     } else {
         // ============================================================
-        // ❌ 答错：重新 insert 一条，触发器自动 +1
+        // ❌ 答错：重新 insert，触发器自动 +1
         // ============================================================
         feedback.className = 'quiz-feedback show error';
         feedback.innerHTML = `
@@ -1917,12 +1919,12 @@ async function selectQuizOption(selectedIndex) {
             <div class="feedback-detail">✅ ${currentLang === 'fr' ? 'Bonne réponse' : '正确答案'}: ${optionLetters[q.correct_answer]}. ${q.options[q.correct_answer]}</div>
             ${q.explanation ? `<div class="feedback-detail">💡 ${q.explanation}</div>` : ''}
         `;
-        
+
+        // ---- 数据库：走统一的 recordMistake，触发器 +1 ----
         try {
             if (window.supabaseAuth && window.supabaseAuth.recordMistake) {
-                // 构造一个符合 recordMistakeToDB 期望的 question 对象
                 const questionForSave = {
-                    question_id: q.question_id || q.id,   // 用错题表里的 question_id
+                    question_id: q.question_id || q.id,
                     question:    q.question,
                     category:    q.category || q.theme || 'Autre',
                     difficulty:  q.difficulty || 'moyen',
@@ -1930,34 +1932,32 @@ async function selectQuizOption(selectedIndex) {
                     answer:      q.correct_answer,
                     explanation: q.explanation || ''
                 };
-
                 await window.supabaseAuth.recordMistake(
                     studentInfo,
                     questionForSave,
-                    selectedIndex,               // 用户这次选的（错的）
+                    selectedIndex,
                     q.test_type || 'quiz_elimination'
                 );
-                console.log('✅ 答错已记录，触发器自动 +1');
-            } else {
-                console.warn('⚠️ recordMistake 不可用');
+                console.log('✅ 答错已记录（触发器自动 +1）');
             }
         } catch (e) {
-            console.warn('⚠️ 记录失败:', e.message);
+            console.warn('⚠️ Supabase 记录失败:', e.message);
         }
-        
-        // 本地同步（只为 UI 立即反映，数据库已经通过触发器 +1）
+
+        // ---- 本地同步（UI 立即反映） ----
         q.times_wrong = (q.times_wrong || 0) + 1;
         const mi = allMistakes.findIndex(m => m.id === q.id);
         if (mi !== -1) allMistakes[mi].times_wrong = q.times_wrong;
         const fi = filteredMistakes.findIndex(m => m.id === q.id);
         if (fi !== -1) filteredMistakes[fi].times_wrong = q.times_wrong;
-        
+
         saveMistakesToLocal();
         updateStats();
         updateQuizBadge();
-        renderMistakesList();     // 🔥 同步"我的错题" tab
+
+        renderMistakesList();   // 🔥 同步"我的错题" tab
     }
-    
+
     quizAnswered = true;
     document.getElementById('quizNextBtn').style.display = 'inline-flex';
 }
@@ -2243,14 +2243,21 @@ function switchTab(tabId) {
     document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
     document.getElementById(`tab-${tabId}`).classList.add('active');
     document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+
     if (tabId === 'history') {
         setTimeout(renderChart, 100);
+    }
+    if (tabId === 'mistakes') {
+        renderMistakesList();        // 🔥 进入错题 tab 时重画
+        populateFilterOptions();     // 🔥 重建筛选下拉
     }
     if (tabId === 'quiz') {
         renderQuiz();
     }
+    if (tabId === 'stats') {
+        renderStatsTab();            // 🔥 进入统计 tab 时重画
+    }
 }
-
 function refreshData() {
     showToast('Info', 'Rafraîchissement des données...', 'info');
     loadAllData();
