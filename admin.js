@@ -266,6 +266,91 @@ const I18N = {
 
         'footer': '© 2025-2026 Association Mille Voiles / 千帆协会',
         'loading': 'Chargement...',
+        'msg.noUser': 'Aucun utilisateur',
+        'msg.noPrereg': 'Aucune pré-inscription',
+        'msg.noCourse': 'Aucun cours',
+        'msg.noExam': 'Aucun examen enregistré',
+        'msg.copied': 'Copié !',
+        'msg.loadingData': 'Chargement des données...',
+        'msg.loadError': 'Erreur de chargement : {err}',
+        'msg.error': 'Erreur : {err}',
+        'msg.accessDenied': 'Accès refusé',
+        'msg.modifying': 'Modification...',
+        'msg.creating': 'Création...',
+        'msg.deleting': 'Suppression...',
+        'msg.validating': 'Validation...',
+        'msg.rejecting': 'Rejet...',
+        'msg.cancelling': 'Annulation...',
+        'msg.nameRequired': 'Nom requis',
+        'msg.passwordRequired': 'Mot de passe requis',
+        'msg.userModified': 'Utilisateur modifié ✓',
+        'msg.userCreated': 'Utilisateur créé ✓',
+        'msg.deleted': 'Supprimé ✓',
+        'msg.confirmDeleteUser': 'Supprimer {name} ?\n\nCette action est irréversible.',
+        'msg.alreadyProcessed': 'Déjà traité',
+        'msg.cannotEditProcessed': 'Impossible : déjà traité',
+        'msg.preRegModified': 'Pré-inscription modifiée ✓',
+        'msg.confirmValidate': "Valider la pré-inscription de {name} ?\n\nL'utilisateur sera ajouté à la base.",
+        'msg.noPassword': "Pré-inscription sans mot de passe. Corrigez-la d'abord.",
+        'msg.nameExists': 'Ce nom existe déjà',
+        'msg.validatedEmail': '✅ Validé + email envoyé',
+        'msg.validatedNoSend': '✅ Validé (email non envoyé)',
+        'msg.validatedNoEmail': "✅ Validé (pas d'email)",
+        'msg.confirmReject': 'Rejeter la pré-inscription de {name} ?',
+        'msg.rejected': 'Pré-inscription rejetée',
+        'msg.teacherRequired': 'Intervenant requis',
+        'msg.dateRequired': 'Date/heure requise',
+        'msg.typeRequired': 'Type de cours requis',
+        'msg.dateInvalid': 'Format de date invalide',
+        'msg.conflictToast': 'Conflit horaire !',
+        'msg.studentRequired': 'Élève requis',
+        'msg.groupMin': 'Sélectionnez au moins un élève',
+        'msg.noMeetTeacher': "⚠️ Cet intervenant n'a pas de lien Meet configuré",
+        'msg.noMeetTeacherHint': "⚠️ Cet intervenant n'a pas de lien Meet configuré. Ajoutez-le dans l'onglet Liens Meet.",
+        'msg.courseModified': 'Cours modifié ✓',
+        'msg.courseCreated': 'Cours créé ✓',
+        'msg.courseCancelled': 'Cours annulé ✓',
+        'msg.courseDeleted': 'Cours supprimé ✓',
+        'msg.courseAlreadyCancelled': 'Cours déjà annulé',
+        'msg.csFail': "Impossible d'enregistrer les élèves du cours. Opération annulée.",
+        'msg.availRemoved': ' — 🗑️ {n} créneau(x) libre(s) en conflit supprimé(s)',
+        'msg.emailsSent': ' — 📧 {n} e-mail(s) envoyé(s)',
+        'msg.emailNotSent': ' — ⚠️ e-mail non envoyé',
+        'msg.selectReason': 'Sélectionnez un motif',
+        'msg.examModified': 'Examen modifié ✓',
+        'msg.examAdded': 'Examen ajouté ✓',
+        'msg.examDeleted': 'Examen supprimé ✓',
+        'msg.confirmDeleteExam': 'Supprimer cet examen ?',
+        'msg.typeReq': 'Type requis',
+        'msg.dateReq': 'Date requise',
+        'um.title.edit': 'Modifier ',
+        'cm.title.edit': 'Modifier le cours',
+        'se.title.edit': "Modifier l'examen",
+        'form.modulesTeacher': 'Enseigne (matière)',
+        'cm.selectedCount': '({n} sélectionné(s))',
+        'cm.typeSelected': 'Sélectionné : ',
+        'cm.frenchRoot': '🇫🇷 Cours de français',
+        'cc.group': 'Groupe',
+        'cc.solo': 'Individuel',
+        'cc.studentLabel': 'Élève : ',
+        'cc.groupLine': 'Groupe ({n}) : {names}',
+        'cc.toDefine': 'À définir',
+        'cc.visio': 'Lien visio',
+        'cc.reason': 'Motif : ',
+        'cc.edit': 'Modifier',
+        'cc.cancel': 'Annuler',
+        'cc.delete': 'Supprimer',
+        'status.pending': '⏳ En attente',
+        'status.validated': '✅ Validé',
+        'status.rejected': '❌ Rejeté',
+        'module.both': '📘🇫🇷 Double',
+        'meeting.synced': ' — 🔗 {n} cours mis à jour',
+        'meeting.syncPartial': ' — ⚠️ synchronisation des cours incomplète',
+        'page.more': 'Afficher plus',
+        'header.titleFr': 'Admin Français',
+        'header.titleCiv': 'Admin Civique',
+        'header.backFr': 'Retour Français',
+        'header.backCiv': 'Retour Civique',
 
         days: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
         daysFull: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'],
@@ -487,6 +572,91 @@ const I18N = {
 
         'footer': '© 2025-2026 千帆协会 / Association Mille Voiles',
         'loading': '加载中...',
+        'msg.noUser': '暂无用户',
+        'msg.noPrereg': '暂无预注册',
+        'msg.noCourse': '暂无课程',
+        'msg.noExam': '暂无考试记录',
+        'msg.copied': '已复制',
+        'msg.loadingData': '正在加载数据...',
+        'msg.loadError': '加载失败：{err}',
+        'msg.error': '错误：{err}',
+        'msg.accessDenied': '无权访问',
+        'msg.modifying': '修改中...',
+        'msg.creating': '创建中...',
+        'msg.deleting': '删除中...',
+        'msg.validating': '审核中...',
+        'msg.rejecting': '拒绝中...',
+        'msg.cancelling': '取消中...',
+        'msg.nameRequired': '请填写姓名',
+        'msg.passwordRequired': '请填写密码',
+        'msg.userModified': '用户已修改 ✓',
+        'msg.userCreated': '用户已创建 ✓',
+        'msg.deleted': '已删除 ✓',
+        'msg.confirmDeleteUser': '确定删除 {name} 吗？\n\n此操作不可恢复。',
+        'msg.alreadyProcessed': '已处理',
+        'msg.cannotEditProcessed': '无法操作：已处理',
+        'msg.preRegModified': '预注册已修改 ✓',
+        'msg.confirmValidate': '确认通过 {name} 的预注册吗？\n\n该用户将被添加到数据库。',
+        'msg.noPassword': '该预注册没有密码，请先补充。',
+        'msg.nameExists': '该姓名已存在',
+        'msg.validatedEmail': '✅ 已通过，并已发送邮件',
+        'msg.validatedNoSend': '✅ 已通过（邮件未发送）',
+        'msg.validatedNoEmail': '✅ 已通过（无邮箱）',
+        'msg.confirmReject': '确认拒绝 {name} 的预注册吗？',
+        'msg.rejected': '预注册已拒绝',
+        'msg.teacherRequired': '请选择教师',
+        'msg.dateRequired': '请选择日期和时间',
+        'msg.typeRequired': '请选择课程类型',
+        'msg.dateInvalid': '日期格式无效',
+        'msg.conflictToast': '时间冲突！',
+        'msg.studentRequired': '请选择学生',
+        'msg.groupMin': '请至少选择一名学生',
+        'msg.noMeetTeacher': '⚠️ 该教师尚未配置 Meet 链接',
+        'msg.noMeetTeacherHint': '⚠️ 该教师尚未配置 Meet 链接，请先在「Meet 链接」标签页中添加。',
+        'msg.courseModified': '课程已修改 ✓',
+        'msg.courseCreated': '课程已创建 ✓',
+        'msg.courseCancelled': '课程已取消 ✓',
+        'msg.courseDeleted': '课程已删除 ✓',
+        'msg.courseAlreadyCancelled': '课程已被取消',
+        'msg.csFail': '无法保存课程学员，操作已取消。',
+        'msg.availRemoved': ' — 🗑️ 已删除 {n} 个冲突的空闲时段',
+        'msg.emailsSent': ' — 📧 已发送 {n} 封邮件',
+        'msg.emailNotSent': ' — ⚠️ 邮件未发送',
+        'msg.selectReason': '请选择取消原因',
+        'msg.examModified': '考试已修改 ✓',
+        'msg.examAdded': '考试已添加 ✓',
+        'msg.examDeleted': '考试已删除 ✓',
+        'msg.confirmDeleteExam': '确定删除这条考试记录吗？',
+        'msg.typeReq': '请选择考试类型',
+        'msg.dateReq': '请选择日期',
+        'um.title.edit': '修改 ',
+        'cm.title.edit': '修改课程',
+        'se.title.edit': '修改考试',
+        'form.modulesTeacher': '授课模块',
+        'cm.selectedCount': '（已选 {n}）',
+        'cm.typeSelected': '已选：',
+        'cm.frenchRoot': '🇫🇷 法语课程',
+        'cc.group': '小组',
+        'cc.solo': '一对一',
+        'cc.studentLabel': '学生：',
+        'cc.groupLine': '小组（{n} 人）：{names}',
+        'cc.toDefine': '待定',
+        'cc.visio': '视频链接',
+        'cc.reason': '原因：',
+        'cc.edit': '修改',
+        'cc.cancel': '取消课程',
+        'cc.delete': '删除',
+        'status.pending': '⏳ 待处理',
+        'status.validated': '✅ 已通过',
+        'status.rejected': '❌ 已拒绝',
+        'module.both': '📘🇫🇷 双课',
+        'meeting.synced': ' — 🔗 已更新 {n} 节课',
+        'meeting.syncPartial': ' — ⚠️ 课程同步不完整',
+        'page.more': '显示更多',
+        'header.titleFr': '法语管理',
+        'header.titleCiv': '公民课管理',
+        'header.backFr': '返回法语',
+        'header.backCiv': '返回公民课',
 
         days: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
         daysFull: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
@@ -506,10 +676,16 @@ const I18N = {
     }
 };
 
-function t(key) {
-    return (I18N[currentLang] && I18N[currentLang][key])
+function t(key, params) {
+    let str = (I18N[currentLang] && I18N[currentLang][key])
         || (I18N.fr[key])
         || key;
+    if (params && typeof str === 'string') {
+        Object.keys(params).forEach(k => {
+            str = str.split('{' + k + '}').join(params[k]);
+        });
+    }
+    return str;
 }
 
 function getMonday(d) {
@@ -587,6 +763,35 @@ let teacherMeetingLinks = {};
 // ============================================================
 // 工具函数
 // ============================================================
+// ---------- 分页（"显示更多"） ----------
+const PAGE = { users: 50, prereg: 50, civique: 20, french: 20, exams: 50 };
+const pageLimit = Object.assign({}, PAGE);
+const pageSig = {};
+
+function loadMoreRow(key, shown, total, colspan) {
+    return '<tr><td class="load-more-cell" colspan="' + colspan + '">' +
+        '<button class="btn btn-secondary btn-sm load-more-btn" data-key="' + key + '">' +
+        escapeHtml(t('page.more')) + ' (' + shown + ' / ' + total + ')</button></td></tr>';
+}
+
+function loadMoreCard(key, shown, total) {
+    return '<div class="load-more-wrap">' +
+        '<button class="btn btn-secondary btn-sm load-more-btn" data-key="' + key + '">' +
+        escapeHtml(t('page.more')) + ' (' + shown + ' / ' + total + ')</button></div>';
+}
+
+// 手机卡片模式下，表格每个单元格用 data-label 显示列名
+function L(key) {
+    return ' data-label="' + escapeHtml(t(key)) + '"';
+}
+
+// 邮件发送结果 → toast 后缀
+function emailSuffix(r, quiet) {
+    if (r && r.sentCount > 0) return t('msg.emailsSent', { n: r.sentCount });
+    if (!quiet && r && r.skipped) return t('msg.emailNotSent');
+    return '';
+}
+
 function escapeHtml(s) {
     if (!s) return '';
     return String(s)
@@ -1058,7 +1263,7 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
 async function init() {
     const tokenData = parseToken();
     if (!tokenData || !validateToken(tokenData)) {
-        showToast('Accès refusé', 'error');
+        showToast(t('msg.accessDenied'), 'error');
         setTimeout(() => window.location.href = 'index.html', 2000);
         return;
     }
@@ -1106,6 +1311,19 @@ function applyLanguage() {
         btn.classList.toggle('active', btn.dataset.lang === currentLang);
     });
 
+    // 动态生成的下拉选项也要跟着语言刷新
+    if (allUsers.length) {
+        buildCiviqueFilterOptions();
+        buildFrenchFilterOptions();
+        buildCalendarFilterOptions();
+    }
+    // 手机上返回/退出只显示图标，用 title 提示文字
+    const _back = document.getElementById('backHomeLink');
+    const _backTxt = document.getElementById('backHomeText');
+    if (_back && _backTxt) _back.title = _backTxt.textContent;
+    const _logout = document.getElementById('logoutBtn');
+    if (_logout) _logout.title = t('header.logout');
+
     if (typeof renderCalendar === 'function' && allCiviqueCourses.length + allFrenchCourses.length > 0) renderCalendar();
     if (typeof updateUserStats === 'function' && allUsers.length) updateUserStats();
     if (typeof applyUserFilters === 'function' && allUsers.length) applyUserFilters();
@@ -1125,14 +1343,14 @@ function applyMode() {
 
     if (currentMode === 'francais') {
         if (backLink) backLink.href = 'francais.html';
-        if (backHomeText) backHomeText.textContent = 'Retour Français';
+        if (backHomeText) { backHomeText.dataset.i18n = 'header.backFr'; backHomeText.textContent = t('header.backFr'); }
         document.body.setAttribute('data-theme', 'francais');
-        if (headerTitle) headerTitle.textContent = 'Admin Français';
+        if (headerTitle) { headerTitle.dataset.i18n = 'header.titleFr'; headerTitle.textContent = t('header.titleFr'); }
     } else if (currentMode === 'civique') {
         if (backLink) backLink.href = 'examen-civique.html';
-        if (backHomeText) backHomeText.textContent = 'Retour Civique';
+        if (backHomeText) { backHomeText.dataset.i18n = 'header.backCiv'; backHomeText.textContent = t('header.backCiv'); }
         document.body.setAttribute('data-theme', 'civique');
-        if (headerTitle) headerTitle.textContent = 'Admin Civique';
+        if (headerTitle) { headerTitle.dataset.i18n = 'header.titleCiv'; headerTitle.textContent = t('header.titleCiv'); }
     } else {
         if (backLink) backLink.href = 'examen-civique.html';
     }
@@ -1164,6 +1382,23 @@ function bindTabs() {
 }
 
 function bindGlobalEvents() {
+    // "显示更多" 按钮（事件委托）
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.load-more-btn');
+        if (!btn) return;
+        const key = btn.dataset.key;
+        if (!(key in pageLimit)) return;
+        pageLimit[key] += PAGE[key];
+        const renderers = {
+            users: renderUsersTable,
+            prereg: renderPreRegTable,
+            civique: renderCiviqueCourses,
+            french: renderFrenchCourses,
+            exams: renderStudentExams
+        };
+        if (renderers[key]) renderers[key]();
+    });
+
     document.getElementById('logoutBtn').addEventListener('click', () => {
         sessionStorage.clear();
         window.location.href = 'examen-civique.html';
@@ -1449,12 +1684,12 @@ async function saveTeacherMeetingLink(teacherId, link) {
         // ============================================================
         if (syncErr) {
             showToast(
-                t('meeting.saved') + ' — ⚠️ ' + syncCount + ' cours synchronisés (partiel)',
+                t('meeting.saved') + t('meeting.syncPartial'),
                 'warning'
             );
         } else if (syncCount > 0) {
             showToast(
-                t('meeting.saved') + ' — 🔗 ' + syncCount + ' cours mis à jour',
+                t('meeting.saved') + t('meeting.synced', { n: syncCount }),
                 'success'
             );
         } else {
@@ -1545,7 +1780,7 @@ function getTeacherMeetingLink(teacherId) {
 // 加载所有数据
 // ============================================================
 async function loadAllData() {
-    showLoading('Chargement des données...');
+    showLoading(t('msg.loadingData'));
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
           await loadTeacherMeetingLinks();
@@ -1581,10 +1816,56 @@ async function loadAllData() {
 
     } catch (err) {
         console.error('加载数据失败:', err);
-        showToast('Erreur de chargement: ' + err.message, 'error');
+        showToast(t('msg.loadError', { err: err.message }), 'error');
     } finally {
         hideLoading();
     }
+}
+
+// ============================================================
+// 局部刷新：只重新拉取受影响的数据，不再每次全量加载
+// ============================================================
+async function refreshUsers() {
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    allUsers = data || [];
+    updateUserStats();
+    applyUserFilters();
+    buildCiviqueFilterOptions();
+    buildFrenchFilterOptions();
+    buildCalendarFilterOptions();
+    renderMeetingLinksList();
+}
+
+async function refreshPreRegs() {
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const { data, error } = await supabase.from('pre_registrations').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    allPreRegs = data || [];
+    renderPreRegTable();
+    updatePreRegCount();
+}
+
+async function refreshCourses() {
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const { data, error } = await supabase.from('courses_v2').select('*').order('start_time', { ascending: true });
+    if (error) throw error;
+    const all = data || [];
+    allCiviqueCourses = all.filter(c => c.category === 'civique');
+    allFrenchCourses = all.filter(c => c.category === 'francais');
+    await attachUsersToCourses();
+    renderCiviqueCourses();
+    renderFrenchCourses();
+    renderCalendar();
+}
+
+async function refreshExams() {
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const { data, error } = await supabase.from('student_exams').select('*, student:student_id(id,name)').order('exam_date', { ascending: false });
+    if (error) throw error;
+    allStudentExams = data || [];
+    renderStudentExams();
 }
 
 async function attachUsersToCourses() {
@@ -1717,23 +1998,27 @@ function renderUsersTable() {
     const tbody = document.getElementById('usersTableBody');
     if (!tbody) return;
 
+    const sig = userFilter + '|' + userSearchTerm;
+    if (sig !== pageSig.users) { pageSig.users = sig; pageLimit.users = PAGE.users; }
+
     if (filteredUsers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="11" class="empty-state"><i class="fas fa-users"></i><p>Aucun utilisateur</p></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" class="empty-state"><i class="fas fa-users"></i><p>' + t('msg.noUser') + '</p></td></tr>';
         return;
     }
 
-    tbody.innerHTML = filteredUsers.map(u => {
+    const visibleUsers = filteredUsers.slice(0, pageLimit.users);
+    tbody.innerHTML = visibleUsers.map(u => {
         const rowClass = isExpired(u) ? 'expired-row' : '';
         const roleBadge = getRoleBadge(u.role);
 
         const modules = u.modules || [];
         let moduleHtml = '';
         if (modules.includes('civique') && modules.includes('francais')) {
-            moduleHtml = '<span class="badge badge-both">📘🇫🇷 Double</span>';
+            moduleHtml = '<span class="badge badge-both">' + t('module.both') + '</span>';
         } else if (modules.includes('civique')) {
-            moduleHtml = '<span class="badge badge-civique">📘 Civique</span>';
+            moduleHtml = '<span class="badge badge-civique">' + t('module.civique') + '</span>';
         } else if (modules.includes('francais')) {
-            moduleHtml = '<span class="badge badge-francais">🇫🇷 Français</span>';
+            moduleHtml = '<span class="badge badge-francais">' + t('module.francais') + '</span>';
         } else {
             moduleHtml = '<span style="color:#999;">—</span>';
         }
@@ -1769,24 +2054,24 @@ function renderUsersTable() {
         }
 
         return '<tr class="' + rowClass + '">' +
-            '<td><strong>' + escapeHtml(u.name) + '</strong></td>' +
-            '<td>' + roleBadge + '</td>' +
-            '<td>' + moduleHtml + '</td>' +
-            '<td>' + typeHtml + '</td>' +
-            '<td>' + levelHtml + '</td>' +
-            '<td class="credit-cell">' + civiqueCreditHtml + '</td>' +
-            '<td class="credit-cell">' + frenchCreditHtml + '</td>' +
-            '<td>' + timerText + '</td>' +
-            '<td>' + escapeHtml(u.email || '—') + '</td>' +
-            '<td><div class="password-cell"><span class="pwd">' + escapeHtml(u.password || '—') + '</span>' +
+            '<td' + L('th.name') + '><strong>' + escapeHtml(u.name) + '</strong></td>' +
+            '<td' + L('th.role') + '>' + roleBadge + '</td>' +
+            '<td' + L('th.modules') + '>' + moduleHtml + '</td>' +
+            '<td' + L('th.type') + '>' + typeHtml + '</td>' +
+            '<td' + L('th.level') + '>' + levelHtml + '</td>' +
+            '<td class="credit-cell"' + L('th.creditCivique') + '>' + civiqueCreditHtml + '</td>' +
+            '<td class="credit-cell"' + L('th.creditFrench') + '>' + frenchCreditHtml + '</td>' +
+            '<td' + L('th.expiry') + '>' + timerText + '</td>' +
+            '<td' + L('th.email') + '>' + escapeHtml(u.email || '—') + '</td>' +
+            '<td' + L('th.password') + '><div class="password-cell"><span class="pwd">' + escapeHtml(u.password || '—') + '</span>' +
             (u.password ? '<button class="copy-password-btn" data-pwd="' + escapeHtml(u.password) + '"><i class="fas fa-copy"></i></button>' : '') +
             '</div></td>' +
-            '<td><div class="action-buttons">' +
+            '<td' + L('th.actions') + '><div class="action-buttons">' +
             '<button class="action-btn edit-btn" data-id="' + u.id + '"><i class="fas fa-edit"></i></button>' +
             '<button class="action-btn delete-btn" data-id="' + u.id + '"' + (u.role === 'admin' && u.id === currentAdmin.userId ? ' disabled' : '') + '><i class="fas fa-trash"></i></button>' +
             '</div></td>' +
             '</tr>';
-    }).join('');
+    }).join('') + (filteredUsers.length > visibleUsers.length ? loadMoreRow('users', visibleUsers.length, filteredUsers.length, 11) : '');
 
     tbody.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', () => openUserModal(btn.dataset.id));
@@ -1796,21 +2081,23 @@ function renderUsersTable() {
     });
     tbody.querySelectorAll('.copy-password-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            navigator.clipboard.writeText(this.dataset.pwd).then(() => showToast('Copié!', 'success'));
+            navigator.clipboard.writeText(this.dataset.pwd).then(() => showToast(t('msg.copied'), 'success'));
         });
     });
 }
 
 function getRoleBadge(role) {
     const map = {
-        'admin': '<span class="badge badge-admin">👑 Admin</span>',
-        'teacher': '<span class="badge badge-teacher">👨‍🏫 Intervenant</span>',
-        'stu': '<span class="badge badge-stu">📘 Élève Civique</span>',
-        'stu_fr': '<span class="badge badge-stu_fr">🇫🇷 Élève Français</span>',
-        'stu_all': '<span class="badge badge-stu_all">📘🇫🇷 Élève Double</span>',
-        'user': '<span class="badge badge-user">👤 Membre</span>'
+        'admin': ['badge-admin', 'role.admin'],
+        'teacher': ['badge-teacher', 'role.teacher'],
+        'stu': ['badge-stu', 'role.stu'],
+        'stu_fr': ['badge-stu_fr', 'role.stuFr'],
+        'stu_all': ['badge-stu_all', 'role.stuAll'],
+        'user': ['badge-user', 'role.user']
     };
-    return map[role] || role || '—';
+    const m = map[role];
+    if (!m) return role || '—';
+    return '<span class="badge ' + m[0] + '">' + t(m[1]) + '</span>';
 }
 
 // ============================================================
@@ -1823,7 +2110,7 @@ function openUserModal(userId) {
     if (userId) {
         const u = allUsers.find(x => x.id === userId);
         if (!u) return;
-        document.getElementById('userModalTitle').textContent = 'Modifier ' + u.name;
+        document.getElementById('userModalTitle').textContent = t('um.title.edit') + u.name;
         document.getElementById('userId').value = u.id;
         document.getElementById('userName').value = u.name;
         document.getElementById('userEmail').value = u.email || '';
@@ -1918,7 +2205,7 @@ function updateUserModalFields() {
     // 动态改 modules label
     const modulesLabel = document.getElementById('modulesLabel');
     if (modulesLabel) {
-        modulesLabel.textContent = (role === 'teacher') ? 'Enseigne (教什么课)' : (t('form.modules') || 'Modules autorisés');
+        modulesLabel.textContent = (role === 'teacher') ? t('form.modulesTeacher') : t('form.modules');
     }
 }
 
@@ -1930,7 +2217,7 @@ async function handleUserSubmit(e) {
     const password = document.getElementById('userPassword').value;
     const role = document.getElementById('userRole').value;
 
-    if (!name) { showToast('Nom requis', 'error'); return; }
+    if (!name) { showToast(t('msg.nameRequired'), 'error'); return; }
 
     const modules = [];
     if (document.getElementById('userModuleCivique').checked) modules.push('civique');
@@ -1954,24 +2241,24 @@ async function handleUserSubmit(e) {
     const frenchTimer = document.getElementById('userFrenchTimer').value;
     data.french_timer = frenchTimer ? new Date(frenchTimer).toISOString() : null;
 
-    showLoading(id ? 'Modification...' : 'Création...');
+    showLoading(id ? t('msg.modifying') : t('msg.creating'));
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         let result;
         if (id) {
             result = await supabase.from('users').update(data).eq('id', id).select().single();
         } else {
-            if (!password) { showToast('Mot de passe requis', 'error'); hideLoading(); return; }
+            if (!password) { showToast(t('msg.passwordRequired'), 'error'); hideLoading(); return; }
             data.created_at = new Date().toISOString();
             result = await supabase.from('users').insert([data]).select().single();
         }
         if (result.error) throw result.error;
         closeModal('userModal');
-        await loadAllData();
-        showToast(id ? 'Utilisateur modifié ✓' : 'Utilisateur créé ✓', 'success');
+        await Promise.all([refreshUsers(), refreshCourses()]);
+        showToast(id ? t('msg.userModified') : t('msg.userCreated'), 'success');
     } catch (err) {
         console.error(err);
-        showToast('Erreur: ' + err.message, 'error');
+        showToast(t('msg.error', { err: err.message }), 'error');
     } finally {
         hideLoading();
     }
@@ -1980,18 +2267,18 @@ async function handleUserSubmit(e) {
 function confirmDeleteUser(id) {
     const u = allUsers.find(x => x.id === id);
     if (!u) return;
-    if (!confirm('Supprimer ' + u.name + ' ?\n\nCette action est irréversible.')) return;
+    if (!confirm(t('msg.confirmDeleteUser', { name: u.name }))) return;
 
-    showLoading('Suppression...');
+    showLoading(t('msg.deleting'));
     (async () => {
         try {
             const supabase = window.supabaseAuth.getSupabaseClient();
             const { error } = await supabase.from('users').delete().eq('id', id);
             if (error) throw error;
-            await loadAllData();
-            showToast('Supprimé ✓', 'success');
+            await Promise.all([refreshUsers(), refreshCourses(), refreshExams()]);
+            showToast(t('msg.deleted'), 'success');
         } catch (err) {
-            showToast('Erreur: ' + err.message, 'error');
+            showToast(t('msg.error', { err: err.message }), 'error');
         } finally {
             hideLoading();
         }
@@ -2013,50 +2300,54 @@ function renderPreRegTable() {
     if (!tbody) return;
 
     if (allPreRegs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><i class="fas fa-user-plus"></i><p>Aucune pré-inscription</p></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><i class="fas fa-user-plus"></i><p>' + t('msg.noPrereg') + '</p></td></tr>';
         return;
     }
 
-    tbody.innerHTML = allPreRegs.map(reg => {
-        const statusMap = {
-            'pending': '<span class="badge badge-pending">⏳ En attente</span>',
-            'validated': '<span class="badge badge-validated">✅ Validé</span>',
-            'rejected': '<span class="badge badge-rejected">❌ Rejeté</span>'
-        };
-        const paymentMap = {
-            'wechat': '<span class="payment-badge payment-wechat">WeChat</span>',
-            'alipay': '<span class="payment-badge payment-alipay">Alipay</span>',
-            'xiaohongshu': '<span class="payment-badge payment-xiaohongshu">Xiaohongshu</span>',
-            'cb': '<span class="payment-badge payment-cb">CB</span>'
-        };
-        const civiqueTypeLabels = {
-            'n': 'N · 入籍',
-            'r': 'R · 十年卡',
-            'm': 'M · 多年卡',
-            't': 'T · 全部权限'
-        };
+    const statusMap = {
+        'pending': '<span class="badge badge-pending">' + t('status.pending') + '</span>',
+        'validated': '<span class="badge badge-validated">' + t('status.validated') + '</span>',
+        'rejected': '<span class="badge badge-rejected">' + t('status.rejected') + '</span>'
+    };
+    const paymentMap = {
+        'wechat': '<span class="payment-badge payment-wechat">WeChat</span>',
+        'alipay': '<span class="payment-badge payment-alipay">Alipay</span>',
+        'xiaohongshu': '<span class="payment-badge payment-xiaohongshu">Xiaohongshu</span>',
+        'cb': '<span class="payment-badge payment-cb">CB</span>'
+    };
+    const civiqueTypeLabels = {
+        'n': 'N · 入籍',
+        'r': 'R · 十年卡',
+        'm': 'M · 多年卡',
+        't': 'T · 全部权限'
+    };
+    const roleKeys = { 'user': 'role.user', 'stu': 'role.stu', 'teacher': 'role.teacher' };
+
+    const visible = allPreRegs.slice(0, pageLimit.prereg);
+
+    tbody.innerHTML = visible.map(reg => {
         const typeText = civiqueTypeLabels[reg.type] || reg.type || '—';
-        const roleText = { 'user': 'Membre', 'stu': 'Élève', 'teacher': 'Intervenant' }[reg.role] || reg.role || '—';
+        const roleText = roleKeys[reg.role] ? t(roleKeys[reg.role]) : (reg.role || '—');
         const isEditable = reg.status === 'pending';
 
         return '<tr' + (reg.status === 'pending' ? ' style="background:rgba(255,214,51,0.06);"' : '') + '>' +
-            '<td><strong>' + escapeHtml(reg.name) + '</strong></td>' +
-            '<td><span class="user-type type-' + (reg.type || 'n') + '">' + typeText + '</span></td>' +
-            '<td>' + roleText + '</td>' +
-            '<td>' + formatDateShort(reg.created_at) + '</td>' +
-            '<td>' + formatDateShort(reg.timer) + '</td>' +
-            '<td>' + (reg.credit ? reg.credit + ' h' : '—') + '</td>' +
-            '<td style="font-size:0.78rem;">' + escapeHtml(reg.order_number || '—') + '</td>' +
-            '<td>' + (paymentMap[reg.payment_method] || '—') + '</td>' +
-            '<td>' + (statusMap[reg.status] || reg.status) + '</td>' +
-            '<td><div class="action-buttons">' +
+            '<td' + L('th.name') + '><strong>' + escapeHtml(reg.name) + '</strong></td>' +
+            '<td' + L('th.type') + '><span class="user-type type-' + (reg.type || 'n') + '">' + typeText + '</span></td>' +
+            '<td' + L('th.role') + '>' + roleText + '</td>' +
+            '<td' + L('th.inscription') + '>' + formatDateShort(reg.created_at) + '</td>' +
+            '<td' + L('th.expiry') + '>' + formatDateShort(reg.timer) + '</td>' +
+            '<td' + L('th.credit') + '>' + (reg.credit ? reg.credit + ' h' : '—') + '</td>' +
+            '<td' + L('th.order') + ' style="font-size:0.78rem;">' + escapeHtml(reg.order_number || '—') + '</td>' +
+            '<td' + L('th.payment') + '>' + (paymentMap[reg.payment_method] || '—') + '</td>' +
+            '<td' + L('th.status') + '>' + (statusMap[reg.status] || reg.status) + '</td>' +
+            '<td' + L('th.actions') + '><div class="action-buttons">' +
             (isEditable ? '<button class="action-btn edit-btn" data-action="edit-prereg" data-id="' + reg.id + '"><i class="fas fa-pen"></i></button>' : '') +
             (reg.status === 'pending' ? '<button class="action-btn-validate" data-action="validate" data-id="' + reg.id + '"><i class="fas fa-check"></i></button>' +
                 '<button class="action-btn-reject" data-action="reject" data-id="' + reg.id + '"><i class="fas fa-times"></i></button>' : '') +
             '<button class="action-btn-detail" data-action="detail" data-id="' + reg.id + '"><i class="fas fa-eye"></i></button>' +
             '</div></td>' +
             '</tr>';
-    }).join('');
+    }).join('') + (allPreRegs.length > visible.length ? loadMoreRow('prereg', visible.length, allPreRegs.length, 10) : '');
 
     tbody.querySelectorAll('[data-action="edit-prereg"]').forEach(btn => {
         btn.addEventListener('click', () => openEditPreRegModal(parseInt(btn.dataset.id)));
@@ -2082,9 +2373,9 @@ function showPreRegDetail(id) {
     'm': 'M — Carte pluriannuelle (多年卡)',
     't': 'T — Tous droits (全部权限)'
 };
-    const roleMap = { 'user': 'Membre / 会员', 'stu': 'Élève / 学员', 'teacher': 'Intervenant' };
+    const roleMap = { 'user': t('role.user'), 'stu': t('role.stu'), 'teacher': t('role.teacher') };
     const paymentMap = { 'wechat': 'WeChat 微信', 'alipay': 'Alipay 支付宝', 'xiaohongshu': 'Xiaohongshu 小红书', 'cb': 'CB 银行卡' };
-    const statusMap = { 'pending': 'En attente / 等待中', 'validated': 'Validé / 已通过', 'rejected': 'Rejeté / 已拒绝' };
+    const statusMap = { 'pending': t('status.pending'), 'validated': t('status.validated'), 'rejected': t('status.rejected') };
 
     document.getElementById('dName').textContent = reg.name || '—';
     document.getElementById('dType').textContent = typeMap[reg.type] || reg.type || '—';
@@ -2109,7 +2400,7 @@ function showPreRegDetail(id) {
 function openEditPreRegModal(id) {
     const reg = allPreRegs.find(r => r.id === id);
     if (!reg || reg.status !== 'pending') {
-        showToast('Impossible: déjà traité', 'warning');
+        showToast(t('msg.cannotEditProcessed'), 'warning');
         return;
     }
 
@@ -2145,13 +2436,13 @@ async function handleEditPreRegSubmit(e) {
     const id = parseInt(document.getElementById('editPreRegId').value);
     const reg = allPreRegs.find(r => r.id === id);
     if (!reg || reg.status !== 'pending') {
-        showToast('Déjà traité', 'warning');
+        showToast(t('msg.alreadyProcessed'), 'warning');
         closeModal('editPreRegModal');
         return;
     }
 
     const name = document.getElementById('editPreRegName').value.trim();
-    if (!name) { showToast('Nom requis', 'error'); return; }
+    if (!name) { showToast(t('msg.nameRequired'), 'error'); return; }
 
     const data = {
         name: name,
@@ -2183,16 +2474,16 @@ async function handleEditPreRegSubmit(e) {
     const timer = document.getElementById('editPreRegTimer').value;
     data.timer = timer ? new Date(timer).toISOString() : null;
 
-    showLoading('Modification...');
+    showLoading(t('msg.modifying'));
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         const { error } = await supabase.from('pre_registrations').update(data).eq('id', id);
         if (error) throw error;
         closeModal('editPreRegModal');
-        await loadAllData();
-        showToast('Pré-inscription modifiée ✓', 'success');
+        await refreshPreRegs();
+        showToast(t('msg.preRegModified'), 'success');
     } catch (err) {
-        showToast('Erreur: ' + err.message, 'error');
+        showToast(t('msg.error', { err: err.message }), 'error');
     } finally {
         hideLoading();
     }
@@ -2201,16 +2492,16 @@ async function handleEditPreRegSubmit(e) {
 async function validatePreReg(id) {
     const reg = allPreRegs.find(r => r.id === id);
     if (!reg || reg.status !== 'pending') {
-        showToast('Déjà traité', 'warning');
+        showToast(t('msg.alreadyProcessed'), 'warning');
         return;
     }
 
-    if (!confirm('Valider la pré-inscription de ' + reg.name + ' ?\n\nL\'utilisateur sera ajouté à la base.')) return;
+    if (!confirm(t('msg.confirmValidate', { name: reg.name }))) return;
     if (!reg.password || reg.password.trim() === '') {
-        showToast('Pré-inscription sans mot de passe. Corrigez-la d\'abord.', 'error');
+        showToast(t('msg.noPassword'), 'error');
         return;
     }
-    showLoading('Validation...');
+    showLoading(t('msg.validating'));
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
 
@@ -2242,7 +2533,7 @@ async function validatePreReg(id) {
         const { error: insertErr } = await supabase.from('users').insert([studentData]);
         if (insertErr) {
             if (insertErr.code === '23505') {
-                showToast('Ce nom existe déjà', 'error');
+                showToast(t('msg.nameExists'), 'error');
                 return;
             }
             throw insertErr;
@@ -2257,18 +2548,18 @@ async function validatePreReg(id) {
         if (reg.email) {
             try {
                 await sendActivationEmail(reg.email, reg.name, reg.type, reg.role, reg.password);
-                showToast('✅ Validé + email envoyé', 'success');
+                showToast(t('msg.validatedEmail'), 'success');
             } catch (e) {
-                showToast('✅ Validé (email non envoyé)', 'warning');
+                showToast(t('msg.validatedNoSend'), 'warning');
             }
         } else {
-            showToast('✅ Validé (pas d\'email)', 'info');
+            showToast(t('msg.validatedNoEmail'), 'info');
         }
 
-        await loadAllData();
+        await Promise.all([refreshUsers(), refreshPreRegs()]);
     } catch (err) {
         console.error(err);
-        showToast('Erreur: ' + err.message, 'error');
+        showToast(t('msg.error', { err: err.message }), 'error');
     } finally {
         hideLoading();
     }
@@ -2277,9 +2568,9 @@ async function validatePreReg(id) {
 async function rejectPreReg(id) {
     const reg = allPreRegs.find(r => r.id === id);
     if (!reg || reg.status !== 'pending') return;
-    if (!confirm('Rejeter la pré-inscription de ' + reg.name + ' ?')) return;
+    if (!confirm(t('msg.confirmReject', { name: reg.name }))) return;
 
-    showLoading('Rejet...');
+    showLoading(t('msg.rejecting'));
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         const { error } = await supabase.from('pre_registrations').update({
@@ -2288,10 +2579,10 @@ async function rejectPreReg(id) {
             validated_by: currentAdmin.name || 'admin'
         }).eq('id', id);
         if (error) throw error;
-        await loadAllData();
-        showToast('Pré-inscription rejetée', 'warning');
+        await refreshPreRegs();
+        showToast(t('msg.rejected'), 'warning');
     } catch (err) {
-        showToast('Erreur: ' + err.message, 'error');
+        showToast(t('msg.error', { err: err.message }), 'error');
     } finally {
         hideLoading();
     }
@@ -2304,25 +2595,33 @@ let groupSelectedStudents = [];
 
 function buildCiviqueFilterOptions() {
     const typeSelect = document.getElementById('civiqueFilterType');
+    const curType = typeSelect.value;
     const codes = getAllCiviqueTypeCodes();
-    typeSelect.innerHTML = '<option value="">Tous les types</option>' +
+    typeSelect.innerHTML = '<option value="">' + t('filter.allTypes') + '</option>' +
         codes.map(c => '<option value="' + c + '">' + getCiviqueTypeText(c) + '</option>').join('');
+    typeSelect.value = curType;
 
     const teacherSelect = document.getElementById('civiqueFilterTeacher');
+    const curTeacher = teacherSelect.value;
     const teachers = allUsers.filter(u => u.role === 'teacher' && (u.modules || []).includes('civique'));
-    teacherSelect.innerHTML = '<option value="">Tous les intervenants</option>' +
+    teacherSelect.innerHTML = '<option value="">' + t('filter.allTeachers') + '</option>' +
         teachers.map(t2 => '<option value="' + t2.id + '">' + escapeHtml(t2.name) + '</option>').join('');
+    teacherSelect.value = curTeacher;
 }
 
 function buildFrenchFilterOptions() {
     const typeSelect = document.getElementById('frenchFilterType');
-    typeSelect.innerHTML = '<option value="">Tous les types</option>' +
+    const curType = typeSelect.value;
+    typeSelect.innerHTML = '<option value="">' + t('filter.allTypes') + '</option>' +
         FRENCH_TYPES.map(t2 => '<option value="' + t2.code + '">' + t2.name + '</option>').join('');
+    typeSelect.value = curType;
 
     const teacherSelect = document.getElementById('frenchFilterTeacher');
+    const curTeacher = teacherSelect.value;
     const teachers = allUsers.filter(u => u.role === 'teacher' && (u.modules || []).includes('francais'));
-    teacherSelect.innerHTML = '<option value="">Tous les intervenants</option>' +
+    teacherSelect.innerHTML = '<option value="">' + t('filter.allTeachers') + '</option>' +
         teachers.map(t2 => '<option value="' + t2.id + '">' + escapeHtml(t2.name) + '</option>').join('');
+    teacherSelect.value = curTeacher;
 }
 
 function toggleCourseFilter(category, upcoming) {
@@ -2358,11 +2657,17 @@ function renderCiviqueCourses() {
             (c.student?.name || '').toLowerCase().includes(s)
         );
     }
+
+    const sig = JSON.stringify(civiqueFilter);
+    if (sig !== pageSig.civique) { pageSig.civique = sig; pageLimit.civique = PAGE.civique; }
+
     if (list.length === 0) {
-        container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Aucun cours</p></div>';
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><p>' + t('msg.noCourse') + '</p></div>';
         return;
     }
-    container.innerHTML = list.map(c => renderCourseCard(c, 'civique')).join('');
+    const visible = list.slice(0, pageLimit.civique);
+    container.innerHTML = visible.map(c => renderCourseCard(c, 'civique')).join('') +
+        (list.length > visible.length ? loadMoreCard('civique', visible.length, list.length) : '');
     bindCourseCardEvents(container, 'civique');
 }
 
@@ -2385,37 +2690,45 @@ function renderFrenchCourses() {
             (c.student?.name || '').toLowerCase().includes(s)
         );
     }
+
+    const sig = JSON.stringify(frenchFilter);
+    if (sig !== pageSig.french) { pageSig.french = sig; pageLimit.french = PAGE.french; }
+
     if (list.length === 0) {
-        container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><p>Aucun cours</p></div>';
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar-times"></i><p>' + t('msg.noCourse') + '</p></div>';
         return;
     }
-    container.innerHTML = list.map(c => renderCourseCard(c, 'francais')).join('');
+    const visible = list.slice(0, pageLimit.french);
+    container.innerHTML = visible.map(c => renderCourseCard(c, 'francais')).join('') +
+        (list.length > visible.length ? loadMoreCard('french', visible.length, list.length) : '');
     bindCourseCardEvents(container, 'francais');
 }
 
 function renderCourseCard(c, category) {
     const typeText = category === 'civique' ? getCiviqueTypeText(c.course_type) : getFrenchTypeText(c.course_type);
     const teacherName = c.teacher?.name || '—';
-    const studentName = (c.students || []).map(s => s.name).join(', ') || c.student?.name || '—';
+    const studentList = (c.students || []).map(s => s.name);
+    const studentName = studentList.join(', ') || c.student?.name || '—';
 
     const statusMap = {
-        'scheduled': '<span class="status-badge status-scheduled">📅 Planifié</span>',
-        'in_progress': '<span class="status-badge status-in_progress">🔄 En cours</span>',
-        'completed': '<span class="status-badge status-completed">✅ Terminé</span>',
-        'cancelled': '<span class="status-badge status-cancelled">❌ Annulé</span>'
+        'scheduled': '<span class="status-badge status-scheduled">' + t('filter.scheduled') + '</span>',
+        'in_progress': '<span class="status-badge status-in_progress">' + t('cal.filter.inProgress') + '</span>',
+        'completed': '<span class="status-badge status-completed">' + t('filter.completed') + '</span>',
+        'cancelled': '<span class="status-badge status-cancelled">' + t('filter.cancelled') + '</span>'
     };
 
     const modeBadge = c.course_mode === 'group'
-        ? '<span class="mode-indicator mode-group"><i class="fas fa-users"></i> Groupe</span>'
-        : '<span class="mode-indicator mode-solo"><i class="fas fa-user"></i> Individuel</span>';
+        ? '<span class="mode-indicator mode-group"><i class="fas fa-users"></i> ' + t('cc.group') + '</span>'
+        : '<span class="mode-indicator mode-solo"><i class="fas fa-user"></i> ' + t('cc.solo') + '</span>';
 
     const startStr = formatDateTime(c.start_time);
 
     let studentsHtml = '';
     if (c.course_mode === 'group') {
-        studentsHtml = '<div class="detail-item"><i class="fas fa-users"></i> Groupe de ' + (c.max_students || '?') + ' élèves max</div>';
+        studentsHtml = '<div class="course-detail-item"><i class="fas fa-users"></i> ' +
+            escapeHtml(t('cc.groupLine', { n: studentList.length || c.max_students || '?', names: studentName })) + '</div>';
     } else {
-        studentsHtml = '<div class="detail-item"><i class="fas fa-user-graduate"></i> Élève: ' + escapeHtml(studentName) + '</div>';
+        studentsHtml = '<div class="course-detail-item"><i class="fas fa-user-graduate"></i> ' + t('cc.studentLabel') + escapeHtml(studentName) + '</div>';
     }
 
     return '<div class="course-card" data-id="' + c.id + '" data-category="' + category + '">' +
@@ -2425,17 +2738,17 @@ function renderCourseCard(c, category) {
         '</div>' +
         '<div class="course-details">' +
         studentsHtml +
-        '<div class="detail-item"><i class="fas fa-chalkboard-user"></i> ' + escapeHtml(teacherName) + '</div>' +
-        '<div class="detail-item"><i class="fas fa-clock"></i> ' + (c.duration || 2) + ' h</div>' +
-        '<div class="detail-item"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(c.location || 'À définir') + '</div>' +
-        (c.meeting_link ? '<div class="detail-item"><i class="fas fa-video"></i> <a href="' + c.meeting_link + '" target="_blank">Lien visio</a></div>' : '') +
-        (c.cancel_reason ? '<div class="detail-item"><i class="fas fa-ban"></i> Motif: ' + escapeHtml(c.cancel_reason) + '</div>' : '') +
+        '<div class="course-detail-item"><i class="fas fa-chalkboard-user"></i> ' + escapeHtml(teacherName) + '</div>' +
+        '<div class="course-detail-item"><i class="fas fa-clock"></i> ' + (c.duration || 2) + ' h</div>' +
+        '<div class="course-detail-item"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(c.location || t('cc.toDefine')) + '</div>' +
+        (c.meeting_link ? '<div class="course-detail-item"><i class="fas fa-video"></i> <a href="' + escapeHtml(c.meeting_link) + '" target="_blank" rel="noopener">' + t('cc.visio') + '</a></div>' : '') +
+        (c.cancel_reason ? '<div class="course-detail-item"><i class="fas fa-ban"></i> ' + t('cc.reason') + escapeHtml(c.cancel_reason) + '</div>' : '') +
         '</div>' +
         '<div class="course-actions">' +
-        '<button class="action-btn edit-btn" data-action="edit"><i class="fas fa-edit"></i> Modifier</button>' +
+        '<button class="action-btn edit-btn" data-action="edit"><i class="fas fa-edit"></i> ' + t('cc.edit') + '</button>' +
         (c.status !== 'cancelled' && c.status !== 'completed' ?
-            '<button class="action-btn cancel-btn-icon" data-action="cancel"><i class="fas fa-ban"></i> Annuler</button>' : '') +
-        '<button class="action-btn delete-btn" data-action="delete"><i class="fas fa-trash"></i> Supprimer</button>' +
+            '<button class="action-btn cancel-btn-icon" data-action="cancel"><i class="fas fa-ban"></i> ' + t('cc.cancel') + '</button>' : '') +
+        '<button class="action-btn delete-btn" data-action="delete"><i class="fas fa-trash"></i> ' + t('cc.delete') + '</button>' +
         '</div>' +
         '</div>';
 }
@@ -2494,12 +2807,12 @@ function openCourseModal(category, courseId) {
     } else {
         students = allUsers.filter(u => u.role === 'stu_fr' || u.role === 'stu_all');
     }
-    soloSelect.innerHTML = '<option value="">Sélectionner...</option>' +
+    soloSelect.innerHTML = '<option value="">' + t('form.select') + '</option>' +
         students.map(s => '<option value="' + s.id + '">' + escapeHtml(s.name) + ' (' + (category === 'civique' ? (s.credit || 0) : (s.french_credit || 0)) + 'h)</option>').join('');
 
     const teacherSelect = document.getElementById('courseTeacher');
     const teachers = allUsers.filter(u => u.role === 'teacher' && (u.modules || []).includes(category));
-    teacherSelect.innerHTML = '<option value="">Sélectionner...</option>' +
+    teacherSelect.innerHTML = '<option value="">' + t('form.select') + '</option>' +
         teachers.map(t2 => '<option value="' + t2.id + '">' + escapeHtml(t2.name) + '</option>').join('');
 
     renderGroupStudentsList(students, category);
@@ -2516,7 +2829,7 @@ function openCourseModal(category, courseId) {
             : allFrenchCourses.find(c => c.id === courseId);
         if (!course) return;
 
-        document.getElementById('courseModalTitle').textContent = 'Modifier le cours';
+        document.getElementById('courseModalTitle').textContent = t('cm.title.edit');
         document.getElementById('courseId').value = course.id;
         document.getElementById('courseMode').value = course.course_mode || 'solo';
         document.getElementById('courseMeetingLink').value = course.meeting_link || getTeacherMeetingLink(course.teacher_id) || '';
@@ -2609,7 +2922,7 @@ function updateSelectedStudentsSummary() {
     const summary = document.getElementById('selectedStudentsSummary');
     const chips = document.getElementById('selectedStudentsChips');
 
-    if (hint) hint.textContent = '(' + groupSelectedStudents.length + ' sélectionné' + (groupSelectedStudents.length > 1 ? 's' : '') + ')';
+    if (hint) hint.textContent = t('cm.selectedCount', { n: groupSelectedStudents.length });
 
     if (groupSelectedStudents.length === 0) {
         summary.style.display = 'none';
@@ -2654,7 +2967,7 @@ function autoFillMeetingLink() {
         linkInput.value = link;
     } else {
         linkInput.value = '';
-        showToast('⚠️ Ce professeur n\'a pas de lien Meet configuré. Ajoutez-le dans la table teacher_meeting_links.', 'warning');
+        showToast(t('msg.noMeetTeacherHint'), 'warning');
     }
 }
 
@@ -2695,7 +3008,7 @@ function renderCiviqueTypeSelector(selectedCode) {
         document.getElementById('courseTypeValue').value = selectedCode;
         const display = document.getElementById('selectedTypeDisplay');
         display.style.display = 'inline-block';
-        display.textContent = '已选: ' + getCiviqueTypeText(selectedCode);
+        display.textContent = t('cm.typeSelected') + getCiviqueTypeText(selectedCode);
     }
 }
 
@@ -2704,7 +3017,7 @@ function renderFrenchTypeSelector(selectedCode) {
     let html = '<div class="course-type-container">';
     html += '<div class="level1-item">' +
         '<div class="level1-header" data-level1="root">' +
-        '<i class="fas fa-language"></i><span>🇫🇷 Cours de français</span>' +
+        '<i class="fas fa-language"></i><span>' + t('cm.frenchRoot') + '</span>' +
         '<i class="fas fa-chevron-down chevron"></i>' +
         '</div>' +
         '<div class="level2-container" id="level2-root">' +
@@ -2723,7 +3036,7 @@ function renderFrenchTypeSelector(selectedCode) {
             document.getElementById('courseTypeValue').value = this.dataset.code;
             const display = document.getElementById('selectedTypeDisplay');
             display.style.display = 'inline-block';
-            display.textContent = '已选: ' + getFrenchTypeText(this.dataset.code);
+            display.textContent = t('cm.typeSelected') + getFrenchTypeText(this.dataset.code);
         });
     });
 
@@ -2731,7 +3044,7 @@ function renderFrenchTypeSelector(selectedCode) {
         document.getElementById('courseTypeValue').value = selectedCode;
         const display = document.getElementById('selectedTypeDisplay');
         display.style.display = 'inline-block';
-        display.textContent = '已选: ' + getFrenchTypeText(selectedCode);
+        display.textContent = t('cm.typeSelected') + getFrenchTypeText(selectedCode);
     }
 }
 
@@ -2758,7 +3071,7 @@ function bindTypeSelectorEvents(container) {
             document.getElementById('courseTypeValue').value = this.dataset.code;
             const display = document.getElementById('selectedTypeDisplay');
             display.style.display = 'inline-block';
-            display.textContent = '已选: ' + getCiviqueTypeText(this.dataset.code);
+            display.textContent = t('cm.typeSelected') + getCiviqueTypeText(this.dataset.code);
         });
     });
 }
@@ -2779,12 +3092,12 @@ async function handleCourseSubmit(e) {
     const status = document.getElementById('courseStatus').value;
 
     // ---------- 1. 基础校验 ----------
-    if (!teacherId) { showToast('Intervenant requis', 'error'); return; }
-    if (!startTimeLocal) { showToast('Date/heure requise', 'error'); return; }
-    if (!courseType) { showToast('Type de cours requis', 'error'); return; }
+    if (!teacherId) { showToast(t('msg.teacherRequired'), 'error'); return; }
+    if (!startTimeLocal) { showToast(t('msg.dateRequired'), 'error'); return; }
+    if (!courseType) { showToast(t('msg.typeRequired'), 'error'); return; }
 
     const startTimeStr = normalizeLocalDateTime(startTimeLocal);
-    if (!startTimeStr) { showToast('Format date invalide', 'error'); return; }
+    if (!startTimeStr) { showToast(t('msg.dateInvalid'), 'error'); return; }
 
     // ---------- 2. 冲突检查（老师已有课程） ----------
     const allCoursesForCheck = [...allCiviqueCourses, ...allFrenchCourses];
@@ -2800,7 +3113,7 @@ async function handleCourseSubmit(e) {
     });
     if (hasConflict) {
         document.getElementById('courseConflictWarning').classList.add('show');
-        showToast('Conflit horaire!', 'error');
+        showToast(t('msg.conflictToast'), 'error');
         return;
     }
 
@@ -2809,11 +3122,11 @@ async function handleCourseSubmit(e) {
     let studentIds = [];
     if (mode === 'solo') {
         studentId = document.getElementById('courseStudentSolo').value;
-        if (!studentId) { showToast('Élève requis', 'error'); return; }
+        if (!studentId) { showToast(t('msg.studentRequired'), 'error'); return; }
         studentIds = [studentId];
     } else {
         if (groupSelectedStudents.length === 0) {
-            showToast('Sélectionnez au moins un élève', 'error');
+            showToast(t('msg.groupMin'), 'error');
             return;
         }
         studentId = groupSelectedStudents[0];
@@ -2893,7 +3206,7 @@ async function handleCourseSubmit(e) {
     // ---------- 5. 校验老师 Meet 链接 ----------
     const meetingLink = document.getElementById('courseMeetingLink').value.trim();
     if (!meetingLink) {
-        showToast('⚠️ Ce professeur n\'a pas de lien Meet configuré', 'error');
+        showToast(t('msg.noMeetTeacher'), 'error');
         return;
     }
 
@@ -2916,13 +3229,13 @@ async function handleCourseSubmit(e) {
 
     // ---------- 7. 状态 = cancelled → 走取消流程 ----------
     if (status === 'cancelled') {
-        pendingCancelData = { id: id, category: category, data: data, isNew: !id };
+        pendingCancelData = { id: id, category: category, data: data, isNew: !id, studentIds: studentIds };
         openModal('cancelReasonModal');
         return;
     }
 
     // ---------- 8. 写入数据库 ----------
-    showLoading(id ? 'Modification...' : 'Création...');
+    showLoading(id ? t('msg.modifying') : t('msg.creating'));
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         let courseResult;
@@ -2976,7 +3289,16 @@ async function handleCourseSubmit(e) {
         }));
         const { error: csErr } = await supabase.from('course_students').insert(csData);
         if (csErr) {
-            console.warn('⚠️ course_students 写入失败:', csErr.message);
+            // 学生关联写入失败 → 回滚，避免出现“没有学生的课程”
+            console.error('❌ course_students 写入失败:', csErr.message);
+            if (!id) {
+                await supabase.from('courses_v2').delete().eq('id', courseResult.id);
+            } else if (oldCreditInfo && oldCreditInfo.studentIds.length > 0) {
+                await supabase.from('course_students').insert(
+                    oldCreditInfo.studentIds.map(sid => ({ course_id: courseResult.id, student_id: sid }))
+                );
+            }
+            throw new Error(t('msg.csFail') + ' (' + csErr.message + ')');
         }
 
         // ---------- 9. 退旧 credit + 扣新 credit ----------
@@ -3011,27 +3333,18 @@ async function handleCourseSubmit(e) {
             console.warn('⚠️ 邮件发送异常:', emailErr.message);
         }
 
-        // ---------- 12. 关闭 + 刷新 + Toast ----------
+        // ---------- 12. 关闭 + 局部刷新 + Toast ----------
         closeModal('courseModal');
-        await loadAllData();
+        await Promise.all([refreshCourses(), refreshUsers()]);
 
-        const savedMsg = id ? 'Cours modifié ✓' : 'Cours créé ✓';
-        let extraMsg = '';
-        if (availRemoved > 0) {
-            extraMsg += ` — 🗑️ ${availRemoved} 个冲突空闲已删除`;
-        }
-
-        if (emailResult?.skipped) {
-            showToast(savedMsg + extraMsg + ' — ⚠️ 邮件未发送', 'warning');
-        } else if (emailResult?.sentCount > 0) {
-            showToast(savedMsg + extraMsg + ` — 📧 ${emailResult.sentCount} 封邮件已发送`, 'success');
-        } else {
-            showToast(savedMsg + extraMsg, 'success');
-        }
+        let msg = id ? t('msg.courseModified') : t('msg.courseCreated');
+        if (availRemoved > 0) msg += t('msg.availRemoved', { n: availRemoved });
+        msg += emailSuffix(emailResult);
+        showToast(msg, emailResult && emailResult.skipped ? 'warning' : 'success');
 
     } catch (err) {
         console.error(err);
-        showToast('Erreur: ' + err.message, 'error');
+        showToast(t('msg.error', { err: err.message }), 'error');
     } finally {
         hideLoading();
     }
@@ -3039,71 +3352,63 @@ async function handleCourseSubmit(e) {
 // ============================================================
 // 课时扣减/退还
 // ============================================================
-async function deductStudentCredit(studentId, hours, category) {
-    if (!studentId || !hours) return true;
+// 优先调用数据库函数 adjust_user_credit（原子操作，见 credit_functions.sql）；
+// 函数不存在时自动回退到“先读后写”的旧方式。
+let creditRpcAvailable = true;
+
+async function adjustStudentCredit(studentId, delta, category) {
+    if (!studentId || !delta) return true;
     const supabase = window.supabaseAuth.getSupabaseClient();
     const field = category === 'civique' ? 'credit' : 'french_credit';
 
+    if (creditRpcAvailable) {
+        const { error } = await supabase.rpc('adjust_user_credit', {
+            p_user_id: String(studentId),
+            p_field: field,
+            p_delta: delta
+        });
+        if (!error) return true;
+
+        const missing = error.code === 'PGRST202' || error.code === '42883' ||
+            /could not find the function|does not exist/i.test(error.message || '');
+        if (!missing) {
+            console.error('❌ adjust_user_credit 失败:', error.message);
+            return false;
+        }
+        creditRpcAvailable = false;
+        console.warn('⚠️ 数据库函数 adjust_user_credit 不存在，回退到非原子方式（请执行 credit_functions.sql）');
+    }
+
+    // ---- 回退：读 → 改 → 写 ----
     const { data: u, error: fetchErr } = await supabase
         .from('users')
         .select(field)
         .eq('id', studentId)
         .maybeSingle();
-
     if (fetchErr || !u) {
-        console.warn('⚠️ deductStudentCredit: 学生不存在', studentId);
+        console.warn('⚠️ adjustStudentCredit: 学生不存在', studentId);
         return false;
     }
-
-    const current = u[field] || 0;
-
-    // Credit 不足时警告（不阻止，只提示）
-    if (current < hours) {
-        console.warn('⚠️ Credit 不足: 学生', studentId, '— 当前', current, 'h，需要', hours, 'h');
-    }
-
-    const newVal = Math.max(0, current - hours);
-
+    const newVal = Math.max(0, (u[field] || 0) + delta);
     const { error: updErr } = await supabase
         .from('users')
         .update({ [field]: newVal })
         .eq('id', studentId);
-
     if (updErr) {
-        console.error('❌ 扣 credit 失败:', updErr.message);
+        console.error('❌ 更新 credit 失败:', updErr.message);
         return false;
     }
     return true;
 }
+
+async function deductStudentCredit(studentId, hours, category) {
+    if (!hours) return true;
+    return adjustStudentCredit(studentId, -hours, category);
+}
+
 async function refundStudentCredit(studentId, hours, category) {
-    if (!studentId || !hours) return true;
-    const supabase = window.supabaseAuth.getSupabaseClient();
-    const field = category === 'civique' ? 'credit' : 'french_credit';
-
-    const { data: u, error: fetchErr } = await supabase
-        .from('users')
-        .select(field)
-        .eq('id', studentId)
-        .maybeSingle();
-
-    if (fetchErr || !u) {
-        console.warn('⚠️ refundStudentCredit: 学生不存在', studentId);
-        return false;
-    }
-
-    const current = u[field] || 0;
-    const newVal = current + hours;
-
-    const { error: updErr } = await supabase
-        .from('users')
-        .update({ [field]: newVal })
-        .eq('id', studentId);
-
-    if (updErr) {
-        console.error('❌ refund credit 失败:', updErr.message);
-        return false;
-    }
-    return true;
+    if (!hours) return true;
+    return adjustStudentCredit(studentId, hours, category);
 }
 
 // ============================================================
@@ -3117,35 +3422,36 @@ async function confirmCancelReason() {
         const custom = document.getElementById('customReason').value.trim();
         if (custom) reason = custom;
     }
-    if (!reason) { showToast('Sélectionnez un motif', 'error'); return; }
+    if (!reason) { showToast(t('msg.selectReason'), 'error'); return; }
 
-    showLoading('Annulation...');
-    let emailResult = null;   // 🔥 声明
+    showLoading(t('msg.cancelling'));
+    let emailResult = null;
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
-        const { id, category, data, isNew } = pendingCancelData;
+        const { id, category, data, isNew, studentIds } = pendingCancelData;
 
         if (isNew) {
-            // ============================================================
-            // 新建一个已取消的课程：不需要退 credit（因为还没扣过）
-            // ============================================================
+            // 新建一门“已取消”的课：从未扣过课时，所以不用退
             const insertRes = await supabase
                 .from('courses_v2')
-                .insert([{ ...data, cancel_reason: reason, status: 'cancelled' }])
+                .insert([{ ...data, cancel_reason: reason, status: 'cancelled', created_at: new Date().toISOString() }])
                 .select()
                 .single();
+            if (insertRes.error) throw insertRes.error;
 
-            if (!insertRes.error) {
-                try {
-                    emailResult = await sendCourseEmailNotification(insertRes.data.id, 'cancel');
-                } catch (e) {
-                    console.warn('⚠️ 取消邮件失败:', e.message);
-                }
+            const ids = (studentIds && studentIds.length) ? studentIds : (data.student_id ? [data.student_id] : []);
+            if (ids.length > 0) {
+                await supabase.from('course_students').insert(
+                    ids.map(sid => ({ course_id: insertRes.data.id, student_id: sid }))
+                );
+            }
+            try {
+                emailResult = await sendCourseEmailNotification(insertRes.data.id, 'cancel');
+            } catch (e) {
+                console.warn('⚠️ 取消邮件失败:', e.message);
             }
         } else {
-            // ============================================================
-            // 防重：先查当前状态，已取消就直接退出
-            // ============================================================
+            // 防重：已取消就直接退出
             const { data: currentCourse } = await supabase
                 .from('courses_v2')
                 .select('status')
@@ -3153,37 +3459,38 @@ async function confirmCancelReason() {
                 .maybeSingle();
 
             if (currentCourse?.status === 'cancelled') {
-                showToast('Cours déjà annulé', 'warning');
+                showToast(t('msg.courseAlreadyCancelled'), 'warning');
                 closeModal('cancelReasonModal');
                 closeModal('courseModal');
                 pendingCancelData = null;
                 return;
             }
 
-            // 1) 先更新状态为 cancelled
-            const { error: updErr } = await supabase
-                .from('courses_v2')
-                .update({ status: 'cancelled', cancel_reason: reason })
-                .eq('id', id);
-            if (updErr) throw updErr;
-
-            // 2) 拿学生列表 + 退 credit
-            const { data: csList } = await supabase
-                .from('course_students')
-                .select('student_id')
-                .eq('course_id', id);
-
-            const ids = (csList || []).map(cs => cs.student_id);
             const course = category === 'civique'
                 ? allCiviqueCourses.find(c => c.id === id)
                 : allFrenchCourses.find(c => c.id === id);
             const dur = course?.duration || 2;
 
+            // 1) 保留用户在表单里同时修改的字段（学生/模式不动，避免课时账对不上）
+            const { student_id, course_mode, max_students, ...editable } = data || {};
+            const { error: updErr } = await supabase
+                .from('courses_v2')
+                .update({ ...editable, status: 'cancelled', cancel_reason: reason })
+                .eq('id', id);
+            if (updErr) throw updErr;
+
+            // 2) 按“原来”的时长退课时
+            const { data: csList } = await supabase
+                .from('course_students')
+                .select('student_id')
+                .eq('course_id', id);
+            let ids = (csList || []).map(cs => cs.student_id);
+            if (ids.length === 0 && course?.student_id) ids = [course.student_id];
             for (const sid of ids) {
                 await refundStudentCredit(sid, dur, category);
             }
 
-            // 3) 发邮件（状态已 cancelled，但 overrideCourse 可以传原 course）
+            // 3) 邮件
             try {
                 emailResult = await sendCourseEmailNotification(id, 'cancel');
             } catch (e) {
@@ -3193,19 +3500,13 @@ async function confirmCancelReason() {
 
         closeModal('cancelReasonModal');
         closeModal('courseModal');
-        await loadAllData();
-
-        // 邮件结果提示
-        if (emailResult?.sentCount > 0) {
-            showToast(`Cours annulé ✓ — 📧 ${emailResult.sentCount} 封邮件已发送`, 'success');
-        } else if (emailResult?.skipped) {
-            showToast('Cours annulé ✓ — ⚠️ 邮件未发送（无邮箱）', 'warning');
-        } else {
-            showToast('Cours annulé ✓', 'success');
-        }
         pendingCancelData = null;
+        await Promise.all([refreshCourses(), refreshUsers()]);
+
+        showToast(t('msg.courseCancelled') + emailSuffix(emailResult),
+            emailResult && emailResult.skipped ? 'warning' : 'success');
     } catch (err) {
-        showToast('Erreur: ' + err.message, 'error');
+        showToast(t('msg.error', { err: err.message }), 'error');
     } finally {
         hideLoading();
     }
@@ -3226,7 +3527,8 @@ function showDeleteCourseConfirm(id, category) {
     document.getElementById('deleteCourseType').textContent = typeText;
     document.getElementById('deleteCourseDate').textContent = formatDateTime(course.start_time);
     document.getElementById('deleteCourseTeacher').textContent = course.teacher?.name || '—';
-    document.getElementById('deleteCourseStudent').textContent = course.student?.name || '—';
+    document.getElementById('deleteCourseStudent').textContent =
+        (course.students || []).map(s => s.name).join(', ') || course.student?.name || '—';
 
     document.getElementById('deleteConfirmOverlay').classList.add('active');
 }
@@ -3238,23 +3540,22 @@ async function confirmDeleteCourse() {
         ? allCiviqueCourses.find(c => c.id === id)
         : allFrenchCourses.find(c => c.id === id);
 
-    showLoading('Suppression...');
+    showLoading(t('msg.deleting'));
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
 
-        // ============================================================
         // 1. 先拿学生列表（删课程后 course_students 会被级联删）
-        // ============================================================
         const { data: csList } = await supabase
             .from('course_students')
             .select('student_id')
             .eq('course_id', id);
-        const ids = (csList || []).map(cs => cs.student_id);
+        let ids = (csList || []).map(cs => cs.student_id);
+        if (ids.length === 0 && course?.student_id) ids = [course.student_id];
         const dur = course?.duration || 2;
+        // 已取消的课在取消时已经退过课时，这里不能再退一次
+        const alreadyRefunded = course?.status === 'cancelled';
 
-        // ============================================================
-        // 2. 🔥 删除前：先发邮件（用 course 快照，因为马上要删了）
-        // ============================================================
+        // 2. 删除前先发邮件（课程删掉后就查不到学生了）
         let emailResult = null;
         try {
             emailResult = await sendCourseEmailNotification(id, 'delete', course);
@@ -3262,37 +3563,31 @@ async function confirmDeleteCourse() {
             console.warn('⚠️ 删除前邮件发送失败:', e.message);
         }
 
-        // ============================================================
         // 3. 删除课程
-        // ============================================================
         const { error: delErr } = await supabase
             .from('courses_v2')
             .delete()
             .eq('id', id);
         if (delErr) throw delErr;
 
-        // ============================================================
-        // 4. 删除成功后：退 credit
-        // ============================================================
-        for (const sid of ids) {
-            try {
-                await refundStudentCredit(sid, dur, category);
-            } catch (e) {
-                console.warn('⚠️ 退 credit 失败:', sid, e.message);
+        // 4. 删除成功后退课时
+        if (!alreadyRefunded) {
+            for (const sid of ids) {
+                try {
+                    await refundStudentCredit(sid, dur, category);
+                } catch (e) {
+                    console.warn('⚠️ 退 credit 失败:', sid, e.message);
+                }
             }
         }
 
         document.getElementById('deleteConfirmOverlay').classList.remove('active');
         pendingDeleteCourse = { id: null, category: null };
-        await loadAllData();
+        await Promise.all([refreshCourses(), refreshUsers()]);
 
-        if (emailResult?.sentCount > 0) {
-            showToast(`Cours supprimé ✓ — 📧 ${emailResult.sentCount} 封邮件已发送`, 'success');
-        } else {
-            showToast('Cours supprimé ✓', 'success');
-        }
+        showToast(t('msg.courseDeleted') + emailSuffix(emailResult, true), 'success');
     } catch (err) {
-        showToast('Erreur: ' + err.message, 'error');
+        showToast(t('msg.error', { err: err.message }), 'error');
     } finally {
         hideLoading();
     }
@@ -3327,42 +3622,47 @@ function renderStudentExams() {
         list = list.filter(e => (e.student?.name || '').toLowerCase().includes(studentExamSearch));
     }
 
+    const sig = studentExamFilter + '|' + studentExamSearch;
+    if (sig !== pageSig.exams) { pageSig.exams = sig; pageLimit.exams = PAGE.exams; }
+
     if (list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><i class="fas fa-file-signature"></i><p>Aucun examen enregistré</p></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><i class="fas fa-file-signature"></i><p>' + t('msg.noExam') + '</p></td></tr>';
         return;
     }
 
     const statusMap = {
-        'planned': '<span class="badge badge-scheduled">📅 Planifié</span>',
-        'passed': '<span class="badge badge-validated">✅ Réussi</span>',
-        'failed': '<span class="badge badge-rejected">❌ Échoué</span>',
-        'absent': '<span class="badge badge-cancelled">🚫 Absent</span>'
+        'planned': '<span class="badge badge-scheduled">' + t('se.status.planned') + '</span>',
+        'passed': '<span class="badge badge-validated">' + t('se.status.passed') + '</span>',
+        'failed': '<span class="badge badge-rejected">' + t('se.status.failed') + '</span>',
+        'absent': '<span class="badge badge-cancelled">' + t('se.status.absent') + '</span>'
     };
 
     const catMap = {
-        'civique': '<span class="badge badge-civique">📘 Civique</span>',
-        'francais': '<span class="badge badge-francais">🇫🇷 Français</span>'
+        'civique': '<span class="badge badge-civique">' + t('se.cat.civique') + '</span>',
+        'francais': '<span class="badge badge-francais">' + t('se.cat.francais') + '</span>'
     };
 
-    tbody.innerHTML = list.map(e => {
+    const visible = list.slice(0, pageLimit.exams);
+
+    tbody.innerHTML = visible.map(e => {
         const scoreText = e.score !== null && e.score !== undefined
             ? (e.total ? e.score + ' / ' + e.total : e.score)
             : '—';
 
         return '<tr>' +
-            '<td><strong>' + escapeHtml(e.student?.name || '—') + '</strong></td>' +
-            '<td>' + (catMap[e.exam_category] || e.exam_category || '—') + '</td>' +
-            '<td>' + getStudentExamTypeLabel(e.exam_type) + '</td>' +
-            '<td>' + formatDateShort(e.exam_date) + '</td>' +
-            '<td>' + scoreText + '</td>' +
-            '<td>' + (statusMap[e.status] || e.status || '—') + '</td>' +
-            '<td>' + escapeHtml(e.notes || '—') + '</td>' +
-            '<td><div class="action-buttons">' +
+            '<td' + L('th.student') + '><strong>' + escapeHtml(e.student?.name || '—') + '</strong></td>' +
+            '<td' + L('th.category') + '>' + (catMap[e.exam_category] || e.exam_category || '—') + '</td>' +
+            '<td' + L('th.examType') + '>' + getStudentExamTypeLabel(e.exam_type) + '</td>' +
+            '<td' + L('th.date') + '>' + formatDateShort(e.exam_date) + '</td>' +
+            '<td' + L('th.score') + '>' + scoreText + '</td>' +
+            '<td' + L('th.result') + '>' + (statusMap[e.status] || e.status || '—') + '</td>' +
+            '<td' + L('th.notes') + '>' + escapeHtml(e.notes || '—') + '</td>' +
+            '<td' + L('th.actions') + '><div class="action-buttons">' +
             '<button class="action-btn edit-btn" data-id="' + e.id + '" data-action="edit-exam"><i class="fas fa-edit"></i></button>' +
             '<button class="action-btn delete-btn" data-id="' + e.id + '" data-action="delete-exam"><i class="fas fa-trash"></i></button>' +
             '</div></td>' +
             '</tr>';
-    }).join('');
+    }).join('') + (list.length > visible.length ? loadMoreRow('exams', visible.length, list.length, 8) : '');
 
     tbody.querySelectorAll('[data-action="edit-exam"]').forEach(btn => {
         btn.addEventListener('click', () => openStudentExamModal(btn.dataset.id));
@@ -3378,7 +3678,7 @@ function openStudentExamModal(id) {
 
     const studentSelect = document.getElementById('studentExamStudent');
     const students = allUsers.filter(u => u.role === 'stu' || u.role === 'stu_fr' || u.role === 'stu_all');
-    studentSelect.innerHTML = '<option value="">Sélectionner...</option>' +
+    studentSelect.innerHTML = '<option value="">' + t('form.select') + '</option>' +
         students.map(s => '<option value="' + s.id + '">' + escapeHtml(s.name) + '</option>').join('');
 
     updateStudentExamTypes();
@@ -3386,7 +3686,7 @@ function openStudentExamModal(id) {
     if (id) {
         const e = allStudentExams.find(x => x.id === id);
         if (!e) return;
-        document.getElementById('studentExamModalTitle').textContent = 'Modifier l\'examen';
+        document.getElementById('studentExamModalTitle').textContent = t('se.title.edit');
         document.getElementById('studentExamId').value = e.id;
         document.getElementById('studentExamStudent').value = e.student_id || '';
         document.getElementById('studentExamCategory').value = e.exam_category || 'civique';
@@ -3419,9 +3719,9 @@ async function handleStudentExamSubmit(e) {
     const status = document.getElementById('studentExamStatus').value;
     const notes = document.getElementById('studentExamNotes').value.trim();
 
-    if (!studentId) { showToast('Élève requis', 'error'); return; }
-    if (!examType) { showToast('Type requis', 'error'); return; }
-    if (!examDate) { showToast('Date requise', 'error'); return; }
+    if (!studentId) { showToast(t('msg.studentRequired'), 'error'); return; }
+    if (!examType) { showToast(t('msg.typeReq'), 'error'); return; }
+    if (!examDate) { showToast(t('msg.dateReq'), 'error'); return; }
 
     const scoreNum = score === '' ? null : parseInt(score);
     const totalNum = total === '' ? null : parseInt(total);
@@ -3439,7 +3739,7 @@ async function handleStudentExamSubmit(e) {
         updated_at: new Date().toISOString()
     };
 
-    showLoading(id ? 'Modification...' : 'Création...');
+    showLoading(id ? t('msg.modifying') : t('msg.creating'));
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         let result;
@@ -3451,10 +3751,10 @@ async function handleStudentExamSubmit(e) {
         }
         if (result.error) throw result.error;
         closeModal('studentExamModal');
-        await loadAllData();
-        showToast(id ? 'Examen modifié ✓' : 'Examen ajouté ✓', 'success');
+        await refreshExams();
+        showToast(id ? t('msg.examModified') : t('msg.examAdded'), 'success');
     } catch (err) {
-        showToast('Erreur: ' + err.message, 'error');
+        showToast(t('msg.error', { err: err.message }), 'error');
     } finally {
         hideLoading();
     }
@@ -3463,17 +3763,17 @@ async function handleStudentExamSubmit(e) {
 async function deleteStudentExam(id) {
     const e = allStudentExams.find(x => x.id === id);
     if (!e) return;
-    if (!confirm('Supprimer cet examen ?')) return;
+    if (!confirm(t('msg.confirmDeleteExam'))) return;
 
-    showLoading('Suppression...');
+    showLoading(t('msg.deleting'));
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         const { error } = await supabase.from('student_exams').delete().eq('id', id);
         if (error) throw error;
-        await loadAllData();
-        showToast('Examen supprimé ✓', 'success');
+        await refreshExams();
+        showToast(t('msg.examDeleted'), 'success');
     } catch (err) {
-        showToast('Erreur: ' + err.message, 'error');
+        showToast(t('msg.error', { err: err.message }), 'error');
     } finally {
         hideLoading();
     }
@@ -3523,12 +3823,49 @@ function getCoursesForCalendar() {
         list = list.filter(c => c.teacher_id === calendarFilter.teacherId);
     }
     if (calendarFilter.studentId) {
-        list = list.filter(c => c.student_id === calendarFilter.studentId);
+        list = list.filter(c => c.student_id === calendarFilter.studentId ||
+            (c.students || []).some(st => st.id === calendarFilter.studentId));
     }
     if (calendarFilter.status !== 'all') {
         list = list.filter(c => c.status === calendarFilter.status);
     }
     return list;
+}
+
+// 同一天内时间重叠的课程：并排显示（类似 Google Calendar）
+function layoutOverlaps(list) {
+    const items = list.map(c => {
+        const d = new Date(c.start_time);
+        const st = d.getHours() + d.getMinutes() / 60;
+        return { id: c.id, s: st, e: st + (c.duration || 2), col: 0 };
+    }).sort((a, b) => (a.s - b.s) || (a.e - b.e));
+
+    const out = {};
+    let cluster = [];
+    let clusterEnd = -1;
+    const EPS = 1e-9;
+
+    const flush = () => {
+        if (!cluster.length) return;
+        const colEnds = [];
+        cluster.forEach(it => {
+            let col = colEnds.findIndex(end => end <= it.s + EPS);
+            if (col === -1) { col = colEnds.length; colEnds.push(it.e); }
+            else colEnds[col] = it.e;
+            it.col = col;
+        });
+        const n = colEnds.length;
+        cluster.forEach(it => { out[it.id] = { col: it.col, cols: n }; });
+        cluster = [];
+    };
+
+    items.forEach(it => {
+        if (cluster.length && it.s >= clusterEnd - EPS) { flush(); clusterEnd = -1; }
+        cluster.push(it);
+        clusterEnd = Math.max(clusterEnd, it.e);
+    });
+    flush();
+    return out;
 }
 
 function renderCalendar() {
@@ -3582,6 +3919,7 @@ function renderCalendar() {
             const cd = new Date(c.start_time);
             return cd.toDateString() === d.toDateString();
         });
+        const layout = layoutOverlaps(dayCourses);
         dayCourses.forEach(c => {
             const cd = new Date(c.start_time);
             const h = cd.getHours() + cd.getMinutes() / 60;
@@ -3592,9 +3930,11 @@ function renderCalendar() {
             const typeText = c.category === 'civique' ? getCiviqueTypeText(c.course_type) : getFrenchTypeText(c.course_type);
             const cancelled = c.status === 'cancelled';
             const completed = c.status === 'completed';
+            const lay = layout[c.id] || { col: 0, cols: 1 };
+            const colStyle = 'left:calc(' + (lay.col * 100 / lay.cols) + '% + 2px);right:auto;width:calc(' + (100 / lay.cols) + '% - 4px);';
             html += '<div class="cal-course-card ' + (cancelled ? 'cancelled' : '') + (completed ? ' completed' : '') +
                 '" data-id="' + c.id + '" data-category="' + c.category + '"' +
-                ' style="top:' + top + 'px;height:' + height + 'px;">' +
+                ' style="top:' + top + 'px;height:' + height + 'px;' + colStyle + '">' +
                 '<div class="cal-course-time">' + String(cd.getHours()).padStart(2, '0') + ':' + String(cd.getMinutes()).padStart(2, '0') + '</div>' +
                 '<div class="cal-course-title">' + typeText + '</div>' +
                 '<div class="cal-course-sub">' + escapeHtml(c.teacher?.name || '—') + '</div>' +
@@ -3682,7 +4022,7 @@ function openCourseDetailModal(courseId, category) {
         '<div class="detail-item"><span class="label">' + t('th.status') + '</span><div class="value">' + (statusMap[course.status] || course.status || '—') + '</div></div>' +
         '<div class="detail-item"><span class="label">' + t('cm.location') + '</span><div class="value">' + escapeHtml(course.location || '—') + '</div></div>' +
         '<div class="detail-item detail-full"><span class="label">🔗 Visio</span><div class="value">' +
-        (course.meeting_link ? '<a href="' + course.meeting_link + '" target="_blank">' + escapeHtml(course.meeting_link) + '</a>' : '—') +
+        (course.meeting_link ? '<a href="' + escapeHtml(course.meeting_link) + '" target="_blank" rel="noopener">' + escapeHtml(course.meeting_link) + '</a>' : '—') +
         '</div></div>' +
         '<div class="detail-item detail-full"><span class="label">' + t('th.notes') + '</span><div class="value">' + escapeHtml(course.notes || '—') + '</div></div>' +
         (course.cancel_reason ? '<div class="detail-item detail-full"><span class="label">❌ ' + t('cr.title') + '</span><div class="value" style="color:#e74c3c;">' + escapeHtml(course.cancel_reason) + '</div></div>' : '') +
