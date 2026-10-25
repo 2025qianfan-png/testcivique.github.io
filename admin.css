@@ -92,36 +92,10 @@ button { font-family: inherit; cursor: pointer; }
 input, select, textarea { font-family: inherit; }
 
 /* ============================================================
-   3. 移动端整体缩放
+   3. 移动端：不再缩放 body（transform 会破坏 position:fixed 的弹窗）
    ============================================================ */
 @media (max-width: 768px) {
-    body {
-        transform: scale(0.8);
-        transform-origin: top center;
-        width: 125%;
-        min-height: 125vh;
-        position: relative;
-        left: -12.5%;
-    }
-    html { overflow-x: hidden; }
-}
-
-@media (max-width: 480px) {
-    body {
-        transform: scale(0.7);
-        width: 142.86%;
-        min-height: 142.86vh;
-        left: -21.43%;
-    }
-}
-
-@media (max-width: 360px) {
-    body {
-        transform: scale(0.6);
-        width: 166.67%;
-        min-height: 166.67vh;
-        left: -33.33%;
-    }
+    input, select, textarea { font-size: 16px !important; } /* 防止 iOS 聚焦时自动放大 */
 }
 
 /* ============================================================
@@ -1029,28 +1003,31 @@ tbody tr.expired-row:hover { background: rgba(231,76,60,0.15) !important; }
         padding: 0;
         align-items: flex-end;
     }
-    .modal-content {
+    .modal-content,
+    .modal-content.modal-lg,
+    .modal-content.modal-xl {
         border-radius: 20px 20px 0 0;
+        max-width: 100%;
         max-height: 92vh;
-        padding: 20px;
-        padding-bottom: 0;
+        max-height: 92dvh;
+        padding: 18px 16px calc(20px + env(safe-area-inset-bottom));
         animation: modalSlideUp 0.3s ease;
+        overscroll-behavior: contain;
     }
     @keyframes modalSlideUp {
         from { transform: translateY(100%); }
         to   { transform: translateY(0); }
     }
-    .modal-header { margin-bottom: 15px; }
+    .modal-header { margin-bottom: 14px; }
     .modal-title { font-size: 1.1rem; }
+    /* 按钮跟随内容滚动，不再固定遮挡输入框 */
     .form-actions,
     .modal-footer {
-        position: sticky;
-        bottom: 0;
-        background: white;
-        margin: 16px -20px 0;
-        padding: 14px 20px;
-        box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
-        z-index: 10;
+        position: static;
+        margin: 18px 0 0;
+        padding: 14px 0 0;
+        box-shadow: none;
+        background: transparent;
     }
     .form-actions button,
     .modal-footer button { flex: 1; }
