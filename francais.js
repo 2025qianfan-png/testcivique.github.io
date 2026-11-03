@@ -55,6 +55,9 @@ const dict = {
         res4Desc: "Exercices de rédaction, modèles de lettres et conseils pour améliorer votre écrit.",
         res5Title: "💬 Expression orale",
         res5Desc: "Ateliers de conversation, simulations et exercices de prononciation.",
+        res6Title: "Examen blanc",
+        res6Desc: "Écoute, lecture, écriture et oral en une seule session, avec bilan de niveau CECRL par l'IA.",
+        roleExam: "Examen blanc",
         footerAbout: "Association d'intégration et de formation",
         footerAddr: "Paris, France",
         footerYear: "Fondée en 2025",
@@ -159,6 +162,9 @@ const dict = {
         res4Desc: "写作练习、信件模板和写作技巧，提升您的法语写作水平。",
         res5Title: "💬 口语表达",
         res5Desc: "会话工作坊、情景模拟和发音练习，提升您的法语口语。",
+        res6Title: "模拟考试",
+        res6Desc: "听力、阅读、写作、口语一次完成，AI 给出 CECRL 水平评估报告。",
+        roleExam: "模拟考试",
         footerAbout: "融入与培训协会",
         footerAddr: "法国巴黎",
         footerYear: "成立于2025年",
@@ -338,7 +344,8 @@ function updateUIForUser() {
         } else if (user.role === 'teacher') {
             roleMenu.innerHTML = `<a href="teacher.html?token=${encodeURIComponent(token)}"><i class="fas fa-chalkboard-user"></i> ${t.roleTeacher || 'Espace intervenant'}</a>`;
         } else if (user.role === 'stu' || user.role === 'stu_fr' || user.role === 'stu_all') {
-            roleMenu.innerHTML = `<a href="student.html?token=${encodeURIComponent(token)}"><i class="fas fa-user-graduate"></i> ${t.roleStudent || 'Espace étudiant'}</a>`;
+            roleMenu.innerHTML = `<a href="student.html?token=${encodeURIComponent(token)}"><i class="fas fa-user-graduate"></i> ${t.roleStudent || 'Espace étudiant'}</a>` +
+                `<a href="examen.html?token=${encodeURIComponent(token)}"><i class="fas fa-flag-checkered"></i> ${t.roleExam || 'Examen blanc'}</a>`;
         } else {
             roleMenu.innerHTML = `<a href="#" onclick="showToast('${t.roleMemberLocked || 'Accès réservé aux membres'}', 'warning')"><i class="fas fa-info-circle"></i> ${t.roleMember || 'Devenir membre'}</a>`;
         }
@@ -598,7 +605,8 @@ function renderRessources() {
         { icon: 'fa-book', title: 'Grammaire', desc: dict[currentLang].res2Desc, type: 'grammar' },
         { icon: 'fa-eye', title: 'Compréhension écrite', desc: dict[currentLang].res3Desc, type: 'reading' },
         { icon: 'fa-pen-fancy', title: 'Expression écrite', desc: dict[currentLang].res4Desc, type: 'writing' },
-        { icon: 'fa-comments', title: 'Expression orale', desc: dict[currentLang].res5Desc, type: 'speaking' }
+        { icon: 'fa-comments', title: 'Expression orale', desc: dict[currentLang].res5Desc, type: 'speaking' },
+        { icon: 'fa-flag-checkered', title: dict[currentLang].res6Title, desc: dict[currentLang].res6Desc, type: 'mock' }
     ];
 
     container.innerHTML = resourceItems.map(item => `
@@ -646,6 +654,8 @@ function handleResourceClick(event, type) {
         window.location.href = `ecoute.html?token=${encodeURIComponent(token)}`;
     }else if (type === 'speaking') {
     window.location.href = `tcf-oral.html?token=${encodeURIComponent(token)}`;
+    } else if (type === 'mock') {
+        window.location.href = `examen.html?token=${encodeURIComponent(token)}`;
     } else {
         window.location.href = `developpement.html?token=${encodeURIComponent(token)}&type=${type}`;
     }
