@@ -48,3 +48,8 @@ details{margin-top:10px}summary{cursor:pointer;font-weight:700;color:var(--orang
 .ex-chip.ok{background:rgba(39,174,96,.15);color:#1e8449}
 .ex-chip.ko{background:rgba(231,76,60,.13);color:#c0392b}
 .ex-lstat{padding:22px 10px;text-align:center;font-size:1.05rem;font-weight:700;color:var(--orange)}
+.ex-spinner{width:54px;height:54px;margin:0 auto;border:5px solid var(--grey);border-top-color:var(--orange);border-radius:50%;animation:exspin .9s linear infinite}
+@keyframes exspin{to{transform:rotate(360deg)}}
+.ex-prep{list-style:none;max-width:520px;margin:18px auto 0;text-align:left;font-size:.92rem}
+.ex-prep li{padding:6px 0;color:var(--text-muted)}.ex-prep li.ok{color:var(--green)}
+.ex-dotspin{display:inline-block;width:12px;height:12px;border:2px solid var(--grey);border-top-color:var(--orange);border-radius:50%;animation:exspin .8s linear infinite;vertical-align:-1px;margin-right:2px}

@@ -6,7 +6,7 @@ const CFG = {
   // Écoute : 5 questions tirées de la banque (audio réel) + 5 documents générés par l'IA (niveau B1–B2, lus par synthèse vocale)
   listening: { bank: { A1: 1, A2: 1, B1: 1, B2: 1, C1: 1 }, ai: ['B1', 'B1', 'B1', 'B2', 'B2'], maxPerText: 1,
     plays: 1,        // nombre de lectures automatiques de chaque document (2 = comme le DELF)
-    answerSec: 10 }, // secondes pour répondre après la fin de l'audio, puis passage automatique à la suite,
+    answerSec: 3 },  // secondes pour répondre après la fin de l'audio, puis passage automatique à la suite,
   reading:   { lv: { A1: 1, A2: 1, B1: 1, B2: 1, C1: 1 }, maxPerText: 2 },
   grammar:   { lv: { A1: 3, A2: 4, B1: 4, B2: 4, C1: 3, C2: 2 } },          // total = 20
   writing: ['tache2', 'tache3'],               // 1 sujet tiré au hasard
@@ -239,10 +239,13 @@ async function pickOral() {
 }
 
 async function startExam() {
-  $('startBtn').disabled = true;
-  $('sIntro').innerHTML = `<div class="ex-card ex-wait"><i class="fas fa-spinner fa-spin"></i><h2 style="margin-top:14px">Préparation de l'examen…</h2><p>Tirage des questions et génération des documents audio par l'IA (10–30 s).</p></div>`;
+  const steps = [['l', 'Écoute : tirage de la banque + génération des documents audio par l\'IA'], ['r', 'Lecture'], ['g', 'Grammaire'], ['w', 'Écriture'], ['o', 'Oral (3 tâches)']], done = new Set();
+  const paint = () => $('sIntro').innerHTML = `<div class="ex-card ex-wait"><div class="ex-spinner"></div><h2 style="margin-top:16px">Préparation de l'examen…</h2><p>Génération des questions par l'IA, cela peut prendre 10–30 secondes. Ne fermez pas la page.</p>
+    <ul class="ex-prep">${steps.map(([k, t]) => `<li class="${done.has(k) ? 'ok' : ''}">${done.has(k) ? '✅' : '<span class="ex-dotspin"></span>'} ${t}</li>`).join('')}</ul></div>`;
+  const track = (k, p) => p.then(x => { done.add(k); paint(); return x; });
+  paint();
   try {
-    const [l, r, g, w, o] = await Promise.all([buildListening(), buildReading(), buildGrammar().catch(e => { console.error(e); toast('Grammaire indisponible : ' + e.message, 'warning'); return { items: [] }; }), pickWriting(), pickOral()]);
+    const [l, r, g, w, o] = await Promise.all([track('l', buildListening()), track('r', buildReading()), track('g', buildGrammar().catch(e => { console.error(e); toast('Grammaire indisponible : ' + e.message, 'warning'); return { items: [] }; })), track('w', pickWriting()), track('o', pickOral())]);
     S.listening = l; S.reading = r; S.grammar = g; S.writing = w; S.oral = o;
     S.order = [l.items.length && 'listening', r.items.length && 'reading', g.items.length && 'grammar', S.writing && 'writing', S.oral && 'oral'].filter(Boolean);
     if (!S.order.length) { toast('Aucune question disponible dans la banque', 'error'); intro(); return; }
