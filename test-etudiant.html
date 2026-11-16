@@ -384,6 +384,13 @@ main{flex:1;min-height:0;position:relative;overflow:hidden}
 .foot.mini{flex:none;padding:0 0 4px;font-size:.72rem;max-width:1000px;width:100%;margin:0 auto;line-height:1.3}
 .foot.mini p{display:inline;margin:0 8px}
 @media(max-width:640px){.foot.mini{display:none}}
+
+/* 三张卡片对齐：等高，标题/简介/数据块/按钮各自同一水平线 */
+.cards{align-items:stretch}
+.card .ch{min-height:78px}
+.card .ds{min-height:2.9em}
+.card .info{flex:1}
+@media(max-width:900px){.card .ch,.card .ds{min-height:0}}
 </style>
 </head>
 <body>
@@ -596,7 +603,7 @@ function selectQuestions(){
   questions=shuffle(sel.slice(0,40));
 }
 function initTest(){
-  clearInterval(timerId); cur=0; timeLeft=totalTime; score=0;
+  clearInterval(timerId); cur=0; timeLeft=totalTime; score=0; levelPicked=false;
   selectQuestions(); answers=new Array(questions.length).fill(null);
   $('totQ').textContent=questions.length;
   $('timer').className=''; $('timer').parentNode.classList.remove('warn','crit');
@@ -885,11 +892,23 @@ async function showScoreHistory(){
 }
 
 // ==================== 初始化 ====================
-function fitQuestion(){
+let fitLock=false,levelPicked=false,rzT;
+// 整场考试统一一档尺寸：试排全部题目，选「约90%的题都放得下」的最大一档，其余超长题自行滚动
+function pickLevel(){
   const v=$('vTest'),qs=$('qs');
-  for(let l=0;l<=3;l++){v.dataset.d=l; if(qs.scrollHeight<=qs.clientHeight+1) break;}
+  if(!questions.length||!qs.clientHeight) return;
+  const saved=cur,need=Math.ceil(questions.length*0.9);
+  let chosen=3; fitLock=true;
+  for(let l=0;l<=3&&chosen===3;l++){
+    v.dataset.d=l; let fit=0;
+    for(let i=0;i<questions.length;i++){cur=i;showQuestion();if(qs.scrollHeight<=qs.clientHeight+1)fit++;}
+    if(fit>=need) chosen=l;
+  }
+  v.dataset.d=chosen; cur=saved; fitLock=false; levelPicked=true;
+  showQuestion(); qs.scrollTop=0;
 }
-window.addEventListener('resize',()=>{if(view==='vTest')fitQuestion();});
+function fitQuestion(){ if(fitLock||levelPicked) return; pickLevel(); }
+window.addEventListener('resize',()=>{if(view!=='vTest')return;clearTimeout(rzT);rzT=setTimeout(()=>{levelPicked=false;fitQuestion();},150);});
 $('ov').addEventListener('click',e=>{if(e.target.id==='ov'&&$('mdl').classList.contains('wide'))$('ov').classList.remove('on');});
 document.addEventListener('DOMContentLoaded',()=>{
   const token=new URLSearchParams(location.search).get('token');
