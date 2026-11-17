@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -6,1190 +5,209 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Test - Histoire, Géographie et Culture française</title>
 <link rel="icon" href="icons/icon-192x192.png" type="image/png">
-<!-- 添加Supabase库和配置文件 -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
-/* Variables et reset */
-:root {
-  --primary-blue: #004080;
-  --primary-light-blue: #0066cc;
-  --primary-yellow: #ffd633;
-  --primary-light-yellow: #ffe066;
-  --dark-gray: #333333;
-  --medium-gray: #666666;
-  --light-gray: #f5f7fa;
-  --white: #ffffff;
-  --green: #27ae60;
-  --red: #e74c3c;
-  --orange: #f39c12;
-  --purple: #9b59b6;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.12);
-  --border-radius: 12px;
-  --transition: all 0.3s ease;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: 'Open Sans', sans-serif;
-  color: var(--dark-gray);
-  background-color: var(--light-gray);
-  line-height: 1.7;
-  overflow-x: hidden;
-}
-
-h1, h2, h3, h4 {
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 700;
-  line-height: 1.3;
-  color: var(--primary-blue);
-}
-
-.container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.btn {
-  display: inline-block;
-  padding: 16px 36px;
-  background-color: var(--primary-yellow);
-  color: var(--primary-blue);
-  border: none;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: var(--transition);
-  text-align: center;
-  font-family: 'Montserrat', sans-serif;
-  box-shadow: var(--shadow);
-}
-
-.btn:hover {
-  background-color: var(--primary-light-yellow);
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-hover);
-}
-
-.btn-primary {
-  background-color: var(--primary-blue);
-  color: var(--white);
-}
-
-.btn-primary:hover {
-  background-color: var(--primary-light-blue);
-}
-
-.btn-success {
-  background-color: var(--green);
-  color: var(--white);
-}
-
-.btn-success:hover {
-  background-color: #229954;
-}
-
-/* Custom Alert Modal */
-.alert-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 4000;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
-
-.alert-content {
-  background-color: var(--white);
-  padding: 40px;
-  border-radius: var(--border-radius);
-  max-width: 600px;
-  width: 100%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: modalFade 0.4s ease-out;
-  text-align: center;
-}
-
-@keyframes modalFade {
-  from { opacity: 0; transform: translateY(-30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.alert-icon {
-  font-size: 4rem;
-  margin-bottom: 20px;
-}
-
-.alert-icon.success {
-  color: var(--green);
-}
-
-.alert-icon.warning {
-  color: var(--orange);
-}
-
-.alert-icon.error {
-  color: var(--red);
-}
-
-.alert-icon.info {
-  color: var(--primary-blue);
-}
-
-.alert-content h2 {
-  font-size: 1.8rem;
-  margin-bottom: 15px;
-  color: var(--primary-blue);
-}
-
-.alert-content p {
-  margin-bottom: 25px;
-  color: var(--medium-gray);
-  font-size: 1.1rem;
-  line-height: 1.6;
-}
-
-.alert-btns {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  margin-top: 25px;
-}
-
-/* Login Modal */
-.login-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.85);
-  z-index: 3000;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.login-content {
-  background-color: var(--white);
-  padding: 30px;
-  border-radius: var(--border-radius);
-  max-width: 500px;
-  width: 100%;
-  margin: 40px auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: modalFade 0.4s ease-out;
-}
-
-.login-content h2 {
-  font-size: 1.8rem;
-  margin-bottom: 15px;
-  color: var(--primary-blue);
-  text-align: center;
-}
-
-.login-content p {
-  margin-bottom: 20px;
-  color: var(--medium-gray);
-  font-size: 1rem;
-  text-align: center;
-}
-
-.login-form {
-  text-align: left;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: var(--primary-blue);
-}
-
-.form-group input {
-  width: 100%;
-  padding: 14px;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 16px;
-  transition: var(--transition);
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1);
-}
-
-.form-error {
-  color: var(--red);
-  margin-top: 10px;
-  font-weight: 600;
-  display: none;
-  font-size: 0.9rem;
-}
-
-.login-btns {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  margin-top: 25px;
-}
-
-.btn-modal {
-  padding: 14px 30px;
-  min-width: 140px;
-}
-
-/* ========== 修改以下样式 ========== */
-
-/* Training Info Modal - 改为和登录框一样的样式 */
-.training-info-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.85);
-  z-index: 3001;
-  display: none;
-  justify-content: center;
-  align-items: flex-start; /* 改这里：从center改为flex-start */
-  padding: 20px;
-  overflow-y: auto; /* 加这行：启用垂直滚动 */
-}
-
-.training-info-content {
-  background-color: var(--white);
-  padding: 30px;
-  border-radius: var(--border-radius);
-  max-width: 700px;
-  width: 100%;
-  margin: 40px auto; /* 改这里：添加上下边距 */
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: modalFade 0.4s ease-out;
-  /* 添加这两行 */
-  max-height: calc(100vh - 80px);
-  overflow-y: auto;
-}
-
-/* ========== 删除下面这些旧的响应式样式（如果有的话）========== */
-/*
-.training-info-content {
-  max-height: 90vh;
-}
-*/
-
-/* 保持现有的响应式样式，但要修改max-height值 */
-@media (min-width: 768px) {
-  .training-info-content {
-    padding: 25px;
-    margin: 20px auto; /* 调整边距 */
-    max-height: 85vh; /* 改为使用vh单位 */
-  }
-}
-
-@media (max-width: 576px) {
-  .training-info-content {
-    padding: 15px;
-    margin: 10px auto; /* 调整边距 */
-    max-height: 90vh; /* 改为使用vh单位 */
-  }
-  
-  .training-info-header h2 {
-    font-size: 1.3rem;
-    margin-bottom: 8px;
-  }
-}
-
-@media (max-width: 375px) {
-  .training-info-content {
-    padding: 10px;
-    margin: 5px auto; /* 调整边距 */
-    max-height: 95vh; /* 增加高度 */
-  }
-  
-  .training-info-header h2 {
-    font-size: 1.2rem;
-  }
-}
-.training-info-header {
-  text-align: center;
-  margin-bottom: 25px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid var(--light-gray);
-}
-
-.training-info-header h2 {
-  font-size: 1.8rem;
-  margin-bottom: 10px;
-  color: var(--primary-blue);
-}
-
-.training-info-header p {
-  color: var(--medium-gray);
-  font-size: 1rem;
-}
-
-.training-info-body {
-  margin-bottom: 25px;
-}
-
-.training-type-info {
-  background-color: rgba(0, 64, 128, 0.1);
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  border-left: 4px solid var(--primary-blue);
-}
-
-.training-type-info h3 {
-  color: var(--primary-blue);
-  margin-bottom: 10px;
-  font-size: 1.3rem;
-}
-
-.training-type-info p {
-  margin-bottom: 8px;
-  line-height: 1.5;
-}
-
-.training-type-info .chinese {
-  color: var(--medium-gray);
-  font-style: italic;
-  margin-top: 5px;
-  padding-left: 15px;
-  border-left: 3px solid #ddd;
-}
-
-.access-days-info {
-  background-color: rgba(243, 156, 18, 0.1);
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  border-left: 4px solid var(--orange);
-  text-align: center;
-}
-
-.access-days-info i {
-  color: var(--orange);
-  margin-right: 8px;
-}
-
-/* 移除题目分布部分的样式 */
-
-/* Test Container */
-.test-container {
-  display: none;
-}
-
-.test-container.show {
-  display: block;
-}
-
-/* Question Counter - 增强样式 */
-.question-counter {
-  background-color: var(--white);
-  padding: 20px;
-  border-radius: var(--border-radius);
-  margin-bottom: 30px;
-  box-shadow: var(--shadow);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.counter-info {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.progress-container {
-  flex-grow: 1;
-  max-width: 400px;
-  min-width: 200px;
-}
-
-.progress-bar {
-  height: 10px;
-  background-color: #e0e0e0;
-  border-radius: 5px;
-  overflow: hidden;
-  margin-top: 5px;
-}
-
-.progress-fill {
-  height: 100%;
-  background-color: var(--primary-blue);
-  width: 0%;
-  transition: width 0.5s ease;
-}
-
-/* Question Card - 增强版 */
-.question-card {
-  background-color: var(--white);
-  border-radius: var(--border-radius);
-  padding: 30px;
-  margin-bottom: 30px;
-  box-shadow: var(--shadow);
-  transition: var(--transition);
-}
-
-.question-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid var(--light-gray);
-}
-
-.question-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.question-tag i {
-  margin-right: 5px;
-  font-size: 0.8rem;
-}
-
-.tag-category {
-  background-color: rgba(0, 64, 128, 0.1);
-  color: var(--primary-blue);
-}
-
-.tag-difficulty {
-  background-color: rgba(243, 156, 18, 0.1);
-  color: var(--orange);
-}
-
-.tag-type {
-  background-color: rgba(155, 89, 182, 0.1);
-  color: var(--purple);
-}
-
-.tag-theme {
-  background-color: rgba(39, 174, 96, 0.1);
-  color: var(--green);
-}
-
-.question-text {
-  font-size: 1.4rem;
-  margin-bottom: 25px;
-  color: var(--dark-gray);
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-/* Options with ABCD labels */
-.options-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 25px;
-}
-
-.option {
-  display: flex;
-  align-items: flex-start;
-  padding: 16px 18px;
-  border: 2px solid #e0e0e0;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: var(--transition);
-  background-color: #f9f9f9;
-}
-
-.option:hover {
-  background-color: #f0f7ff;
-  border-color: var(--primary-light-blue);
-}
-
-.option.selected {
-  background-color: #e6f2ff;
-  border-color: var(--primary-blue);
-}
-
-.option.correct {
-  background-color: rgba(39, 174, 96, 0.1);
-  border-color: var(--green);
-}
-
-.option.incorrect {
-  background-color: rgba(231, 76, 60, 0.1);
-  border-color: var(--red);
-}
-
-.option-letter {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  background-color: var(--primary-blue);
-  color: white;
-  border-radius: 50%;
-  font-weight: bold;
-  margin-right: 12px;
-  flex-shrink: 0;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.9rem;
-}
-
-.option.correct .option-letter {
-  background-color: var(--green);
-}
-
-.option.incorrect .option-letter {
-  background-color: var(--red);
-}
-
-.option input {
-  display: none;
-}
-
-.option label {
-  cursor: pointer;
-  font-size: 1.1rem;
-  flex-grow: 1;
-  display: flex;
-  align-items: flex-start;
-  line-height: 1.4;
-}
-
-/* 答案反馈区域 */
-.answer-feedback {
-  display: none;
-  margin-top: 30px;
-  padding: 25px;
-  border-radius: var(--border-radius);
-  animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.answer-feedback.correct {
-  background-color: rgba(39, 174, 96, 0.1);
-  border-left: 4px solid var(--green);
-}
-
-.answer-feedback.incorrect {
-  background-color: rgba(231, 76, 60, 0.1);
-  border-left: 4px solid var(--red);
-}
-
-.feedback-header {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.feedback-icon {
-  font-size: 2.5rem;
-}
-
-.feedback-icon.correct {
-  color: var(--green);
-}
-
-.feedback-icon.incorrect {
-  color: var(--red);
-}
-
-.feedback-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--dark-gray);
-}
-
-.feedback-explanation {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  color: var(--dark-gray);
-  margin-bottom: 25px;
-}
-
-.next-question-btn {
-  text-align: center;
-  margin-top: 20px;
-  display: none;
-}
-
-/* Navigation */
-.navigation-btns {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 40px;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.nav-btn {
-  padding: 14px 30px;
-  min-width: 150px;
-  flex: 1;
-  min-width: 120px;
-}
-
-.nav-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Results */
-.results-container {
-  display: none;
-}
-
-.results-container.show {
-  display: block;
-  animation: fadeIn 0.5s ease;
-}
-
-.results-content {
-  background-color: var(--white);
-  border-radius: var(--border-radius);
-  padding: 40px;
-  margin-top: 40px;
-  box-shadow: var(--shadow);
-  text-align: center;
-}
-
-.results-header {
-  margin-bottom: 40px;
-}
-
-.score-display {
-  font-size: 4rem;
-  font-weight: 800;
-  color: var(--primary-blue);
-  margin-bottom: 10px;
-}
-
-.score-text {
-  font-size: 1.8rem;
-  margin-bottom: 30px;
-  line-height: 1.3;
-}
-
-.score-bar {
-  height: 20px;
-  background-color: #e0e0e0;
-  border-radius: 10px;
-  overflow: hidden;
-  margin: 30px 0;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.score-fill {
-  height: 100%;
-  background-color: var(--green);
-  width: 0%;
-  transition: width 1.5s ease;
-}
-
-/* Question Map */
-.question-map-container {
-  background-color: var(--light-gray);
-  padding: 25px;
-  border-radius: var(--border-radius);
-  margin: 40px 0;
-}
-
-.question-map-container h3 {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  color: var(--primary-blue);
-  text-align: center;
-}
-
-.question-map {
-  display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.map-item {
-  width: 100%;
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-  font-size: 1rem;
-  border: 2px solid transparent;
-}
-
-.map-item:hover {
-  transform: scale(1.05);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-}
-
-.map-item.unanswered {
-  background-color: #f0f0f0;
-  color: var(--medium-gray);
-}
-
-.map-item.correct {
-  background-color: var(--green);
-  color: white;
-}
-
-.map-item.incorrect {
-  background-color: var(--red);
-  color: white;
-}
-
-.map-item.current {
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 2px var(--primary-blue);
-}
-
-.map-legend {
-  display: flex;
-  justify-content: center;
-  gap: 25px;
-  font-size: 0.9rem;
-  flex-wrap: wrap;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.legend-color {
-  width: 15px;
-  height: 15px;
-  border-radius: 3px;
-}
-
-.legend-color.unanswered {
-  background-color: #f0f0f0;
-}
-
-.legend-color.correct {
-  background-color: var(--green);
-}
-
-.legend-color.incorrect {
-  background-color: var(--red);
-}
-
-/* Question Review */
-.question-review-container {
-  background-color: var(--white);
-  border-radius: var(--border-radius);
-  padding: 30px;
-  margin: 30px 0;
-  box-shadow: var(--shadow);
-  display: none;
-}
-
-.question-review-container.active {
-  display: block;
-  animation: fadeIn 0.5s ease;
-}
-
-.review-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid var(--light-gray);
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.review-header h4 {
-  font-size: 1.3rem;
-  color: var(--primary-blue);
-  margin: 0;
-}
-
-.review-question {
-  font-size: 1.2rem;
-  margin-bottom: 25px;
-  color: var(--dark-gray);
-  font-weight: 600;
-  line-height: 1.5;
-}
-
-.review-options {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 25px;
-}
-
-.review-option {
-  display: flex;
-  align-items: flex-start;
-  padding: 15px;
-  border-radius: 8px;
-  border: 2px solid #e0e0e0;
-  position: relative;
-}
-
-.review-option.correct-answer {
-  border-color: var(--green);
-  background-color: rgba(39, 174, 96, 0.05);
-}
-
-.review-option.user-answer {
-  border-color: var(--primary-blue);
-  background-color: rgba(0, 64, 128, 0.05);
-}
-
-.review-option.user-answer.incorrect {
-  border-color: var(--red);
-  background-color: rgba(231, 76, 60, 0.05);
-}
-
-.review-option-label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 25px;
-  height: 25px;
-  background-color: var(--primary-blue);
-  color: white;
-  border-radius: 50%;
-  font-weight: bold;
-  margin-right: 12px;
-  flex-shrink: 0;
-  font-size: 0.9rem;
-}
-
-.review-option.correct-answer .review-option-label {
-  background-color: var(--green);
-}
-
-.review-option.user-answer.incorrect .review-option-label {
-  background-color: var(--red);
-}
-
-.review-option-text {
-  flex-grow: 1;
-  font-size: 1rem;
-}
-
-.review-option-badge {
-  position: absolute;
-  top: -10px;
-  right: 10px;
-  background-color: var(--green);
-  color: white;
-  padding: 3px 8px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.review-option.user-answer .review-option-badge {
-  background-color: var(--primary-blue);
-}
-
-.review-option.user-answer.incorrect .review-option-badge {
-  background-color: var(--red);
-}
-
-.review-explanation {
-  background-color: rgba(255, 214, 51, 0.1);
-  padding: 20px;
-  border-radius: 8px;
-  margin-top: 20px;
-  border-left: 4px solid var(--primary-yellow);
-}
-
-.review-explanation h5 {
-  color: var(--primary-blue);
-  margin-bottom: 10px;
-  font-size: 1.1rem;
-}
-
-.review-explanation p {
-  color: var(--dark-gray);
-  line-height: 1.6;
-}
-
-.results-actions {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 50px;
-  flex-wrap: wrap;
-}
-
-/* Footer */
-.test-footer {
-  background-color: var(--primary-blue);
-  color: var(--white);
-  padding: 40px 0;
-  margin-top: 80px;
-  text-align: center;
-  display: none;
-}
-
-.test-footer a {
-  color: var(--primary-yellow);
-  font-weight: 600;
-}
-
-/* Loading Spinner */
-.loading-spinner {
-  display: none;
-  text-align: center;
-  padding: 30px;
-}
-
-.spinner {
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid var(--primary-blue);
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 20px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* 烟花和心碎动画效果 */
-@keyframes fireworks {
-  0% { transform: scale(0.8); opacity: 0.5; }
-  50% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-@keyframes heartbreak {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(-15deg); }
-  75% { transform: rotate(15deg); }
-  100% { transform: rotate(0deg); }
-}
-
-.fireworks {
-  animation: fireworks 1s ease-in-out 3;
-}
-
-.heartbreak {
-  animation: heartbreak 0.5s ease-in-out 3;
-}
-
-/* Test Header */
-.test-header {
-  display: none;
-  background-color: var(--white);
-  padding: 20px 0;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.test-header .container {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.test-header h1 {
-  font-size: 1.8rem;
-  margin: 0;
-}
-
-.test-header p {
-  color: var(--medium-gray);
-  margin: 0;
-}
-
-.header-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.header-actions .btn {
-  padding: 10px 20px;
-  font-size: 0.9rem;
-}
-
-/* 全局滚动条样式 */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
-}
-
-/* Responsive - 移动端优先设计 */
-
-/* 平板 - 768px以上 */
-@media (min-width: 768px) {
-  .training-info-content {
-    padding: 25px;
-    margin: 20px auto;
-    max-height: 90vh;
-  }
-  
-  .training-info-header h2 {
-    font-size: 1.8rem;
-  }
-}
-
-/* 小手机优化 - 576px以下 */
-@media (max-width: 576px) {
-  .training-info-content {
-    padding: 15px;
-    margin: 5px auto;
-    max-height: 98vh;
-  }
-  
-  .training-info-header h2 {
-    font-size: 1.3rem;
-    margin-bottom: 8px;
-  }
-  
-  .training-type-info {
-    padding: 15px;
-  }
-  
-  /* 其他页面的移动端优化 */
-  .question-map {
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-  }
-  
-  .map-item {
-    font-size: 0.9rem;
-  }
-  
-  .question-card {
-    padding: 20px;
-  }
-  
-  .question-text {
-    font-size: 1.2rem;
-  }
-  
-  .option {
-    padding: 12px 15px;
-  }
-  
-  .option-letter {
-    width: 25px;
-    height: 25px;
-    font-size: 0.8rem;
-  }
-  
-  .navigation-btns {
-    flex-direction: column;
-  }
-  
-  .nav-btn {
-    width: 100%;
-  }
-  
-  .results-actions {
-    flex-direction: column;
-  }
-  
-  .results-actions .btn {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-  
-  .score-display {
-    font-size: 2.5rem;
-  }
-  
-  .score-text {
-    font-size: 1.3rem;
-  }
-}
-
-/* 超小手机 - 375px以下 */
-@media (max-width: 375px) {
-  .question-map {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  
-  .training-info-content {
-    padding: 10px;
-  }
-  
-  .training-info-header h2 {
-    font-size: 1.2rem;
-  }
+:root{--primary-blue:#004080;--primary-light-blue:#0066cc;--primary-yellow:#ffd633;--primary-light-yellow:#ffe066;--dark-gray:#333333;--medium-gray:#666666;--light-gray:#f5f7fa;--white:#ffffff;--green:#27ae60;--red:#e74c3c;--orange:#f39c12;--purple:#9b59b6;--shadow:0 10px 30px rgba(0,0,0,.08);--shadow-hover:0 15px 40px rgba(0,0,0,.12);--border-radius:12px;--transition:all .3s ease}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Open Sans',sans-serif;color:var(--dark-gray);background:var(--light-gray);line-height:1.6;overflow-x:hidden;min-height:100dvh;display:flex;flex-direction:column}
+main{flex:1}
+h1,h2,h3,h4{font-family:'Montserrat',sans-serif;font-weight:700;line-height:1.3;color:var(--primary-blue)}
+.container{width:100%;max-width:1000px;margin:0 auto;padding:0 16px}
+
+/* 按钮 */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 28px;background:var(--primary-yellow);color:var(--primary-blue);border:0;border-radius:50px;font:600 .95rem 'Montserrat',sans-serif;cursor:pointer;transition:var(--transition);box-shadow:var(--shadow)}
+.btn:hover{background:var(--primary-light-yellow);transform:translateY(-2px)}
+.btn-primary{background:var(--primary-blue);color:#fff}
+.btn-primary:hover{background:var(--primary-light-blue)}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover{background:#229954}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* 提示窗 */
+.alert-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:4000;display:none;justify-content:center;align-items:center;padding:16px}
+.alert-content{background:#fff;padding:32px 28px;border-radius:var(--border-radius);max-width:520px;width:100%;max-height:92dvh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:modalFade .4s ease-out;text-align:center;border-top:8px solid var(--primary-blue)}
+@keyframes modalFade{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
+.alert-icon{font-size:3.4rem;margin-bottom:12px}
+.alert-icon.success{color:var(--green)}.alert-icon.warning{color:var(--orange)}.alert-icon.error{color:var(--red)}.alert-icon.info{color:var(--primary-blue)}
+.alert-content h2{font-size:1.5rem;margin-bottom:10px}
+.alert-content p{color:var(--medium-gray);font-size:1rem;line-height:1.6;white-space:pre-line}
+.alert-btns{display:flex;gap:12px;justify-content:center;margin-top:22px}
+.alert-btns .btn{flex:1;max-width:220px}
+
+/* 培训信息窗：头部 + 可滚动内容 + 固定按钮 */
+.training-info-modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:3001;display:none;justify-content:center;align-items:center;padding:16px}
+.training-info-content{background:#fff;border-radius:16px;max-width:640px;width:100%;max-height:94dvh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:modalFade .4s ease-out}
+.ti-head{flex:none;background:linear-gradient(135deg,#004080,#0a5ab5);color:#fff;text-align:center;padding:24px 20px 20px}
+.ti-head>i{display:flex;align-items:center;justify-content:center;width:52px;height:52px;margin:0 auto 10px;border-radius:50%;background:var(--primary-yellow);color:var(--primary-blue);font-size:1.4rem}
+.ti-head h2{color:#fff;font-size:1.35rem}
+.ti-head p{color:rgba(255,255,255,.85);font-size:.92rem;margin-top:2px}
+.ti-scroll{flex:1;min-height:0;overflow-y:auto;padding:18px 22px 6px;-webkit-overflow-scrolling:touch}
+.training-info-content .alert-btns{flex:none;margin:0;padding:12px 22px 20px;border-top:1px solid #eef1f5}
+.training-info-content .alert-btns .btn{max-width:none}
+.training-type-info{background:rgba(0,64,128,.07);padding:16px 18px;border-radius:10px;margin-bottom:14px;border-left:4px solid var(--primary-blue)}
+.training-type-info h3{font-size:1.15rem;margin-bottom:8px}
+.training-type-info p{margin-bottom:6px;line-height:1.5;font-size:.92rem}
+.training-type-info .chinese{color:var(--medium-gray);margin-top:6px;padding-left:12px;border-left:3px solid #ddd}
+.access-days-info{background:rgba(243,156,18,.1);padding:12px;border-radius:10px;margin-bottom:14px;border-left:4px solid var(--orange);text-align:center;font-size:.92rem}
+.access-days-info i{color:var(--orange);margin-right:8px}
+.ti-tips{margin:4px 0 12px;padding:14px 16px;background:rgba(0,64,128,.04);border-radius:10px;border-left:4px solid var(--primary-yellow)}
+.ti-tips h3{font-size:1rem;margin-bottom:8px}
+.ti-tips ul{color:var(--medium-gray);padding-left:20px;line-height:1.6;font-size:.9rem}
+
+/* 顶栏 */
+.test-header{display:none;background:linear-gradient(135deg,#004080,#0a5ab5);box-shadow:0 4px 16px rgba(0,64,128,.25);position:sticky;top:0;z-index:1000;padding:8px 0}
+.test-header .container{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:1000px}
+.th-t{min-width:0}
+.test-header h1{font-size:1.1rem;color:#fff;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.test-header p{color:rgba(255,255,255,.78);font-size:.8rem;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header-actions{display:flex;gap:6px;flex:none}
+.header-actions .btn{padding:8px 16px;font-size:.82rem;background:rgba(255,255,255,.15);color:#fff;box-shadow:none}
+.header-actions .btn:hover{background:rgba(255,255,255,.28);transform:none}
+.header-actions .btn-primary{background:var(--primary-yellow);color:var(--primary-blue)}
+.header-actions .btn-primary:hover{background:var(--primary-light-yellow)}
+
+/* 测试区 */
+.test-container{display:none}
+.test-container.show{display:block}
+.question-counter{background:#fff;padding:12px 18px;border-radius:var(--border-radius);margin-bottom:10px;box-shadow:var(--shadow);border-top:4px solid var(--primary-blue)}
+.counter-info{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.counter-info h3{font-size:1.05rem}
+.counter-info p{font-size:.8rem;color:var(--medium-gray)}
+.progress-container{flex:1;min-width:200px;max-width:420px;font-size:.8rem;color:var(--medium-gray)}
+.progress-bar{height:8px;background:#e0e0e0;border-radius:4px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;background:var(--primary-blue);width:0;transition:width .5s ease}
+.question-card{background:#fff;border-radius:var(--border-radius);padding:clamp(16px,2.6vh,28px) clamp(16px,2.4vw,28px);box-shadow:var(--shadow)}
+.question-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:clamp(10px,1.6vh,16px)}
+.question-tag{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:600;text-transform:uppercase}
+.question-tag i{margin-right:5px;font-size:.75rem}
+.tag-theme{background:rgba(39,174,96,.1);color:var(--green)}
+.tag-difficulty{background:rgba(243,156,18,.1);color:var(--orange)}
+.tag-type{background:rgba(155,89,182,.1);color:var(--purple)}
+.question-text{font:600 clamp(1.1rem,2.6vh,1.45rem)/1.4 'Montserrat',sans-serif;color:var(--primary-blue);margin-bottom:clamp(12px,2.2vh,22px);padding-bottom:clamp(10px,1.6vh,16px);border-bottom:2px solid var(--light-gray)}
+.options-container{display:flex;flex-direction:column;gap:clamp(7px,1.3vh,12px)}
+.option{display:flex;align-items:center;padding:clamp(9px,1.8vh,16px) 16px;min-height:48px;border:2px solid #e0e0e0;border-radius:12px;cursor:pointer;transition:var(--transition);background:#fff;-webkit-tap-highlight-color:transparent}
+@media(hover:hover){.option:hover{background:#f0f7ff;border-color:var(--primary-light-blue)}}
+.option.selected{background:#eaf3ff;border-color:var(--primary-blue);box-shadow:0 0 0 3px rgba(0,64,128,.08)}
+.option.correct{background:rgba(39,174,96,.1);border-color:var(--green)}
+.option.incorrect{background:rgba(231,76,60,.1);border-color:var(--red)}
+.option-letter{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--primary-blue);color:#fff;border-radius:50%;font:700 .9rem 'Montserrat',sans-serif;margin-right:12px;flex-shrink:0}
+.option.selected .option-letter{background:var(--primary-yellow);color:var(--primary-blue)}
+.option.correct .option-letter{background:var(--green);color:#fff}
+.option.incorrect .option-letter{background:var(--red);color:#fff}
+.option input{display:none}
+.option label{cursor:pointer;font-size:clamp(1rem,2vh,1.12rem);flex-grow:1;display:flex;align-items:center;line-height:1.4}
+
+/* 答案反馈 */
+.answer-feedback{display:none;margin-top:16px;padding:16px 18px;border-radius:var(--border-radius);animation:fadeIn .5s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.answer-feedback.correct{background:rgba(39,174,96,.1);border-left:4px solid var(--green)}
+.answer-feedback.incorrect{background:rgba(231,76,60,.1);border-left:4px solid var(--red)}
+.feedback-header{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.feedback-icon{font-size:1.9rem}
+.feedback-icon.correct{color:var(--green)}.feedback-icon.incorrect{color:var(--red)}
+.feedback-title{font:700 1.2rem 'Montserrat',sans-serif;color:var(--dark-gray)}
+.fb-answers{display:flex;flex-direction:column;gap:8px;margin:4px 0 12px}
+.fb-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;background:#fff;border:2px solid #e0e0e0}
+.fb-row.good{border-color:var(--green)}
+.fb-row.bad{border-color:var(--red)}
+.fb-letter{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;flex:none;border-radius:50%;color:#fff;font:700 .85rem 'Montserrat',sans-serif}
+.fb-row.good .fb-letter{background:var(--green)}
+.fb-row.bad .fb-letter{background:var(--red)}
+.fb-label{font:700 .72rem 'Montserrat',sans-serif;text-transform:uppercase;letter-spacing:.04em;color:var(--medium-gray);margin-bottom:1px}
+.fb-row.good .fb-label{color:var(--green)}
+.fb-row.bad .fb-label{color:var(--red)}
+.fb-text{font-size:1rem;line-height:1.45}
+.fb-explain{background:#fff;border-radius:10px;padding:12px 14px;border-left:4px solid var(--primary-yellow)}
+.fb-explain h5,.review-explanation h5{display:flex;align-items:center;gap:6px;color:var(--primary-blue);margin-bottom:6px;font:700 1rem 'Montserrat',sans-serif}
+.fb-explain h5 i{color:var(--orange)}
+.fb-explain p,.review-explanation p{margin:0 0 8px;line-height:1.65}
+.fb-explain p:last-child,.review-explanation p:last-child{margin-bottom:0}
+.fb-explain ul,.review-explanation ul{margin:0 0 8px;padding-left:20px;line-height:1.65}
+
+/* 底部操作栏：吸底，随时可点 */
+.action-bar{position:sticky;bottom:0;z-index:50;display:flex;gap:10px;margin-top:12px;padding:10px 0 calc(10px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--light-gray) 75%,rgba(245,247,250,0))}
+.action-bar>*{flex:1}
+.action-bar .btn{width:100%;padding:13px 10px;font-size:.98rem}
+#prevBtn{background:#fff;color:var(--primary-blue);box-shadow:inset 0 0 0 2px #d4deea}
+#prevBtn:hover{background:#f3f7fc}
+.next-question-btn{display:none}
+.nav-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* 结果 */
+.results-container{display:none}
+.results-container.show{display:block;animation:fadeIn .5s ease}
+.results-content{background:#fff;border-radius:var(--border-radius);padding:28px 22px;margin:16px 0;box-shadow:var(--shadow);text-align:center}
+.score-display{font:800 4rem 'Montserrat',sans-serif;color:var(--primary-blue);line-height:1.1}
+.score-text{font:700 1.3rem/1.4 'Montserrat',sans-serif;margin:10px 0 16px;display:inline-block;padding:10px 22px;border-radius:50px;background:var(--light-gray)}
+.score-bar{height:16px;background:#e0e0e0;border-radius:8px;overflow:hidden;margin:16px auto 6px;max-width:560px}
+.score-fill{height:100%;background:var(--green);width:0;transition:width 1.5s ease}
+.question-map-container{background:var(--light-gray);padding:20px;border-radius:var(--border-radius);margin:24px 0}
+.question-map-container h3{font-size:1.2rem;margin-bottom:14px}
+.question-map{display:grid;grid-template-columns:repeat(10,1fr);gap:8px;margin:0 auto 14px;max-width:640px}
+.map-item{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font:600 .95rem 'Montserrat',sans-serif;cursor:pointer;transition:var(--transition);border:2px solid transparent}
+.map-item:hover{transform:scale(1.08);box-shadow:0 3px 10px rgba(0,0,0,.12)}
+.map-item.unanswered{background:#e8ebf0;color:var(--medium-gray)}
+.map-item.correct{background:var(--green);color:#fff}
+.map-item.incorrect{background:var(--red);color:#fff}
+.map-legend{display:flex;justify-content:center;gap:20px;font-size:.85rem;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:8px}
+.legend-color{width:14px;height:14px;border-radius:3px}
+.legend-color.unanswered{background:#e8ebf0}.legend-color.correct{background:var(--green)}.legend-color.incorrect{background:var(--red)}
+.question-review-container{background:#fff;border-radius:var(--border-radius);padding:22px;margin:20px 0;box-shadow:var(--shadow);border:1px solid #edf1f6;text-align:left;display:none}
+.question-review-container.active{display:block;animation:fadeIn .5s ease}
+.review-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--light-gray);flex-wrap:wrap;gap:10px}
+.review-header h4{font-size:1.1rem;margin:0}
+.review-question{font:600 1.1rem/1.5 'Montserrat',sans-serif;margin-bottom:16px}
+.review-options{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.review-option{display:flex;align-items:flex-start;padding:12px 14px;border-radius:10px;border:2px solid #e0e0e0;position:relative}
+.review-option.correct-answer{border-color:var(--green);background:rgba(39,174,96,.06)}
+.review-option.user-answer{border-color:var(--primary-blue);background:rgba(0,64,128,.05)}
+.review-option.user-answer.incorrect{border-color:var(--red);background:rgba(231,76,60,.06)}
+.review-option-label{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;background:var(--primary-blue);color:#fff;border-radius:50%;font-weight:700;margin-right:12px;flex-shrink:0;font-size:.85rem}
+.review-option.correct-answer .review-option-label{background:var(--green)}
+.review-option.user-answer.incorrect .review-option-label{background:var(--red)}
+.review-option-text{flex-grow:1;font-size:1rem}
+.review-option-badge{position:absolute;top:-10px;right:10px;background:var(--green);color:#fff;padding:2px 10px;border-radius:12px;font-size:.75rem;font-weight:600}
+.review-option.user-answer .review-option-badge{background:var(--primary-blue)}
+.review-option.user-answer.incorrect .review-option-badge{background:var(--red)}
+.review-explanation{background:rgba(255,214,51,.12);padding:16px 18px;border-radius:10px;margin-top:14px;border-left:4px solid var(--primary-yellow)}
+.review-explanation h5{color:var(--primary-blue);margin-bottom:6px;font:700 1rem 'Montserrat',sans-serif}
+.results-actions{display:flex;justify-content:center;gap:12px;margin-top:28px;flex-wrap:wrap}
+
+/* 页脚 */
+.test-footer{background:var(--primary-blue);color:#fff;padding:20px 0;margin-top:30px;text-align:center;display:none;font-size:.85rem}
+.test-footer a{color:var(--primary-yellow);font-weight:600}
+
+/* 结果动画 */
+@keyframes fireworks{0%{transform:scale(.8);opacity:.5}50%{transform:scale(1.15);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes heartbreak{0%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}100%{transform:rotate(0)}}
+.fireworks{animation:fireworks 1s ease-in-out 3}
+.heartbreak{animation:heartbreak .5s ease-in-out 3}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#f1f1f1;border-radius:3px}
+::-webkit-scrollbar-thumb{background:#c1c1c1;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#a8a8a8}
+
+@media(max-width:768px){.question-map{grid-template-columns:repeat(5,1fr)}}
+@media(max-width:576px){
+ .container{padding:0 10px}
+ .hd-t{display:none}
+ .header-actions .btn{padding:9px 13px}
+ .counter-info{gap:8px}.progress-container{min-width:0;max-width:none;width:100%}
+ .score-display{font-size:3rem}.score-text{font-size:1.1rem}
+ .results-content{padding:20px 14px}
+ .results-actions .btn{width:100%}
+ .alert-btns{flex-wrap:wrap}
 }
 </style>
 </head>
 <body>
 
-<!-- Custom Alert Modal -->
+<!-- Custom Alert Modal（必须保持在最前：JS 用 querySelector('.alert-btns') 取第一个按钮区） -->
 <div id="alertModal" class="alert-overlay">
   <div class="alert-content">
     <div class="alert-icon info" id="alertIcon">
@@ -1203,34 +221,20 @@ h1, h2, h3, h4 {
   </div>
 </div>
 
-
-
-<!-- 找到这个部分 -->
+<!-- Training Info Modal -->
 <div id="trainingInfoModal" class="training-info-modal">
   <div class="training-info-content">
-    <!-- 在这两行中间添加： -->
-    <div style="max-height: 100%; overflow-y: auto; padding-right: 5px;">
-    
-    <div class="training-info-header">
+    <div class="ti-head">
+      <i class="fas fa-landmark-flag"></i>
       <h2>Informations sur votre formation</h2>
       <p>Informations sur le test et votre compte</p>
     </div>
-    
-    <div class="training-info-body">
-      <div class="training-type-info" id="trainingTypeInfo">
-        <!-- 内容不变 -->
-      </div>
-      
-      <div class="access-days-info" id="accessDaysInfo" style="display: none;">
-        <!-- 内容不变 -->
-      </div>
-      
-      <!-- 添加这个额外信息块让内容更充实 -->
-      <div style="margin-top: 30px; padding: 15px; background-color: rgba(0, 64, 128, 0.05); border-radius: 8px; border-left: 4px solid var(--primary-blue);">
-        <h3 style="color: var(--primary-blue); margin-bottom: 10px; font-size: 1.1rem;">
-          <i class="fas fa-lightbulb"></i> Conseils pour le test
-        </h3>
-        <ul style="color: var(--medium-gray); padding-left: 20px; line-height: 1.6;">
+    <div class="ti-scroll">
+      <div class="training-type-info" id="trainingTypeInfo"></div>
+      <div class="access-days-info" id="accessDaysInfo" style="display: none;"></div>
+      <div class="ti-tips">
+        <h3><i class="fas fa-lightbulb"></i> Conseils pour le test</h3>
+        <ul>
           <li>Prenez votre temps, il n'y a pas de limite de temps</li>
           <li>Lisez attentivement chaque question</li>
           <li>Consultez les explications après chaque réponse</li>
@@ -1239,14 +243,10 @@ h1, h2, h3, h4 {
         </ul>
       </div>
     </div>
-    
     <div class="alert-btns">
       <button class="btn btn-primary" onclick="closeTrainingInfo()">
         <i class="fas fa-play-circle"></i> Commencer le test
       </button>
-    </div>
-    
-    <!-- 在这行之前添加： -->
     </div>
   </div>
 </div>
@@ -1254,18 +254,14 @@ h1, h2, h3, h4 {
 <!-- Test Header -->
 <header class="test-header" style="display: none;">
   <div class="container">
-    <h1 id="testTitle">Histoire et Culture Française</h1>
-    <p id="testSubtitle">20 questions - Pas de limite de temps</p>
+    <div class="th-t">
+      <h1 id="testTitle">Histoire et Culture Française</h1>
+      <p id="testSubtitle">20 questions - Pas de limite de temps</p>
+    </div>
     <div class="header-actions">
-      <button class="btn" onclick="showInstructions()">
-        <i class="fas fa-info-circle"></i> Instructions
-      </button>
-      <button class="btn" onclick="restartTest()">
-        <i class="fas fa-redo"></i> Recommencer
-      </button>
-      <button class="btn btn-primary" onclick="goBackToHome()">
-        <i class="fas fa-home"></i> Accueil
-      </button>
+      <button class="btn" onclick="showInstructions()"><i class="fas fa-info-circle"></i><span class="hd-t"> Instructions</span></button>
+      <button class="btn" onclick="restartTest()"><i class="fas fa-redo"></i><span class="hd-t"> Recommencer</span></button>
+      <button class="btn btn-primary" onclick="goBackToHome()"><i class="fas fa-home"></i><span class="hd-t"> Accueil</span></button>
     </div>
   </div>
 </header>
@@ -1273,12 +269,11 @@ h1, h2, h3, h4 {
 <!-- Test Container -->
 <main class="container">
   <div id="testContainer" class="test-container">
-    <!-- Question Counter -->
-    <div class="question-counter">
+    <div class="question-counter" style="margin-top:14px">
       <div class="counter-info">
         <div>
           <h3>Question <span id="currentQuestion">1</span> sur <span id="totalQuestions">20</span></h3>
-          <p id="testTypeInfo">Test des Valeurs Républicaines</p>
+          <p id="testTypeInfo">Test Histoire et Culture</p>
         </div>
         <div class="progress-container">
           <div>Progression: <span id="progressPercent">0%</span></div>
@@ -1288,98 +283,59 @@ h1, h2, h3, h4 {
         </div>
       </div>
     </div>
-    
-    <!-- Question -->
+
     <div class="question-card">
-      <!-- 题目元数据标签区域 -->
-      <div class="question-meta" id="questionMeta">
-        <!-- 标签将由JavaScript动态添加 -->
-      </div>
-      
+      <div class="question-meta" id="questionMeta"></div>
       <div class="question-text" id="questionText">Chargement de la question...</div>
-      
-      <div class="options-container" id="optionsContainer">
-        <!-- Options will be inserted here by JavaScript -->
-      </div>
-      
-      <!-- 答案反馈区域 -->
-      <div class="answer-feedback" id="answerFeedback">
-        <!-- 反馈内容将由JavaScript动态添加 -->
-      </div>
-      
-      <!-- 下一题按钮 -->
+      <div class="options-container" id="optionsContainer"></div>
+      <div class="answer-feedback" id="answerFeedback"></div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="action-bar">
+      <button class="btn nav-btn" id="prevBtn" onclick="previousQuestion()" disabled>
+        <i class="fas fa-arrow-left"></i> Précédente
+      </button>
+      <button class="btn btn-primary nav-btn" id="submitBtn" onclick="submitCurrentQuestion()" style="display: none;">
+        Valider la réponse
+      </button>
       <div class="next-question-btn" id="nextQuestionBtn">
         <button class="btn btn-primary" onclick="nextQuestion()">
           <i class="fas fa-arrow-right"></i> Question suivante
         </button>
       </div>
-      
-      <div class="navigation-btns">
-        <button class="btn nav-btn" id="prevBtn" onclick="previousQuestion()" disabled>
-          <i class="fas fa-arrow-left"></i> Précédente
-        </button>
-        <button class="btn btn-primary nav-btn" id="submitBtn" onclick="submitCurrentQuestion()" style="display: none;">
-          Valider la réponse
-        </button>
-      </div>
-    </div>
-    
-    <!-- 提交测试按钮（在最后一题显示） -->
-    <div style="text-align: center; margin-top: 40px;">
-      <button class="btn btn-primary" id="finishTestBtn" onclick="submitTest()" style="padding: 18px 50px; font-size: 1.2rem; display: none;">
+      <button class="btn btn-success" id="finishTestBtn" onclick="submitTest()" style="display: none;">
         <i class="fas fa-paper-plane"></i> Terminer le test
       </button>
     </div>
   </div>
-  
+
   <!-- Results Container -->
   <div id="resultsContainer" class="results-container">
     <div class="results-content">
       <div class="results-header">
-        <!-- 显示总分 -->
         <div class="score-display" id="scoreDisplay">0/20</div>
         <div class="score-text" id="scoreText">Chargement du résultat...</div>
-        
-        <!-- 显示进度条 -->
         <div class="score-bar">
           <div class="score-fill" id="scoreFill"></div>
         </div>
       </div>
-      
-      <!-- Question Map -->
+
       <div class="question-map-container" id="questionMapContainer">
         <h3>Carte des Réponses</h3>
-        <div class="question-map" id="questionMap">
-          <!-- Question map will be inserted here by JavaScript -->
-        </div>
+        <div class="question-map" id="questionMap"></div>
         <div class="map-legend">
-          <div class="legend-item">
-            <div class="legend-color unanswered"></div>
-            <span>Non répondue</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color correct"></div>
-            <span>Correcte</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color incorrect"></div>
-            <span>Incorrecte</span>
-          </div>
+          <div class="legend-item"><div class="legend-color unanswered"></div><span>Non répondue</span></div>
+          <div class="legend-item"><div class="legend-color correct"></div><span>Correcte</span></div>
+          <div class="legend-item"><div class="legend-color incorrect"></div><span>Incorrecte</span></div>
         </div>
       </div>
-      
-      <!-- Question Review -->
-      <div class="question-review-container" id="questionReview">
-        <!-- Question review will be inserted here when user clicks on map -->
-      </div>
-      
+
+      <div class="question-review-container" id="questionReview"></div>
+
       <div class="results-actions">
-        <button class="btn" onclick="restartTest()">
-          <i class="fas fa-redo"></i> Nouveau test
-        </button>
-        <button class="btn btn-primary" onclick="goBackToHome()">
-          <i class="fas fa-home"></i> Accueil
-        </button>
+        <button class="btn" onclick="restartTest()"><i class="fas fa-redo"></i> Nouveau test</button>
+        <button class="btn btn-primary" onclick="goBackToHome()"><i class="fas fa-home"></i> Accueil</button>
       </div>
     </div>
   </div>
@@ -1389,25 +345,24 @@ h1, h2, h3, h4 {
 <footer class="test-footer">
   <div class="container">
     <p>© 2026 Association Mille Voiles</p>
-    <p id="footerTestInfo">Test des Valeurs Républicaines - Simulation spécialisée</p>
+    <p id="footerTestInfo">Histoire, géographie et culture française - 20 questions</p>
     <p><a href="examen-civique.html">Retour au site principal</a></p>
   </div>
 </footer>
-
 
 <script src="question_multia.js"></script>
 <script src="question_resident.js"></script>
 <script src="question_nat.js"></script>
 
 <script>
-// ==================== 全局配置 ====================
-let selectedTestType = 'culture_module'
-// 禁止右键
+
+let selectedTestType = 'culture_module';
+
+// 禁止右键 & 常见快捷键
 document.addEventListener('contextmenu', function (e) {
     e.preventDefault();
 });
 
-// 禁止常见快捷键
 document.addEventListener('keydown', function (e) {
     if (e.ctrlKey && ['c', 'u', 's', 'x', 'v', 'a'].includes(e.key.toLowerCase())) {
         e.preventDefault();
@@ -1417,23 +372,22 @@ document.addEventListener('keydown', function (e) {
     }
 });
 
-
-// ==================== 主题分布配置 ====================
-// 模块四：法国历史、地理和文化
-const themeDistribution = {
-    "Grandes périodes et personnages historiques": 7,  // 历史时期和人物：7道
-    "Territoires et géographie": 7,                     // 领土和地理：7道
-    "Patrimoine français": 6                           // 法国遗产：6道
+// 主题分布：历史与人物 7 题，领土与地理 7 题，法国遗产 6 题，共 20 题
+const THEME_REQUIREMENTS = {
+    "Grandes périodes et personnages historiques": 7,
+    "Territoires et géographie": 7,
+    "Patrimoine français": 6
 };
-// 总计：20题
+const ALLOWED_THEMES = Object.keys(THEME_REQUIREMENTS);
+const TOTAL_QUESTIONS = 20;
+const PASS_SCORE = 16;
 
-// ==================== 全局变量 ====================
 let studentInfo = { name: "", testDate: "", type: "", daysLeft: 0 };
 let selectedQuestions = [];
 let currentQuestionIndex = 0;
 let userAnswers = [];
-let answeredQuestions = new Set(); // 记录已回答的题目
-let currentAnswerSubmitted = false; // 当前题目是否已提交
+let answeredQuestions = new Set();
+let currentAnswerSubmitted = false;
 
 let currentScore = 0;
 let currentPercentage = 0;
@@ -1441,18 +395,19 @@ let currentScoreText = "";
 
 let allQuestions = [];
 
-// ==================== 自定义提示窗口 ====================
 function showAlert(title, message, type = 'info') {
     const alertModal = document.getElementById('alertModal');
     const alertTitle = document.getElementById('alertTitle');
     const alertMessage = document.getElementById('alertMessage');
     const alertIcon = document.getElementById('alertIcon');
-    
-    // 设置标题和消息
+
     alertTitle.textContent = title;
     alertMessage.textContent = message;
-    
-    // 设置图标类型
+
+    // 每次打开都还原为默认的 OK 按钮（避免残留上一次的“取消/确认”按钮）
+    alertModal.querySelector('.alert-btns').innerHTML =
+        '<button class="btn btn-primary" onclick="closeAlert()">OK</button>';
+
     alertIcon.className = 'alert-icon';
     switch(type) {
         case 'success':
@@ -1473,8 +428,7 @@ function showAlert(title, message, type = 'info') {
             alertIcon.innerHTML = '<i class="fas fa-info-circle"></i>';
             break;
     }
-    
-    // 显示窗口
+
     alertModal.style.display = 'flex';
 }
 
@@ -1482,87 +436,62 @@ function closeAlert() {
     document.getElementById('alertModal').style.display = 'none';
 }
 
-// ==================== 培训信息窗口 ====================
 function showTrainingInfo() {
     const trainingTypeInfo = document.getElementById('trainingTypeInfo');
     const accessDaysInfo = document.getElementById('accessDaysInfo');
-    
-    // 根据学生类型显示不同的培训信息
-    let trainingHTML = '';
-    let difficultyNote = '';
-    let bankInfo = ''; // 新增：题库信息
-    
-    switch(studentInfo.type) {
-        case 'm': // 四年居留
-            trainingHTML = `
-                <h3><i class="fas fa-landmark-flag"></i> Formation : Histoire, Géographie et Culture Française</h3>
-                <p><strong>Public visé :</strong> Demandeurs de titre de séjour pluriannuel (2-4 ans)</p>
-                <p><strong>Target audience :</strong> Multi-year residence permit applicants (2-4 years)</p>
-                <div class="chinese">
-                    <strong>适用对象：</strong> 2-4年居留许可申请者
-                </div>
-            `;
-            bankInfo = `
-                <p><strong><i class="fas fa-database"></i> Base de questions :</strong> multi année</p>
-                <p><strong>题库来源：</strong> 多年期居留题库</p>
-            `;
-            difficultyNote = '<p><strong>Note :</strong> Questions sur les connaissances de base de l\'histoire, géographie et culture française.</p>';
-            break;
-            
-        case 'n': // 入籍
-            trainingHTML = `
-                <h3><i class="fas fa-landmark-flag"></i> Formation : Histoire, Géographie et Culture Française</h3>
-                <p><strong>Public visé :</strong> Demandeurs de nationalité française</p>
-                <p><strong>Target audience :</strong> French nationality applicants</p>
-                <div class="chinese">
-                    <strong>适用对象：</strong> 法国入籍申请者
-                </div>
-            `;
-            bankInfo = `
-                <p><strong><i class="fas fa-database"></i> Base de questions :</strong> Nationalité</p>
-                <p><strong>题库来源：</strong> 入籍题库</p>
-            `;
-            difficultyNote = '<p><strong>Note :</strong> Questions approfondies sur l\'histoire, la géographie et le patrimoine culturel français.</p>';
-            break;
-            
-        case 'r': // 十年居留
-            trainingHTML = `
-                <h3><i class="fas fa-landmark-flag"></i> Formation : Histoire, Géographie et Culture Française</h3>
-                <p><strong>Public visé :</strong> Demandeurs de carte de résident de 10 ans</p>
-                <p><strong>Target audience :</strong> 10-year resident card applicants</p>
-                <div class="chinese">
-                    <strong>适用对象：</strong> 10年居留卡申请者
-                </div>
-            `;
-            bankInfo = `
-                <p><strong><i class="fas fa-database"></i> Base de questions :</strong>Résident</p>
-                <p><strong>题库来源：</strong> 10年居留卡题库</p>
-            `;
-            difficultyNote = '<p><strong>Note :</strong> Questions sur la compréhension de l\'histoire et de la culture française.</p>';
-            break;
-            
-        case 't': // 所有类型
-            trainingHTML = `
-                <h3><i class="fas fa-landmark-flag"></i> Formation : Histoire, Géographie et Culture Française</h3>
-                <p><strong>Public visé :</strong> Tous les demandeurs (accès complet)</p>
-                <p><strong>Target audience :</strong> All applicants (full access)</p>
-                <div class="chinese">
-                    <strong>适用对象：</strong> 所有申请者（完全访问权限）
-                </div>
-            `;
-            bankInfo = `
-                <p><strong><i class="fas fa-database"></i> Base de questions :</strong> Toutes les bases </p>
-                <p><strong>题库来源：</strong> 所有题库</p>
-            `;
-            difficultyNote = '<p><strong>Note :</strong> Vous avez accès à toutes les questions sur l\'histoire, la géographie et la culture française.</p>';
-            break;
+
+    const TRAINING_TITLE = "Histoire, Géographie et Culture Française";
+    const TRAINING_ICON = "fa-landmark-flag";
+    const AUDIENCES = {
+        "m": {
+                "fr": "Demandeurs de titre de séjour pluriannuel (2-4 ans)",
+                "en": "Multi-year residence permit applicants (2-4 years)",
+                "zh": "2-4年居留许可申请者",
+                "bank": "multi année",
+                "bankZh": "多年期居留题库",
+                "note": "Questions sur les connaissances de base de l'histoire, géographie et culture française."
+        },
+        "n": {
+                "fr": "Demandeurs de nationalité française",
+                "en": "French nationality applicants",
+                "zh": "法国入籍申请者",
+                "bank": "Nationalité",
+                "bankZh": "入籍题库",
+                "note": "Questions approfondies sur l'histoire, la géographie et le patrimoine culturel français."
+        },
+        "r": {
+                "fr": "Demandeurs de carte de résident de 10 ans",
+                "en": "10-year resident card applicants",
+                "zh": "10年居留卡申请者",
+                "bank": "Résident",
+                "bankZh": "10年居留卡题库",
+                "note": "Questions sur la compréhension de l'histoire et de la culture française."
+        },
+        "t": {
+                "fr": "Tous les demandeurs (accès complet)",
+                "en": "All applicants (full access)",
+                "zh": "所有申请者（完全访问权限）",
+                "bank": "Toutes les bases",
+                "bankZh": "所有题库",
+                "note": "Vous avez accès à toutes les questions sur l'histoire, la géographie et la culture française."
+        }
+};
+    const info = AUDIENCES[studentInfo.type] || AUDIENCES.t;
+
+    let trainingHTML = `
+        <h3><i class="fas ${TRAINING_ICON}"></i> Formation : ${TRAINING_TITLE}</h3>
+        <p><strong>Public visé :</strong> ${info.fr}</p>
+        <p><strong>Target audience :</strong> ${info.en}</p>
+        <div class="chinese">
+            <strong>适用对象：</strong> ${info.zh}
+        </div>
+        <p><strong><i class="fas fa-database"></i> Base de questions :</strong> ${info.bank}</p>
+        <p><strong>题库来源：</strong> ${info.bankZh}</p>
+    `;
+    if (info.note) {
+        trainingHTML += `<p><strong>Note :</strong> ${info.note}</p>`;
     }
-    
-    // 将题库信息添加到显示内容中
-    trainingHTML += bankInfo;
-    trainingHTML += difficultyNote;
-    
-    // 添加测试具体信息
+
     trainingHTML += `
         <div style="margin-top: 15px; padding: 12px; background-color: rgba(0, 64, 128, 0.08); border-radius: 6px;">
             <p style="margin-bottom: 8px;"><strong><i class="fas fa-question-circle"></i> Test spécialisé :</strong></p>
@@ -1588,10 +517,9 @@ function showTrainingInfo() {
             </div>
         </div>
     `;
-    
+
     trainingTypeInfo.innerHTML = trainingHTML;
-    
-    // 显示剩余天数信息
+
     if (studentInfo.daysLeft > 0) {
         accessDaysInfo.style.display = 'block';
         if (studentInfo.daysLeft === 1) {
@@ -1603,8 +531,7 @@ function showTrainingInfo() {
         accessDaysInfo.style.display = 'block';
         accessDaysInfo.innerHTML = `<p><i class="fas fa-infinity"></i> Votre accès est valide <strong>sans limitation de durée</strong>.</p>`;
     }
-    
-    // 显示培训信息窗口
+
     document.getElementById('trainingInfoModal').style.display = 'flex';
 }
 
@@ -1613,199 +540,148 @@ function closeTrainingInfo() {
     startTest();
 }
 
+// 按学员类型组装题库（startTest 与 proceedWithRestart 共用）
+function buildQuestionBank() {
+    let bank = [...question_multi];
+    if (studentInfo.type === 'm') {
+        return bank;
+    }
+    if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
+        bank = bank.concat(question_resident);
+    }
+    if (studentInfo.type === 'r') {
+        return bank;
+    }
+    // 'n' 以及其他（'t'）：再加入入籍题库
+    if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
+        bank = bank.concat(question_nat);
+    }
+    return bank;
+}
 
-// ==================== 开始测试 ====================
 function startTest() {
-    // 显示加载动画
     document.getElementById('trainingInfoModal').style.display = 'none';
-    
-    // 创建加载提示
+
     showAlert("Préparation du test", "Chargement des questions en cours...", 'info');
-    
+
     setTimeout(() => {
         try {
-            // 根据学生类型选择题库
-            if (studentInfo.type === 'm') {
-                // 四年居留：只用 question_multia
-                allQuestions = [...question_multi];
-                console.log("四年居留题库：使用 question_multia，总数:", allQuestions.length);
-            } else if (studentInfo.type === 'r') {
-                // 十年居留：使用 question_multia + question_resident
-                allQuestions = [...question_multi];
-                if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
-                    allQuestions = allQuestions.concat(question_resident);
-                    console.log("十年居留题库：使用 question_multia + question_resident，总数:", allQuestions.length);
-                } else {
-                    console.warn("question_resident.js 未找到，仅使用 question_multia");
-                }
-            } else if (studentInfo.type === 'n') {
-                // 法国入籍：使用 question_multia + question_resident + question_nat
-                allQuestions = [...question_multi];
-                if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
-                    allQuestions = allQuestions.concat(question_resident);
-                }
-                if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
-                    allQuestions = allQuestions.concat(question_nat);
-                    console.log("法国入籍题库：使用 question_multia + question_resident + question_nat，总数:", allQuestions.length);
-                } else {
-                    console.warn("question_nat.js 未找到，仅使用 question_multia + question_resident");
-                }
-            } else {
-                // 完全访问：使用所有题库
-                allQuestions = [...question_multi];
-                if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
-                    allQuestions = allQuestions.concat(question_resident);
-                }
-                if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
-                    allQuestions = allQuestions.concat(question_nat);
-                }
-                console.log("完全访问题库：使用所有题库，总数:", allQuestions.length);
-            }
-            
+            allQuestions = buildQuestionBank();
+
             if (allQuestions.length === 0) {
                 throw new Error("题库为空，请检查题库文件");
             }
-            
-            // 隐藏提示窗口
+
             closeAlert();
-            
-            // 显示测试界面
+
             document.querySelector('.test-header').style.display = 'block';
             document.getElementById('testContainer').classList.add('show');
             document.querySelector('.test-footer').style.display = 'block';
-            
+
             document.getElementById('testTitle').textContent = "Histoire et Culture";
             document.getElementById('testSubtitle').textContent = "Histoire, géographie et patrimoine français";
             document.getElementById('testTypeInfo').textContent = "Test Histoire et Culture";
-            document.getElementById('footerTestInfo').textContent = 
+            document.getElementById('footerTestInfo').textContent =
                 "Histoire, géographie et culture française - 20 questions";
-            
+
             initializeTest();
-            
+
         } catch (error) {
             console.error("初始化测试失败:", error);
             showAlert("Erreur d'initialisation", error.message || "Erreur lors de l'initialisation du test.", 'error');
         }
     }, 1500);
 }
-// ==================== 根据主题分布选择题目 ====================
-function selectQuestionsByTheme() {
-    console.log("========== 开始选题 ==========");
-    console.log("学生类型:", studentInfo.type);
-    console.log("总题库大小:", allQuestions.length);
-    
-    // ========== 1. 定义允许的主题 ==========
-    const ALLOWED_THEMES = [
-        "Grandes périodes et personnages historiques",
-        "Territoires et géographie",
-        "Patrimoine français"
-    ];
-    
-    // ========== 2. 过滤：只保留允许的主题 ==========
-    const filteredQuestions = allQuestions.filter(q => {
-        const category = q.category || "Autre";
-        return ALLOWED_THEMES.includes(category);
-    });
-    
-    console.log(`📊 过滤前: ${allQuestions.length} 题`);
-    console.log(`📊 过滤后: ${filteredQuestions.length} 题 (只保留 3 个主题)`);
-    
-    // 打印各主题数量
-    const tempCount = {};
-    filteredQuestions.forEach(q => {
-        const t = q.category || "Autre";
-        tempCount[t] = (tempCount[t] || 0) + 1;
-    });
-    console.log("📋 各主题题目数量:");
-    for (const [theme, count] of Object.entries(tempCount)) {
-        console.log(`  ${theme}: ${count} 题`);
+
+// 题目所属主题（兼容 category / theme 两种字段）
+function getTheme(question) {
+    return question.category || question.theme || "Autre";
+}
+
+// 显示用的主题标签（题库里的主题名较长，直接显示全名）
+function getMainTag(theme, question) {
+    return theme;
+}
+
+function addTags(question) {
+    const category = getTheme(question);
+    const tags = [];
+
+    if (category.includes("historiques") || category.includes("personnages")) {
+        tags.push("Histoire");
+    } else if (category.includes("géographie") || category.includes("Territoires")) {
+        tags.push("Géographie");
+    } else if (category.includes("Patrimoine") || category.includes("culture")) {
+        tags.push("Patrimoine");
+    } else {
+        tags.push(category);
     }
-    
-    // 如果过滤后题目不够，报错
-    if (filteredQuestions.length < 20) {
-        console.error(`❌ 错误：过滤后只有 ${filteredQuestions.length} 题，需要 20 题`);
-        // 紧急情况：从所有题目中取
+
+    if (question.difficulté) tags.push(question.difficulté);
+    if (question.typeQuestion) tags.push(question.typeQuestion);
+
+    return {
+        ...question,
+        customTags: tags,
+        theme: category
+    };
+}
+
+function selectQuestionsByTheme() {
+    const filteredQuestions = allQuestions.filter(q => ALLOWED_THEMES.includes(getTheme(q)));
+
+    if (filteredQuestions.length < TOTAL_QUESTIONS) {
+        console.error(`❌ 错误：过滤后只有 ${filteredQuestions.length} 题，需要 ${TOTAL_QUESTIONS} 题`);
         const shuffled = shuffleArray([...allQuestions]);
-        selectedQuestions = shuffled.slice(0, 20);
-        // 添加标签后返回
-        selectedQuestions = selectedQuestions.map((question) => {
-            const category = question.category || "Autre";
-            let tags = [];
-            if (category.includes("historiques") || category.includes("personnages")) tags.push("Histoire");
-            else if (category.includes("géographie") || category.includes("Territoires")) tags.push("Géographie");
-            else if (category.includes("Patrimoine") || category.includes("culture")) tags.push("Patrimoine");
-            else tags.push(category);
-            if (question.difficulté) tags.push(question.difficulté);
-            if (question.typeQuestion) tags.push(question.typeQuestion);
-            return {
-                ...question,
-                customTags: tags,
-                theme: category
-            };
-        });
+        selectedQuestions = shuffled.slice(0, TOTAL_QUESTIONS).map(addTags);
         return;
     }
-    
-    // ========== 3. 按主题分组 ==========
-    const questionsByCategory = {};
+
+    const questionsByTheme = {};
     filteredQuestions.forEach((question) => {
-        const category = question.category || "Autre";
-        if (!questionsByCategory[category]) {
-            questionsByCategory[category] = [];
+        const theme = getTheme(question);
+        if (!questionsByTheme[theme]) {
+            questionsByTheme[theme] = [];
         }
-        questionsByCategory[category].push(question);
+        questionsByTheme[theme].push(question);
     });
-    
-    // ========== 4. 从每个主题中选题 ==========
-    const themeRequirements = {
-        "Grandes périodes et personnages historiques": 7,
-        "Territoires et géographie": 7,
-        "Patrimoine français": 6
-    };
-    
+
     selectedQuestions = [];
     let totalSelected = 0;
-    
-    for (const [theme, requiredCount] of Object.entries(themeRequirements)) {
-        const available = questionsByCategory[theme] || [];
+
+    for (const [theme, requiredCount] of Object.entries(THEME_REQUIREMENTS)) {
+        const available = questionsByTheme[theme] || [];
         if (available.length === 0) {
             console.warn(`⚠️ 主题 "${theme}" 没有题目！`);
             continue;
         }
-        
+
         const shuffled = shuffleArray([...available]);
         const toAdd = shuffled.slice(0, Math.min(requiredCount, available.length));
         selectedQuestions.push(...toAdd);
         totalSelected += toAdd.length;
-        console.log(`✅ "${theme}" 选中 ${toAdd.length} 题 (共 ${available.length} 题)`);
     }
-    
-    console.log(`📊 已选 ${totalSelected} 题`);
-    
-    // ========== 5. 如果不够 20 题，从允许的主题中补充（关键修改） ==========
-    if (totalSelected < 20) {
-        const needed = 20 - totalSelected;
+
+    if (totalSelected < TOTAL_QUESTIONS) {
+        const needed = TOTAL_QUESTIONS - totalSelected;
         const selectedSet = new Set(selectedQuestions);
         const extraPool = [];
-        
-        // 🔥 只从允许的主题中补充
+
         for (const theme of ALLOWED_THEMES) {
-            const available = (questionsByCategory[theme] || []).filter(q => !selectedSet.has(q));
+            const available = (questionsByTheme[theme] || []).filter(q => !selectedSet.has(q));
             extraPool.push(...available);
         }
-        
+
         if (extraPool.length > 0) {
             const shuffled = shuffleArray(extraPool);
             const toAdd = shuffled.slice(0, Math.min(needed, extraPool.length));
             selectedQuestions.push(...toAdd);
             totalSelected += toAdd.length;
-            console.log(`🔄 从允许主题补充了 ${toAdd.length} 题`);
         }
     }
-    
-    // ========== 6. 如果还是不够，从所有题目中强行补足（紧急情况） ==========
-    if (totalSelected < 20) {
-        const needed = 20 - totalSelected;
+
+    if (totalSelected < TOTAL_QUESTIONS) {
+        const needed = TOTAL_QUESTIONS - totalSelected;
         const selectedSet = new Set(selectedQuestions);
         const allAvailable = allQuestions.filter(q => !selectedSet.has(q));
         if (allAvailable.length > 0) {
@@ -1815,53 +691,14 @@ function selectQuestionsByTheme() {
             console.warn(`⚠️ 紧急：从所有题目补充了 ${toAdd.length} 题（可能混入其他主题）`);
         }
     }
-    
-    // ========== 7. 截取前 20 题 ==========
-    if (selectedQuestions.length > 20) {
-        selectedQuestions = selectedQuestions.slice(0, 20);
+
+    if (selectedQuestions.length > TOTAL_QUESTIONS) {
+        selectedQuestions = selectedQuestions.slice(0, TOTAL_QUESTIONS);
     }
-    
-    // ========== 8. 打乱顺序 ==========
-    selectedQuestions = shuffleArray(selectedQuestions);
-    
-    console.log(`🎯 最终选择 ${selectedQuestions.length} 题`);
-    
-    // ========== 9. 打印选中的主题分布 ==========
-    const finalThemes = {};
-    selectedQuestions.forEach(q => {
-        const t = q.category || "Autre";
-        finalThemes[t] = (finalThemes[t] || 0) + 1;
-    });
-    console.log("📋 选中的主题分布:", finalThemes);
-    
-    // ========== 10. 添加标签 ==========
-    selectedQuestions = selectedQuestions.map((question) => {
-        const category = question.category || "Autre";
-        let tags = [];
-        
-        if (category.includes("historiques") || category.includes("personnages")) {
-            tags.push("Histoire");
-        } else if (category.includes("géographie") || category.includes("Territoires")) {
-            tags.push("Géographie");
-        } else if (category.includes("Patrimoine") || category.includes("culture")) {
-            tags.push("Patrimoine");
-        } else {
-            tags.push(category);
-        }
-        
-        if (question.difficulté) tags.push(question.difficulté);
-        if (question.typeQuestion) tags.push(question.typeQuestion);
-        
-        return {
-            ...question,
-            customTags: tags,
-            theme: category
-        };
-    });
-    
-    console.log("========== 选题完成 ==========");
+
+    selectedQuestions = shuffleArray(selectedQuestions).map(addTags);
 }
-// Fisher-Yates 洗牌算法
+
 function shuffleArray(array) {
     const newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -1871,78 +708,57 @@ function shuffleArray(array) {
     return newArray;
 }
 
-// ==================== 显示题目 - 修改为一道题一道题的交互模式 ====================
 function showQuestion(index) {
     if (!selectedQuestions[index]) {
         console.error("题目不存在:", index);
         return;
     }
-    
+
     const question = selectedQuestions[index];
-    
-    // 重置当前题目状态
+
     currentAnswerSubmitted = answeredQuestions.has(index);
-    
-    // 显示题目元数据标签 - 只显示一份
+
     const questionMeta = document.getElementById('questionMeta');
     questionMeta.innerHTML = '';
-    
-    // 添加主题标签（只显示一个主要标签）
+
     const theme = question.theme || question.category || "Autre";
-    
-    // 根据主题判断显示哪个标签
-    let mainTag = '';
-    if (theme.includes("Laïcité")) {
-        mainTag = 'Laïcité';
-    } else if (theme.includes("Devise") || theme.includes("symboles")) {
-        mainTag = 'Symboles';
-    } else if (theme.includes("Mises en situation") || (question.id && question.id.toLowerCase().startsWith("si"))) {
-        mainTag = 'Situation';
-    } else {
-        mainTag = theme;
-    }
-    
-    // 添加主题标签
+    const mainTag = getMainTag(theme, question);
+
     const themeTag = document.createElement('span');
     themeTag.className = 'question-tag tag-theme';
     themeTag.innerHTML = `<i class="fas fa-tag"></i> ${mainTag}`;
     questionMeta.appendChild(themeTag);
-    
-    // 添加难度标签（如果存在）
+
     if (question.difficulté) {
         const difficultyTag = document.createElement('span');
         difficultyTag.className = 'question-tag tag-difficulty';
         difficultyTag.innerHTML = `<i class="fas fa-chart-line"></i> ${question.difficulté}`;
         questionMeta.appendChild(difficultyTag);
     }
-    
-    // 添加类型标签（如果存在）
+
     if (question.typeQuestion) {
         const typeTag = document.createElement('span');
         typeTag.className = 'question-tag tag-type';
         typeTag.innerHTML = `<i class="fas fa-question-circle"></i> ${question.typeQuestion}`;
         questionMeta.appendChild(typeTag);
     }
-    
-    // 显示题目文本
+
     document.getElementById('questionText').textContent = `${index + 1}. ${question.question}`;
-    
+
     const optionsContainer = document.getElementById('optionsContainer');
     optionsContainer.innerHTML = '';
-    
+
     if (!question.options || question.options.length === 0) {
         console.error("题目选项为空:", question);
         return;
     }
-    
-    // 为选项分配ABCD标签
+
     const optionLetters = ['A', 'B', 'C', 'D'];
-    
+
     question.options.forEach((option, optionIndex) => {
         const optionDiv = document.createElement('div');
         optionDiv.className = 'option';
-        
-        // 如果已经回答了这道题，显示答案状态
+
         if (currentAnswerSubmitted) {
             if (optionIndex === question.answer) {
                 optionDiv.classList.add('correct');
@@ -1953,13 +769,11 @@ function showQuestion(index) {
         } else if (userAnswers[index] === optionIndex) {
             optionDiv.classList.add('selected');
         }
-        
-        // 创建选项字母标签
+
         const letterSpan = document.createElement('span');
         letterSpan.className = 'option-letter';
         letterSpan.textContent = optionLetters[optionIndex];
-        
-        // 隐藏的radio input
+
         const input = document.createElement('input');
         input.type = 'radio';
         input.name = 'question';
@@ -1968,18 +782,16 @@ function showQuestion(index) {
         if (userAnswers[index] === optionIndex) {
             input.checked = true;
         }
-        
+
         const label = document.createElement('label');
         label.htmlFor = `option${index}_${optionIndex}`;
-        
-        // 添加选项内容
+
         label.appendChild(letterSpan);
         label.appendChild(document.createTextNode(option));
-        
+
         optionDiv.appendChild(input);
         optionDiv.appendChild(label);
-        
-        // 如果还没有提交答案，可以点击选择
+
         if (!currentAnswerSubmitted) {
             optionDiv.addEventListener('click', () => {
                 userAnswers[index] = optionIndex;
@@ -1987,28 +799,23 @@ function showQuestion(index) {
                 document.getElementById('submitBtn').style.display = 'block';
             });
         }
-        
+
         optionsContainer.appendChild(optionDiv);
     });
-    
-    // 显示或隐藏提交按钮
-    document.getElementById('submitBtn').style.display = 
+
+    document.getElementById('submitBtn').style.display =
         (!currentAnswerSubmitted && userAnswers[index] !== null) ? 'block' : 'none';
-    
-    // 显示或隐藏下一题按钮
-    document.getElementById('nextQuestionBtn').style.display = 
+
+    document.getElementById('nextQuestionBtn').style.display =
         (currentAnswerSubmitted) ? 'block' : 'none';
-    
-    // 显示或隐藏完成测试按钮（最后一题）
-    document.getElementById('finishTestBtn').style.display = 
+
+    document.getElementById('finishTestBtn').style.display =
         (index === selectedQuestions.length - 1 && answeredQuestions.size === selectedQuestions.length) ? 'block' : 'none';
-    
+
     document.getElementById('prevBtn').disabled = index === 0;
-    
-    // 更新导航按钮状态
+
     updateNavigationButtons();
-    
-    // 显示答案反馈（如果已经提交）
+
     if (currentAnswerSubmitted) {
         showAnswerFeedback(index);
     } else {
@@ -2016,16 +823,86 @@ function showQuestion(index) {
     }
 }
 
-// ==================== 显示答案反馈 ====================
+// 把解析文字整理成易读的段落 / 列表
+function formatExplanation(raw) {
+    if (!raw) return '';
+    const text = String(raw).trim();
+    // 题库里已经写了 HTML 结构时，原样输出
+    if (/<(p|ul|ol|li|br|div)\b/i.test(text)) return text;
+
+    let lines = text.split(/\n+/).map(s => s.trim()).filter(Boolean);
+
+    // 只有一大段时，按句子切开，每 2 句一段
+    if (lines.length === 1 && lines[0].length > 220) {
+        const sentences = lines[0]
+            .replace(/([.!?])\s+(?=[A-ZÉÈÀÂÊÎÔÛÇ«"])/g, '$1\u0001')
+            .split('\u0001');
+        if (sentences.length > 2) {
+            lines = [];
+            for (let i = 0; i < sentences.length; i += 2) {
+                lines.push(sentences.slice(i, i + 2).join(' '));
+            }
+        }
+    }
+
+    let html = '';
+    let list = [];
+    const flushList = () => {
+        if (list.length) {
+            html += '<ul>' + list.map(li => `<li>${li}</li>`).join('') + '</ul>';
+            list = [];
+        }
+    };
+    lines.forEach(line => {
+        const m = line.match(/^[-•·*]\s+(.*)$/);
+        if (m) {
+            list.push(m[1]);
+        } else {
+            flushList();
+            html += `<p>${line}</p>`;
+        }
+    });
+    flushList();
+    return html;
+}
+
 function showAnswerFeedback(index) {
     const question = selectedQuestions[index];
     const userAnswer = userAnswers[index];
     const isCorrect = userAnswer === question.answer;
     const feedbackDiv = document.getElementById('answerFeedback');
-    
+    const letters = ['A', 'B', 'C', 'D'];
+
     feedbackDiv.className = `answer-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
-    
-    const feedbackHTML = `
+
+    const userOption = (userAnswer !== null && question.options[userAnswer] !== undefined)
+        ? question.options[userAnswer] : null;
+
+    const wrongRow = (!isCorrect && userOption !== null) ? `
+        <div class="fb-row bad">
+            <span class="fb-letter">${letters[userAnswer]}</span>
+            <div>
+                <div class="fb-label">Votre réponse</div>
+                <div class="fb-text">${userOption}</div>
+            </div>
+        </div>` : '';
+
+    const goodRow = `
+        <div class="fb-row good">
+            <span class="fb-letter">${letters[question.answer]}</span>
+            <div>
+                <div class="fb-label">Bonne réponse</div>
+                <div class="fb-text">${question.options[question.answer]}</div>
+            </div>
+        </div>`;
+
+    const explainBlock = question.explanation ? `
+        <div class="fb-explain">
+            <h5><i class="fas fa-lightbulb"></i> Explication</h5>
+            ${formatExplanation(question.explanation)}
+        </div>` : '';
+
+    feedbackDiv.innerHTML = `
         <div class="feedback-header">
             <div class="feedback-icon ${isCorrect ? 'correct' : 'incorrect'}">
                 ${isCorrect ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>'}
@@ -2034,57 +911,44 @@ function showAnswerFeedback(index) {
                 ${isCorrect ? 'Correct!' : 'Incorrect!'}
             </div>
         </div>
-        ${question.explanation ? `
-            <div class="feedback-explanation">
-                <strong>Explication :</strong> ${question.explanation}
-            </div>
-        ` : ''}
+        <div class="fb-answers">${wrongRow}${goodRow}</div>
+        ${explainBlock}
     `;
-    
-    feedbackDiv.innerHTML = feedbackHTML;
     feedbackDiv.style.display = 'block';
-    
-    // 滚动到反馈区域
+
     setTimeout(() => {
         feedbackDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 300);
 }
 
-// ==================== 提交当前题目答案 ====================
 function submitCurrentQuestion() {
     if (userAnswers[currentQuestionIndex] === null) {
         showAlert("Sélection requise", "Veuillez sélectionner une réponse avant de valider.", 'warning');
         return;
     }
-    
-    // 标记此题已提交
+
     answeredQuestions.add(currentQuestionIndex);
     currentAnswerSubmitted = true;
-    
-    // 显示答案反馈
+
     showAnswerFeedback(currentQuestionIndex);
-    
-    // 更新界面
+
     showQuestion(currentQuestionIndex);
     updateQuestionCounter();
-    
-    // 如果是最后一题，显示完成测试按钮
+
     if (currentQuestionIndex === selectedQuestions.length - 1) {
         document.getElementById('finishTestBtn').style.display = 'block';
     }
 }
 
-// ==================== 创建题目地图 ====================
 function createQuestionMap() {
     const questionMap = document.getElementById('questionMap');
     questionMap.innerHTML = '';
-    
+
     for (let i = 0; i < selectedQuestions.length; i++) {
         const mapItem = document.createElement('div');
         mapItem.className = 'map-item';
         mapItem.textContent = i + 1;
-        
-        // 设置状态
+
         if (!answeredQuestions.has(i)) {
             mapItem.classList.add('unanswered');
         } else {
@@ -2095,24 +959,22 @@ function createQuestionMap() {
                 mapItem.classList.add('incorrect');
             }
         }
-        
-        // 添加点击事件
+
         mapItem.addEventListener('click', () => {
             showQuestionReview(i);
         });
-        
+
         questionMap.appendChild(mapItem);
     }
 }
 
-// ==================== 显示题目回顾 ====================
 function showQuestionReview(index) {
     const questionReview = document.getElementById('questionReview');
     const question = selectedQuestions[index];
     const userAnswerIndex = userAnswers[index];
     const isCorrect = userAnswerIndex === question.answer;
     const optionLetters = ['A', 'B', 'C', 'D'];
-    
+
     let reviewHTML = `
         <div class="review-header">
             <h4>Question ${index + 1} - ${question.theme || question.category || "Autre"}</h4>
@@ -2123,17 +985,16 @@ function showQuestionReview(index) {
         <div class="review-question">${question.question}</div>
         <div class="review-options">
     `;
-    
-    // 显示所有选项
+
     question.options.forEach((option, optionIndex) => {
         let optionClass = 'review-option';
         let badgeText = '';
-        
+
         if (optionIndex === question.answer) {
             optionClass += ' correct-answer';
             badgeText = 'Réponse correcte';
         }
-        
+
         if (optionIndex === userAnswerIndex) {
             optionClass += ' user-answer';
             if (optionIndex !== question.answer) {
@@ -2143,7 +1004,7 @@ function showQuestionReview(index) {
                 badgeText = 'Votre réponse (correcte)';
             }
         }
-        
+
         reviewHTML += `
             <div class="${optionClass}">
                 <span class="review-option-label">${optionLetters[optionIndex]}</span>
@@ -2152,38 +1013,33 @@ function showQuestionReview(index) {
             </div>
         `;
     });
-    
+
     reviewHTML += `
         </div>
     `;
-    
-    // 添加解释
+
     if (question.explanation) {
         reviewHTML += `
             <div class="review-explanation">
-                <h5>Explication</h5>
-                <p>${question.explanation}</p>
+                <h5><i class="fas fa-lightbulb" style="color: var(--orange);"></i> Explication</h5>
+                ${formatExplanation(question.explanation)}
             </div>
         `;
     }
-    
+
     questionReview.innerHTML = reviewHTML;
     questionReview.classList.add('active');
-    
-    // 滚动到回顾区域
+
     questionReview.scrollIntoView({ behavior: 'smooth' });
 }
 
-// ==================== 提交和评分 ====================
 function submitTest() {
-    // 检查是否所有题目都已回答
     if (answeredQuestions.size < selectedQuestions.length) {
         const unanswered = selectedQuestions.length - answeredQuestions.size;
-        showAlert("Questions non répondues", 
-            `${unanswered} question(s) non répondues. Souhaitez-vous soumettre quand même?`, 
+        showAlert("Questions non répondues",
+            `${unanswered} question(s) non répondues. Souhaitez-vous soumettre quand même?`,
             'warning');
-        
-        // 创建一个确认按钮
+
         setTimeout(() => {
             const alertBtns = document.querySelector('.alert-btns');
             alertBtns.innerHTML = `
@@ -2193,35 +1049,30 @@ function submitTest() {
         }, 100);
         return;
     }
-    
+
     proceedWithSubmission();
 }
 
-// 在文件末尾添加错题记录函数
 async function recordMistakesToDatabase() {
-    console.log('开始记录错题到数据库...');
-    
     try {
         if (!window.supabaseAuth || !window.supabaseAuth.recordMistake) {
             console.warn('Supabase错题记录功能不可用');
             return;
         }
-        
-        // 确保 studentInfo 有 name
+
         if (!studentInfo.name || studentInfo.name === "Visiteur") {
             console.warn('学生姓名未知，无法记录错题');
             return;
         }
-        
+
         let recordedCount = 0;
-        
+
         for (let i = 0; i < selectedQuestions.length; i++) {
             if (userAnswers[i] !== selectedQuestions[i].answer) {
                 try {
                     const userAnswer = userAnswers[i] !== null ? userAnswers[i] : -1;
-                    
+
                     const questionToSave = { ...selectedQuestions[i] };
-                    // 确保有 difficulty 属性
                     if (!questionToSave.difficulty && questionToSave['difficulté']) {
                         questionToSave.difficulty = questionToSave['difficulté'];
                     }
@@ -2230,7 +1081,7 @@ async function recordMistakesToDatabase() {
                         studentInfo,
                         questionToSave,
                         userAnswer,
-                        'culture_francaise'  // 测试类型标识
+                        'culture_francaise'
                     );
                     if (result) {
                         recordedCount++;
@@ -2240,9 +1091,9 @@ async function recordMistakesToDatabase() {
                 }
             }
         }
-        
+
         console.log(`错题记录完成: ${recordedCount} 题`);
-        
+
     } catch (error) {
         console.error('记录错题过程失败:', error);
     }
@@ -2250,13 +1101,12 @@ async function recordMistakesToDatabase() {
 
 function proceedWithSubmission() {
     calculateScore();
-    
-    // 🔥 构建成绩数据
+
     const testResult = {
         score: currentScore,
         total: selectedQuestions.length,
         percentage: currentPercentage,
-        passed: currentScore >= 16,
+        passed: currentScore >= PASS_SCORE,
         testType: 'culture_francaise',
         duration: 0,
         questions: selectedQuestions.map((q, i) => ({
@@ -2266,10 +1116,7 @@ function proceedWithSubmission() {
             isCorrect: userAnswers[i] === q.answer
         }))
     };
-    
-    console.log('📊 准备记录成绩:', testResult);
-    
-    // 🔥 保存成绩到 Supabase
+
     if (window.supabaseAuth && window.supabaseAuth.recordTestScore) {
         window.supabaseAuth.recordTestScore(studentInfo, testResult)
             .then(result => {
@@ -2288,8 +1135,7 @@ function proceedWithSubmission() {
         console.warn('⚠️ Supabase成绩记录功能不可用，保存到本地');
         saveScoreToLocalOnly(testResult);
     }
-    
-    // 记录错题
+
     recordMistakesToDatabase().then(() => {
         displayResults();
     }).catch(error => {
@@ -2298,12 +1144,11 @@ function proceedWithSubmission() {
     });
 }
 
-// ==================== 本地保存成绩 ====================
 function saveScoreToLocalOnly(testResult) {
     try {
         const key = `test_scores_${studentInfo.name || 'guest'}`;
         const existing = JSON.parse(localStorage.getItem(key) || '[]');
-        
+
         const record = {
             id: `local_${Date.now()}`,
             student_name: studentInfo.name || 'Étudiant',
@@ -2315,10 +1160,9 @@ function saveScoreToLocalOnly(testResult) {
             test_date: new Date().toISOString(),
             local_only: true
         };
-        
+
         existing.push(record);
         localStorage.setItem(key, JSON.stringify(existing));
-        console.log('💾 成绩已保存到本地');
         return record;
     } catch (e) {
         console.error('❌ 本地保存失败:', e);
@@ -2328,74 +1172,68 @@ function saveScoreToLocalOnly(testResult) {
 
 function calculateScore() {
     let correct = 0;
-    
+
     selectedQuestions.forEach((question, index) => {
         if (userAnswers[index] === question.answer) {
             correct++;
         }
     });
-    
+
     currentScore = correct;
     currentPercentage = Math.round((correct / selectedQuestions.length) * 100);
-    
-    // 显示通过/不通过，同时显示具体分数
-    const passed = correct >= 16; // 80% of 20 = 16
-    
-    // 添加烟花或心碎效果
+
+    const passed = correct >= PASS_SCORE;
+
     if (passed) {
         currentScoreText = `🎉 Félicitations! Vous avez réussi le test! 🎉`;
     } else {
         currentScoreText = `💔 Désolé, vous n'avez pas réussi le test. 💔`;
     }
-    
-    // 添加分数详情
+
     currentScoreText += `\nScore: ${correct}/20 (${currentPercentage}%)`;
 }
 
 function displayResults() {
     document.getElementById('testContainer').style.display = 'none';
-    
-    // 显示分数
+
     document.getElementById('scoreDisplay').style.display = 'block';
     document.getElementById('scoreDisplay').textContent = `${currentScore}/20`;
-    
-    document.getElementById('scoreText').textContent = currentScoreText;
-    document.getElementById('scoreText').style.fontSize = '1.5rem';
-    document.getElementById('scoreText').style.fontWeight = 'bold';
-    document.getElementById('scoreText').style.marginTop = '10px';
-    document.getElementById('scoreText').style.marginBottom = '20px';
-    document.getElementById('scoreText').style.whiteSpace = 'pre-line';
-    
-    // 应用动画效果
+
+    const scoreTextEl = document.getElementById('scoreText');
+    scoreTextEl.textContent = currentScoreText;
+    scoreTextEl.style.fontSize = '1.5rem';
+    scoreTextEl.style.fontWeight = 'bold';
+    scoreTextEl.style.marginTop = '10px';
+    scoreTextEl.style.marginBottom = '20px';
+    scoreTextEl.style.whiteSpace = 'pre-line';
+
+    scoreTextEl.classList.remove('fireworks', 'heartbreak');
     if (currentScoreText.includes("🎉")) {
-        document.getElementById('scoreText').classList.add('fireworks');
+        scoreTextEl.classList.add('fireworks');
     } else if (currentScoreText.includes("💔")) {
-        document.getElementById('scoreText').classList.add('heartbreak');
+        scoreTextEl.classList.add('heartbreak');
     }
-    
-    // 显示进度条
+
     document.querySelector('.score-bar').style.display = 'block';
+    document.getElementById('scoreFill').style.width = '0%';
     setTimeout(() => {
         document.getElementById('scoreFill').style.width = currentPercentage + '%';
     }, 300);
-    
-    // 创建题目地图
+
     createQuestionMap();
-    
+
     document.getElementById('resultsContainer').classList.add('show');
-    
-    // 滚动到结果区域
+
     setTimeout(() => {
         document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth' });
     }, 500);
 }
 
-// ==================== 其他功能 ====================
 function restartTest() {
-    showAlert("Recommencer le test", 
-        "Voulez-vous vraiment recommencer le test? Vos réponses actuelles seront perdues.", 
+    showAlert("Recommencer le test",
+        "Voulez-vous vraiment recommencer le test? Vos réponses actuelles seront perdues.",
         'warning');
-    
+
     setTimeout(() => {
         const alertBtns = document.querySelector('.alert-btns');
         alertBtns.innerHTML = `
@@ -2406,63 +1244,30 @@ function restartTest() {
 }
 
 function proceedWithRestart() {
-    // 重新根据学生类型加载题库
-    if (studentInfo.type === 'm') {
-        // 四年居留：只用 question_multia
-        allQuestions = [...question_multi];
-        console.log("重新加载四年居留题库：", allQuestions.length);
-    } else if (studentInfo.type === 'r') {
-        // 十年居留：使用 question_multia + question_resident
-        allQuestions = [...question_multi];
-        if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
-            allQuestions = allQuestions.concat(question_resident);
-            console.log("重新加载十年居留题库：", allQuestions.length);
-        }
-    } else if (studentInfo.type === 'n') {
-        // 法国入籍：使用 question_multia + question_resident + question_nat
-        allQuestions = [...question_multi];
-        if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
-            allQuestions = allQuestions.concat(question_resident);
-        }
-        if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
-            allQuestions = allQuestions.concat(question_nat);
-            console.log("重新加载法国入籍题库：", allQuestions.length);
-        }
-    } else {
-        // 完全访问：使用所有题库
-        allQuestions = [...question_multi];
-        if (typeof question_resident !== 'undefined' && question_resident.length > 0) {
-            allQuestions = allQuestions.concat(question_resident);
-        }
-        if (typeof question_nat !== 'undefined' && question_nat.length > 0) {
-            allQuestions = allQuestions.concat(question_nat);
-        }
-        console.log("重新加载完全访问题库：", allQuestions.length);
-    }
-    
-    // 完全重新初始化
+    allQuestions = buildQuestionBank();
+
     currentQuestionIndex = 0;
     answeredQuestions.clear();
     currentAnswerSubmitted = false;
-    
+
     document.getElementById('resultsContainer').classList.remove('show');
     document.getElementById('questionReview').classList.remove('active');
     document.getElementById('testContainer').style.display = 'block';
-    
-    // 重新选择题目
+
     selectQuestionsByTheme();
     userAnswers = new Array(selectedQuestions.length).fill(null);
-    
+
     document.getElementById('totalQuestions').textContent = selectedQuestions.length;
-    
+
     showQuestion(currentQuestionIndex);
     updateQuestionCounter();
-    
+
     window.scrollTo(0, 0);
 }
+
 function showInstructions() {
     showAlert("Instructions du test",
-        "TEST DES VALEURS RÉPUBLICAINES ET LAÏCITÉ\n\n" +
+        "TEST HISTOIRE, GÉOGRAPHIE ET CULTURE FRANÇAISE\n\n" +
         "1. 20 questions à choix multiples\n" +
         "2. Pas de limite de temps\n" +
         "3. Cliquez sur une réponse pour la sélectionner\n" +
@@ -2474,10 +1279,10 @@ function showInstructions() {
 }
 
 function goBackToHome() {
-    showAlert("Quitter le test", 
-        "Êtes-vous sûr de vouloir quitter? Votre progression sera perdue.", 
+    showAlert("Quitter le test",
+        "Êtes-vous sûr de vouloir quitter? Votre progression sera perdue.",
         'warning');
-    
+
     setTimeout(() => {
         const alertBtns = document.querySelector('.alert-btns');
         alertBtns.innerHTML = `
@@ -2487,7 +1292,6 @@ function goBackToHome() {
     }, 100);
 }
 
-// ==================== 导航函数 ====================
 function nextQuestion() {
     if (currentQuestionIndex < selectedQuestions.length - 1) {
         currentQuestionIndex++;
@@ -2507,7 +1311,7 @@ function previousQuestion() {
 function updateQuestionCounter() {
     const answeredCount = answeredQuestions.size;
     const answeredPercent = Math.round((answeredCount / selectedQuestions.length) * 100);
-    
+
     document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
     document.getElementById('progressPercent').textContent = answeredPercent + '%';
     document.getElementById('progressFill').style.width = answeredPercent + '%';
@@ -2517,49 +1321,34 @@ function updateNavigationButtons() {
     document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
 }
 
-// ==================== 初始化 ====================
 function initializeTest() {
-    // 重置所有状态
     currentQuestionIndex = 0;
     userAnswers = [];
     answeredQuestions.clear();
     currentAnswerSubmitted = false;
-    
-    // 根据主题分布选择题目
+
     selectQuestionsByTheme();
-    
-    // 初始化用户答案数组
+
     userAnswers = new Array(selectedQuestions.length).fill(null);
-    
-    // 更新界面
+
     document.getElementById('totalQuestions').textContent = selectedQuestions.length;
-    
+
     showQuestion(currentQuestionIndex);
     updateQuestionCounter();
-    
+
     window.scrollTo(0, 0);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("页面加载完成");
-    
-    // 从URL获取参数
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
-    const type = urlParams.get('type');
-    
-    console.log("URL参数:", { token, type });
-    
-    // ============ 未登录 → 404 ============
+
     if (!token) {
-        console.log("无 token，跳转到 404");
         window.location.replace('404.html');
         return;
     }
-    // ============ 404 逻辑结束 ============
-    
+
     try {
-        // 解析token
         let userData;
         try {
             const utf8String = atob(token);
@@ -2568,23 +1357,18 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (e) {
             userData = JSON.parse(atob(token));
         }
-        
-        // 填充学生信息
+
         studentInfo = {
             name: userData.name || userData.userId || "Étudiant",
             testDate: new Date().toLocaleString('fr-FR'),
-            type: userData.type || "t",   // ⚠️ 只从 token 读，不再接受 URL 参数
+            type: userData.type || "t",
             daysLeft: userData.daysLeft || -1
         };
-        
-        console.log("学生信息:", studentInfo);
-        
-        // 直接显示培训信息窗口
+
         showTrainingInfo();
-        
+
     } catch (e) {
         console.error("Token解析失败:", e);
-        // token 无效 → 也跳 404
         window.location.replace('404.html');
     }
 });
