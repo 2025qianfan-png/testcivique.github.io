@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Examen Civique Français - Association Mille Voiles</title>
-    <link rel="icon" href="icons/icon-192x192.png" type="image/png">
+    <meta name="description" content="Préparez l'examen civique français : tests en ligne, annales, thématiques et mises en situation. Association Mille Voiles / 千帆协会.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Examen Civique Français - Association Mille Voiles">
+    <meta property="og:description" content="Tests en ligne, annales et mises en situation pour réussir l'examen civique. 公民考试在线备考。">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="examen-civique.css">
@@ -25,15 +28,6 @@
     </script>
 </head>
 <body>
-    <div class="language-toggle">
-        <button class="lang-btn active" id="langFr" onclick="switchLanguage('fr')">
-            <i class="fas fa-language"></i> FR
-        </button>
-        <button class="lang-btn" id="langZh" onclick="switchLanguage('zh')">
-            <i class="fas fa-language"></i> 中文
-        </button>
-    </div>
-
     <header class="main-header">
         <div class="container">
             <h1 id="mainTitle">Examen Civique Français</h1>
@@ -43,7 +37,7 @@
 
     <nav class="main-nav">
         <div class="container nav-container">
-            <button class="hamburger" id="hamburgerBtn">
+            <button class="hamburger" id="hamburgerBtn" aria-label="Menu" aria-controls="navLinks">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -81,19 +75,30 @@
                     </div>
                 </div>
             </div>
+            <div class="language-toggle" role="group" aria-label="Langue / 语言">
+                <button class="lang-btn active" id="langFr" onclick="switchLanguage('fr')" aria-label="Français" aria-pressed="true">
+                    <i class="fas fa-language" aria-hidden="true"></i> FR
+                </button>
+                <button class="lang-btn" id="langZh" onclick="switchLanguage('zh')" aria-label="中文" aria-pressed="false">
+                    <i class="fas fa-language" aria-hidden="true"></i> 中文
+                </button>
+            </div>
         </div>
     </nav>
 
     <section class="hero" id="accueil">
         <div class="container">
             <h2 id="heroTitle">Préparez-vous à l'examen civique 2026</h2>
-            <p id="heroText">À partir du 1er janvier 2026, tous les étrangers souhaitant obtenir une carte de séjour pluriannuelle, une carte de résident ou la naturalisation française devront réussir un examen civique. Préparez-vous dès maintenant avec nos tests en ligne.</p>
-            <a href="#tests" class="btn btn-primary" id="heroBtn">Commencer maintenant</a>
+            <p id="heroText">Depuis le 1er janvier 2026, tous les étrangers souhaitant obtenir une carte de séjour pluriannuelle, une carte de résident ou la naturalisation française doivent réussir un examen civique. Préparez-vous dès maintenant avec nos tests en ligne.</p>
+            <div class="hero-actions">
+                <a href="#tests" class="btn btn-primary" id="heroBtn">Commencer maintenant</a>
+                <a href="#formations" class="btn btn-outline-light" id="heroBtn2">Voir les formations</a>
+            </div>
         </div>
     </section>
 
     <!-- ==================== 课程介绍 ==================== -->
-    <section class="course-intro">
+    <section class="course-intro" id="formations">
         <div class="container">
             <div class="section-title">
                 <h2 id="courseTitle">📚 Nos formations civiques</h2>
@@ -192,17 +197,17 @@
             <div class="kpi-cards">
                 <div class="kpi-card">
                     <div class="kpi-card-icon">👨‍🎓</div>
-                    <div class="kpi-card-number"><span id="statStudentNumber">0</span></div>
+                    <div class="kpi-card-number"><span id="statStudentNumber">—</span></div>
                     <div class="kpi-card-label" id="statStudentLabel">Élèves</div>
                 </div>
-                <div class="kpi-card">
+                <div class="kpi-card" id="kpiSuccessCard" hidden>
                     <div class="kpi-card-icon">✅</div>
                     <div class="kpi-card-number"><span id="statSuccessRate">0</span><span class="kpi-percent">%</span></div>
                     <div class="kpi-card-label" id="statSuccessLabel">Taux de réussite <span style="font-size:0.6rem;opacity:0.7;display:block;">(1er passage)</span></div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-card-icon">⭐</div>
-                    <div class="kpi-card-number"><span id="fbAvgScoreStat">0.0</span></div>
+                    <div class="kpi-card-number"><span id="fbAvgScoreStat">—</span></div>
                     <div class="kpi-card-label" id="fbAvgLabelStat">Évaluations</div>
                 </div>
             </div>
@@ -261,7 +266,7 @@
                     </div>
                     <div class="card-body">
                         <ul class="features-list">
-                            <li><i class="fas fa-check"></i> <span id="annalesFeature1">20 questions officielles</span></li>
+                            <li><i class="fas fa-check"></i> <span id="annalesFeature1">40 questions officielles</span></li>
                             <li><i class="fas fa-check"></i> <span id="annalesFeature2">Correction immédiate</span></li>
                             <li><i class="fas fa-check"></i> <span id="annalesFeature3">Explications détaillées</span></li>
                             <li><i class="fas fa-check"></i> <span id="annalesFeature4">Statistiques de réussite</span></li>
@@ -415,7 +420,7 @@
                     </div>
                 </div>
                 <div class="content-section">
-                    <p id="introPara">Pour obtenir une carte de séjour pluriannuelle, une carte de résident ou la naturalisation française, les étrangers devront avoir réussi un examen civique à compter du 1er janvier 2026. Ce test vise notamment à évaluer leur connaissance des principes et valeurs de la République, ainsi que des droits et devoirs des personnes résidant en France.</p>
+                    <p id="introPara">Pour obtenir une carte de séjour pluriannuelle, une carte de résident ou la naturalisation française, les étrangers doivent avoir réussi un examen civique depuis le 1er janvier 2026. Ce test vise notamment à évaluer leur connaissance des principes et valeurs de la République, ainsi que des droits et devoirs des personnes résidant en France.</p>
                 </div>
                 <div class="content-section">
                     <h3 id="section1Title">Contexte légal</h3>
@@ -424,9 +429,9 @@
                 </div>
                 <div class="content-section">
                     <h3 id="section2Title">Qui est concerné ?</h3>
-                    <p id="section2Text1">À partir du 1er janvier 2026, la réussite à cet examen sera obligatoire pour :</p>
+                    <p id="section2Text1">Depuis le 1er janvier 2026, la réussite à cet examen est obligatoire pour :</p>
                     <div class="highlight-box">
-                        <h4 id="highlight1Title">Obligations à partir du 1er janvier 2026 :</h4>
+                        <h4 id="highlight1Title">Obligations depuis le 1er janvier 2026 :</h4>
                         <ul style="list-style: none; padding-left: 0;">
                             <li id="obligation1">• Obtenir la naturalisation française</li>
                             <li id="obligation2">• Acquérir un titre de séjour pluriannuel (carte de séjour pluriannuelle ou carte de résident), si vous êtes un ressortissant d'un pays non-membre de l'Union européenne</li>
@@ -443,7 +448,7 @@
                 <div class="content-section">
                     <h3 id="section3Title">Quand passer l'examen civique ?</h3>
                     <p id="section3Text1">L'examen civique devra être passé avant le dépôt de la demande de titre de séjour ou de naturalisation.</p>
-                    <p id="section3Text2">Pour les personnes souhaitant obtenir un titre de séjour pluriannuel, l'examen interviendra obligatoirement en conclusion d'une formation civique (d'une durée de 24 heures, réparties sur 4 jours). Actuellement, cette formation est suivie par les étrangers après l'obtention de leur titre de séjour, dans le cadre de leur contrat d'intégration républicaine. À compter du 1er janvier 2026, ils devront donc suivre cette formation avant l'obtention de leur titre de séjour.</p>
+                    <p id="section3Text2">Pour les personnes souhaitant obtenir un titre de séjour pluriannuel, l'examen interviendra obligatoirement en conclusion d'une formation civique (d'une durée de 24 heures, réparties sur 4 jours). Actuellement, cette formation est suivie par les étrangers après l'obtention de leur titre de séjour, dans le cadre de leur contrat d'intégration républicaine. Depuis le 1er janvier 2026, ils doivent donc suivre cette formation avant l'obtention de leur titre de séjour.</p>
                     <div class="highlight-box">
                         <h4 id="highlight3Title">Important :</h4>
                         <p id="highlight3Text">L'attestation de réussite à l'examen civique n'aura pas une durée de validité limitée.</p>
@@ -466,21 +471,21 @@
             </div>
             <div class="faq-container">
                 <div class="faq-item" data-id="1">
-                    <div class="faq-question"><span id="faq1Q">Qui doit passer l'examen civique ?</span><i class="fas fa-chevron-down"></i></div>
+                    <button type="button" class="faq-question" aria-expanded="false"><span id="faq1Q">Qui doit passer l'examen civique ?</span><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
                     <div class="faq-answer">
-                        <div id="faq1AFr"><p>À partir du 1er janvier 2026, tous les étrangers non-ressortissants de l'UE souhaitant obtenir une carte de séjour pluriannuelle, une carte de résident ou la naturalisation française devront passer et réussir l'examen civique.</p></div>
+                        <div id="faq1AFr"><p>Depuis le 1er janvier 2026, tous les étrangers non-ressortissants de l'UE souhaitant obtenir une carte de séjour pluriannuelle, une carte de résident ou la naturalisation française doivent passer et réussir l'examen civique.</p></div>
                         <div id="faq1AZh" style="display: none;"><p>从2026年1月1日起，所有希望获得多年居留卡、长期居留卡或法国国籍的非欧盟外国人都必须参加并通过公民考试。</p></div>
                     </div>
                 </div>
                 <div class="faq-item" data-id="2">
-                    <div class="faq-question"><span id="faq2Q">Combien de questions dans l'examen officiel ?</span><i class="fas fa-chevron-down"></i></div>
+                    <button type="button" class="faq-question" aria-expanded="false"><span id="faq2Q">Combien de questions dans l'examen officiel ?</span><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
                     <div class="faq-answer">
                         <div id="faq2AFr"><p>L'examen officiel comprend 40 questions : 28 questions de connaissances générales et 12 questions de mises en situation. Pour réussir, il faut obtenir au moins 32 bonnes réponses (80%).</p></div>
                         <div id="faq2AZh" style="display: none;"><p>官方考试包括40道题：28道一般知识题和12道情境题。要通过考试，必须获得至少32个正确答案（80%）。</p></div>
                     </div>
                 </div>
                 <div class="faq-item" data-id="3">
-                    <div class="faq-question"><span id="faq3Q">L'examen civique remplace-t-il le test de langue ?</span><i class="fas fa-chevron-down"></i></div>
+                    <button type="button" class="faq-question" aria-expanded="false"><span id="faq3Q">L'examen civique remplace-t-il le test de langue ?</span><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
                     <div class="faq-answer">
                         <div id="faq3AFr"><p>Non, l'examen civique est un nouvel examen supplémentaire. Pour la naturalisation ou certains titres de séjour, vous devez toujours prouver votre maîtrise du français.</p></div>
                         <div id="faq3AZh" style="display: none;"><p>不，公民考试是一项新增的考试。对于入籍或某些居留许可，您仍然需要证明您的法语水平。</p></div>
@@ -528,17 +533,17 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p id="footerCopyright">&copy; 2025 Association Mille Voiles / 千帆协会 - Tous droits réservés.</p>
+                <p id="footerCopyright">&copy; 2026 Association Mille Voiles / 千帆协会 - Tous droits réservés.</p>
             </div>
         </div>
     </footer>
 
     <!-- ==================== 登录模态框 ==================== -->
-    <div id="loginModal" class="modal">
+    <div id="loginModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="loginModalTitle">Connexion Élève</h3>
-                <button class="close-modal" onclick="closeLoginModal()">&times;</button>
+                <button class="close-modal" aria-label="Fermer" onclick="closeLoginModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="loginForm" class="login-form" onsubmit="handleLogin(event)">
@@ -559,11 +564,11 @@
     </div>
 
     <!-- ==================== 个人资料模态框（含邮箱修改） ==================== -->
-    <div id="profileModal" class="modal">
+    <div id="profileModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="profileModalTitle">Mon Profil</h3>
-                <button class="close-modal" onclick="closeProfileModal()">&times;</button>
+                <button class="close-modal" aria-label="Fermer" onclick="closeProfileModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="profileForm" class="login-form" onsubmit="updateProfile(event)">
@@ -644,11 +649,11 @@
 
     <div class="toast-container" id="toastContainer"></div>
     <div id="pwa-install-button" class="pwa-install-btn" style="display: none;"><button onclick="showInstallGuide()" class="install-btn"><i class="fas fa-download"></i><span id="installBtnText">Installer l'app</span></button></div>
-    <div id="pwa-install-guide" class="pwa-install-guide" style="display: none;">
+    <div id="pwa-install-guide" class="pwa-install-guide" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="installGuideTitle">
         <div class="install-guide-content">
             <div class="install-header">
                 <h3 id="installGuideTitle">Installer l'application</h3>
-                <button class="close-guide" onclick="closeInstallGuide()">&times;</button>
+                <button class="close-guide" aria-label="Fermer" onclick="closeInstallGuide()">&times;</button>
             </div>
             <div class="install-body">
                 <div class="device-selector">

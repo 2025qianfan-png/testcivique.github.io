@@ -164,7 +164,13 @@ function escapeHtml(s) {
 }
 
 // ==================== 变量 ====================
-let currentLang = 'fr';
+let currentLang = (function () {
+    try {
+        const saved = localStorage.getItem('siteLang');
+        if (saved === 'fr' || saved === 'zh') return saved;
+    } catch (e) {}
+    return ((navigator.language || '').toLowerCase().indexOf('zh') === 0) ? 'zh' : 'fr';
+})();
 let deferredPrompt;
 let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 let isAndroid = /Android/.test(navigator.userAgent);
@@ -190,8 +196,8 @@ function showToast(title, message, type = 'warning') {
             <i class="fas ${iconClass}"></i>
         </div>
         <div class="toast-content">
-            <div class="toast-title">${title}</div>
-            <div class="toast-message">${message}</div>
+            <div class="toast-title">${escapeHtml(title)}</div>
+            <div class="toast-message">${escapeHtml(message)}</div>
         </div>
         <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
     `;
@@ -226,8 +232,9 @@ const translations = {
         logoutMenuItem: "Déconnexion",
         homePageText: "Accueil",
         heroTitle: "Préparez-vous à l'examen civique 2026",
-        heroText: "À partir du 1er janvier 2026, tous les étrangers souhaitant obtenir une carte de séjour pluriannuelle, une carte de résident ou la naturalisation française devront réussir un examen civique. Préparez-vous dès maintenant avec nos tests en ligne.",
+        heroText: "Depuis le 1er janvier 2026, tous les étrangers souhaitant obtenir une carte de séjour pluriannuelle, une carte de résident ou la naturalisation française doivent réussir un examen civique. Préparez-vous dès maintenant avec nos tests en ligne.",
         heroBtn: "Commencer maintenant",
+        heroBtn2: "Voir les formations",
         testsTitle: "Choisissez votre test",
         testsSubtitle: "Trois options adaptées à vos besoins : test gratuit, test officiel ou test complet pour nos étudiants",
         freeTestTitle: "Test Gratuit",
@@ -243,7 +250,7 @@ const translations = {
         annalesTestTitle: "Test officiel",
         annalesTestPrice: "ACCÈS LIMITÉ",
         annalesTestDesc: "Sujets d'examen réels",
-        annalesFeature1: "20 questions officielles",
+        annalesFeature1: "40 questions officielles",
         annalesFeature2: "Correction immédiate",
         annalesFeature3: "Explications détaillées",
         annalesFeature4: "Statistiques de réussite",
@@ -282,13 +289,13 @@ const translations = {
         articleSource: "Service Public / Direction de l'information légale et administrative (Premier ministre)",
         imageCaption: "Examen civique - Nouvelle exigence pour les étrangers souhaitant s'installer en France",
         imageCitation: "Crédit: LP/ Jean-Baptiste Quentin",
-        introPara: "Pour obtenir une carte de séjour pluriannuelle, une carte de résident ou la naturalisation française, les étrangers devront avoir réussi un examen civique à compter du 1er janvier 2026. Ce test vise notamment à évaluer leur connaissance des principes et valeurs de la République, ainsi que des droits et devoirs des personnes résidant en France.",
+        introPara: "Pour obtenir une carte de séjour pluriannuelle, une carte de résident ou la naturalisation française, les étrangers doivent avoir réussi un examen civique depuis le 1er janvier 2026. Ce test vise notamment à évaluer leur connaissance des principes et valeurs de la République, ainsi que des droits et devoirs des personnes résidant en France.",
         section1Title: "Contexte légal",
         section1Text1: "La loi du 26 janvier 2024 pour contrôler l'immigration, améliorer l'intégration a notamment créé un examen civique.",
         section1Text2: "Cette épreuve, d'une durée de 45 minutes maximum et réalisée sur support numérique, se présente sous la forme d'un questionnaire à choix multiples (QCM) comprenant 40 questions (28 questions de connaissances générales et 12 questions de mises en situation) ; à chaque fois, une seule réponse est correcte parmi les 4 options proposées. Pour valider l'examen, il faut avoir obtenu au moins 32 bonnes réponses (soit 80 % de réussite).",
         section2Title: "Qui est concerné ?",
-        section2Text1: "À partir du 1er janvier 2026, la réussite à cet examen sera obligatoire pour :",
-        highlight1Title: "Obligations à partir du 1er janvier 2026 :",
+        section2Text1: "Depuis le 1er janvier 2026, la réussite à cet examen est obligatoire pour :",
+        highlight1Title: "Obligations depuis le 1er janvier 2026 :",
         obligation1: "• Obtenir la naturalisation française",
         obligation2: "• Acquérir un titre de séjour pluriannuel (carte de séjour pluriannuelle ou carte de résident), si vous êtes un ressortissant d'un pays non-membre de l'Union européenne",
         highlight2Title: "Exceptions :",
@@ -296,7 +303,7 @@ const translations = {
         exception2: "• Vous n'êtes pas concerné par cet examen si vous êtes bénéficiaire d'une protection internationale, notamment",
         section3Title: "Quand passer l'examen civique ?",
         section3Text1: "L'examen civique devra être passé avant le dépôt de la demande de titre de séjour ou de naturalisation.",
-        section3Text2: "Pour les personnes souhaitant obtenir un titre de séjour pluriannuel, l'examen interviendra obligatoirement en conclusion d'une formation civique (d'une durée de 24 heures, réparties sur 4 jours). Actuellement, cette formation est suivie par les étrangers après l'obtention de leur titre de séjour, dans le cadre de leur contrat d'intégration républicaine. À compter du 1er janvier 2026, ils devront donc suivre cette formation avant l'obtention de leur titre de séjour.",
+        section3Text2: "Pour les personnes souhaitant obtenir un titre de séjour pluriannuel, l'examen interviendra obligatoirement en conclusion d'une formation civique (d'une durée de 24 heures, réparties sur 4 jours). Actuellement, cette formation est suivie par les étrangers après l'obtention de leur titre de séjour, dans le cadre de leur contrat d'intégration républicaine. Depuis le 1er janvier 2026, ils doivent donc suivre cette formation avant l'obtention de leur titre de séjour.",
         highlight3Title: "Important :",
         highlight3Text: "L'attestation de réussite à l'examen civique n'aura pas une durée de validité limitée.",
         section4Title: "Thématiques de l'examen",
@@ -345,7 +352,7 @@ const translations = {
         footerContact: "Contact",
         footerEmail: "2025qianfan@gmail.com",
         footerAddress: "Association enregistrée à Paris",
-        footerCopyright: "© 2025 Association Mille Voiles / 千帆协会 - Tous droits réservés.",
+        footerCopyright: "© 2026 Association Mille Voiles / 千帆协会 - Tous droits réservés.",
         courseTitle: "📚 Nos formations civiques",
         courseSubtitle: "Des cursus adaptés à votre niveau et vos besoins",
         course1Title: "📘 Initiation",
@@ -460,6 +467,7 @@ const translations = {
         heroTitle: "为2026年公民考试做好准备",
         heroText: "从2026年1月1日起，所有希望获得多年居留卡、长期居留卡或法国国籍的外国人都必须通过一项公民考试。立即使用我们的在线测试开始准备。",
         heroBtn: "立即开始",
+        heroBtn2: "查看课程",
         testsTitle: "选择您的测试",
         testsSubtitle: "三种选项满足您的需求：免费测试、真题训练或为学员提供的完整测试",
         freeTestTitle: "免费测试",
@@ -475,7 +483,7 @@ const translations = {
         annalesTestTitle: "真题训练",
         annalesTestPrice: "限时访问",
         annalesTestDesc: "学员反馈真题模拟",
-        annalesFeature1: "20道官方真题",
+        annalesFeature1: "40道官方真题",
         annalesFeature2: "即时批改",
         annalesFeature3: "详细解析",
         annalesFeature4: "通过率统计",
@@ -577,7 +585,7 @@ const translations = {
         footerContact: "联系我们",
         footerEmail: "2025qianfan@gmail.com",
         footerAddress: "注册于巴黎的协会",
-        footerCopyright: "© 2025 千帆协会 - 版权所有。",
+        footerCopyright: "© 2026 千帆协会 - 版权所有。",
         courseTitle: "📚 我们的公民课程",
         courseSubtitle: "适合您水平和需求的课程",
         course1Title: "📘 初级课程 · 启蒙",
@@ -1171,14 +1179,21 @@ function initHamburger() {
 
 // ==================== FAQ ====================
 function initFAQ() {
-    document.querySelectorAll('.faq-item').forEach(item => {
-        item.addEventListener('click', function() {
-            this.classList.toggle('active');
-            document.querySelectorAll('.faq-item').forEach(otherItem => {
-                if (otherItem !== this && otherItem.classList.contains('active')) {
-                    otherItem.classList.remove('active');
-                }
+    const items = document.querySelectorAll('.faq-item');
+    items.forEach(item => {
+        const btn = item.querySelector('.faq-question');
+        if (!btn) return;
+        btn.addEventListener('click', function() {
+            const willOpen = !item.classList.contains('active');
+            items.forEach(other => {
+                other.classList.remove('active');
+                const ob = other.querySelector('.faq-question');
+                if (ob) ob.setAttribute('aria-expanded', 'false');
             });
+            if (willOpen) {
+                item.classList.add('active');
+                btn.setAttribute('aria-expanded', 'true');
+            }
         });
     });
 }
@@ -1186,9 +1201,13 @@ function initFAQ() {
 // ==================== 语言切换 ====================
 function switchLanguage(lang) {
     currentLang = lang;
+    try { localStorage.setItem('siteLang', lang); } catch (e) {}
+    document.documentElement.lang = (lang === 'zh') ? 'zh-CN' : 'fr';
     
     document.getElementById('langFr').classList.toggle('active', lang === 'fr');
     document.getElementById('langZh').classList.toggle('active', lang === 'zh');
+    document.getElementById('langFr').setAttribute('aria-pressed', String(lang === 'fr'));
+    document.getElementById('langZh').setAttribute('aria-pressed', String(lang === 'zh'));
     
     const data = translations[lang];
     
@@ -1259,8 +1278,8 @@ function switchLanguage(lang) {
         footerSituationLink.textContent = data.footerSituationLink || (lang === 'fr' ? 'Mises en situation' : '情景题专项');
     }
     
-    loadStats();
-    loadFeedbacks();
+    // 切换语言只需重新渲染已有评价，不重新查库
+    if (typeof allFeedbacks !== 'undefined' && allFeedbacks.length) renderFeedbacks();
     
     console.log(`🌐 Langue: ${lang === 'fr' ? 'Français' : '中文'}`);
 }
@@ -1403,7 +1422,7 @@ function renderFeedbacks() {
                     </div>
                 </div>
                 <div class="feedback-card-meta">
-                    ${examLabel ? `<span class="badge-exam ${examClass}">${t.feedbackExamType || 'Examen'}: ${examLabel}</span>` : ''}
+                    ${examLabel ? `<span class="badge-exam ${examClass}">${t.feedbackExamType || 'Examen'}: ${escapeHtml(examLabel)}</span>` : ''}
                     ${fb.exam_score !== null && fb.exam_score !== undefined ? `<span>📝 ${t.feedbackScore || 'Score'}: ${fb.exam_score}/40</span>` : ''}
                     <span>📅 ${new Date(fb.created_at).toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'zh-CN')}</span>
                 </div>
@@ -1591,9 +1610,6 @@ async function loadStats() {
         if (totalError) throw totalError;
         
         const studentCount = totalCount || 0;
-        const passRate = studentCount > 0 ? ((studentCount - 2) / studentCount * 100) : 0;
-        const passRateDisplay = Math.round(passRate);
-        
         let avgScore = 0;
         try {
             const { data: feedbackData, error: feedbackError } = await supabase
@@ -1608,29 +1624,25 @@ async function loadStats() {
         }
         
         const studentNumberEl = document.getElementById('statStudentNumber');
-        const successRateEl = document.getElementById('statSuccessRate');
         const avgScoreEl = document.getElementById('fbAvgScoreStat');
         
-        if (studentNumberEl) studentNumberEl.textContent = studentCount;
-        if (successRateEl) successRateEl.textContent = passRateDisplay;
-        if (avgScoreEl) avgScoreEl.textContent = avgScore.toFixed(1);
+        if (studentNumberEl) studentNumberEl.textContent = studentCount > 0 ? studentCount : '—';
+        if (avgScoreEl) avgScoreEl.textContent = avgScore > 0 ? avgScore.toFixed(1) : '—';
         
-        console.log('📊 KPI加载成功:', { students: studentCount, passRate: passRateDisplay + '%', avgScore: avgScore.toFixed(1) });
+        console.log('📊 KPI加载成功:', { students: studentCount, avgScore: avgScore.toFixed(1) });
         
     } catch (error) {
         console.error('加载统计数据失败:', error);
         const studentNumberEl = document.getElementById('statStudentNumber');
-        const successRateEl = document.getElementById('statSuccessRate');
         const avgScoreEl = document.getElementById('fbAvgScoreStat');
-        if (studentNumberEl) studentNumberEl.textContent = '0';
-        if (successRateEl) successRateEl.textContent = '0';
-        if (avgScoreEl) avgScoreEl.textContent = '0.0';
+        if (studentNumberEl) studentNumberEl.textContent = '—';
+        if (avgScoreEl) avgScoreEl.textContent = '—';
     }
 }
 
 // ==================== DOM加载完成 ====================
 document.addEventListener('DOMContentLoaded', function() {
-    switchLanguage('fr');
+    switchLanguage(currentLang);
     
     const currentUser = getCurrentUser();
     if (currentUser && currentUser.expiryDate) {
@@ -1666,6 +1678,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (dropdown && userInfo && !userInfo.contains(e.target)) {
             dropdown.classList.remove('show');
         }
+    });
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key !== 'Escape') return;
+        closeLoginModal();
+        closeProfileModal();
+        closeInstallGuide();
+        const dd = document.getElementById('userDropdown');
+        if (dd) dd.classList.remove('show');
     });
     
     loadStats();
