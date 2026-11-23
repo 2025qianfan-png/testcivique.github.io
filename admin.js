@@ -1197,6 +1197,13 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
         // 取消/删除的课不再发送上课链接
         const includeMeetingLink = !(action === 'cancel' || action === 'delete');
         const meetingLinkForEmail = includeMeetingLink ? (meetingLink || '-') : '';
+        // 整块“加入课程”按钮的 HTML：取消/删除或没有链接时为空，模板里用 {{{meeting_block}}} 输出
+        const meetingBlock = (includeMeetingLink && meetingLink)
+            ? '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:22px;">'
+              + '<tr><td align="center" style="background:#004080; border-radius:8px;">'
+              + '<a href="' + escapeHtml(meetingLink) + '" style="display:block; padding:15px 12px; font-size:16px; font-weight:700; color:#ffffff; text-decoration:none;">🔗 Rejoindre le cours (Meet)</a>'
+              + '</td></tr></table>'
+            : '';
         let sentCount = 0;
         const errors = [];
 
@@ -1276,6 +1283,7 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
                 time: time,
                 end_time: endTime,
                 meeting_link: meetingLinkForEmail,
+                meeting_block: meetingBlock,
                 duration: course.duration || 2,
                 teacher_name: teacher?.name || '-',
                 teacher_email: teacher?.email || '-',
