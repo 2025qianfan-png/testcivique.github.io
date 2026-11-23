@@ -1008,7 +1008,7 @@ async function sendActivationEmail(userEmail, userName, userType, userRole, user
         user_password: userPassword || '—',
         login_url: 'https://www.assmv.fr/examen-civique.html',
         contact_email: '2025qianfan@gmail.com',
-        subject: '🎉 Votre compte Mille Voiles est activé ! / 🎉 您的千帆协会账户已激活！'
+        subject: '🎉 Votre compte Mille Voiles est activé ! | 🎉 您的千帆协会账户已激活！'
     };
 
     await emailjs.send(EMAILJS_CONFIG.SERVICE_ID, EMAILJS_CONFIG.TEMPLATE_ID, params, EMAILJS_CONFIG.PUBLIC_KEY);
@@ -1054,6 +1054,16 @@ async function getUpcomingCoursesForUser(userId, userType, excludeCourseId) {
     } catch (e) {
         return [];
     }
+}
+
+// 邮件主题专用：EmailJS 会把变量里的 / ' & 等转成 HTML 实体，而主题是纯文本不会还原，
+// 所以主题里只能用不含这些字符的日期，例如 "dimanche 6 décembre 2026"
+function formatDateForSubject(dateStr) {
+    try {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return '';
+        return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    } catch (e) { return ''; }
 }
 
 function formatEndTimeForEmail(course) {
@@ -1191,6 +1201,9 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
             } catch (e) {}
         }
         const endTime = formatEndTimeForEmail(course);
+        const subjectCategory = course.category === 'francais' ? 'Français' : 'Civique';
+        const subjectText = '📚 Cours ' + actionLabel + ' (' + subjectCategory + ') – '
+            + (formatDateForSubject(course.start_time) || date) + ' à ' + time;
 
         // 新建/修改的课要出现在"即将到来的课程"里；只有取消/删除/完成的课才排除
         const shouldExclude = (action === 'cancel' || action === 'delete' || action === 'complete');
@@ -1239,7 +1252,7 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
                 student_name: students.map(s => s.name).join(', ') || '-',
                 student_email: studentsWithEmail.map(s => s.email).join(', ') || '-',
                 upcoming_courses: teacherCourses,
-                subject: `📚 [Enseignant] Cours ${actionLabel} - ${date}`
+                subject: subjectText
             };
 
             try {
@@ -1288,7 +1301,7 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
                 teacher_name: teacher?.name || '-',
                 teacher_email: teacher?.email || '-',
                 upcoming_courses: studentCourses,
-                subject: `📚 [Élève] Cours ${actionLabel} - ${date}`
+                subject: subjectText
             };
 
             try {
