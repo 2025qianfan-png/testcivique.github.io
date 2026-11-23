@@ -1051,6 +1051,27 @@ async function getUpcomingCoursesForUser(userId, userType, excludeCourseId) {
     }
 }
 
+function formatEndTimeForEmail(course) {
+    try {
+        const end = course.end_time
+            ? new Date(course.end_time)
+            : new Date(new Date(course.start_time).getTime() + (course.duration || 2) * 3600000);
+        return String(end.getHours()).padStart(2, '0') + ':' + String(end.getMinutes()).padStart(2, '0');
+    } catch (e) { return ''; }
+}
+
+// 保证刚新建/修改的这节课一定出现在"即将到来的课程"里（按时间排序）
+function ensureCourseInList(list, course, mustInclude) {
+    const arr = (list || []).slice();
+    if (mustInclude && course && course.status !== 'cancelled'
+        && new Date(course.start_time).getTime() >= Date.now()
+        && !arr.some(c => String(c.id) === String(course.id))) {
+        arr.push(course);
+    }
+    arr.sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+    return arr;
+}
+
 function formatUpcomingCoursesForEmail(courses) {
     if (!courses || courses.length === 0) return '✅ Aucun cours à venir.';
     let formatted = '';
@@ -1059,7 +1080,8 @@ function formatUpcomingCoursesForEmail(courses) {
         const courseTypeName = course.category === 'civique'
             ? getCiviqueTypeText(course.course_type)
             : getFrenchTypeText(course.course_type);
-        formatted += (index + 1) + '. ' + date + ' à ' + time + ' | ' + courseTypeName + ' | ' + (course.duration || 2) + 'h\n';
+        formatted += (index + 1) + '. ' + date + ' ' + time + '–' + formatEndTimeForEmail(course) + ' | ' + courseTypeName + ' | ' + (course.duration || 2) + 'h'
+            + (course.meeting_link ? ' | ' + course.meeting_link : '') + '\n';
     });
     return formatted;
 }
@@ -1152,7 +1174,21 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
             : getFrenchTypeText(course.course_type);
         const categoryLabel = course.category === 'francais' ? '🇫🇷 Français' : '📘 Civique';
 
-        const shouldExclude = (action !== 'create');
+        let meetingLink = course.meeting_link || '';
+        if (!meetingLink && course.teacher_id) {
+            try {
+                const { data: ml } = await supabase
+                    .from('teacher_meeting_links')
+                    .select('meeting_link')
+                    .eq('teacher_id', course.teacher_id)
+                    .maybeSingle();
+                meetingLink = (ml && ml.meeting_link) || '';
+            } catch (e) {}
+        }
+        const endTime = formatEndTimeForEmail(course);
+
+        // 新建/修改的课要出现在"即将到来的课程"里；只有取消/删除/完成的课才排除
+        const shouldExclude = (action === 'cancel' || action === 'delete' || action === 'complete');
         let sentCount = 0;
         const errors = [];
 
@@ -1166,7 +1202,7 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
                     teacher.id, 'teacher',
                     shouldExclude ? courseId : null
                 );
-                teacherCourses = formatUpcomingCoursesForEmail(list);
+                teacherCourses = formatUpcomingCoursesForEmail(ensureCourseInList(list, course, !shouldExclude));
             } catch (e) {}
 
             const teacherParams = {
@@ -1178,6 +1214,8 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
                 course_category: categoryLabel,
                 date: date,
                 time: time,
+                end_time: endTime,
+                meeting_link: meetingLink || '-',
                 duration: course.duration || 2,
                 student_name: students.map(s => s.name).join(', ') || '-',
                 student_email: studentsWithEmail.map(s => s.email).join(', ') || '-',
@@ -1210,7 +1248,7 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
                     student.id, 'student',
                     shouldExclude ? courseId : null
                 );
-                studentCourses = formatUpcomingCoursesForEmail(list);
+                studentCourses = formatUpcomingCoursesForEmail(ensureCourseInList(list, course, !shouldExclude));
             } catch (e) {}
 
             const studentParams = {
@@ -1222,6 +1260,8 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
                 course_category: categoryLabel,
                 date: date,
                 time: time,
+                end_time: endTime,
+                meeting_link: meetingLink || '-',
                 duration: course.duration || 2,
                 teacher_name: teacher?.name || '-',
                 teacher_email: teacher?.email || '-',
@@ -2231,9 +2271,22 @@ async function handleUserSubmit(e) {
     type: document.getElementById('userType').value || null,
     french_type: document.getElementById('userFrenchType').value || null,
     level: document.getElementById('userLevel').value || null,
-    credit: parseInt(document.getElementById('userCredit').value) || 0,
-    french_credit: parseInt(document.getElementById('userFrenchCredit').value) || 0
 };
+    // 课时：支持小数（0.5h），输入无效时报错而不是悄悄变成 0；
+    // 编辑时只写入"没被改成无效"的值，避免覆盖原值
+    const parseCredit = (id, label) => {
+        const el = document.getElementById(id);
+        const raw = String(el.value).trim().replace(',', '.');
+        if (raw === '') return { skip: true };
+        const v = parseFloat(raw);
+        if (!isFinite(v) || v < 0) { showToast(label + ' : valeur invalide / 数值无效', 'error'); return { error: true }; }
+        return { value: v };
+    };
+    const c1 = parseCredit('userCredit', 'Civique');
+    const c2 = parseCredit('userFrenchCredit', 'Français');
+    if (c1.error || c2.error) return;
+    if (!c1.skip) data.credit = c1.value; else if (!id) data.credit = 0;
+    if (!c2.skip) data.french_credit = c2.value; else if (!id) data.french_credit = 0;
     if (password) data.password = password;
 
     const timer = document.getElementById('userTimer').value;
