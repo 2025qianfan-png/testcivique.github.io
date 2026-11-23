@@ -787,6 +787,11 @@ function L(key) {
 
 // 邮件发送结果 → toast 后缀
 function emailSuffix(r, quiet) {
+    if (r && r.errors && r.errors.length > 0) {
+        console.warn('📧 邮件发送问题:', r.errors);
+        const ok = r.sentCount > 0 ? t('msg.emailsSent', { n: r.sentCount }) : '';
+        return ok + ' — ⚠️ ' + r.errors.join(' | ');
+    }
     if (r && r.sentCount > 0) return t('msg.emailsSent', { n: r.sentCount });
     if (!quiet && r && r.skipped) return t('msg.emailNotSent');
     return '';
@@ -1189,12 +1194,19 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
 
         // 新建/修改的课要出现在"即将到来的课程"里；只有取消/删除/完成的课才排除
         const shouldExclude = (action === 'cancel' || action === 'delete' || action === 'complete');
+        // 取消/删除的课不再发送上课链接
+        const includeMeetingLink = !(action === 'cancel' || action === 'delete');
+        const meetingLinkForEmail = includeMeetingLink ? (meetingLink || '-') : '';
         let sentCount = 0;
         const errors = [];
 
         // ============================================================
         // 5. 发老师
         // ============================================================
+        if (!hasTeacherEmail) {
+            console.warn('⚠️ 老师没有邮箱，未发送老师邮件。teacher_id =', course.teacher_id, teacher);
+            errors.push('teacher: 找不到老师邮箱 (teacher_id=' + course.teacher_id + ')');
+        }
         if (hasTeacherEmail) {
             let teacherCourses = '✅ Aucun cours à venir.';
             try {
@@ -1215,7 +1227,7 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
                 date: date,
                 time: time,
                 end_time: endTime,
-                meeting_link: meetingLink || '-',
+                meeting_link: meetingLinkForEmail,
                 duration: course.duration || 2,
                 student_name: students.map(s => s.name).join(', ') || '-',
                 student_email: studentsWithEmail.map(s => s.email).join(', ') || '-',
@@ -1233,8 +1245,9 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
                 sentCount++;
                 console.log('✅ 邮件已发老师:', teacher.email);
             } catch (e) {
-                console.error('❌ 发老师邮件失败:', e.message);
-                errors.push('teacher: ' + e.message);
+                const detail = (e && (e.text || e.message)) || String(e);
+                console.error('❌ 发老师邮件失败:', teacher.email, 'status=' + (e && e.status), detail);
+                errors.push('teacher ' + teacher.email + ' [' + (e && e.status) + ']: ' + detail);
             }
         }
 
@@ -1242,6 +1255,7 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
         // 6. 发每个学生
         // ============================================================
         for (const student of studentsWithEmail) {
+            await new Promise(r => setTimeout(r, 1200));
             let studentCourses = '✅ Aucun cours à venir.';
             try {
                 const list = await getUpcomingCoursesForUser(
@@ -1261,7 +1275,7 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
                 date: date,
                 time: time,
                 end_time: endTime,
-                meeting_link: meetingLink || '-',
+                meeting_link: meetingLinkForEmail,
                 duration: course.duration || 2,
                 teacher_name: teacher?.name || '-',
                 teacher_email: teacher?.email || '-',
@@ -1279,8 +1293,9 @@ async function sendCourseEmailNotification(courseId, action, overrideCourse) {
                 sentCount++;
                 console.log('✅ 邮件已发学生:', student.email);
             } catch (e) {
-                console.error('❌ 发学生邮件失败:', student.email, e.message);
-                errors.push('student ' + student.email + ': ' + e.message);
+                const detail = (e && (e.text || e.message)) || String(e);
+                console.error('❌ 发学生邮件失败:', student.email, 'status=' + (e && e.status), detail);
+                errors.push('student ' + student.email + ' [' + (e && e.status) + ']: ' + detail);
             }
         }
 
@@ -3393,7 +3408,7 @@ async function handleCourseSubmit(e) {
         let msg = id ? t('msg.courseModified') : t('msg.courseCreated');
         if (availRemoved > 0) msg += t('msg.availRemoved', { n: availRemoved });
         msg += emailSuffix(emailResult);
-        showToast(msg, emailResult && emailResult.skipped ? 'warning' : 'success');
+        showToast(msg, emailResult && (emailResult.skipped || emailResult.errors) ? 'warning' : 'success');
 
     } catch (err) {
         console.error(err);
@@ -3557,7 +3572,7 @@ async function confirmCancelReason() {
         await Promise.all([refreshCourses(), refreshUsers()]);
 
         showToast(t('msg.courseCancelled') + emailSuffix(emailResult),
-            emailResult && emailResult.skipped ? 'warning' : 'success');
+            emailResult && (emailResult.skipped || emailResult.errors) ? 'warning' : 'success');
     } catch (err) {
         showToast(t('msg.error', { err: err.message }), 'error');
     } finally {
