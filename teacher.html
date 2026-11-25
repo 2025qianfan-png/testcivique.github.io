@@ -557,6 +557,155 @@ body { font-family: 'Open Sans', sans-serif; background: var(--light-gray); colo
     .toast { bottom: 12px; right: 12px; left: 12px; max-width: none; font-size: 0.82rem; }
 }
 .hidden { display: none !important; }
+/* ============ MES ÉLÈVES / PLANIFICATION ============ */
+.admin-tab.active[data-cat="students"] { color: var(--green); border-bottom-color: var(--green); }
+.stu-toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+.stu-search {
+    flex: 1; min-width: 200px; padding: 10px 14px; border: 2px solid #e2e8f0;
+    border-radius: 8px; font-family: inherit; font-size: 0.92rem;
+}
+.stu-search:focus { outline: none; border-color: var(--green); }
+.stu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+.stu-card {
+    border: 1px solid #e8ecf1; border-left: 4px solid var(--green); border-radius: var(--radius);
+    padding: 16px; background: #fff; display: flex; flex-direction: column; gap: 8px;
+    transition: var(--transition);
+}
+.stu-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+.stu-card h4 { font-size: 1.02rem; color: var(--dark-gray); display: flex; align-items: center; gap: 8px; }
+.stu-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.stu-badge {
+    font-size: 0.74rem; font-weight: 700; padding: 3px 10px; border-radius: 20px;
+    background: rgba(0,64,128,0.08); color: var(--civique);
+}
+.stu-badge.francais { background: rgba(230,126,34,0.12); color: var(--francais); }
+.stu-badge.credit { background: #eafaf1; color: var(--green); }
+.stu-meta { font-size: 0.82rem; color: var(--medium-gray); display: flex; flex-direction: column; gap: 3px; }
+.stu-meta i { width: 16px; color: var(--gray); }
+.stu-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.stu-btn {
+    padding: 7px 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;
+    font-size: 0.8rem; color: white; display: inline-flex; align-items: center; gap: 6px;
+    transition: var(--transition);
+}
+.stu-btn:hover { transform: translateY(-2px); filter: brightness(0.95); }
+.stu-btn.profile { background: var(--civique); }
+.stu-btn.dash { background: var(--purple); }
+.stu-btn.plan { background: var(--green); }
+.modal-content.modal-lg { max-width: 780px; }
+.sp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+@media (max-width: 600px) { .sp-grid { grid-template-columns: 1fr; } }
+.sp-item { background: var(--light-gray); border-radius: 8px; padding: 10px 14px; }
+.sp-item .label { font-size: 0.72rem; font-weight: 700; color: var(--medium-gray); text-transform: uppercase; }
+.sp-item .value { font-size: 0.92rem; margin-top: 3px; word-break: break-word; }
+.sp-lock { font-size: 0.72rem; color: var(--gray); margin-left: 4px; }
+.sp-last {
+    background: #fff9e6; border: 1px solid #ffe28a; border-radius: 10px;
+    padding: 12px 14px; margin-bottom: 16px; font-size: 0.9rem;
+}
+.sp-h { font-size: 0.95rem; color: var(--civique); margin: 14px 0 8px; display: flex; align-items: center; gap: 8px; }
+.hist-item {
+    border: 1px solid #eee; border-left: 4px solid var(--civique); border-radius: 8px;
+    padding: 10px 12px; margin-bottom: 8px; font-size: 0.86rem;
+}
+.hist-item.francais { border-left-color: var(--francais); }
+.hist-item.cancelled { opacity: 0.6; border-left-color: var(--gray); }
+.hist-item.mine { background: #f4fbf7; }
+.hist-top { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-weight: 600; }
+.hist-sub { color: var(--medium-gray); margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap; }
+.hist-comment { margin-top: 6px; font-style: italic; color: var(--purple); }
+.hist-me { background: var(--green); color: white; font-size: 0.68rem; padding: 2px 8px; border-radius: 10px; margin-left: 6px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+.mode-switch { display: flex; gap: 8px; }
+.mode-switch button {
+    flex: 1; padding: 10px; border: 2px solid #e2e8f0; background: white; border-radius: 8px;
+    cursor: pointer; font-weight: 600; transition: var(--transition);
+}
+.mode-switch button.active { border-color: var(--civique); background: rgba(0,64,128,0.06); color: var(--civique); }
+.stu-pick-list { max-height: 190px; overflow-y: auto; border: 2px solid #e2e8f0; border-radius: 8px; padding: 6px; }
+.stu-pick { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; font-size: 0.88rem; }
+.stu-pick:hover { background: var(--light-gray); }
+.form-group .stu-pick input[type="checkbox"] { width: 18px; height: 18px; padding: 0; accent-color: var(--civique); }
+.stu-pick .cr { margin-left: auto; font-size: 0.76rem; color: var(--green); font-weight: 700; }
+.cf-note { font-size: 0.78rem; color: var(--medium-gray); background: #eef5ff; border-radius: 8px; padding: 8px 12px; margin-bottom: 14px; }
+.cf-warn { font-size: 0.82rem; color: #c0392b; background: #fdecea; border-radius: 8px; padding: 8px 12px; margin-bottom: 14px; }
+.stu-filters { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.stu-filter-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.stu-filter-label { font-size: 0.78rem; font-weight: 700; color: var(--medium-gray); min-width: 56px; text-transform: uppercase; }
+.stu-chip {
+    padding: 7px 14px; border: 2px solid #e2e8f0; background: white; border-radius: 20px;
+    cursor: pointer; font-weight: 600; font-size: 0.82rem; color: var(--medium-gray);
+    transition: var(--transition); display: inline-flex; align-items: center; gap: 6px;
+}
+.stu-chip:hover { border-color: var(--green); color: var(--green); }
+.stu-chip.active { background: var(--green); border-color: var(--green); color: white; }
+.stu-chip .n { background: rgba(0,0,0,0.08); border-radius: 10px; padding: 0 7px; font-size: 0.74rem; }
+.stu-chip.active .n { background: rgba(255,255,255,0.3); }
+.stu-badge.active { background: #eafaf1; color: var(--green); }
+.stu-badge.finished { background: #eceff1; color: #607d8b; }
+/* ============ 手机端适配 ============ */
+.main-header .container, .section-header, .header-actions { min-width: 0; }
+.user-info #teacherName { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 640px) {
+    .container { padding: 0 12px; }
+    main.container { padding-left: 12px !important; padding-right: 12px !important; }
+
+    /* 页头：标题一行，下面「返回 / 用户名 / 退出」一行 */
+    .main-header { padding: 12px 0; }
+    .main-header .container { gap: 8px; }
+    .header-actions { width: 100%; flex-wrap: nowrap; gap: 8px; }
+    .header-actions .user-info { flex: 1; min-width: 0; padding: 6px 12px; font-size: 0.82rem; }
+    .header-actions .user-info span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .back-btn, .logout-btn { padding: 8px 12px; flex-shrink: 0; }
+
+    /* 课程区标题栏：三个按钮不再挤出屏幕 */
+    .section-header > div[style*="display:flex"] { width: 100%; }
+    .section-header #addCourseBtn { flex: 1 0 100%; justify-content: center; }
+    .section-header .filter-btn-active, .section-header .filter-btn-inactive { flex: 1; padding: 8px 10px; }
+
+    .stu-toolbar { margin-bottom: 10px; }
+    .stu-filter-label { min-width: 100%; }
+    .stu-chip { padding: 6px 12px; }
+    .stu-actions .stu-btn { flex: 1; justify-content: center; }
+    .modal-content, .modal-content.modal-lg { padding: 16px; }
+    .modal-content .form-actions { flex-wrap: wrap; }
+    .modal-content .form-actions > * { flex: 1 1 auto; justify-content: center; }
+}
+@media (max-width: 420px) {
+    .back-btn .btn-label, .logout-btn .btn-label { display: none; }
+    .main-header h1 { font-size: 0.98rem; }
+}
+/* ============ 汉堡菜单（手机端） ============ */
+.menu-toggle { display: none; }
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: flex; align-items: center; gap: 12px; width: 100%;
+        padding: 14px 16px; border: none; background: white; cursor: pointer;
+        font-family: inherit; font-weight: 700; font-size: 0.98rem; color: var(--dark-gray);
+    }
+    .menu-toggle .fa-bars { font-size: 1.15rem; color: var(--civique); }
+    .menu-toggle #menuCurrent { flex: 1; text-align: left; }
+    .menu-toggle .chev { font-size: 0.8rem; color: var(--medium-gray); transition: transform 0.2s; }
+    .admin-tabs.open .menu-toggle .chev { transform: rotate(180deg); }
+
+    .admin-tabs .container {
+        display: none; flex-direction: column; gap: 0; padding: 0; overflow: visible;
+        position: absolute; left: 0; right: 0; top: 100%; background: white;
+        border-top: 1px solid #eee; box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    }
+    .admin-tabs.open .container { display: flex; }
+    .admin-tab {
+        width: 100%; justify-content: flex-start; padding: 15px 20px; font-size: 0.98rem;
+        border-radius: 0; border-bottom: none; border-left: 4px solid transparent;
+        border-top: 1px solid #f1f3f5;
+    }
+    .admin-tab.active { background: #f6f8fb; }
+    .admin-tab.active[data-cat="civique"] { border-left-color: var(--civique-accent); }
+    .admin-tab.active[data-cat="francais"] { border-left-color: var(--francais); }
+    .admin-tab.active[data-cat="calendar"] { border-left-color: var(--purple); }
+    .admin-tab.active[data-cat="students"] { border-left-color: var(--green); }
+}
 </style>
 </head>
 <body>
@@ -566,24 +715,30 @@ body { font-family: 'Open Sans', sans-serif; background: var(--light-gray); colo
 <div class="container">
 <h1><i class="fas fa-chalkboard-user"></i> <span id="headerTitle">Espace Intervenant</span></h1>
 <div class="header-actions">
-<button class="back-btn" id="backBtn"><i class="fas fa-arrow-left"></i> Retour</button>
+<button class="back-btn" id="backBtn"><i class="fas fa-arrow-left"></i><span class="btn-label"> Retour</span></button>
 <div class="user-info"><i class="fas fa-user-circle"></i> <span id="teacherName">Chargement...</span></div>
-<button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+<button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span class="btn-label"> Déconnexion</span></button>
 </div>
 </div>
 </header>
 
 <!-- ============ TABS ============ -->
 <nav class="admin-tabs" id="tabsNav" style="display:none;">
+<button type="button" class="menu-toggle" id="menuToggle" aria-label="Menu" aria-expanded="false">
+<i class="fas fa-bars"></i> <span id="menuCurrent">Menu</span> <i class="fas fa-chevron-down chev"></i>
+</button>
 <div class="container">
 <button class="admin-tab active" data-cat="civique" id="tabCivique">
-<i class="fas fa-graduation-cap"></i> 📘 Civique
+<i class="fas fa-graduation-cap"></i> <span class="tab-label">📘 Civique</span>
 </button>
 <button class="admin-tab" data-cat="francais" id="tabFrancais">
-<i class="fas fa-language"></i> 🇫🇷 Français
+<i class="fas fa-language"></i> <span class="tab-label">🇫🇷 Français</span>
 </button>
 <button class="admin-tab" data-cat="calendar" id="tabCalendar">
-<i class="fas fa-calendar-alt"></i> 📅 Calendrier
+<i class="fas fa-calendar-alt"></i> <span class="tab-label">📅 Calendrier</span>
+</button>
+<button class="admin-tab" data-cat="students" id="tabStudents">
+<i class="fas fa-user-graduate"></i> <span class="tab-label">👨‍🎓 Mes élèves</span>
 </button>
 </div>
 </nav>
@@ -631,7 +786,8 @@ body { font-family: 'Open Sans', sans-serif; background: var(--light-gray); colo
 <div class="section" id="coursesSection">
 <div class="section-header" id="coursesHeader">
 <h3><i class="fas fa-calendar-day"></i> Mes cours</h3>
-<div style="display:flex; gap:8px;">
+<div style="display:flex; gap:8px; flex-wrap:wrap;">
+<button class="add-btn" id="addCourseBtn"><i class="fas fa-calendar-plus"></i> Planifier un cours</button>
 <button class="filter-btn-active" id="showUpcomingBtn">📅 À venir</button>
 <button class="filter-btn-inactive" id="showPastBtn">📜 Terminés</button>
 </div>
@@ -674,6 +830,20 @@ body { font-family: 'Open Sans', sans-serif; background: var(--light-gray); colo
 
 </div>
 </div><!-- /tabContent-calendar -->
+
+<!-- ===== TAB: MES ÉLÈVES ===== -->
+<div id="tabContent-students" class="hidden">
+<div class="section">
+<div class="section-header" style="border-bottom-color: var(--green);">
+<h3 style="color: var(--green);"><i class="fas fa-user-graduate"></i> Mes élèves <span id="studentsCount" class="date-count" style="margin-left:6px;">0</span></h3>
+</div>
+<div class="stu-toolbar">
+<input type="text" class="stu-search" id="studentSearch" placeholder="🔍 Rechercher un élève...">
+</div>
+<div class="stu-filters" id="studentFilters"></div>
+<div id="studentsList"><div class="empty-state">Chargement...</div></div>
+</div>
+</div><!-- /tabContent-students -->
 
 </main>
 
@@ -848,6 +1018,93 @@ body { font-family: 'Open Sans', sans-serif; background: var(--light-gray); colo
 <button type="button" class="cancel-btn" data-close="courseDetailModal">Fermer</button>
 <button type="button" class="save-btn" id="cdEditBtn" style="display:none;"><i class="fas fa-edit"></i> Modifier</button>
 </div>
+</div>
+</div>
+
+<!-- ============ MODAL: PROFIL ÉLÈVE ============ -->
+<div class="modal" id="studentProfileModal">
+<div class="modal-content modal-lg">
+<div class="modal-header">
+<h3 id="spTitle"><i class="fas fa-user-graduate"></i> Élève</h3>
+<button class="close-modal" data-close="studentProfileModal">&times;</button>
+</div>
+<div id="spBody"></div>
+<div class="form-actions">
+<button type="button" class="cancel-btn" data-close="studentProfileModal">Fermer</button>
+<button type="button" class="stu-btn dash" id="spDashBtn"><i class="fas fa-chart-line"></i> Dashboard / Erreurs</button>
+<button type="button" class="stu-btn plan" id="spPlanBtn"><i class="fas fa-calendar-plus"></i> Planifier un cours</button>
+</div>
+</div>
+</div>
+
+<!-- ============ MODAL: PLANIFIER / MODIFIER UN COURS ============ -->
+<div class="modal" id="courseFormModal">
+<div class="modal-content modal-lg">
+<div class="modal-header">
+<h3 id="cfTitle"><i class="fas fa-calendar-plus"></i> Planifier un cours</h3>
+<button class="close-modal" data-close="courseFormModal">&times;</button>
+</div>
+<form id="courseForm">
+<input type="hidden" id="cfCourseId">
+<div class="cf-note"><i class="fas fa-info-circle"></i> Les heures sont déduites automatiquement du solde de l'élève. Vous ne pouvez pas modifier ce solde, et ne pouvez planifier que vos propres cours.</div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-book"></i> Matière</label>
+<select id="cfCategory"></select>
+</div>
+<div class="form-group">
+<label><i class="fas fa-tag"></i> Type de cours *</label>
+<select id="cfType" required></select>
+</div>
+</div>
+<div class="form-group">
+<label><i class="fas fa-users"></i> Mode</label>
+<div class="mode-switch">
+<button type="button" data-mode="solo" class="active"><i class="fas fa-user"></i> Individuel</button>
+<button type="button" data-mode="group"><i class="fas fa-users"></i> Groupe</button>
+</div>
+</div>
+<div class="form-group" id="cfSoloWrap">
+<label><i class="fas fa-user-graduate"></i> Élève *</label>
+<select id="cfStudentSolo"></select>
+</div>
+<div class="form-group hidden" id="cfGroupWrap">
+<label><i class="fas fa-user-graduate"></i> Élèves * <span id="cfSelCount" style="font-weight:400; color:var(--medium-gray);"></span></label>
+<input type="text" id="cfGroupSearch" placeholder="🔍 Rechercher..." style="margin-bottom:8px;">
+<div class="stu-pick-list" id="cfGroupList"></div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label><i class="fas fa-calendar-day"></i> Date et heure *</label>
+<input type="datetime-local" id="cfStart" required>
+</div>
+<div class="form-group">
+<label><i class="fas fa-hourglass-half"></i> Durée (h)</label>
+<input type="number" id="cfDuration" value="2" step="0.5" min="0.5" max="8">
+</div>
+</div>
+<div class="form-group">
+<label><i class="fas fa-video"></i> Lien Google Meet *</label>
+<input type="url" id="cfMeeting" placeholder="https://meet.google.com/...">
+</div>
+<div class="form-group">
+<label><i class="fas fa-map-marker-alt"></i> Lieu</label>
+<input type="text" id="cfLocation" placeholder="Salle, adresse...">
+</div>
+<div class="form-group">
+<label><i class="fas fa-paperclip"></i> Lien du support</label>
+<input type="url" id="cfMaterial" placeholder="https://...">
+</div>
+<div class="form-group">
+<label><i class="fas fa-sticky-note"></i> Notes</label>
+<textarea id="cfNotes" rows="2"></textarea>
+</div>
+<div class="cf-warn hidden" id="cfWarn"></div>
+<div class="form-actions">
+<button type="button" class="cancel-btn" data-close="courseFormModal">Annuler</button>
+<button type="submit" class="save-btn" id="cfSubmitBtn"><i class="fas fa-save"></i> Enregistrer</button>
+</div>
+</form>
 </div>
 </div>
 
@@ -1201,10 +1458,16 @@ async function loadAllData() {
 
         allAvailabilities = availRes.data || [];
 
+        // 学生资料（姓名/邮箱/课时等，只读）
+        const myStudentIds = new Set();
+        allCourses.forEach(c => (c.students || []).forEach(st => myStudentIds.add(st.id)));
+        await loadStudentInfo(Array.from(myStudentIds));
+
         renderStats();
         renderCourses();
         renderAvailabilities();
         renderCalendar();
+        renderStudents();
 
     } catch (err) {
         console.error('加载失败:', err);
@@ -1357,6 +1620,11 @@ function renderCourseCard(c) {
 
     // 按钮构建
     let actions = '';
+
+    // 0. 修改课程（时间/学生/时长…，仅限自己未开始的课，会自动调整课时）
+    if (!isCancelled && !isCompleted && !isStarted && c.status === 'scheduled' && !isExpired) {
+        actions += `<button class="action-btn btn-edit" onclick="openCourseForm('${c.id}')"><i class="fas fa-pen"></i> Modifier</button>`;
+    }
 
     // 1. 编辑地点/Meet
     if (!isCancelled && !isCompleted) {
@@ -2082,7 +2350,7 @@ async function confirmCancel() {
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
 
-        // 拿课程，决定退哪个 credit
+        // 拿课程，决定退哪个 credit（单人课 + 小组课的所有学生都退）
         const { data: course } = await supabase
             .from('courses_v2')
             .select('student_id, duration, category, status')
@@ -2095,17 +2363,15 @@ async function confirmCancel() {
             course.status === 'completed'
         );
 
-        if (isConsuming && course.student_id && course.duration) {
-            const field = course.category === 'francais' ? 'french_credit' : 'credit';
-            const { data: student } = await supabase
-                .from('users')
-                .select(field)
-                .eq('id', course.student_id)
-                .single();
-            if (student) {
-                const newVal = (student[field] || 0) + course.duration;
-                const upd = {}; upd[field] = newVal;
-                await supabase.from('users').update(upd).eq('id', course.student_id);
+        if (isConsuming && course.duration) {
+            const { data: csRows } = await supabase
+                .from('course_students')
+                .select('student_id')
+                .eq('course_id', pendingCancelId);
+            const refundIds = new Set((csRows || []).map(r => r.student_id));
+            if (course.student_id) refundIds.add(course.student_id);
+            for (const sid of refundIds) {
+                await adjustStudentCredit(sid, course.duration, course.category);
             }
         }
 
@@ -2119,7 +2385,14 @@ async function confirmCancel() {
             .eq('id', pendingCancelId);
         if (error) throw error;
 
-        showToast('Cours annulé ✓ (crédits restitués)');
+        let emailResult = null;
+        try {
+            emailResult = await sendCourseEmailNotification(pendingCancelId, 'cancel');
+        } catch (emailErr) {
+            console.warn('⚠️ 取消邮件失败:', emailErr.message);
+        }
+
+        showToast('Cours annulé ✓ (crédits restitués)' + emailSuffix(emailResult), emailHasProblem(emailResult) ? 'warning' : 'success');
         closeAllModals();
         pendingCancelId = null;
         await loadAllData();
@@ -2197,20 +2470,16 @@ async function releaseSlot(id) {
             if (courseErr) throw courseErr;
 
             if (course && course.status !== 'cancelled') {
-                // 2b. 退学生 credit
-                if (course.student_id && course.duration) {
-                    const field = course.category === 'francais' ? 'french_credit' : 'credit';
-                    const { data: stu } = await supabase
-                        .from('users')
-                        .select(field)
-                        .eq('id', course.student_id)
-                        .maybeSingle();
-
-                    if (stu) {
-                        const newVal = (stu[field] || 0) + course.duration;
-                        const upd = {}; upd[field] = newVal;
-                        await supabase.from('users').update(upd).eq('id', course.student_id);
-                        console.log(`↩️ 已退 ${course.duration}h ${field} 给 ${course.student_id}`);
+                // 2b. 退学生 credit（单人课 + 小组课的所有学生）
+                if (course.duration) {
+                    const { data: csRows } = await supabase
+                        .from('course_students')
+                        .select('student_id')
+                        .eq('course_id', courseId);
+                    const refundIds = new Set((csRows || []).map(r => r.student_id));
+                    if (course.student_id) refundIds.add(course.student_id);
+                    for (const sid of refundIds) {
+                        await adjustStudentCredit(sid, course.duration, course.category);
                     }
                 }
 
@@ -2228,6 +2497,8 @@ async function releaseSlot(id) {
                     console.warn('⚠️ 取消课程失败:', cancelErr.message);
                 } else {
                     console.log('✅ 课程已取消:', courseId);
+                    try { await sendCourseEmailNotification(courseId, 'cancel'); }
+                    catch (emailErr) { console.warn('⚠️ 取消邮件失败:', emailErr.message); }
                 }
             }
         }
@@ -2388,6 +2659,13 @@ function applyTabStyles() {
         t.classList.toggle('active', t.dataset.cat === currentCat);
     });
 
+    // 汉堡菜单：显示当前所在页面，并收起菜单
+    const curLabel = document.querySelector('.admin-tab.active .tab-label');
+    const menuCur = document.getElementById('menuCurrent');
+    if (curLabel && menuCur) menuCur.textContent = curLabel.textContent.trim();
+    const navEl = document.getElementById('tabsNav');
+    if (navEl) { navEl.classList.remove('open'); const mt = document.getElementById('menuToggle'); if (mt) mt.setAttribute('aria-expanded', 'false'); }
+
     // Header 主题（日历 Tab 时保持 civique 蓝）
     const header = document.getElementById('mainHeader');
     header.classList.toggle('theme-francais', currentCat === 'francais');
@@ -2395,7 +2673,12 @@ function applyTabStyles() {
     // 内容区切换
     const catContent = document.getElementById('tabContent-cat');
     const calContent = document.getElementById('tabContent-calendar');
-    if (currentCat === 'calendar') {
+    const stuContent = document.getElementById('tabContent-students');
+    if (stuContent) stuContent.classList.toggle('hidden', currentCat !== 'students');
+    if (currentCat === 'students') {
+        catContent.classList.add('hidden');
+        calContent.classList.add('hidden');
+    } else if (currentCat === 'calendar') {
         catContent.classList.add('hidden');
         calContent.classList.remove('hidden');
     } else {
@@ -2419,13 +2702,14 @@ function applyTabStyles() {
 }
 
 function switchTab(cat) {
-    if (cat !== 'civique' && cat !== 'francais' && cat !== 'calendar') return;
+    if (cat !== 'civique' && cat !== 'francais' && cat !== 'calendar' && cat !== 'students') return;
     currentCat = cat;
     applyTabStyles();
     renderStats();
     renderCourses();
     renderAvailabilities();
     renderCalendar();
+    renderStudents();
 }
 
 // ============================================================
@@ -2536,6 +2820,9 @@ function bindEvents() {
     document.getElementById('calPrevBtn').addEventListener('click', () => changeWeek(-1));
     document.getElementById('calTodayBtn').addEventListener('click', () => changeWeek(0));
     document.getElementById('calNextBtn').addEventListener('click', () => changeWeek(1));
+
+    // 学生 / 排课
+    bindStudentAndScheduleEvents();
 }
 // ============================================================
 // 实时订阅：学生预约/取消/评价 时自动刷新
@@ -2633,6 +2920,1027 @@ function subscribeToTeacherCourses() {
 // 
 // ============================================================
 document.addEventListener('DOMContentLoaded', init);
+
+
+// ============================================================
+// 👨‍🎓 MES ÉLÈVES（学生资料 / 课程历史 / Dashboard）
+// ============================================================
+let studentInfoMap = {};          // { studentId: users 表中的公开字段（不含密码） }
+let studentSearchTerm = '';
+let teacherMeetLinkCache = null;
+
+async function loadStudentInfo(ids) {
+    studentInfoMap = {};
+    if (!ids || ids.length === 0) return;
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        // ⚠️ 不使用 select('*')，避免把学生的密码等敏感字段带到老师浏览器
+        let res = await supabase
+            .from('users')
+            .select('id, name, email, role, type, french_type, level, credit, french_credit, timer, french_timer')
+            .in('id', ids);
+        if (res.error) {
+            res = await supabase.from('users').select('id, name, role, credit, french_credit').in('id', ids);
+        }
+        (res.data || []).forEach(u => { studentInfoMap[u.id] = u; });
+    } catch (e) {
+        console.warn('⚠️ 加载学生资料失败:', e.message);
+    }
+}
+
+function getTeacherModules() {
+    return (teacher.modules || []).filter(m => m === 'civique' || m === 'francais');
+}
+
+function getCreditOf(info, cat) {
+    return (cat === 'francais' ? info.french_credit : info.credit) || 0;
+}
+
+// 老师教过的学生（来自自己的课程，仅限自己的科目；单人课与小组课都算）
+let studentStatusFilter = 'all';     // 'all' | 'active' | 'finished'
+let studentCatFilter = 'all';        // 'all' | 'civique' | 'francais'
+
+function getMyStudents() {
+    const mods = getTeacherModules();
+    const map = {};
+    allCourses.filter(c => mods.includes(c.category)).forEach(c => {
+        (c.students || []).forEach(s => {
+            if (!map[s.id]) map[s.id] = { id: s.id, name: s.name, courses: [] };
+            map[s.id].courses.push(c);
+        });
+    });
+    const now = new Date();
+    return Object.values(map).map(st => {
+        const live = st.courses.filter(c => c.status !== 'cancelled');
+        const base = live.length ? live : st.courses;
+        st.cats = [...new Set(base.map(c => c.category))];
+        const done = live.filter(c => c.status === 'completed')
+            .sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+        const up = live.filter(c => c.status !== 'completed' && new Date(c.start_time) > now)
+            .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+        st.lastCourse = done[0] || null;
+        st.nextCourse = up[0] || null;
+        st.doneCount = done.length;
+        st.info = studentInfoMap[st.id] || {};
+        // 每个科目的状态：还有剩余课时 或 还有未上的已排课程 = 进行中；否则 = 已结课
+        st.state = {};
+        st.cats.forEach(cat => {
+            const hasUpcoming = live.some(c => c.category === cat && c.status !== 'completed' &&
+                new Date(new Date(c.start_time).getTime() + (c.duration || 2) * 3600000) > now);
+            const raw = cat === 'francais' ? st.info.french_credit : st.info.credit;
+            st.state[cat] = (hasUpcoming || (raw != null && raw > 0)) ? 'active' : 'finished';
+        });
+        return st;
+    }).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+}
+
+function studentMatches(s, status, cat) {
+    const cats = cat === 'all' ? s.cats : s.cats.filter(c => c === cat);
+    if (cats.length === 0) return false;
+    if (status === 'all') return true;
+    const anyActive = cats.some(c => s.state[c] === 'active');
+    return status === 'active' ? anyActive : !anyActive;
+}
+
+function renderStudentFilters(all) {
+    const el = document.getElementById('studentFilters');
+    if (!el) return;
+    const mods = getTeacherModules();
+    const cnt = (st, ct) => all.filter(s => studentMatches(s, st, ct)).length;
+    const chip = (group, value, label, n, active) =>
+        `<button type="button" class="stu-chip ${active ? 'active' : ''}" data-group="${group}" data-value="${value}">${label} <span class="n">${n}</span></button>`;
+
+    let html = '<div class="stu-filter-row"><span class="stu-filter-label">Statut</span>' +
+        chip('status', 'all', 'Tous', cnt('all', studentCatFilter), studentStatusFilter === 'all') +
+        chip('status', 'active', '🟢 En cours', cnt('active', studentCatFilter), studentStatusFilter === 'active') +
+        chip('status', 'finished', '🏁 Terminés', cnt('finished', studentCatFilter), studentStatusFilter === 'finished') +
+        '</div>';
+
+    if (mods.length > 1) {
+        html += '<div class="stu-filter-row"><span class="stu-filter-label">Matière</span>' +
+            chip('cat', 'all', 'Toutes', cnt(studentStatusFilter, 'all'), studentCatFilter === 'all') +
+            chip('cat', 'civique', '📘 Civique', cnt(studentStatusFilter, 'civique'), studentCatFilter === 'civique') +
+            chip('cat', 'francais', '🇫🇷 Français', cnt(studentStatusFilter, 'francais'), studentCatFilter === 'francais') +
+            '</div>';
+    }
+    el.innerHTML = html;
+}
+
+function renderStudents() {
+    const container = document.getElementById('studentsList');
+    if (!container) return;
+    const mods = getTeacherModules();
+    if (mods.length <= 1) studentCatFilter = 'all';   // 只教一个科目时不需要科目筛选
+
+    const all = getMyStudents();
+    renderStudentFilters(all);
+
+    const term = studentSearchTerm.trim().toLowerCase();
+    let list = all.filter(s => studentMatches(s, studentStatusFilter, studentCatFilter));
+    if (term) list = list.filter(s => (s.name || '').toLowerCase().includes(term));
+    document.getElementById('studentsCount').textContent = list.length;
+
+    if (list.length === 0) {
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash"></i><p>${term ? 'Aucun élève trouvé' : 'Aucun élève dans cette catégorie'}</p></div>`;
+        return;
+    }
+
+    container.innerHTML = '<div class="stu-grid">' + list.map(s => {
+        const shownCats = studentCatFilter === 'all' ? s.cats : s.cats.filter(c => c === studentCatFilter);
+        const badges = shownCats.map(cat => {
+            const fr = cat === 'francais';
+            const fin = s.state[cat] === 'finished';
+            return `<span class="stu-badge ${fr ? 'francais' : ''}">${fr ? '🇫🇷 Français' : '📘 Civique'}</span>` +
+                   `<span class="stu-badge credit" title="Solde (lecture seule)">⏱ ${getCreditOf(s.info, cat)}h</span>` +
+                   `<span class="stu-badge ${fin ? 'finished' : 'active'}">${fin ? '🏁 Terminé' : '🟢 En cours'}</span>`;
+        }).join('');
+        const last = s.lastCourse
+            ? `<div><i class="fas fa-history"></i> Dernier cours avec vous : ${escapeHtml(formatDateTime(s.lastCourse.start_time))}</div>`
+            : `<div><i class="fas fa-history"></i> Aucun cours terminé avec vous</div>`;
+        const next = s.nextCourse
+            ? `<div><i class="fas fa-calendar-check"></i> Prochain cours : ${escapeHtml(formatDateTime(s.nextCourse.start_time))}</div>`
+            : `<div><i class="fas fa-calendar"></i> Aucun cours planifié</div>`;
+        return `<div class="stu-card">
+            <h4><i class="fas fa-user-circle" style="color:var(--green);"></i> ${escapeHtml(s.name || '—')}</h4>
+            <div class="stu-badges">${badges}</div>
+            <div class="stu-meta">${last}${next}<div><i class="fas fa-check-circle"></i> ${s.doneCount} cours terminé(s) avec vous</div></div>
+            <div class="stu-actions">
+                <button class="stu-btn profile" onclick="openStudentProfile('${escapeHtml(s.id)}')"><i class="fas fa-id-card"></i> Profil</button>
+                <button class="stu-btn dash" onclick="openStudentDashboard('${escapeHtml(s.id)}')"><i class="fas fa-chart-line"></i> Erreurs</button>
+                <button class="stu-btn plan" onclick="openCourseForm(null, { studentId: '${escapeHtml(s.id)}' })"><i class="fas fa-calendar-plus"></i> Planifier</button>
+            </div>
+        </div>`;
+    }).join('') + '</div>';
+}
+
+// 打开学生的 Dashboard（错题集、成绩历史）
+function openStudentDashboard(studentId) {
+    const info = studentInfoMap[studentId] || (getMyStudents().find(s => s.id === studentId) || {});
+    const name = info.name || '';
+    if (!name) { showToast('Élève introuvable', 'error'); return; }
+    const payload = {
+        id: studentId, userId: studentId, name: name,
+        type: 't', daysLeft: -1, role: 'student',
+        viewedByTeacher: teacher.id
+    };
+    const token = btoa(encodeURIComponent(JSON.stringify(payload)));
+    window.open('dashboard-etudiant.html?token=' + encodeURIComponent(token) + '&type=t', '_blank');
+}
+window.openStudentDashboard = openStudentDashboard;
+
+// 学生的完整课程历史（所有老师，仅限本老师所教的科目）
+async function loadStudentHistory(studentId) {
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const mods = getTeacherModules();
+
+    const [csRes, legacyRes] = await Promise.all([
+        supabase.from('course_students').select('course_id, teacher_comment').eq('student_id', studentId),
+        supabase.from('courses_v2').select('id').eq('student_id', studentId)
+    ]);
+    const csComment = {};
+    const ids = new Set();
+    (csRes.data || []).forEach(r => { ids.add(r.course_id); csComment[r.course_id] = r.teacher_comment || ''; });
+    (legacyRes.data || []).forEach(r => ids.add(r.id));
+    const idList = Array.from(ids);
+    if (idList.length === 0) return [];
+
+    let courses = [];
+    for (let i = 0; i < idList.length; i += 80) {
+        const chunk = idList.slice(i, i + 80);
+        const res = await supabase
+            .from('courses_v2')
+            .select('id, category, course_type, course_mode, start_time, duration, status, teacher_id, teacher_comment, cancel_reason')
+            .in('id', chunk)
+            .in('category', mods);
+        if (res.error) throw res.error;
+        courses = courses.concat(res.data || []);
+    }
+
+    const tIds = [...new Set(courses.map(c => c.teacher_id).filter(Boolean))];
+    const tMap = {};
+    if (tIds.length) {
+        const tr = await supabase.from('users').select('id, name').in('id', tIds);
+        (tr.data || []).forEach(u => { tMap[u.id] = u.name; });
+    }
+
+    return courses.map(c => ({
+        ...c,
+        teacher_name: tMap[c.teacher_id] || '—',
+        comment: c.course_mode === 'group' ? (csComment[c.id] || '') : (c.teacher_comment || csComment[c.id] || '')
+    })).sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+}
+
+async function openStudentProfile(studentId) {
+    const st = getMyStudents().find(s => s.id === studentId);
+    if (!st) return;
+    const info = st.info || {};
+    const mods = getTeacherModules();
+
+    document.getElementById('spTitle').innerHTML = '<i class="fas fa-user-graduate"></i> ' + escapeHtml(st.name || 'Élève');
+    document.getElementById('spDashBtn').onclick = () => openStudentDashboard(studentId);
+    document.getElementById('spPlanBtn').onclick = () => { closeAllModals(); openCourseForm(null, { studentId: studentId }); };
+
+    const creditHtml = mods.map(cat => {
+        const fr = cat === 'francais';
+        return `<div class="sp-item"><div class="label">${fr ? '🇫🇷 Crédit Français' : '📘 Crédit Civique'}<span class="sp-lock"><i class="fas fa-lock"></i> lecture seule</span></div><div class="value"><strong>${getCreditOf(info, cat)} h</strong></div></div>`;
+    }).join('');
+
+    let expiryHtml = '';
+    if (mods.includes('civique') && info.timer) expiryHtml += `<div class="sp-item"><div class="label">⏳ Expiration Civique</div><div class="value">${escapeHtml(formatDateShort(info.timer))}</div></div>`;
+    if (mods.includes('francais') && info.french_timer) expiryHtml += `<div class="sp-item"><div class="label">⏳ Expiration Français</div><div class="value">${escapeHtml(formatDateShort(info.french_timer))}</div></div>`;
+
+    const body = document.getElementById('spBody');
+    body.innerHTML = `
+        <div class="sp-grid">
+            <div class="sp-item"><div class="label">Nom</div><div class="value">${escapeHtml(st.name || '—')}</div></div>
+            <div class="sp-item"><div class="label">Email</div><div class="value">${escapeHtml(info.email || '—')}</div></div>
+            <div class="sp-item"><div class="label">Niveau</div><div class="value">${escapeHtml(info.level || '—')}</div></div>
+            <div class="sp-item"><div class="label">Cours terminés avec vous</div><div class="value">${st.doneCount}</div></div>
+            ${creditHtml}
+            ${expiryHtml}
+        </div>
+        <div id="spHistory"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Chargement de l'historique...</p></div></div>`;
+    document.getElementById('studentProfileModal').style.display = 'flex';
+
+    try {
+        const history = await loadStudentHistory(studentId);
+        const el = document.getElementById('spHistory');
+        if (!el) return;
+        el.innerHTML = renderStudentHistory(history);
+    } catch (err) {
+        console.error(err);
+        const el = document.getElementById('spHistory');
+        if (el) el.innerHTML = `<div class="cf-warn">Impossible de charger l'historique : ${escapeHtml(err.message)}</div>`;
+    }
+}
+window.openStudentProfile = openStudentProfile;
+
+function renderStudentHistory(history) {
+    const statusMap = {
+        scheduled: '📅 Planifié', in_progress: '🔄 En cours',
+        completed: '✅ Terminé', cancelled: '❌ Annulé'
+    };
+    const lastDone = history.find(h => h.status === 'completed');
+    let html = '';
+
+    if (lastDone) {
+        const mine = lastDone.teacher_id === teacher.id;
+        html += `<div class="sp-last"><strong>📌 Dernier cours :</strong> ${escapeHtml(formatDateTime(lastDone.start_time))}
+            — ${escapeHtml(getCourseTypeText(lastDone.category, lastDone.course_type))}<br>
+            <strong>👨‍🏫 Intervenant :</strong> ${escapeHtml(lastDone.teacher_name)}${mine ? ' <span class="hist-me">Vous</span>' : ''}</div>`;
+    } else {
+        html += `<div class="sp-last">📌 Aucun cours terminé pour le moment.</div>`;
+    }
+
+    html += `<div class="sp-h"><i class="fas fa-history"></i> Historique des cours (${history.length})</div>`;
+    if (history.length === 0) return html + '<div class="empty-state"><p>Aucun cours</p></div>';
+
+    html += history.map(h => {
+        const fr = h.category === 'francais';
+        const mine = h.teacher_id === teacher.id;
+        return `<div class="hist-item ${fr ? 'francais' : ''} ${h.status === 'cancelled' ? 'cancelled' : ''} ${mine ? 'mine' : ''}">
+            <div class="hist-top">
+                <span>${escapeHtml(getCourseTypeText(h.category, h.course_type))}</span>
+                <span>${statusMap[h.status] || escapeHtml(h.status || '')}</span>
+            </div>
+            <div class="hist-sub">
+                <span><i class="fas fa-calendar-day"></i> ${escapeHtml(formatDateTime(h.start_time))} (${h.duration || 2} h)</span>
+                <span><i class="fas fa-chalkboard-user"></i> ${escapeHtml(h.teacher_name)}${mine ? ' <span class="hist-me">Vous</span>' : ''}</span>
+                ${h.course_mode === 'group' ? '<span><i class="fas fa-users"></i> Groupe</span>' : ''}
+            </div>
+            ${h.comment ? `<div class="hist-comment">💬 ${escapeHtml(h.comment)}</div>` : ''}
+            ${h.cancel_reason ? `<div class="hist-sub"><span><i class="fas fa-ban"></i> ${escapeHtml(h.cancel_reason)}</span></div>` : ''}
+        </div>`;
+    }).join('');
+    return html;
+}
+
+// ============================================================
+// 📅 老师排课 / 修改自己的课（与管理员一致：扣减 / 退还学生课时）
+// ============================================================
+const CIVIQUE_TYPE_GROUPS = [
+    { label: '➡️ 全能班', items: [['ec110', '十年卡全能班'], ['ec14', '四年卡全能班'], ['ec1f', '入籍全能班']] },
+    { label: '➡️ 速成班', items: [['ec210', '十年卡速成'], ['ec24', '四年卡速成'], ['ec2f', '入籍速成']] },
+    { label: '➡️ 自选班', items: [['ec310', '十年卡自选'], ['ec34', '四年卡自选'], ['ec3f', '入籍自选']] },
+    { label: '➡️ 模拟考试', items: [['ex4', '四年卡模拟考试'], ['ex10', '十年卡模拟考试'], ['exf', '入籍模拟考试']] }
+];
+const FRENCH_TYPE_LIST = [
+    ['beginner', '🌱 Débutant A1-A2'], ['intermediate', '📈 Intermédiaire B1-B2'],
+    ['advanced', '🎯 Avancé C1-C2'], ['business', '💼 Français des affaires'],
+    ['delf', '📝 Préparation DELF'], ['dalf', '📝 Préparation DALF'],
+    ['tcf', '📝 Préparation TCF'], ['tcf_irn', '📝 Préparation TCF IRN']
+];
+
+let cfMode = 'solo';
+let cfSelected = [];          // 小组课已勾选的学生 id
+let cfExtraIds = [];          // 编辑时必须保留在候选里的原学生
+
+function isValidTypeFor(category, code) {
+    if (category === 'civique') return CIVIQUE_TYPE_GROUPS.some(g => g.items.some(i => i[0] === code));
+    if (category === 'francais') return FRENCH_TYPE_LIST.some(i => i[0] === code);
+    return false;
+}
+
+function normalizeLocalDateTime(localValue) {
+    if (!localValue) return null;
+    const parts = localValue.split('T');
+    if (parts.length !== 2) return null;
+    const hm = parts[1].split(':');
+    if (hm.length < 2) return null;
+    return parts[0] + ' ' + hm[0].padStart(2, '0') + ':' + hm[1].padStart(2, '0') + ':00';
+}
+
+function getCandidateStudents(category) {
+    const roleOk = r => !r || (category === 'civique' ? (r === 'stu' || r === 'stu_all') : (r === 'stu_fr' || r === 'stu_all'));
+    return getMyStudents().filter(s => cfExtraIds.includes(s.id) || roleOk(s.info.role));
+}
+
+async function getTeacherMeetLink() {
+    if (teacherMeetLinkCache !== null) return teacherMeetLinkCache;
+    let link = '';
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        const { data } = await supabase
+            .from('teacher_meeting_links').select('meeting_link')
+            .eq('teacher_id', teacher.id).maybeSingle();
+        if (data && data.meeting_link) link = data.meeting_link;
+    } catch (e) { /* ignore */ }
+    if (!link) {
+        const last = [...allCourses].reverse().find(c => c.meeting_link);
+        if (last) link = last.meeting_link;
+    }
+    teacherMeetLinkCache = link;
+    return link;
+}
+
+function fillTypeOptions(category, selected) {
+    const sel = document.getElementById('cfType');
+    let html = '<option value="">— Choisir —</option>';
+    if (category === 'civique') {
+        CIVIQUE_TYPE_GROUPS.forEach(g => {
+            html += `<optgroup label="${escapeHtml(g.label)}">` +
+                g.items.map(i => `<option value="${i[0]}">${escapeHtml(i[1])}</option>`).join('') + '</optgroup>';
+        });
+    } else {
+        html += FRENCH_TYPE_LIST.map(i => `<option value="${i[0]}">${escapeHtml(i[1])}</option>`).join('');
+    }
+    sel.innerHTML = html;
+    sel.value = selected && isValidTypeFor(category, selected) ? selected : '';
+}
+
+function refreshCfStudents() {
+    const category = document.getElementById('cfCategory').value;
+    const candidates = getCandidateStudents(category);
+    const validIds = candidates.map(s => s.id);
+    cfSelected = cfSelected.filter(id => validIds.includes(id));
+
+    const solo = document.getElementById('cfStudentSolo');
+    const prevSolo = solo.value;
+    solo.innerHTML = '<option value="">— Choisir —</option>' + candidates.map(s =>
+        `<option value="${escapeHtml(s.id)}">${escapeHtml(s.name)} (${getCreditOf(s.info, category)}h)</option>`).join('');
+    solo.value = validIds.includes(prevSolo) ? prevSolo : '';
+
+    document.getElementById('cfGroupList').innerHTML = candidates.length ? candidates.map(s =>
+        `<label class="stu-pick" data-name="${escapeHtml((s.name || '').toLowerCase())}">
+            <input type="checkbox" value="${escapeHtml(s.id)}" ${cfSelected.includes(s.id) ? 'checked' : ''}>
+            <span>${escapeHtml(s.name)}</span><span class="cr">${getCreditOf(s.info, category)}h</span>
+        </label>`).join('') : '<div class="empty-state" style="padding:12px;"><p>Aucun élève disponible</p></div>';
+    updateCfSelCount();
+}
+
+function updateCfSelCount() {
+    document.getElementById('cfSelCount').textContent = '(' + cfSelected.length + ' sélectionné' + (cfSelected.length > 1 ? 's' : '') + ')';
+}
+
+function setCfMode(mode) {
+    cfMode = mode;
+    document.querySelectorAll('#courseFormModal .mode-switch button').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+    document.getElementById('cfSoloWrap').classList.toggle('hidden', mode !== 'solo');
+    document.getElementById('cfGroupWrap').classList.toggle('hidden', mode !== 'group');
+}
+
+async function openCourseForm(courseId, opts) {
+    opts = opts || {};
+    const cats = getTeacherModules();
+    if (cats.length === 0) { showToast('Aucun module assigné', 'error'); return; }
+
+    document.getElementById('courseForm').reset();
+    document.getElementById('cfWarn').classList.add('hidden');
+    document.getElementById('cfCourseId').value = courseId || '';
+    cfSelected = [];
+    cfExtraIds = [];
+
+    let course = null;
+    if (courseId) {
+        course = allCourses.find(c => c.id === courseId);
+        if (!course) return;
+        // 🔒 只能改自己的课、自己模块内的课、未开始的课
+        if (course.teacher_id !== teacher.id || !cats.includes(course.category)) {
+            showToast('Vous ne pouvez modifier que vos propres cours', 'error'); return;
+        }
+        if (course.status !== 'scheduled' || course.teacher_started) {
+            showToast('Ce cours ne peut plus être modifié', 'error'); return;
+        }
+        cfExtraIds = (course.students || []).map(s => s.id);
+    }
+
+    const catSel = document.getElementById('cfCategory');
+    catSel.innerHTML = cats.map(c => `<option value="${c}">${c === 'francais' ? '🇫🇷 Français' : '📘 Civique'}</option>`).join('');
+    let initialCat = course ? course.category : (opts.category && cats.includes(opts.category) ? opts.category : (cats.includes(currentCat) ? currentCat : cats[0]));
+    catSel.value = initialCat;
+    catSel.disabled = !!course || cats.length === 1;   // 编辑时不能换科目
+
+    fillTypeOptions(initialCat, course ? course.course_type : '');
+
+    document.getElementById('cfTitle').innerHTML = course
+        ? '<i class="fas fa-edit"></i> Modifier le cours'
+        : '<i class="fas fa-calendar-plus"></i> Planifier un cours';
+
+    if (course) {
+        setCfMode(course.course_mode === 'group' ? 'group' : 'solo');
+        cfSelected = cfExtraIds.slice();
+        refreshCfStudents();
+        if (course.course_mode !== 'group') document.getElementById('cfStudentSolo').value = cfExtraIds[0] || '';
+        const d = new Date(course.start_time);
+        document.getElementById('cfStart').value = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        document.getElementById('cfDuration').value = course.duration || 2;
+        document.getElementById('cfLocation').value = course.location || '';
+        document.getElementById('cfMaterial').value = course.material_link || '';
+        document.getElementById('cfNotes').value = course.notes || '';
+        document.getElementById('cfMeeting').value = course.meeting_link || '';
+    } else {
+        setCfMode('solo');
+        if (opts.studentId) cfSelected = [opts.studentId];
+        refreshCfStudents();
+        if (opts.studentId) document.getElementById('cfStudentSolo').value = opts.studentId;
+        document.getElementById('cfDuration').value = 2;
+    }
+
+    document.getElementById('courseFormModal').style.display = 'flex';
+
+    if (!document.getElementById('cfMeeting').value) {
+        const link = await getTeacherMeetLink();
+        const input = document.getElementById('cfMeeting');
+        if (link && !input.value) input.value = link;
+    }
+}
+window.openCourseForm = openCourseForm;
+
+// ---- 课时增减（优先调用数据库原子函数 adjust_user_credit） ----
+let creditRpcAvailable = true;
+async function adjustStudentCredit(studentId, delta, category) {
+    if (!studentId || !delta) return true;
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const field = category === 'civique' ? 'credit' : 'french_credit';
+
+    if (creditRpcAvailable) {
+        const { error } = await supabase.rpc('adjust_user_credit', {
+            p_user_id: String(studentId), p_field: field, p_delta: delta
+        });
+        if (!error) return true;
+        const missing = error.code === 'PGRST202' || error.code === '42883' ||
+            /could not find the function|does not exist/i.test(error.message || '');
+        if (!missing) { console.error('❌ adjust_user_credit 失败:', error.message); return false; }
+        creditRpcAvailable = false;
+        console.warn('⚠️ adjust_user_credit 不存在，回退到非原子方式');
+    }
+
+    const { data: u, error: fetchErr } = await supabase.from('users').select(field).eq('id', studentId).maybeSingle();
+    if (fetchErr || !u) return false;
+    const newVal = Math.max(0, (u[field] || 0) + delta);
+    const { error: updErr } = await supabase.from('users').update({ [field]: newVal }).eq('id', studentId);
+    if (updErr) { console.error('❌ 更新 credit 失败:', updErr.message); return false; }
+    return true;
+}
+
+// 删除老师「未被预定」且与新课冲突的空闲时间段（与管理员一致，仅限自己的）
+async function removeConflictingAvailabilities(startTimeStr, duration) {
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        const newStart = new Date(startTimeStr).getTime();
+        const newEnd = newStart + (duration || 2) * 3600000;
+        const { data: slots, error } = await supabase
+            .from('teacher_availabilities')
+            .select('id, start_time, end_time, status, course_id')
+            .eq('teacher_id', teacher.id)
+            .eq('status', 'available')
+            .gt('end_time', new Date().toISOString());
+        if (error || !slots) return 0;
+        const ids = slots.filter(s => !s.course_id &&
+            newStart < new Date(s.end_time).getTime() && newEnd > new Date(s.start_time).getTime()).map(s => s.id);
+        if (ids.length === 0) return 0;
+        const { data: deleted } = await supabase
+            .from('teacher_availabilities').delete().in('id', ids).eq('status', 'available').select('id');
+        return (deleted || []).length;
+    } catch (e) {
+        console.warn('⚠️ 清理冲突空闲失败:', e.message);
+        return 0;
+    }
+}
+
+async function handleCourseFormSubmit(e) {
+    e.preventDefault();
+    const warn = document.getElementById('cfWarn');
+    warn.classList.add('hidden');
+
+    const id = document.getElementById('cfCourseId').value;
+    const category = document.getElementById('cfCategory').value;
+    const courseType = document.getElementById('cfType').value;
+    const startLocal = document.getElementById('cfStart').value;
+    const duration = parseFloat(document.getElementById('cfDuration').value);
+    const meetingLink = document.getElementById('cfMeeting').value.trim();
+    const mods = getTeacherModules();
+
+    // ---------- 1. 权限与基础校验 ----------
+    if (!mods.includes(category)) { showToast('Vous ne pouvez planifier que dans vos matières', 'error'); return; }
+    if (!isValidTypeFor(category, courseType)) { showToast('Choisissez un type de cours valide', 'error'); return; }
+    if (!duration || duration <= 0 || duration > 8) { showToast('Durée invalide', 'error'); return; }
+    const startTimeStr = normalizeLocalDateTime(startLocal);
+    if (!startTimeStr) { showToast('Date invalide', 'error'); return; }
+    if (new Date(startTimeStr) <= new Date()) { showToast('La date doit être dans le futur', 'error'); return; }
+    if (!meetingLink) { showToast('Renseignez votre lien Google Meet', 'error'); return; }
+
+    let oldCourse = null;
+    if (id) {
+        oldCourse = allCourses.find(c => c.id === id);
+        if (!oldCourse || oldCourse.teacher_id !== teacher.id || !mods.includes(oldCourse.category)) {
+            showToast('Vous ne pouvez modifier que vos propres cours', 'error'); return;
+        }
+        if (oldCourse.status !== 'scheduled' || oldCourse.teacher_started) {
+            showToast('Ce cours ne peut plus être modifié', 'error'); return;
+        }
+        if (oldCourse.category !== category) { showToast('La matière ne peut pas être modifiée', 'error'); return; }
+    }
+
+    // ---------- 2. 学生 ----------
+    let studentIds;
+    if (cfMode === 'solo') {
+        const sid = document.getElementById('cfStudentSolo').value;
+        if (!sid) { showToast('Choisissez un élève', 'error'); return; }
+        studentIds = [sid];
+    } else {
+        studentIds = cfSelected.slice();
+        if (studentIds.length === 0) { showToast('Sélectionnez au moins un élève', 'error'); return; }
+    }
+    const allowedIds = getCandidateStudents(category).map(s => s.id);
+    if (studentIds.some(sid => !allowedIds.includes(sid))) {
+        showToast('Élève non autorisé', 'error'); return;
+    }
+
+    // ---------- 3. 冲突检查（仅自己的课程） ----------
+    const startTs = new Date(startTimeStr).getTime();
+    const endTs = startTs + duration * 3600000;
+    const conflict = allCourses.some(c => {
+        if (c.teacher_id !== teacher.id || c.status === 'cancelled') return false;
+        if (id && c.id === id) return false;
+        const cs = new Date(c.start_time).getTime();
+        return startTs < cs + (c.duration || 2) * 3600000 && endTs > cs;
+    });
+    if (conflict) {
+        warn.textContent = '⚠️ Vous avez déjà un cours sur ce créneau.';
+        warn.classList.remove('hidden');
+        showToast('Conflit d\'horaire', 'error');
+        return;
+    }
+
+    showLoading();
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        const field = category === 'civique' ? 'credit' : 'french_credit';
+
+        // ---------- 4. 旧学生（编辑时） ----------
+        let oldIds = [];
+        const oldDur = oldCourse ? (oldCourse.duration || 2) : 0;
+        if (oldCourse) {
+            const { data: oldCs } = await supabase.from('course_students').select('student_id').eq('course_id', id);
+            oldIds = (oldCs || []).map(r => r.student_id);
+            if (oldIds.length === 0 && oldCourse.student_id) oldIds = [oldCourse.student_id];
+        }
+
+        // ---------- 5. 课时检查（实时读取；不足则禁止，老师无权透支/归零） ----------
+        const { data: fresh, error: freshErr } = await supabase
+            .from('users').select('id, name, credit, french_credit').in('id', studentIds);
+        if (freshErr) throw freshErr;
+        const freshMap = {};
+        (fresh || []).forEach(u => { freshMap[u.id] = u; });
+
+        const short = [];
+        for (const sid of studentIds) {
+            const stu = freshMap[sid];
+            if (!stu) { throw new Error('Élève introuvable'); }
+            const need = oldIds.includes(sid) ? Math.max(0, duration - oldDur) : duration;
+            const cur = stu[field] || 0;
+            if (need > cur) short.push(`• ${stu.name} : ${cur}h disponibles, ${need}h nécessaires`);
+        }
+        if (short.length) {
+            hideLoading();
+            alert('⚠️ Crédits insuffisants :\n\n' + short.join('\n') + '\n\nContactez l\'administrateur pour recharger le solde.');
+            return;
+        }
+
+        // ---------- 6. 写入课程 ----------
+        const data = {
+            category: category,
+            course_mode: cfMode,
+            course_type: courseType,
+            student_id: studentIds[0],
+            teacher_id: teacher.id,              // 🔒 固定为自己
+            start_time: startTimeStr,
+            duration: duration,
+            location: document.getElementById('cfLocation').value.trim() || null,
+            material_link: document.getElementById('cfMaterial').value.trim() || null,
+            meeting_link: meetingLink,
+            notes: document.getElementById('cfNotes').value.trim() || null,
+            status: 'scheduled',
+            max_students: cfMode === 'group' ? studentIds.length : 1
+        };
+
+        let courseRow;
+        let oldRowBackup = null;
+        if (id) {
+            oldRowBackup = {
+                course_mode: oldCourse.course_mode, course_type: oldCourse.course_type,
+                student_id: oldCourse.student_id, start_time: oldCourse.start_time,
+                duration: oldCourse.duration, location: oldCourse.location,
+                material_link: oldCourse.material_link, meeting_link: oldCourse.meeting_link,
+                notes: oldCourse.notes, max_students: oldCourse.max_students
+            };
+            data.updated_at = new Date().toISOString();
+            const upd = await supabase.from('courses_v2').update(data)
+                .eq('id', id).eq('teacher_id', teacher.id).select().single();
+            if (upd.error) throw upd.error;
+            courseRow = upd.data;
+            await supabase.from('course_students').delete().eq('course_id', id);
+        } else {
+            data.created_at = new Date().toISOString();
+            const ins = await supabase.from('courses_v2').insert([data]).select().single();
+            if (ins.error) throw ins.error;
+            courseRow = ins.data;
+        }
+
+        const { error: csErr } = await supabase.from('course_students')
+            .insert(studentIds.map(sid => ({ course_id: courseRow.id, student_id: sid })));
+        if (csErr) {
+            // 回滚：避免“没有学生的课程”
+            if (!id) {
+                await supabase.from('courses_v2').delete().eq('id', courseRow.id);
+            } else {
+                await supabase.from('courses_v2').update(oldRowBackup).eq('id', id);
+                if (oldIds.length) {
+                    await supabase.from('course_students').insert(oldIds.map(sid => ({ course_id: id, student_id: sid })));
+                }
+            }
+            throw new Error('Échec de l\'association élèves (' + csErr.message + ')');
+        }
+
+        // ---------- 7. 退旧课时 + 扣新课时 ----------
+        let creditFail = 0;
+        for (const sid of oldIds) {
+            if (!(await adjustStudentCredit(sid, oldDur, category))) creditFail++;
+        }
+        for (const sid of studentIds) {
+            if (!(await adjustStudentCredit(sid, -duration, category))) creditFail++;
+        }
+
+        // ---------- 8. 清理冲突的空闲时间段 ----------
+        const removed = await removeConflictingAvailabilities(startTimeStr, duration);
+
+        // ---------- 9. 邮件通知（老师 + 学生，与管理员一致） ----------
+        let emailResult = null;
+        try {
+            emailResult = await sendCourseEmailNotification(courseRow.id, id ? 'update' : 'create');
+        } catch (emailErr) {
+            console.warn('⚠️ 邮件发送异常:', emailErr.message);
+        }
+
+        closeAllModals();
+        await loadAllData();
+
+        let msg = id ? 'Cours modifié ✓' : 'Cours planifié ✓ (crédits déduits)';
+        if (removed > 0) msg += ` — ${removed} créneau(x) libre(s) supprimé(s)`;
+        msg += emailSuffix(emailResult);
+        if (creditFail > 0) {
+            showToast(msg + ' ⚠️ Mise à jour des crédits incomplète, vérifiez avec l\'administrateur', 'warning');
+        } else {
+            showToast(msg, emailHasProblem(emailResult) ? 'warning' : 'success');
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('Erreur: ' + err.message, 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+// ============================================================
+// 📧 邮件通知（与管理员端完全一致：同一套 EmailJS 账号与模板，老师 + 学生都会收到）
+// ============================================================
+const EMAILJS_COURSE = {
+    PUBLIC_KEY: 'c2dTn19suzx4VxUu6',
+    SERVICE_ID: 'service_64o8j3r',
+    TEACHER_TEMPLATE_ID: 'template_m97muhh',
+    STUDENT_TEMPLATE_ID: 'template_f6nsc21'
+};
+let emailjsLoaded = false;
+
+function loadEmailJS() {
+    return new Promise((resolve) => {
+        if (typeof emailjs !== 'undefined') { emailjsLoaded = true; resolve(); return; }
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+        script.onload = () => { emailjsLoaded = true; resolve(); };
+        script.onerror = () => resolve();
+        document.head.appendChild(script);
+    });
+}
+
+function emailCiviqueTypeText(code) {
+    if (!code) return '—';
+    const map = {
+        'ec': '1️⃣ 公民考试', 'ec110': '📚 十年卡全能班', 'ec14': '🎫 四年卡全能班', 'ec1f': '🛂 入籍全能班',
+        'ec210': '📚 十年卡速成', 'ec24': '🎫 四年卡速成', 'ec2f': '🛂 入籍速成',
+        'ec310': '📚 十年卡自选', 'ec34': '🎫 四年卡自选', 'ec3f': '🛂 入籍自选',
+        'ex4': '📝 四年卡模拟考试', 'ex10': '📝 十年卡模拟考试', 'exf': '📝 入籍模拟考试'
+    };
+    return map[code] || code;
+}
+function emailFrenchTypeText(code) {
+    const map = {
+        'beginner': '🌱 Débutant', 'intermediate': '📈 Intermédiaire', 'advanced': '🎯 Avancé',
+        'business': '💼 Affaires', 'delf': '📝 DELF', 'dalf': '📝 DALF',
+        'tcf': '📝 TCF', 'tcf_irn': '📝 TCF IRN'
+    };
+    return map[code] || code || '—';
+}
+
+function formatDateForEmail(dateStr) {
+    if (!dateStr) return { date: '—', time: '—' };
+    try {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return { date: '—', time: '—' };
+        return {
+            date: String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear(),
+            time: String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0')
+        };
+    } catch (e) { return { date: '—', time: '—' }; }
+}
+function formatDateForSubject(dateStr) {
+    try {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return '';
+        return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    } catch (e) { return ''; }
+}
+function formatEndTimeForEmail(course) {
+    try {
+        const end = course.end_time ? new Date(course.end_time)
+            : new Date(new Date(course.start_time).getTime() + (course.duration || 2) * 3600000);
+        return String(end.getHours()).padStart(2, '0') + ':' + String(end.getMinutes()).padStart(2, '0');
+    } catch (e) { return ''; }
+}
+function ensureCourseInList(list, course, mustInclude) {
+    const arr = (list || []).slice();
+    if (mustInclude && course && course.status !== 'cancelled'
+        && new Date(course.start_time).getTime() >= Date.now()
+        && !arr.some(c => String(c.id) === String(course.id))) {
+        arr.push(course);
+    }
+    arr.sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+    return arr;
+}
+function formatUpcomingCoursesForEmail(courses) {
+    if (!courses || courses.length === 0) return '✅ Aucun cours à venir.';
+    let formatted = '';
+    courses.forEach((course, index) => {
+        const { date, time } = formatDateForEmail(course.start_time);
+        const typeName = course.category === 'civique' ? emailCiviqueTypeText(course.course_type) : emailFrenchTypeText(course.course_type);
+        formatted += (index + 1) + '. ' + date + ' ' + time + '–' + formatEndTimeForEmail(course) + ' | ' + typeName + ' | ' + (course.duration || 2) + 'h'
+            + (course.meeting_link ? ' | ' + course.meeting_link : '') + '\n';
+    });
+    return formatted;
+}
+
+async function getUpcomingCoursesForUser(userId, userType, excludeCourseId) {
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        if (!supabase) return [];
+        let query = supabase.from('courses_v2').select('*')
+            .eq('status', 'scheduled').gte('start_time', new Date().toISOString())
+            .order('start_time', { ascending: true });
+
+        if (userType === 'teacher') {
+            query = query.eq('teacher_id', userId);
+        } else {
+            const { data: csList } = await supabase.from('course_students').select('course_id').eq('student_id', userId);
+            const { data: legacy } = await supabase.from('courses_v2').select('id').eq('student_id', userId);
+            const allIds = [...new Set([...(csList || []).map(x => x.course_id), ...(legacy || []).map(x => x.id)])];
+            if (allIds.length === 0) return [];
+            query = query.in('id', allIds);
+        }
+        if (excludeCourseId) query = query.neq('id', excludeCourseId);
+        const { data, error } = await query;
+        return error ? [] : (data || []);
+    } catch (e) { return []; }
+}
+
+// action: 'create' | 'update' | 'cancel'
+async function sendCourseEmailNotification(courseId, action) {
+    try {
+        if (typeof emailjs === 'undefined') await loadEmailJS();
+        if (typeof emailjs === 'undefined') return { success: false, skipped: true, reason: 'emailjs_unavailable' };
+        try { emailjs.init(EMAILJS_COURSE.PUBLIC_KEY); } catch (e) {}
+
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        const { data: course, error } = await supabase.from('courses_v2').select('*').eq('id', courseId).maybeSingle();
+        if (error || !course) return { success: false, skipped: true, reason: 'course_not_found' };
+
+        const { data: courseStudents } = await supabase.from('course_students').select('student_id').eq('course_id', courseId);
+        let studentIds = (courseStudents || []).map(cs => cs.student_id);
+        if (studentIds.length === 0 && course.student_id) studentIds = [course.student_id];
+
+        const userIds = [course.teacher_id, ...studentIds].filter(Boolean);
+        if (userIds.length === 0) return { success: false, skipped: true, reason: 'no_users' };
+
+        const { data: users } = await supabase.from('users').select('id, name, email').in('id', userIds);
+        const userMap = {};
+        (users || []).forEach(u => { userMap[u.id] = u; });
+
+        const teacherUser = userMap[course.teacher_id] || null;
+        const students = studentIds.map(id => userMap[id]).filter(Boolean);
+        const studentsWithEmail = students.filter(s => s.email && s.email.trim() !== '');
+        const hasTeacherEmail = teacherUser && teacherUser.email && teacherUser.email.trim() !== '';
+        if (!hasTeacherEmail && studentsWithEmail.length === 0) return { success: false, skipped: true, reason: 'no_email' };
+
+        const actionLabel = { create: 'créé', update: 'modifié', cancel: 'annulé', complete: 'terminé', delete: 'supprimé' }[action] || action;
+        const { date, time } = formatDateForEmail(course.start_time);
+        const courseTypeName = course.category === 'civique' ? emailCiviqueTypeText(course.course_type) : emailFrenchTypeText(course.course_type);
+        const categoryLabel = course.category === 'francais' ? '🇫🇷 Français' : '📘 Civique';
+
+        let meetingLink = course.meeting_link || '';
+        if (!meetingLink && course.teacher_id) {
+            try {
+                const { data: ml } = await supabase.from('teacher_meeting_links').select('meeting_link')
+                    .eq('teacher_id', course.teacher_id).maybeSingle();
+                meetingLink = (ml && ml.meeting_link) || '';
+            } catch (e) {}
+        }
+        const endTime = formatEndTimeForEmail(course);
+        const subjectCategory = course.category === 'francais' ? 'Français' : 'Civique';
+        const subjectText = '📚 Cours ' + actionLabel + ' (' + subjectCategory + ') – '
+            + (formatDateForSubject(course.start_time) || date) + ' à ' + time;
+
+        const shouldExclude = (action === 'cancel' || action === 'delete' || action === 'complete');
+        const includeMeetingLink = !(action === 'cancel' || action === 'delete');
+        const meetingLinkForEmail = includeMeetingLink ? (meetingLink || '-') : '';
+        const meetingBlock = (includeMeetingLink && meetingLink)
+            ? '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:22px;">'
+              + '<tr><td align="center" style="background:#004080; border-radius:8px;">'
+              + '<a href="' + escapeHtml(meetingLink) + '" style="display:block; padding:15px 12px; font-size:16px; font-weight:700; color:#ffffff; text-decoration:none;">🔗 Rejoindre le cours (Meet)</a>'
+              + '</td></tr></table>'
+            : '';
+
+        let sentCount = 0;
+        const errors = [];
+
+        if (!hasTeacherEmail) errors.push('teacher: email introuvable');
+        if (hasTeacherEmail) {
+            let teacherCourses = '✅ Aucun cours à venir.';
+            try {
+                const list = await getUpcomingCoursesForUser(teacherUser.id, 'teacher', shouldExclude ? courseId : null);
+                teacherCourses = formatUpcomingCoursesForEmail(ensureCourseInList(list, course, !shouldExclude));
+            } catch (e) {}
+            try {
+                await emailjs.send(EMAILJS_COURSE.SERVICE_ID, EMAILJS_COURSE.TEACHER_TEMPLATE_ID, {
+                    to_email: teacherUser.email,
+                    to_name: teacherUser.name || 'Enseignant',
+                    teacher_name: teacherUser.name || 'Enseignant',
+                    action: actionLabel,
+                    course_type: courseTypeName,
+                    course_category: categoryLabel,
+                    date: date, time: time, end_time: endTime,
+                    meeting_link: meetingLinkForEmail,
+                    duration: course.duration || 2,
+                    student_name: students.map(s => s.name).join(', ') || '-',
+                    student_email: studentsWithEmail.map(s => s.email).join(', ') || '-',
+                    upcoming_courses: teacherCourses,
+                    subject: subjectText
+                }, EMAILJS_COURSE.PUBLIC_KEY);
+                sentCount++;
+            } catch (e) {
+                const detail = (e && (e.text || e.message)) || String(e);
+                console.error('❌ 发老师邮件失败:', detail);
+                errors.push('teacher [' + (e && e.status) + ']: ' + detail);
+            }
+        }
+
+        for (const student of studentsWithEmail) {
+            await new Promise(r => setTimeout(r, 1200));
+            let studentCourses = '✅ Aucun cours à venir.';
+            try {
+                const list = await getUpcomingCoursesForUser(student.id, 'student', shouldExclude ? courseId : null);
+                studentCourses = formatUpcomingCoursesForEmail(ensureCourseInList(list, course, !shouldExclude));
+            } catch (e) {}
+            try {
+                await emailjs.send(EMAILJS_COURSE.SERVICE_ID, EMAILJS_COURSE.STUDENT_TEMPLATE_ID, {
+                    to_email: student.email,
+                    to_name: student.name || 'Élève',
+                    student_name: student.name || 'Élève',
+                    action: actionLabel,
+                    course_type: courseTypeName,
+                    course_category: categoryLabel,
+                    date: date, time: time, end_time: endTime,
+                    meeting_link: meetingLinkForEmail,
+                    meeting_block: meetingBlock,
+                    duration: course.duration || 2,
+                    teacher_name: teacherUser ? teacherUser.name : '-',
+                    teacher_email: teacherUser ? (teacherUser.email || '-') : '-',
+                    upcoming_courses: studentCourses,
+                    subject: subjectText
+                }, EMAILJS_COURSE.PUBLIC_KEY);
+                sentCount++;
+            } catch (e) {
+                const detail = (e && (e.text || e.message)) || String(e);
+                console.error('❌ 发学生邮件失败:', student.email, detail);
+                errors.push('student ' + student.email + ' [' + (e && e.status) + ']: ' + detail);
+            }
+        }
+
+        return { success: sentCount > 0, sentCount, skipped: false, errors: errors.length ? errors : undefined };
+    } catch (err) {
+        console.error('❌ 邮件发送异常:', err);
+        return { success: false, error: err.message };
+    }
+}
+
+function emailSuffix(r) {
+    if (r && r.errors && r.errors.length > 0) {
+        console.warn('📧 邮件发送问题:', r.errors);
+        return (r.sentCount > 0 ? ' — 📧 ' + r.sentCount + ' e-mail(s) envoyé(s)' : '') + ' — ⚠️ ' + r.errors.join(' | ');
+    }
+    if (r && r.sentCount > 0) return ' — 📧 ' + r.sentCount + ' e-mail(s) envoyé(s)';
+    if (r && (r.skipped || r.error)) return ' — ⚠️ e-mail non envoyé';
+    return '';
+}
+function emailHasProblem(r) {
+    return !!(r && (r.skipped || r.error || (r.errors && r.errors.length)));
+}
+
+function bindStudentAndScheduleEvents() {
+    // 汉堡菜单开/关；点击菜单外部自动收起
+    const navEl = document.getElementById('tabsNav');
+    const menuBtn = document.getElementById('menuToggle');
+    if (navEl && menuBtn) {
+        menuBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            const open = navEl.classList.toggle('open');
+            menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        document.addEventListener('click', e => {
+            if (!navEl.contains(e.target)) {
+                navEl.classList.remove('open');
+                menuBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    document.getElementById('studentSearch').addEventListener('input', e => {
+        studentSearchTerm = e.target.value || '';
+        renderStudents();
+    });
+
+    const addBtn = document.getElementById('addCourseBtn');
+    if (addBtn) addBtn.addEventListener('click', () => openCourseForm(null, { category: currentCat }));
+
+    document.getElementById('studentFilters').addEventListener('click', e => {
+        const btn = e.target.closest('.stu-chip');
+        if (!btn) return;
+        if (btn.dataset.group === 'status') studentStatusFilter = btn.dataset.value;
+        else studentCatFilter = btn.dataset.value;
+        renderStudents();
+    });
+
+    document.getElementById('courseForm').addEventListener('submit', handleCourseFormSubmit);
+
+    document.getElementById('cfCategory').addEventListener('change', e => {
+        fillTypeOptions(e.target.value, '');
+        refreshCfStudents();
+    });
+    document.querySelectorAll('#courseFormModal .mode-switch button').forEach(b => {
+        b.addEventListener('click', () => setCfMode(b.dataset.mode));
+    });
+    document.getElementById('cfGroupList').addEventListener('change', e => {
+        if (!e.target.matches('input[type="checkbox"]')) return;
+        const v = e.target.value;
+        cfSelected = e.target.checked ? [...new Set([...cfSelected, v])] : cfSelected.filter(x => x !== v);
+        updateCfSelCount();
+    });
+    document.getElementById('cfGroupSearch').addEventListener('input', e => {
+        const term = (e.target.value || '').toLowerCase();
+        document.querySelectorAll('#cfGroupList .stu-pick').forEach(el => {
+            el.style.display = (el.dataset.name || '').includes(term) ? 'flex' : 'none';
+        });
+    });
+}
 
 </script>
 </body>
