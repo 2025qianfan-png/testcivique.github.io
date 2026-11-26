@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -788,6 +788,56 @@
             .stat-card { padding: 12px; }
             .stat-card .stat-number { font-size: 1.4rem; }
         }
+    
+        /* ===== 汉堡菜单 / 只读模式 / 其他适配 ===== */
+        .menu-toggle { display: none; }
+        .tabs-list { display: flex; gap: 5px; flex: 1; flex-wrap: wrap; }
+        .stats-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .readonly-banner {
+            background: #eef5ff; border: 1px solid #b8d4f5; color: var(--primary-blue);
+            padding: 10px 18px; border-radius: var(--border-radius); margin-bottom: 16px;
+            font-size: 0.85rem; font-weight: 600; display: none; align-items: center; gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .tabs-container { position: relative; padding: 0; overflow: visible; }
+            .menu-toggle {
+                display: flex; align-items: center; gap: 12px; width: 100%;
+                padding: 14px 16px; border: none; background: transparent; cursor: pointer;
+                font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.95rem;
+                color: var(--primary-blue); border-radius: var(--border-radius);
+            }
+            .menu-toggle .fa-bars { font-size: 1.15rem; }
+            .menu-toggle #menuCurrent { flex: 1; text-align: left; }
+            .menu-toggle .chev { font-size: 0.8rem; color: var(--medium-gray); transition: transform 0.2s; }
+            .tabs-container.open .menu-toggle .chev { transform: rotate(180deg); }
+            .menu-toggle .menu-badge {
+                background: var(--red); color: white; border-radius: 50px; padding: 1px 9px;
+                font-size: 0.72rem; display: none;
+            }
+            .tabs-list {
+                display: none; position: absolute; left: 0; right: 0; top: calc(100% + 6px);
+                flex-direction: column; gap: 2px; padding: 6px; background: var(--white);
+                border-radius: var(--border-radius); box-shadow: var(--shadow-hover); z-index: 50;
+            }
+            .tabs-container.open .tabs-list { display: flex; }
+            .tabs-list .tab-btn { flex: none; width: 100%; text-align: left; padding: 13px 16px; font-size: 0.92rem; }
+
+            .dashboard-header { padding: 14px 16px; gap: 10px; }
+            .dashboard-header .logo h1 { font-size: 1.2rem; }
+            .stats-two-col { grid-template-columns: 1fr; }
+            .filter-bar select { width: 100%; }
+            .mistake-card { padding: 16px; }
+            .stat-summary-box { flex-direction: column; align-items: stretch; }
+            .quiz-header { flex-direction: column; align-items: flex-start; }
+            .toast-container { left: 10px; right: 10px; top: 10px; }
+            .toast { min-width: 0; max-width: none; }
+        }
+        @media (max-width: 480px) {
+            .hdr-btn span { display: none; }
+            .hdr-btn { padding: 10px 16px; }
+            .quiz-actions .btn { flex: 1 1 100%; justify-content: center; }
+        }
     </style>
 </head>
 <body>
@@ -807,11 +857,15 @@
                 <button class="lang-btn" data-lang="zh" onclick="setLang('zh')">中文</button>
             </div>
 
-            <button class="btn btn-primary" onclick="refreshData()"><i class="fas fa-sync"></i> <span data-i18n="refresh">Rafraîchir</span></button>
-            <button class="btn btn-yellow" onclick="goToTest()"><i class="fas fa-pencil-alt"></i> <span data-i18n="test">Test</span></button>
-            <button class="btn btn-outline" onclick="goBackToHome()"><i class="fas fa-home"></i> <span data-i18n="home">Accueil</span></button>
+            <button class="btn btn-primary hdr-btn" title="Rafraîchir" onclick="refreshData()"><i class="fas fa-sync"></i> <span data-i18n="refresh">Rafraîchir</span></button>
+            <button class="btn btn-yellow hdr-btn" id="btnTest" title="Test" onclick="goToTest()"><i class="fas fa-pencil-alt"></i> <span data-i18n="test">Test</span></button>
+            <button class="btn btn-outline hdr-btn" id="btnHome" title="Accueil" onclick="goBackToHome()"><i class="fas fa-home"></i> <span data-i18n="home" id="btnHomeLabel">Accueil</span></button>
         </div>
     </header>
+
+    <div class="readonly-banner" id="readonlyBanner">
+        <i class="fas fa-eye"></i> <span data-i18n="readonlyBanner">Mode enseignant : consultation uniquement</span>
+    </div>
 
     <div class="streak-banner" id="streakBanner">
         <i class="fas fa-rocket"></i>
@@ -847,20 +901,27 @@
         </div>
     </div>
 
-    <div class="tabs-container">
-        <button class="tab-btn active" data-tab="history" onclick="switchTab('history')">
-            <i class="fas fa-history"></i> <span data-i18n="tabHistory">Historique</span>
+    <div class="tabs-container" id="tabsContainer">
+        <button type="button" class="menu-toggle" id="menuToggle" aria-label="Menu" aria-expanded="false">
+            <i class="fas fa-bars"></i> <span id="menuCurrent">Historique</span>
+            <span class="menu-badge" id="menuQuizBadge">0</span>
+            <i class="fas fa-chevron-down chev"></i>
         </button>
-        <button class="tab-btn" data-tab="mistakes" onclick="switchTab('mistakes')">
-            <i class="fas fa-book-medical"></i> <span data-i18n="tabMistakes">Mes erreurs</span>
-        </button>
-        <button class="tab-btn" data-tab="quiz" onclick="switchTab('quiz')" id="quizTabBtn">
-            <i class="fas fa-gamepad"></i> <span data-i18n="tabQuiz">Éliminez vos erreurs</span>
-            <span id="quizBadge" style="background:var(--red);color:white;border-radius:50%;padding:0 8px;font-size:0.7rem;margin-left:4px;display:none;">0</span>
-        </button>
-        <button class="tab-btn" data-tab="stats" onclick="switchTab('stats')">
-            <i class="fas fa-chart-pie"></i> <span data-i18n="tabStats">Statistiques</span>
-        </button>
+        <div class="tabs-list" id="tabsList">
+            <button class="tab-btn active" data-tab="history" onclick="switchTab('history')">
+                <i class="fas fa-history"></i> <span data-i18n="tabHistory">Historique</span>
+            </button>
+            <button class="tab-btn" data-tab="mistakes" onclick="switchTab('mistakes')">
+                <i class="fas fa-book-medical"></i> <span data-i18n="tabMistakes">Mes erreurs</span>
+            </button>
+            <button class="tab-btn" data-tab="quiz" onclick="switchTab('quiz')" id="quizTabBtn">
+                <i class="fas fa-gamepad"></i> <span data-i18n="tabQuiz">Éliminez vos erreurs</span>
+                <span id="quizBadge" style="background:var(--red);color:white;border-radius:50%;padding:0 8px;font-size:0.7rem;margin-left:4px;display:none;">0</span>
+            </button>
+            <button class="tab-btn" data-tab="stats" onclick="switchTab('stats')">
+                <i class="fas fa-chart-pie"></i> <span data-i18n="tabStats">Statistiques</span>
+            </button>
+        </div>
     </div>
 
     <div class="loading-spinner" id="loadingSpinner">
@@ -887,18 +948,18 @@
         <div class="filter-bar" id="filterBar">
             <label><i class="fas fa-filter"></i> <span data-i18n="filter">Filtrer</span>:</label>
             <select id="filterTheme" onchange="applyFilters()">
-                <option value="all"><span data-i18n="allThemes">Tous les thèmes</span></option>
+                <option value="all">Tous les thèmes</option>
             </select>
             <select id="filterDifficulty" onchange="applyFilters()">
-                <option value="all"><span data-i18n="allDifficulties">Toutes difficultés</span></option>
-                <option value="facile"><span data-i18n="easy">Facile</span></option>
-                <option value="moyen"><span data-i18n="medium">Moyen</span></option>
-                <option value="difficile"><span data-i18n="hard">Difficile</span></option>
+                <option value="all">Toutes difficultés</option>
+                <option value="facile">Facile</option>
+                <option value="moyen">Moyen</option>
+                <option value="difficile">Difficile</option>
             </select>
             <select id="filterStatus" onchange="applyFilters()">
-                <option value="all"><span data-i18n="allStatus">Tous</span></option>
-                <option value="mastered"><span data-i18n="mastered">Maîtrisés</span></option>
-                <option value="not_mastered"><span data-i18n="notMastered">Non maîtrisés</span></option>
+                <option value="all">Tous</option>
+                <option value="mastered">Maîtrisés</option>
+                <option value="not_mastered">Non maîtrisés</option>
             </select>
             <div class="filter-actions">
                 <button class="btn btn-primary" onclick="applyFilters()" style="padding: 6px 16px; font-size: 0.8rem;">
@@ -939,13 +1000,22 @@ let chartInstance = null;
 let quizQuestions = [];
 let quizIndex = 0;
 let quizAnswered = false;
+let quizLastCorrect = false;
+let readOnly = false;          // 老师查看学生 Dashboard 时为只读
+
+function esc(v) {
+    return String(v == null ? '' : v)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 
 // ============================================================
 // 国际化
 // ============================================================
 const i18n = {
     fr: {
-        refresh: 'Rafraîchir', test: 'Test', home: 'Accueil',
+        refresh: 'Rafraîchir', test: 'Test', home: 'Accueil', close: 'Fermer',
+        readonlyBanner: 'Mode enseignant : consultation uniquement',
         totalTests: 'Tests passés', passed: 'Réussis', failed: 'Échoués', avg: 'Moyenne', mistakes: 'Erreurs totales',
         tabHistory: 'Historique', tabMistakes: 'Mes erreurs', tabQuiz: 'Éliminez vos erreurs', tabStats: 'Statistiques',
         historyTitle: 'Historique des scores', chartTitle: 'Évolution des scores',
@@ -989,7 +1059,8 @@ const i18n = {
         type_situation_module: 'Mises en situation'
     },
     zh: {
-        refresh: '刷新', test: '测试', home: '首页',
+        refresh: '刷新', test: '测试', home: '首页', close: '关闭',
+        readonlyBanner: '老师模式：仅供查看',
         totalTests: '测试次数', passed: '通过', failed: '未通过', avg: '平均分', mistakes: '总错题数',
         tabHistory: '历史记录', tabMistakes: '我的错题', tabQuiz: '错题消消乐', tabStats: '统计分析',
         historyTitle: '成绩历史', chartTitle: '分数变化',
@@ -1066,15 +1137,16 @@ function setLang(lang) {
     renderMistakesList();
     renderStatsTab();
     renderChart();
-    if (quizQuestions.length === 0 || quizIndex >= quizQuestions.length) {
-    renderQuiz();
-        } else {
-            renderQuizQuestion();
-        }   
+    // 正在看答题反馈时不重画（否则反馈会丢），其余情况刷新语言
+    if (!quizAnswered) {
+        if (quizQuestions.length === 0 || quizIndex >= quizQuestions.length) renderQuiz();
+        else renderQuizQuestion();
+    }
     updateFilterOptionsText();
     updateStatsLabels();
     updateQuizBadge();
     checkStreak();
+    updateMenuLabel();
 }
 
 function updateFilterOptionsText() {
@@ -1104,11 +1176,14 @@ function updateStatsLabels() {
 function updateQuizBadge() {
     const unmastered = allMistakes.filter(m => !m.mastered).length;
     const badge = document.getElementById('quizBadge');
-    if (unmastered > 0) {
+    const mBadge = document.getElementById('menuQuizBadge');
+    if (unmastered > 0 && !readOnly) {
         badge.style.display = 'inline';
         badge.textContent = unmastered;
+        if (mBadge) { mBadge.style.display = 'inline'; mBadge.textContent = unmastered; }
     } else {
         badge.style.display = 'none';
+        if (mBadge) mBadge.style.display = 'none';
     }
 }
 
@@ -1175,7 +1250,9 @@ document.addEventListener('DOMContentLoaded', function() {
             studentInfo.name = userData.name || userData.userId || userData.student_name || 'Étudiant';
             studentInfo.type = type || userData.type || userData.userType || 't';
             studentInfo.id = userData.id || userData.userId || userData.student_id || null;
-            studentInfo.daysLeft = userData.daysLeft || userData.days_left || -1;
+            studentInfo.daysLeft = (userData.daysLeft ?? userData.days_left ?? -1);   // 0 = 已过期（原来会被当成“无限期”）
+            readOnly = !!userData.viewedByTeacher;
+            if (readOnly) applyReadOnlyMode();
 
             document.getElementById('studentNameDisplay').textContent = studentInfo.name;
             document.getElementById('studentTypeDisplay').textContent = getTypeLabel(studentInfo.type);
@@ -1219,6 +1296,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function saveSession() {
+    if (readOnly) return;     // 老师查看时不写入会话
     try {
         sessionStorage.setItem('student_dashboard_data', JSON.stringify({
             studentInfo: studentInfo,
@@ -1226,6 +1304,39 @@ function saveSession() {
         }));
     } catch (e) { console.warn('保存会话失败:', e); }
 }
+
+function applyReadOnlyMode() {
+    document.getElementById('readonlyBanner').style.display = 'flex';
+    document.getElementById('btnTest').style.display = 'none';
+    document.getElementById('quizTabBtn').style.display = 'none';
+    const lbl = document.getElementById('btnHomeLabel');
+    if (lbl) { lbl.dataset.i18n = 'close'; lbl.textContent = t('close'); }
+    document.getElementById('btnHome').title = 'Fermer';
+}
+
+// ---------- 汉堡菜单 ----------
+function updateMenuLabel() {
+    const cur = document.querySelector('.tab-btn.active span[data-i18n]');
+    const el = document.getElementById('menuCurrent');
+    if (cur && el) el.textContent = cur.textContent.trim();
+}
+function closeMenu() {
+    const c = document.getElementById('tabsContainer');
+    if (c) c.classList.remove('open');
+    const b = document.getElementById('menuToggle');
+    if (b) b.setAttribute('aria-expanded', 'false');
+}
+document.addEventListener('click', function (e) {
+    const c = document.getElementById('tabsContainer');
+    const b = document.getElementById('menuToggle');
+    if (!c || !b) return;
+    if (b.contains(e.target)) {
+        const open = c.classList.toggle('open');
+        b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    } else if (!c.contains(e.target)) {
+        closeMenu();
+    }
+});
 
 function getTypeLabel(type) {
     const map = {
@@ -1294,6 +1405,7 @@ async function loadScores() {
     }
 
     try {
+        if (readOnly) throw new Error('readOnly: skip local');
         const key = `test_scores_${studentInfo.name}`;
         const localData = localStorage.getItem(key);
         if (localData) {
@@ -1364,7 +1476,7 @@ async function loadMistakes() {
         console.warn('⚠️ Supabase 错题加载失败:', e.message);
     }
 
-    if (mistakes.length === 0) {
+    if (mistakes.length === 0 && !readOnly) {
         try {
             const key = `mistakes_${studentInfo.name}`;
             const localData = localStorage.getItem(key);
@@ -1668,9 +1780,9 @@ function renderMistakesList() {
                 <span><strong>✅ ${t('masteredLabel')}:</strong> ${masteredCount}</span>
                 <span><strong>📝 ${t('toReview')}:</strong> ${totalUnique - masteredCount}</span>
             </div>
-            <button class="btn btn-danger" onclick="clearAllMistakes()" style="padding: 6px 16px; font-size: 0.8rem;">
+            ${readOnly ? '' : `<button class="btn btn-danger" onclick="clearAllMistakes()" style="padding: 6px 16px; font-size: 0.8rem;">
                 <i class="fas fa-trash"></i> ${t('clearAll')}
-            </button>
+            </button>`}
         </div>
     `;
 
@@ -1682,13 +1794,13 @@ function renderMistakesList() {
         html += `
             <div class="mistake-card ${isMastered ? 'mastered' : ''}">
                 <div class="meta">
-                    <span class="theme-tag"><i class="fas fa-tag"></i> ${mistake.category || mistake.theme || 'Autre'}</span>
-                    <span class="difficulty-tag ${difficultyClass}">${mistake.difficulty || 'Moyen'}</span>
+                    <span class="theme-tag"><i class="fas fa-tag"></i> ${esc(mistake.category || mistake.theme || 'Autre')}</span>
+                    <span class="difficulty-tag ${difficultyClass}">${esc(mistake.difficulty || 'Moyen')}</span>
                     <span style="color: var(--red); font-weight: 600; font-size: 0.8rem;"><i class="fas fa-times-circle"></i> ${timesWrong} ${currentLang === 'fr' ? 'erreur' : '次错误'}${timesWrong > 1 ? 's' : ''}</span>
                     ${isMastered ? `<span style="background: var(--green); color: white; padding: 3px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600;"><i class="fas fa-check"></i> ${t('masteredLabel')}</span>` : ''}
                 </div>
 
-                <div class="question-text">${index + 1}. ${mistake.question}</div>
+                <div class="question-text">${index + 1}. ${esc(mistake.question)}</div>
 
                 <div class="options">
         `;
@@ -1704,7 +1816,7 @@ function renderMistakesList() {
             html += `
                 <div class="${optionClass}">
                     <span class="letter">${optionLetters[optIndex]}</span>
-                    <span>${option}</span>
+                    <span>${esc(option)}</span>
                     ${isCorrect ? ' ✅' : ''}
                     ${isUserAnswer && !isCorrect ? ' ❌' : ''}
                 </div>
@@ -1721,15 +1833,17 @@ function renderMistakesList() {
                 </div>
                 ` : ''}
 
+                ${readOnly ? '' : `
                 <div class="actions">
                     <button class="btn-sm ${isMastered ? 'btn-outline' : 'btn-success'}"
-                            onclick="toggleMastered('${mistake.id}', ${!isMastered})">
+                            onclick="toggleMastered('${esc(mistake.id)}', ${!isMastered})">
                         ${isMastered ? '<i class="fas fa-times"></i> ' + t('toReview') : '<i class="fas fa-check"></i> ' + t('masteredLabel')}
                     </button>
-                    <button class="btn-sm btn-danger" onclick="deleteMistake('${mistake.id}')">
+                    <button class="btn-sm btn-danger" onclick="deleteMistake('${esc(mistake.id)}')">
                         <i class="fas fa-trash"></i> ${t('delete')}
                     </button>
                 </div>
+                `}
             </div>
         `;
     });
@@ -1741,11 +1855,16 @@ function renderMistakesList() {
 // 🎮 错题消消乐
 // ============================================================
 function renderQuiz() {
+    if (readOnly) return;
     const container = document.getElementById('quizContainer');
     
     const unmastered = allMistakes.filter(m => !m.mastered);
     
     if (unmastered.length === 0) {
+        quizQuestions = [];
+        quizIndex = 0;
+        quizAnswered = false;
+        quizLastCorrect = false;
         container.innerHTML = `
             <div class="quiz-container" style="text-align:center; padding:50px 30px;">
                 <div class="quiz-empty">
@@ -1764,6 +1883,7 @@ function renderQuiz() {
     quizQuestions = shuffleArray([...unmastered]);
     quizIndex = 0;
     quizAnswered = false;
+    quizLastCorrect = false;
 
     renderQuizQuestion();
 }
@@ -1803,7 +1923,7 @@ function renderQuizQuestion() {
         optionsHtml += `
             <button class="option-btn" data-index="${idx}" onclick="selectQuizOption(${idx})">
                 <span class="letter">${optionLetters[idx]}</span>
-                <span class="option-text">${opt}</span>
+                <span class="option-text">${esc(opt)}</span>
                 <span class="result-icon"></span>
             </button>
         `;
@@ -1822,13 +1942,13 @@ function renderQuizQuestion() {
             </div>
             
             <div class="quiz-meta-tags">
-                <span class="tag tag-theme"><i class="fas fa-tag"></i> ${q.category || q.theme || 'Autre'}</span>
-                <span class="tag ${diffClass}"><i class="fas fa-signal"></i> ${q.difficulty || 'Moyen'}</span>
+                <span class="tag tag-theme"><i class="fas fa-tag"></i> ${esc(q.category || q.theme || 'Autre')}</span>
+                <span class="tag ${diffClass}"><i class="fas fa-signal"></i> ${esc(q.difficulty || 'Moyen')}</span>
                 <span class="tag tag-wrong"><i class="fas fa-times-circle"></i> ${q.times_wrong || 0}x ${t('quizWrongCount')}</span>
             </div>
             
             <div class="quiz-question-number">${currentLang === 'fr' ? 'Question' : '题目'} ${current}/${total}</div>
-            <div class="quiz-question-text">${q.question}</div>
+            <div class="quiz-question-text">${esc(q.question)}</div>
             
             <div class="quiz-options" id="quizOptions">
                 ${optionsHtml}
@@ -1848,7 +1968,9 @@ function renderQuizQuestion() {
     `;
 }
 async function selectQuizOption(selectedIndex) {
-    if (quizAnswered) return;
+    if (quizAnswered || readOnly) return;
+    quizAnswered = true;          // 先上锁，避免网络请求期间重复点击
+    quizLastCorrect = false;
 
     const q = quizQuestions[quizIndex];
     const isCorrect = selectedIndex === q.correct_answer;
@@ -1878,7 +2000,7 @@ async function selectQuizOption(selectedIndex) {
         feedback.className = 'quiz-feedback show success';
         feedback.innerHTML = `
             <div class="feedback-title">${t('quizCorrect')}</div>
-            ${q.explanation ? `<div class="feedback-detail">💡 ${q.explanation}</div>` : ''}
+            ${q.explanation ? `<div class="feedback-detail">💡 ${esc(q.explanation)}</div>` : ''}
         `;
 
         // ---- 数据库 ----
@@ -1898,9 +2020,8 @@ async function selectQuizOption(selectedIndex) {
         if (fi !== -1) filteredMistakes[fi].mastered = true;
         q.mastered = true;
 
-        // 从 quiz 队列移除（已掌握，本轮不用再答）
-        quizQuestions.splice(quizIndex, 1);
-        quizIndex--;
+        // 答对：点“下一题”时再从本轮队列移除（避免索引错位导致切换语言时报错）
+        quizLastCorrect = true;
 
         saveMistakesToLocal();
         updateStats();
@@ -1916,8 +2037,8 @@ async function selectQuizOption(selectedIndex) {
         feedback.className = 'quiz-feedback show error';
         feedback.innerHTML = `
             <div class="feedback-title">${t('quizWrong')}</div>
-            <div class="feedback-detail">✅ ${currentLang === 'fr' ? 'Bonne réponse' : '正确答案'}: ${optionLetters[q.correct_answer]}. ${q.options[q.correct_answer]}</div>
-            ${q.explanation ? `<div class="feedback-detail">💡 ${q.explanation}</div>` : ''}
+            <div class="feedback-detail">✅ ${currentLang === 'fr' ? 'Bonne réponse' : '正确答案'}: ${optionLetters[q.correct_answer]}. ${esc(q.options[q.correct_answer])}</div>
+            ${q.explanation ? `<div class="feedback-detail">💡 ${esc(q.explanation)}</div>` : ''}
         `;
 
         // ---- 数据库：走统一的 recordMistake，触发器 +1 ----
@@ -1962,13 +2083,30 @@ async function selectQuizOption(selectedIndex) {
     document.getElementById('quizNextBtn').style.display = 'inline-flex';
 }
 function nextQuizQuestion() {
-    quizIndex++;
+    if (quizLastCorrect) { quizQuestions.splice(quizIndex, 1); }   // 答对的题移出本轮
+    else { quizIndex++; }
+    quizLastCorrect = false;
     quizAnswered = false;
     if (quizIndex >= quizQuestions.length) {
         renderQuiz();
     } else {
         renderQuizQuestion();
     }
+}
+
+// 进入答题页：保留当前进度，只剔除已删除/已掌握的题、补入新的未掌握题
+function syncQuizOnEnter() {
+    if (readOnly) return;
+    if (quizAnswered) {                       // 离开时停在反馈页 → 直接进入下一题
+        if (quizLastCorrect) quizQuestions.splice(quizIndex, 1); else quizIndex++;
+        quizLastCorrect = false;
+        quizAnswered = false;
+    }
+    const unm = allMistakes.filter(m => !m.mastered);
+    quizQuestions = quizQuestions.filter(q => unm.includes(q));
+    unm.forEach(m => { if (!quizQuestions.includes(m)) quizQuestions.push(m); });
+    if (quizQuestions.length === 0 || quizIndex >= quizQuestions.length) renderQuiz();
+    else renderQuizQuestion();
 }
 
 function resetQuiz() {
@@ -1980,10 +2118,12 @@ function resetQuiz() {
     quizQuestions = shuffleArray([...unmastered]);
     quizIndex = 0;
     quizAnswered = false;
+    quizLastCorrect = false;
     renderQuizQuestion();
 }
 
 function saveMistakesToLocal() {
+    if (readOnly) return;
     try {
         const key = `mistakes_${studentInfo.name}`;
         localStorage.setItem(key, JSON.stringify(allMistakes));
@@ -2026,7 +2166,7 @@ function renderStatsTab() {
     });
 
     let html = `
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div class="stats-two-col">
             <div>
                 <h3 style="color: var(--primary-blue); margin-bottom: 14px; font-size: 1rem;">
                     <i class="fas fa-tags"></i> ${currentLang === 'fr' ? 'Distribution par thème' : '主题分布'}
@@ -2043,7 +2183,7 @@ function renderStatsTab() {
             const percentage = Math.round((count / maxCount) * 100);
             html += `
                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                    <span style="width: 120px; font-size: 0.85rem; color: var(--dark-gray);">${theme}</span>
+                    <span style="width: 120px; flex-shrink: 0; font-size: 0.85rem; color: var(--dark-gray);">${esc(theme)}</span>
                     <div style="flex: 1; height: 18px; background: #e0e0e0; border-radius: 10px; overflow: hidden; margin: 0 10px;">
                         <div style="height: 100%; width: ${percentage}%; background: var(--primary-blue); border-radius: 10px;"></div>
                     </div>
@@ -2131,6 +2271,7 @@ function resetFilters() {
 // 错题操作 - 同步到 Supabase
 // ============================================================
 async function toggleMastered(mistakeId, mastered) {
+    if (readOnly) return;
     try {
         if (window.supabaseAuth && window.supabaseAuth.markMistakeAsMastered) {
             await window.supabaseAuth.markMistakeAsMastered(mistakeId, mastered);
@@ -2152,6 +2293,7 @@ async function toggleMastered(mistakeId, mastered) {
 }
 
 async function deleteMistake(mistakeId) {
+    if (readOnly) return;
     if (!confirm(currentLang === 'fr' ? 'Supprimer cette erreur ?' : '删除此错题？')) return;
     try {
         if (window.supabaseAuth && window.supabaseAuth.deleteMistake) {
@@ -2175,6 +2317,7 @@ async function deleteMistake(mistakeId) {
 }
 
 async function clearAllMistakes() {
+    if (readOnly) return;
     if (!confirm(currentLang === 'fr' ? 'Supprimer toutes les erreurs ?' : '删除所有错题？')) return;
     try {
         if (window.supabaseAuth && window.supabaseAuth.clearAllMistakes) {
@@ -2218,7 +2361,7 @@ function getDifficultyClass(difficulty) {
 
 function formatExplanation(text) {
     if (!text) return '';
-    return text.replace(/\n/g, '<br>');
+    return esc(text).replace(/\n/g, '<br>');
 }
 
 function showLoading(show) {
@@ -2239,6 +2382,7 @@ function showToast(title, message, type = 'info') {
 }
 
 function switchTab(tabId) {
+    if (tabId === 'quiz' && readOnly) return;
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
     document.getElementById(`tab-${tabId}`).classList.add('active');
@@ -2252,11 +2396,13 @@ function switchTab(tabId) {
         populateFilterOptions();     // 🔥 重建筛选下拉
     }
     if (tabId === 'quiz') {
-        renderQuiz();
+        syncQuizOnEnter();
     }
     if (tabId === 'stats') {
         renderStatsTab();            // 🔥 进入统计 tab 时重画
     }
+    updateMenuLabel();
+    closeMenu();
 }
 function refreshData() {
     showToast('Info', 'Rafraîchissement des données...', 'info');
@@ -2276,6 +2422,7 @@ function goToTest() {
 }
 
 function goBackToHome() {
+    if (readOnly) { window.close(); return; }
     if (confirm(currentLang === 'fr' ? 'Retourner à l\'accueil ?' : '返回主页？')) {
         window.location.href = 'examen-civique.html';
     }

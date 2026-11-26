@@ -1409,6 +1409,7 @@ function applyLanguage() {
   
     if (typeof renderStudentExams === 'function' && allStudentExams.length) renderStudentExams();
     if (typeof renderMeetingLinksList === 'function' && allUsers.length) renderMeetingLinksList();   // 🔥 加这一行
+    if (typeof updateMenuLabel === 'function') updateMenuLabel();
 }
 
 
@@ -1436,9 +1437,38 @@ function applyMode() {
         const visible = scope === 'both' || currentMode === 'all' || scope === currentMode;
         tab.classList.toggle('hidden', !visible);
     });
+    if (typeof updateMenuLabel === 'function') updateMenuLabel();
+}
+
+// ---------- 汉堡菜单（手机端） ----------
+function updateMenuLabel() {
+    const cur = document.querySelector('.admin-tab.active');
+    const el = document.getElementById('menuCurrent');
+    if (!cur || !el) return;
+    const clone = cur.cloneNode(true);
+    clone.querySelectorAll('.tab-count').forEach(n => n.remove());
+    el.textContent = clone.textContent.replace(/\s+/g, ' ').trim();
+}
+function closeMenu() {
+    const nav = document.getElementById('adminTabs');
+    if (nav) nav.classList.remove('open');
+    const b = document.getElementById('menuToggle');
+    if (b) b.setAttribute('aria-expanded', 'false');
 }
 
 function bindTabs() {
+    const menuBtn = document.getElementById('menuToggle');
+    const menuNav = document.getElementById('adminTabs');
+    if (menuBtn && menuNav) {
+        menuBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            const open = menuNav.classList.toggle('open');
+            menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        document.addEventListener('click', e => { if (!menuNav.contains(e.target)) closeMenu(); });
+    }
+    updateMenuLabel();
+
     document.querySelectorAll('.admin-tab').forEach(btn => {
         btn.addEventListener('click', function() {
             const tab = this.dataset.tab;
@@ -1451,6 +1481,8 @@ function bindTabs() {
             if (tab.startsWith('french-')) document.body.setAttribute('data-theme', 'francais');
             else document.body.setAttribute('data-theme', 'civique');
 
+            updateMenuLabel();
+            closeMenu();
             if (tab === 'calendar') renderCalendar();
             if (tab === 'meeting-links') renderMeetingLinksList();   // 🔥 加这一行
         });
@@ -2382,6 +2414,8 @@ function updatePreRegCount() {
     const el2 = document.getElementById('preRegCount2');
     if (el1) el1.textContent = pending;
     if (el2) el2.textContent = pending;
+    const mb = document.getElementById('menuPreRegBadge');
+    if (mb) { mb.textContent = pending; mb.style.display = pending > 0 ? 'inline-flex' : 'none'; }
 }
 
 function renderPreRegTable() {

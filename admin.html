@@ -137,7 +137,11 @@
 <!-- ============================================================
      TABS
      ============================================================ -->
-<nav class="admin-tabs"><div class="container">
+<nav class="admin-tabs" id="adminTabs">
+<button type="button" class="menu-toggle" id="menuToggle" aria-label="Menu" aria-expanded="false">
+<i class="fas fa-bars"></i> <span id="menuCurrent">Menu</span> <span class="menu-badge" id="menuPreRegBadge">0</span> <i class="fas fa-chevron-down chev"></i>
+</button>
+<div class="container">
 <button class="admin-tab active" data-tab="users" data-scope="both"><i class="fas fa-users"></i> <span data-i18n="tab.users">Utilisateurs</span></button>
 <button class="admin-tab" data-tab="prereg" data-scope="civique"><i class="fas fa-user-plus"></i> <span data-i18n="tab.prereg">Pré-inscriptions</span> <span class="tab-count" id="preRegCount">0</span></button>
 <button class="admin-tab" data-tab="civique-courses" data-scope="civique"><i class="fas fa-graduation-cap"></i> <span data-i18n="tab.civique">Cours Civique</span></button>

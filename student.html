@@ -86,7 +86,7 @@ body { font-family: 'Open Sans', sans-serif; background: var(--light-gray); colo
 .admin-tabs {
     background: white; border-bottom: 1px solid #e0e0e0;
     box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-    position: sticky; top: 62px; z-index: 40;
+    position: sticky; top: var(--header-h, 62px); z-index: 40;
 }
 .admin-tabs .container { display: flex; gap: 4px; padding-top: 8px; overflow-x: auto; scrollbar-width: none; }
 .admin-tabs .container::-webkit-scrollbar { display: none; }
@@ -323,7 +323,7 @@ body { font-family: 'Open Sans', sans-serif; background: var(--light-gray); colo
 .teacher-group-body { padding: 8px 16px 16px; }
 .teacher-group-body.collapsed { display: none; }
 
-.slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+.slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 10px; }
 .slot-card {
     border: 1px solid #eef2f7; border-radius: 8px;
     padding: 12px 14px; background: white;
@@ -721,6 +721,53 @@ body { font-family: 'Open Sans', sans-serif; background: var(--light-gray); colo
     .feedback-rating-row .label { min-width: auto; }
 }
 .hidden { display: none !important; }
+
+/* ============ 汉堡菜单 / 手机页头 ============ */
+.menu-toggle { display: none; }
+.user-info #studentName { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+@media (max-width: 768px) {
+    .container { padding: 0 14px; }
+    .main-header { padding: 12px 0; }
+    .main-header .container { gap: 10px; }
+    .main-header h1 { flex: 1; min-width: 0; font-size: 1.05rem; }
+    .header-actions { width: 100%; flex-wrap: wrap; gap: 8px; }
+    /* 第一行：语言 / 返回 / 退出；第二行：用户名 + 课时（独占一行，不再互相挤压） */
+    .header-actions .lang-switch { order: 1; }
+    .header-actions .back-btn { order: 2; }
+    .header-actions .logout-btn { order: 3; margin-left: auto; }
+    .header-actions .user-info { order: 4; flex: 1 1 100%; min-width: 0; padding: 7px 14px; font-size: 0.82rem; }
+    .user-info #studentName { flex: 1; }
+    .user-info .credit-badge { flex-shrink: 0; white-space: nowrap; }
+
+    .menu-toggle {
+        display: flex; align-items: center; gap: 12px; width: 100%;
+        padding: 14px 16px; border: none; background: white; cursor: pointer;
+        font-family: inherit; font-weight: 700; font-size: 0.98rem; color: var(--dark-gray);
+    }
+    .menu-toggle .fa-bars { font-size: 1.15rem; color: var(--civique); }
+    .menu-toggle #menuCurrent { flex: 1; text-align: left; }
+    .menu-toggle .chev { font-size: 0.8rem; color: var(--medium-gray); transition: transform 0.2s; }
+    .admin-tabs.open .menu-toggle .chev { transform: rotate(180deg); }
+    .admin-tabs .container {
+        display: none; flex-direction: column; gap: 0; padding: 0; overflow: visible;
+        position: absolute; left: 0; right: 0; top: 100%; background: white;
+        border-top: 1px solid #eee; box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    }
+    .admin-tabs.open .container { display: flex; }
+    .admin-tab {
+        width: 100%; padding: 15px 20px; font-size: 0.98rem; border-radius: 0;
+        border-bottom: none; border-left: 4px solid transparent; border-top: 1px solid #f1f3f5;
+    }
+    .admin-tab.active { background: #f6f8fb; }
+    .admin-tab.active[data-cat="civique"] { border-left-color: var(--civique-accent); }
+    .admin-tab.active[data-cat="francais"] { border-left-color: var(--francais); }
+    .admin-tab.active[data-cat="calendar"] { border-left-color: var(--purple); }
+    .section-header > div[style*="display:flex"] { width: 100%; }
+    .section-header .filter-btn-active, .section-header .filter-btn-inactive { flex: 1; }
+}
+@media (max-width: 420px) {
+    .back-btn #backBtnText, .logout-btn #logoutText { display: none; }
+}
 </style>
 </head>
 <body>
@@ -747,6 +794,9 @@ body { font-family: 'Open Sans', sans-serif; background: var(--light-gray); colo
 
 <!-- ============ TABS ============ -->
 <nav class="admin-tabs" id="tabsNav" style="display:none;">
+<button type="button" class="menu-toggle" id="menuToggle" aria-label="Menu" aria-expanded="false">
+<i class="fas fa-bars"></i> <span id="menuCurrent">Menu</span> <i class="fas fa-chevron-down chev"></i>
+</button>
 <div class="container">
 <button class="admin-tab active" data-cat="civique" id="tabCivique">
 <i class="fas fa-graduation-cap"></i> 📘 <span data-i18n="tabCivique">Civique</span>
@@ -1607,6 +1657,23 @@ function escapeHtml(s) {
         .replace(/'/g, '&#039;');
 }
 
+// 只允许 http/https 链接，避免 javascript: 等危险协议
+function safeUrl(u) {
+    if (!u) return '';
+    try {
+        const url = new URL(String(u).trim(), window.location.href);
+        return (url.protocol === 'http:' || url.protocol === 'https:') ? url.href : '';
+    } catch (e) { return ''; }
+}
+function openExternal(courseId) {
+    const c = allCourses.find(x => x.id === courseId);
+    const u = c && safeUrl(c.meeting_link);
+    if (!u) { showToast(t('noMeetingLink'), 'warning'); return; }
+    const w = window.open(u, '_blank');
+    if (w) w.opener = null;
+}
+window.openExternal = openExternal;
+
 function showToast(msg, type = 'success') {
     const container = document.getElementById('toastContainer');
     if (!container) return;
@@ -1786,6 +1853,43 @@ async function init() {
 // ============================================================
 // 语言切换
 // ============================================================
+function updateMenuLabel() {
+    const cur = document.querySelector('.admin-tab.active');
+    const el = document.getElementById('menuCurrent');
+    if (cur && el) el.textContent = cur.textContent.replace(/\s+/g, ' ').trim();
+}
+function closeMenu() {
+    const nav = document.getElementById('tabsNav');
+    if (nav) nav.classList.remove('open');
+    const b = document.getElementById('menuToggle');
+    if (b) b.setAttribute('aria-expanded', 'false');
+}
+document.addEventListener('click', function (e) {
+    const nav = document.getElementById('tabsNav');
+    const b = document.getElementById('menuToggle');
+    if (!nav || !b) return;
+    if (b.contains(e.target)) {
+        const open = nav.classList.toggle('open');
+        b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    } else if (!nav.contains(e.target)) {
+        closeMenu();
+    }
+});
+
+// 页头高度会随屏幕/内容变化（手机上会换行），标签栏的 sticky 位置要跟着变
+function syncHeaderHeight() {
+    const h = document.getElementById('mainHeader');
+    if (h) document.documentElement.style.setProperty('--header-h', h.offsetHeight + 'px');
+}
+window.addEventListener('load', syncHeaderHeight);
+window.addEventListener('resize', syncHeaderHeight);
+if (window.ResizeObserver) {
+    document.addEventListener('DOMContentLoaded', () => {
+        const h = document.getElementById('mainHeader');
+        if (h) new ResizeObserver(syncHeaderHeight).observe(h);
+    });
+}
+
 function applyLanguage() {
     document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'fr';
 
@@ -1812,6 +1916,8 @@ function applyLanguage() {
     });
 
     updateCreditBadge();
+    updateMenuLabel();
+    syncHeaderHeight();
 }
 
 function setLang(lang) {
@@ -1973,6 +2079,8 @@ function applyTabStyles() {
     document.querySelectorAll('.admin-tab').forEach(tab => {
         tab.classList.toggle('active', tab.dataset.cat === currentCat);
     });
+    updateMenuLabel();
+    closeMenu();
 
     const header = document.getElementById('mainHeader');
     header.classList.toggle('theme-francais', currentCat === 'francais');
@@ -2072,7 +2180,7 @@ function renderCourses() {
 
     const byDate = {};
     filtered.forEach(c => {
-        const key = c.start_time.split('T')[0];
+        const key = String(c.start_time).split(/[T ]/)[0];
         if (!byDate[key]) byDate[key] = [];
         byDate[key].push(c);
     });
@@ -2170,7 +2278,7 @@ function renderCourseCard(c) {
     // 2. 已加入，可重新加入
     if (!isCancelled && !isCompleted && isStarted && isConfirmed) {
         if (c.meeting_link) {
-            actions += `<button class="action-btn" style="background:#9C27B0;color:white;" onclick="window.open('${escapeHtml(c.meeting_link)}', '_blank')">
+            actions += `<button class="action-btn" style="background:#9C27B0;color:white;" onclick="openExternal('${c.id}')">
                 <i class="fas fa-redo"></i> ${t('rejoinClass')}
             </button>`;
         }
@@ -2240,7 +2348,7 @@ function renderCourseCard(c) {
     detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-chalkboard-user"></i> ${t('teacher')}: ${escapeHtml(teacherName)}</div>`;
     detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-clock"></i> ${c.duration || 2} ${t('hours')}</div>`;
     if (c.location) detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(c.location)}</div>`;
-    if (c.material_link) detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-paperclip"></i> <a href="${escapeHtml(c.material_link)}" target="_blank">${t('support')}</a></div>`;
+    if (c.material_link) detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-paperclip"></i> <a href="${escapeHtml(safeUrl(c.material_link) || '#')}" target="_blank" rel="noopener noreferrer">${t('support')}</a></div>`;
     if (isCancelled && c.cancel_reason) detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-ban"></i> ${t('cancelReason')}: ${escapeHtml(c.cancel_reason)}</div>`;
     if (isStudentBooking) detailsHtml += `<div class="detail-item ${isFr ? 'francais' : ''}"><i class="fas fa-calendar-check"></i> ${t('bookedViaAvailability')}</div>`;
 
@@ -2600,9 +2708,11 @@ async function confirmAndJoinClass(courseId) {
     // ============================================================
     // 1. 先开会议链接（用户手势上下文里，避免被拦截）
     // ============================================================
-    if (c.meeting_link) {
-        const w = window.open(c.meeting_link, '_blank');
-        if (!w) showToast('⚠️ Popup bloqué - cliquez sur "Rejoindre"', 'warning');
+    const joinUrl = safeUrl(c.meeting_link);
+    if (joinUrl) {
+        const w = window.open(joinUrl, '_blank');
+        if (w) w.opener = null;
+        else showToast('⚠️ Popup bloqué - cliquez sur "Rejoindre"', 'warning');
     } else {
         showToast(t('noMeetingLink'), 'warning');
     }
@@ -2698,7 +2808,7 @@ function viewTeacherComment(courseId) {
         </div>`;
     } else {
         content.innerHTML = `<div style="padding:15px; background:#f0f7ff; border-radius:8px; line-height:1.8; white-space:pre-wrap;">
-            ${escapeHtml(comment).replace(/\n/g, '<br>')}
+            ${escapeHtml(comment)}
         </div>`;
     }
 
@@ -2809,33 +2919,30 @@ async function confirmCancelCourse() {
     }
     if (!reason) { showToast(t('selectReason'), 'error'); return; }
 
+    if (isCancelling) return;
+    isCancelling = true;
     showLoading();
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         const c = allCourses.find(x => x.id === pendingCancelCourseId);
         if (!c) throw new Error('Cours non trouvé');
 
-        // 退课时
-        const field = c.category === 'francais' ? 'french_credit' : 'credit';
-        const { data: u } = await supabase.from('users').select(field).eq('id', student.id).single();
-        if (u) {
-            const newVal = (u[field] || 0) + (c.duration || 2);
-            const upd = {}; upd[field] = newVal;
-            await supabase.from('users').update(upd).eq('id', student.id);
-            if (field === 'credit') student.credit = newVal;
-            else student.french_credit = newVal;
-        }
-
-        // 更新课程
-        const { error } = await supabase
+        // 先更新课程（只允许 scheduled → cancelled），成功后才退课时，避免重复退/失败也退
+        const { data: cancelledRows, error } = await supabase
             .from('courses_v2')
             .update({
                 status: 'cancelled',
                 cancel_reason: reason,
                 updated_at: new Date().toISOString()
             })
-            .eq('id', pendingCancelCourseId);
+            .eq('id', pendingCancelCourseId)
+            .eq('status', 'scheduled')
+            .select('id');
         if (error) throw error;
+        if (!cancelledRows || cancelledRows.length === 0) {
+            throw new Error(currentLang === 'zh' ? '该课程已无法取消（可能已被取消）' : 'Ce cours ne peut plus être annulé (déjà annulé ?)');
+        }
+        await refundStudentCredit(c.category, c.duration || 2);
 
                 // 🔥 发邮件给老师（取消课程）
         try {
@@ -2852,6 +2959,7 @@ async function confirmCancelCourse() {
         console.error(err);
         showToast(t('toastError') + ': ' + err.message, 'error');
     } finally {
+        isCancelling = false;
         hideLoading();
     }
 }
@@ -2879,33 +2987,30 @@ window.openCancelBookingModal = openCancelBookingModal;
 
 async function confirmCancelBooking() {
     if (!pendingCancelBookingId) return;
+    if (isCancelling) return;
+    isCancelling = true;
     showLoading();
     try {
         const supabase = window.supabaseAuth.getSupabaseClient();
         const c = allCourses.find(x => x.id === pendingCancelBookingId);
         if (!c) throw new Error('Cours non trouvé');
 
-        // 退课时
-        const field = c.category === 'francais' ? 'french_credit' : 'credit';
-        const { data: u } = await supabase.from('users').select(field).eq('id', student.id).single();
-        if (u) {
-            const newVal = (u[field] || 0) + (c.duration || 2);
-            const upd = {}; upd[field] = newVal;
-            await supabase.from('users').update(upd).eq('id', student.id);
-            if (field === 'credit') student.credit = newVal;
-            else student.french_credit = newVal;
-        }
-
-        // 更新课程
-        const { error } = await supabase
+        // 先更新课程（只允许 scheduled → cancelled），成功后才退课时，避免重复退/失败也退
+        const { data: cancelledRows, error } = await supabase
             .from('courses_v2')
             .update({
                 status: 'cancelled',
                 cancel_reason: 'Annulé par l\'étudiant (réservation)',
                 updated_at: new Date().toISOString()
             })
-            .eq('id', pendingCancelBookingId);
+            .eq('id', pendingCancelBookingId)
+            .eq('status', 'scheduled')
+            .select('id');
         if (error) throw error;
+        if (!cancelledRows || cancelledRows.length === 0) {
+            throw new Error(currentLang === 'zh' ? '该课程已无法取消（可能已被取消）' : 'Ce cours ne peut plus être annulé (déjà annulé ?)');
+        }
+        await refundStudentCredit(c.category, c.duration || 2);
 
         // 释放空闲时间段
         // 先按 course_id 查
@@ -2960,6 +3065,7 @@ async function confirmCancelBooking() {
         console.error(err);
         showToast(t('toastError') + ': ' + err.message, 'error');
     } finally {
+        isCancelling = false;
         hideLoading();
     }
 }
@@ -3204,6 +3310,25 @@ document.querySelectorAll('#bookingTypeTabs .booking-type-tab').forEach(tb => {
 // 确认预约
 // ============================================================
 let isBooking = false;
+let isCancelling = false;      // 防止取消按钮重复点击导致重复退课时
+
+// 退还课时（优先用数据库原子函数，避免“先读后写”并发丢失）
+async function refundStudentCredit(category, hours) {
+    const supabase = window.supabaseAuth.getSupabaseClient();
+    const field = category === 'francais' ? 'french_credit' : 'credit';
+    const { error } = await supabase.rpc('adjust_user_credit', { p_user_id: String(student.id), p_field: field, p_delta: hours });
+    if (!error) {
+        student[field] = (student[field] || 0) + hours;
+        return;
+    }
+    const { data: u } = await supabase.from('users').select(field).eq('id', student.id).single();
+    if (u) {
+        const newVal = (u[field] || 0) + hours;
+        const upd = {}; upd[field] = newVal;
+        await supabase.from('users').update(upd).eq('id', student.id);
+        student[field] = newVal;
+    }
+}
 
 async function confirmBooking() {
     if (isBooking) return;
