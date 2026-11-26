@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Signature du contrat · 合同签名 — Association Mille Voiles</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.7/build/pdfmake.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.7/build/vfs_fonts.js"></script>
+<script src="contract.js"></script>
+<style>
+  :root { --blue:#004080; --yellow:#ffd633; --bg:#f0f2f5; --line:#e2e6ec; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:#222; }
+  .wrap { max-width:820px; margin:0 auto; padding:20px 14px 60px; }
+  header { text-align:center; padding:18px 0 8px; }
+  header h1 { margin:0; font-size:24px; color:var(--blue); }
+  header p { margin:6px 0 0; color:#777; font-size:14px; }
+  .card { background:#fff; border-radius:14px; padding:22px 24px; margin-top:16px; box-shadow:0 3px 14px rgba(0,0,0,.07); border-top:4px solid var(--yellow); }
+  .card h2 { margin:0 0 12px; font-size:17px; color:var(--blue); }
+  #contractPreview { max-height:520px; overflow:auto; border:1px solid var(--line); border-radius:10px; padding:18px 20px; background:#fff; }
+  .hint { font-size:13px; color:#777; margin:8px 0 0; line-height:1.6; }
+  .pad-box { border:2px dashed #9aa8bb; border-radius:10px; background:#fcfdff; position:relative; }
+  canvas { display:block; width:100%; height:200px; touch-action:none; cursor:crosshair; }
+  .pad-placeholder { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#b4bcc9; pointer-events:none; font-size:15px; text-align:center; padding:0 10px; }
+  .row { display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:10px; flex-wrap:wrap; }
+  .check { display:flex; gap:10px; align-items:flex-start; margin-top:16px; font-size:14px; line-height:1.55; }
+  .check input { margin-top:3px; width:18px; height:18px; flex:none; }
+  button { font:inherit; cursor:pointer; border:0; border-radius:50px; padding:12px 28px; font-weight:700; }
+  .btn-primary { background:var(--blue); color:#fff; font-size:16px; }
+  .btn-primary:disabled { background:#9db3cc; cursor:not-allowed; }
+  .btn-ghost { background:#eef2f7; color:#33475f; padding:8px 18px; font-weight:600; font-size:14px; }
+  .center { text-align:center; }
+  .msg { padding:30px 20px; text-align:center; }
+  .msg .icon { font-size:46px; }
+  .msg h2 { color:var(--blue); }
+  .err { color:#b3261e; font-size:14px; margin-top:10px; min-height:18px; }
+  .hidden { display:none !important; }
+  a.dl { display:inline-block; margin-top:14px; background:var(--blue); color:#fff; text-decoration:none; padding:12px 30px; border-radius:50px; font-weight:700; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>✍️ Signature du contrat <span style="font-weight:400;color:#888">· 合同签名</span></h1>
+    <p>Association Mille Voiles / 千帆协会</p>
+  </header>
+
+  <!-- Chargement / erreur / déjà signé -->
+  <div id="stateCard" class="card msg">
+    <div class="icon" id="stateIcon">⏳</div>
+    <h2 id="stateTitle">Chargement… / 加载中…</h2>
+    <p id="stateText" class="hint"></p>
+  </div>
+
+  <!-- Contrat + signature -->
+  <div id="mainArea" class="hidden">
+    <div class="card">
+      <h2>📄 1. Lisez votre contrat / 请阅读合同</h2>
+      <div id="contractPreview"></div>
+      <p class="hint">Faites défiler pour lire l'ensemble du contrat.<br>请向下滚动阅读完整合同。</p>
+    </div>
+
+    <div class="card">
+      <h2>✍️ 2. Signez ci-dessous / 请在下方签名</h2>
+      <div class="pad-box">
+        <canvas id="pad" width="800" height="260"></canvas>
+        <div class="pad-placeholder" id="padPlaceholder">Signez ici avec le doigt ou la souris<br>请用手指或鼠标在此签名</div>
+      </div>
+      <div class="row">
+        <span class="hint" style="margin:0">Mention : « Lu et approuvé » / “已阅读并同意”</span>
+        <button type="button" class="btn-ghost" id="clearBtn">Effacer / 清除</button>
+      </div>
+
+      <label class="check">
+        <input type="checkbox" id="agree">
+        <span>J'ai lu le contrat, je l'approuve (« Lu et approuvé ») et je consens à le signer électroniquement.<br>
+        我已阅读合同并表示同意（“已阅读并同意”），同意以电子方式签署。</span>
+      </label>
+
+      <div class="center" style="margin-top:20px">
+        <button type="button" class="btn-primary" id="signBtn" disabled>Signer le contrat / 签署合同</button>
+        <div class="err" id="err"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Succès -->
+  <div id="doneCard" class="card msg hidden">
+    <div class="icon">🎉</div>
+    <h2>Contrat signé, merci ! / 合同已签署，谢谢！</h2>
+    <p class="hint">Votre signature a été enregistrée. Conservez une copie du contrat :<br>您的签名已保存，请保存一份合同副本：</p>
+    <a class="dl" id="dlLink" download="contrat.pdf">📄 Télécharger le contrat signé / 下载已签合同</a>
+    <p class="hint" style="margin-top:18px">Contact : <a href="mailto:2025qianfan@gmail.com">2025qianfan@gmail.com</a> · WeChat : qfparis</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var CONTRACT_BUCKET = 'contracts';
+  var UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  var token = new URLSearchParams(location.search).get('t') || '';
+  var reg = null, client = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  function showState(icon, title, text) {
+    $('stateIcon').textContent = icon;
+    $('stateTitle').textContent = title;
+    $('stateText').innerHTML = text || '';
+    $('stateCard').classList.remove('hidden');
+    $('mainArea').classList.add('hidden');
+  }
+
+  // ---------- Pavé de signature ----------
+  var canvas = $('pad'), ctx = canvas.getContext('2d');
+  var drawing = false, hasInk = false, last = null;
+  ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#0a1f44';
+
+  function pos(e) {
+    var r = canvas.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * canvas.width / r.width, y: (e.clientY - r.top) * canvas.height / r.height };
+  }
+  canvas.addEventListener('pointerdown', function (e) {
+    e.preventDefault(); canvas.setPointerCapture(e.pointerId);
+    drawing = true; last = pos(e);
+    ctx.beginPath(); ctx.arc(last.x, last.y, 1.5, 0, 6.283); ctx.fillStyle = '#0a1f44'; ctx.fill();
+    markInk();
+  });
+  canvas.addEventListener('pointermove', function (e) {
+    if (!drawing) return;
+    e.preventDefault();
+    var p = pos(e);
+    ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+    last = p;
+  });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) {
+    canvas.addEventListener(ev, function () { drawing = false; });
+  });
+  function markInk() { hasInk = true; $('padPlaceholder').classList.add('hidden'); refreshBtn(); }
+  $('clearBtn').addEventListener('click', function () {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasInk = false; $('padPlaceholder').classList.remove('hidden'); refreshBtn();
+  });
+  $('agree').addEventListener('change', refreshBtn);
+  function refreshBtn() { $('signBtn').disabled = !(hasInk && $('agree').checked); }
+
+  // ---------- Chargement du contrat ----------
+  async function init() {
+    if (!UUID_RE.test(token)) {
+      return showState('⚠️', 'Lien invalide / 链接无效',
+        'Ce lien de signature n\'est pas valide. Utilisez le lien reçu par e-mail.<br>此签名链接无效，请使用邮件中的链接。');
+    }
+    client = window.supabaseAuth && window.supabaseAuth.getSupabaseClient && window.supabaseAuth.getSupabaseClient();
+    if (!client) {
+      return showState('⚠️', 'Erreur technique / 技术错误', 'Service indisponible, réessayez plus tard.<br>服务暂不可用，请稍后重试。');
+    }
+    try {
+      var res = await client.rpc('get_contract_for_signing', { p_token: token });
+      if (res.error) throw res.error;
+      reg = res.data;
+    } catch (e) {
+      console.error(e);
+      return showState('⚠️', 'Erreur technique / 技术错误', 'Impossible de charger le contrat.<br>无法加载合同。');
+    }
+    if (!reg) {
+      return showState('⚠️', 'Lien introuvable ou expiré / 链接不存在或已失效',
+        'Contactez l\'association : 2025qianfan@gmail.com<br>请联系协会：2025qianfan@gmail.com');
+    }
+    if (reg.signed_at) {
+      var d = new Date(reg.signed_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+      return showState('✅', 'Contrat déjà signé / 合同已签署', 'Ce contrat a été signé le ' + d + '.<br>该合同已于 ' + d + ' 签署。');
+    }
+    $('contractPreview').innerHTML = window.ContractGenerator.buildHtml(reg, { images: { signature: 'signature_organisme.jpeg' } });
+    $('stateCard').classList.add('hidden');
+    $('mainArea').classList.remove('hidden');
+  }
+
+  // ---------- Signature ----------
+  $('signBtn').addEventListener('click', async function () {
+    var btn = $('signBtn'), err = $('err');
+    err.textContent = '';
+    if (!hasInk || !$('agree').checked) return;
+    btn.disabled = true; btn.textContent = 'Signature en cours… / 签署中…';
+    try {
+      var sigData = canvas.toDataURL('image/png');
+      var blob = await window.ContractGenerator.generate(reg, { studentSignature: sigData, date: new Date() });
+
+      var path = 'signed/' + token + '.pdf';
+      var up = await client.storage.from(CONTRACT_BUCKET).upload(path, blob, { contentType: 'application/pdf', upsert: false });
+      // Si un envoi précédent a déjà déposé le fichier (réessai), on continue.
+      if (up.error && !/exist|duplicate|409/i.test((up.error.message || '') + (up.error.statusCode || ''))) throw up.error;
+
+      var rpc = await client.rpc('submit_contract_signature', {
+        p_token: token, p_path: path, p_user_agent: (navigator.userAgent || '').slice(0, 300)
+      });
+      if (rpc.error) throw rpc.error;
+      if (!rpc.data) throw new Error('signature refusée (déjà signé ?)');
+
+      var url = URL.createObjectURL(blob);
+      var a = $('dlLink'); a.href = url;
+      a.download = 'contrat_signe_' + String(reg.name || '').replace(/[^A-Za-z0-9]+/g, '_') + '.pdf';
+      $('mainArea').classList.add('hidden');
+      $('doneCard').classList.remove('hidden');
+      window.scrollTo(0, 0);
+    } catch (e) {
+      console.error(e);
+      err.innerHTML = 'Une erreur est survenue, veuillez réessayer. / 出错了，请重试。';
+      btn.disabled = false; btn.textContent = 'Signer le contrat / 签署合同';
+    }
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>

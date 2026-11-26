@@ -296,6 +296,21 @@ const I18N = {
         'msg.validatedEmail': '✅ Validé + email envoyé',
         'msg.validatedNoSend': '✅ Validé (email non envoyé)',
         'msg.validatedNoEmail': "✅ Validé (pas d'email)",
+        'msg.contractGenerating': 'Génération du contrat...',
+        'msg.contractReady': '📄 Contrat généré',
+        'msg.contractFailed': '⚠️ Contrat non généré (voir la console)',
+        'pd.contract': 'Contrat',
+        'btn.contract': '📄 Contrat (PDF)',
+        'pd.sign': 'Signature du contrat',
+        'btn.resendSign': '✉️ Renvoyer le lien de signature',
+        'btn.signedPdf': '📄 Contrat signé (PDF)',
+        'status.signed': '✅ Signé le {date}',
+        'status.notSigned': '⏳ En attente de signature',
+        'msg.confirmResendSign': 'Renvoyer à {name} un e-mail avec le lien de signature ?',
+        'msg.signResent': '✅ E-mail de signature envoyé',
+        'msg.signResendFailed': '⚠️ Échec de l’envoi de l’e-mail',
+        'msg.signLinkFailed': '⚠️ Lien de signature non créé (voir la console)',
+        'msg.alreadySigned': 'Ce contrat est déjà signé',
         'msg.confirmReject': 'Rejeter la pré-inscription de {name} ?',
         'msg.rejected': 'Pré-inscription rejetée',
         'msg.teacherRequired': 'Intervenant requis',
@@ -602,6 +617,21 @@ const I18N = {
         'msg.validatedEmail': '✅ 已通过，并已发送邮件',
         'msg.validatedNoSend': '✅ 已通过（邮件未发送）',
         'msg.validatedNoEmail': '✅ 已通过（无邮箱）',
+        'msg.contractGenerating': '正在生成合同...',
+        'msg.contractReady': '📄 合同已生成',
+        'msg.contractFailed': '⚠️ 合同生成失败（请查看控制台）',
+        'pd.contract': '合同',
+        'btn.contract': '📄 合同 (PDF)',
+        'pd.sign': '合同签名',
+        'btn.resendSign': '✉️ 重发签名链接',
+        'btn.signedPdf': '📄 已签合同 (PDF)',
+        'status.signed': '✅ 已于 {date} 签署',
+        'status.notSigned': '⏳ 等待签名',
+        'msg.confirmResendSign': '给 {name} 重新发送签名链接邮件吗？',
+        'msg.signResent': '✅ 签名邮件已发送',
+        'msg.signResendFailed': '⚠️ 邮件发送失败',
+        'msg.signLinkFailed': '⚠️ 签名链接创建失败（请查看控制台）',
+        'msg.alreadySigned': '该合同已签署',
         'msg.confirmReject': '确认拒绝 {name} 的预注册吗？',
         'msg.rejected': '预注册已拒绝',
         'msg.teacherRequired': '请选择教师',
@@ -989,7 +1019,35 @@ function loadEmailJS() {
     });
 }
 
-async function sendActivationEmail(userEmail, userName, userType, userRole, userPassword) {
+// ---- Signature du contrat en ligne ----
+const SIGN_PAGE_URL = 'https://www.assmv.fr/sign-contract.html';
+
+function generateSignToken() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = crypto.getRandomValues(new Uint8Array(1))[0] & 15;
+        return (c === 'x' ? r : (r & 3) | 8).toString(16);
+    });
+}
+
+function buildSignUrl(token) {
+    return SIGN_PAGE_URL + '?t=' + encodeURIComponent(token);
+}
+
+// Bloc HTML injecté dans le gabarit EmailJS via {{{contract_sign_block}}} (triple accolade = HTML non échappé).
+// Vide si pas de lien (rôles sans contrat).
+function buildSignBlockHtml(signUrl) {
+    if (!signUrl) return '';
+    return '<div style="background:#fff8e1;border-radius:12px;padding:20px 24px;margin-bottom:25px;border-left:4px solid #f5c842;text-align:center;">' +
+        '<p style="margin:0 0 6px 0;font-size:16px;font-weight:700;color:#004080;">✍️ Contrat de formation à signer / 请签署培训合同</p>' +
+        '<p style="margin:0 0 4px 0;font-size:14px;color:#444;line-height:1.7;">Merci de lire et de signer votre contrat en ligne avant le début de la formation.</p>' +
+        '<p style="margin:0 0 16px 0;font-size:14px;color:#444;line-height:1.7;">请在培训开始前在线阅读并签署您的合同。</p>' +
+        '<a href="' + signUrl + '" style="display:inline-block;background:#004080;color:#ffffff;padding:14px 40px;border-radius:50px;text-decoration:none;font-weight:700;font-size:16px;">✍️ Signer le contrat / 签署合同</a>' +
+        '<p style="margin:12px 0 0 0;font-size:12px;color:#999;line-height:1.6;">Ce lien est personnel, ne le partagez pas.<br>此链接为您个人专用，请勿转发。</p>' +
+        '</div>';
+}
+
+async function sendActivationEmail(userEmail, userName, userType, userRole, userPassword, contractUrl, signUrl) {
     if (typeof emailjs === 'undefined') await loadEmailJS();
     if (typeof emailjs === 'undefined') throw new Error('EmailJS non disponible');
 
@@ -1007,6 +1065,9 @@ async function sendActivationEmail(userEmail, userName, userType, userRole, user
         user_role: roleLabels[userRole] || userRole || '—',
         user_password: userPassword || '—',
         login_url: 'https://www.assmv.fr/examen-civique.html',
+        contract_url: contractUrl || '',
+        sign_url: signUrl || '',
+        contract_sign_block: buildSignBlockHtml(signUrl),
         contact_email: '2025qianfan@gmail.com',
         subject: '🎉 Votre compte Mille Voiles est activé ! | 🎉 您的千帆协会账户已激活！'
     };
@@ -2517,6 +2578,30 @@ function showPreRegDetail(id) {
     document.getElementById('dPhone').textContent = reg.phone || '—';
     document.getElementById('dPack').textContent = reg.pack_hours ? (reg.pack_hours + ' h' + (reg.pack_price ? ' (' + reg.pack_price + ' €)' : '')) : '—';
 
+    const contractRow = document.getElementById('dContractRow');
+    if (contractRow) {
+        contractRow.style.display = (reg.status === 'validated' && preRegNeedsContract(reg)) ? '' : 'none';
+        document.getElementById('dContractBtn').onclick = () => downloadContract(reg.id);
+    }
+
+    const signRow = document.getElementById('dSignRow');
+    if (signRow) {
+        const show = reg.status === 'validated' && preRegNeedsContract(reg);
+        signRow.style.display = show ? '' : 'none';
+        if (show) {
+            const signed = !!reg.signed_at;
+            document.getElementById('dSignStatus').textContent = signed
+                ? t('status.signed', { date: formatDateTime(reg.signed_at) })
+                : t('status.notSigned');
+            const resendBtn = document.getElementById('dSignResendBtn');
+            resendBtn.style.display = (!signed && reg.email) ? '' : 'none';
+            resendBtn.onclick = () => resendSignEmail(reg.id);
+            const pdfBtn = document.getElementById('dSignedPdfBtn');
+            pdfBtn.style.display = (signed && reg.signed_contract_path) ? '' : 'none';
+            pdfBtn.onclick = () => downloadSignedContract(reg.id);
+        }
+    }
+
     openModal('detailModal');
 }
 
@@ -2612,6 +2697,125 @@ async function handleEditPreRegSubmit(e) {
     }
 }
 
+// ============================================================
+// 合同自动生成（依赖 contract.js + html2pdf.js）
+// ============================================================
+const CONTRACT_BUCKET = 'contracts';
+
+// 仅 Examen civique 学员（stu / stu_all）需要合同
+function preRegNeedsContract(reg) {
+    return ['stu', 'stu_all'].includes(reg.role || 'stu');
+}
+
+function contractFileName(reg) {
+    const slug = String(reg.name || '')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+    return 'contrat_' + reg.id + (slug ? '_' + slug : '') + '.pdf';
+}
+
+function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+// 生成 PDF → 上传 Supabase Storage → 记录路径。永远不抛异常（合同失败不能影响审核）。
+async function generateAndStoreContract(reg, supabase) {
+    const result = { blob: null, path: null, url: null };
+    try {
+        result.blob = await window.ContractGenerator.generate(reg);
+    } catch (e) {
+        console.error('Contract generation failed:', e);
+        return result;
+    }
+    const path = reg.id + '/' + contractFileName(reg);
+    try {
+        const { error } = await supabase.storage.from(CONTRACT_BUCKET)
+            .upload(path, result.blob, { contentType: 'application/pdf', upsert: true });
+        if (error) throw error;
+        result.path = path;
+        const { data } = await supabase.storage.from(CONTRACT_BUCKET)
+            .createSignedUrl(path, 60 * 60 * 24 * 30); // 链接 30 天有效
+        result.url = data ? data.signedUrl : null;
+        const { error: upErr } = await supabase.from('pre_registrations')
+            .update({ contract_path: path }).eq('id', reg.id);
+        if (upErr) console.warn('contract_path not saved:', upErr);
+    } catch (e) {
+        console.warn('Contract upload failed (PDF kept locally):', e);
+    }
+    return result;
+}
+
+// 详情弹窗按钮：已存档 → 打开签名链接；否则现场重新生成并下载
+async function downloadContract(id) {
+    const reg = allPreRegs.find(r => r.id === id);
+    if (!reg) return;
+    showLoading(t('msg.contractGenerating'));
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        if (reg.contract_path) {
+            const { data, error } = await supabase.storage.from(CONTRACT_BUCKET).createSignedUrl(reg.contract_path, 300);
+            if (!error && data && data.signedUrl) {
+                window.open(data.signedUrl, '_blank');
+                return;
+            }
+        }
+        const blob = await window.ContractGenerator.generate(reg);
+        downloadBlob(blob, contractFileName(reg));
+    } catch (e) {
+        console.error(e);
+        showToast(t('msg.contractFailed'), 'warning');
+    } finally {
+        hideLoading();
+    }
+}
+
+// Renvoyer l'e-mail (avec le lien de signature) à un étudiant déjà validé
+async function resendSignEmail(id) {
+    const reg = allPreRegs.find(r => r.id === id);
+    if (!reg || !reg.email) return;
+    if (reg.signed_at) { showToast(t('msg.alreadySigned'), 'info'); return; }
+    if (!confirm(t('msg.confirmResendSign', { name: reg.name }))) return;
+    showLoading(t('msg.validating'));
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        let token = reg.sign_token;
+        if (!token) {
+            token = generateSignToken();
+            const { error } = await supabase.from('pre_registrations').update({ sign_token: token }).eq('id', id);
+            if (error) throw error;
+        }
+        await sendActivationEmail(reg.email, reg.name, reg.type, reg.role, reg.password, null, buildSignUrl(token));
+        showToast(t('msg.signResent'), 'success');
+        await refreshPreRegs();
+    } catch (e) {
+        console.error(e);
+        showToast(t('msg.signResendFailed'), 'warning');
+    } finally {
+        hideLoading();
+    }
+}
+
+async function downloadSignedContract(id) {
+    const reg = allPreRegs.find(r => r.id === id);
+    if (!reg || !reg.signed_contract_path) return;
+    try {
+        const supabase = window.supabaseAuth.getSupabaseClient();
+        const { data, error } = await supabase.storage.from(CONTRACT_BUCKET).createSignedUrl(reg.signed_contract_path, 300);
+        if (error || !data) throw error || new Error('no url');
+        window.open(data.signedUrl, '_blank');
+    } catch (e) {
+        console.error(e);
+        showToast(t('msg.contractFailed'), 'warning');
+    }
+}
+
 async function validatePreReg(id) {
     const reg = allPreRegs.find(r => r.id === id);
     if (!reg || reg.status !== 'pending') {
@@ -2668,9 +2872,42 @@ async function validatePreReg(id) {
             validated_by: currentAdmin.name || 'admin'
         }).eq('id', id);
 
+        let contract = null;
+        if (!preRegNeedsContract(reg) && reg.role !== 'user') {
+            showToast('ℹ️ 未自动生成合同：角色为「' + (reg.role || '—') + '」（仅 stu / stu_all 自动生成）。可在详情里手动生成。', 'info');
+        }
+        if (preRegNeedsContract(reg)) {
+            // 只更新提示文字，不能再 showLoading（否则计数 +1，finally 里只 hideLoading 一次，遮罩永远关不掉）
+            const lt = document.getElementById('loadingText');
+            if (lt) lt.textContent = t('msg.contractGenerating');
+            contract = await generateAndStoreContract(reg, supabase);
+            if (contract.blob) {
+                // 上传失败时，把 PDF 直接下载给管理员，避免丢失
+                if (!contract.path) downloadBlob(contract.blob, contractFileName(reg));
+                showToast(t('msg.contractReady'), 'success');
+            } else {
+                showToast(t('msg.contractFailed'), 'warning');
+            }
+        }
+
+        // Lien de signature en ligne (étudiants avec contrat uniquement)
+        let signUrl = null;
+        if (preRegNeedsContract(reg)) {
+            try {
+                const signToken = generateSignToken();
+                const { error: tokErr } = await supabase.from('pre_registrations')
+                    .update({ sign_token: signToken }).eq('id', id);
+                if (tokErr) throw tokErr;
+                signUrl = buildSignUrl(signToken);
+            } catch (e) {
+                console.warn('sign_token not saved:', e);
+                showToast(t('msg.signLinkFailed'), 'warning');
+            }
+        }
+
         if (reg.email) {
             try {
-                await sendActivationEmail(reg.email, reg.name, reg.type, reg.role, reg.password);
+                await sendActivationEmail(reg.email, reg.name, reg.type, reg.role, reg.password, contract && contract.url, signUrl);
                 showToast(t('msg.validatedEmail'), 'success');
             } catch (e) {
                 showToast(t('msg.validatedNoSend'), 'warning');

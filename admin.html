@@ -10,6 +10,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.7/build/pdfmake.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.7/build/vfs_fonts.js"></script>
+<script src="contract.js"></script>
 <style>
 .lang-switch {
     display: inline-flex;
@@ -550,6 +553,8 @@
 <div class="detail-item detail-full"><span class="label" data-i18n="pd.address">Adresse</span><div class="value" id="dAddress">-</div></div>
 <div class="detail-item detail-full"><span class="label" data-i18n="pd.phone">Téléphone</span><div class="value" id="dPhone">-</div></div>
 <div class="detail-item detail-full"><span class="label" data-i18n="pd.pack">Forfait</span><div class="value" id="dPack">-</div></div>
+<div class="detail-item detail-full" id="dContractRow" style="display:none"><span class="label" data-i18n="pd.contract">Contrat</span><div class="value"><button type="button" class="cancel-action-btn" id="dContractBtn" data-i18n="btn.contract">📄 Contrat (PDF)</button></div></div>
+<div class="detail-item detail-full" id="dSignRow" style="display:none"><span class="label" data-i18n="pd.sign">Signature du contrat</span><div class="value"><div id="dSignStatus" style="margin-bottom:6px">-</div><button type="button" class="cancel-action-btn" id="dSignResendBtn" data-i18n="btn.resendSign">✉️ Renvoyer le lien de signature</button> <button type="button" class="cancel-action-btn" id="dSignedPdfBtn" style="display:none" data-i18n="btn.signedPdf">📄 Contrat signé (PDF)</button></div></div>
 </div>
 <div class="form-actions">
 <button class="cancel-action-btn" onclick="closeModal('detailModal')" data-i18n="btn.close">Fermer</button>
