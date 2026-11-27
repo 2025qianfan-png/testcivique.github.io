@@ -720,6 +720,64 @@
                 justify-content: center;
             }
         }
+        /* ===== 模块切换 ===== */
+        .module-tabs {
+            position: sticky; top: 0; z-index: 20;
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
+            background: var(--white); padding: 10px 30px;
+            border-bottom: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+        .module-tabs a {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 52px; padding: 6px 4px; border-radius: 10px;
+            background: var(--light-gray); color: var(--primary-blue);
+            text-decoration: none; font-family: 'Montserrat', sans-serif; text-align: center;
+        }
+        .module-tabs a strong { font-size: 0.9rem; white-space: nowrap; }
+        .module-tabs a span { font-size: 0.72rem; color: var(--medium-gray); white-space: nowrap; }
+        .module-tabs a:hover { background: var(--primary-light-yellow); }
+        .module-tabs a.active { background: var(--primary-blue); color: var(--white); }
+        .module-tabs a.active span { color: var(--primary-yellow); }
+        .module-pager { display: flex; justify-content: space-between; gap: 10px; margin-top: 1.5rem; flex-wrap: wrap; }
+        .module-pager a { text-decoration: none; display: inline-block; }
+        .module-pager a:last-child { margin-left: auto; }
+
+        /* ===== 朗读 ===== */
+        .speech-notice { background: #fff4cc; border-radius: 10px; padding: 0.7rem 1rem; font-size: 0.85rem; margin-bottom: 1rem; }
+        .flashcard { user-select: none; touch-action: pan-y; }
+        .flashcard .card-word.long { font-size: 1.5rem; }
+        .speak-row { display: flex; justify-content: center; align-items: center; gap: 0.8rem; flex-wrap: wrap; margin: 0.5rem 0; }
+        .auto-speak { font-size: 0.85rem; color: var(--medium-gray); display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .card-slider { display: block; width: 100%; max-width: 600px; margin: 0.8rem auto 0; accent-color: var(--primary-blue); }
+
+        /* ===== 句子 ===== */
+        #sentenceView { scroll-margin-top: 90px; }
+        .sentence-item { display: block; }
+        .sentence-row { display: flex; align-items: flex-start; gap: 0.4rem; }
+        .sentence-row .sentence-number { margin-top: 0.3rem; }
+        .sentence-words { flex: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.25rem; min-width: 0; }
+        .word-chip { font-family: inherit; color: inherit; line-height: 1.6; flex-wrap: wrap; text-align: left; max-width: 100%; }
+        .punct { padding: 0 0.15rem; }
+        .sentence-actions { display: flex; gap: 0.3rem; }
+        .icon-btn { width: 2.1rem; height: 2.1rem; border-radius: 50%; border: none; background: var(--light-gray); color: var(--primary-blue); font-weight: 700; cursor: pointer; }
+        .icon-btn:hover, .icon-btn.on { background: var(--primary-yellow); }
+        .sentence-zh { margin: 0.5rem 0 0.1rem 2.9rem; color: var(--primary-blue); font-size: 0.95rem; }
+        .page-numbers { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.4rem; margin: 0.8rem 0; }
+        .page-num { width: 2.2rem; height: 2.2rem; border-radius: 50%; border: none; background: var(--light-gray); cursor: pointer; font-weight: 600; color: var(--primary-blue); }
+        .page-num.active { background: var(--primary-blue); color: var(--white); }
+        .action-small:disabled { opacity: 0.4; cursor: default; transform: none; }
+        .unknown-word { border: 1px solid #e6b9a0; background: var(--white); border-radius: 2rem; padding: 0.2rem 0.7rem; margin: 0.25rem 0.25rem 0 0; cursor: pointer; font-family: inherit; font-size: 0.85rem; }
+
+        @media (max-width: 768px) {
+            .module-tabs { padding: 8px; grid-template-columns: repeat(5, minmax(62px, 1fr)); }
+            .module-tabs a strong { font-size: 0.78rem; }
+            .module-tabs a span { font-size: 0.66rem; }
+            .sentence-row { flex-wrap: wrap; }
+            .sentence-words { flex-basis: calc(100% - 3.2rem); }
+            .sentence-actions { margin-left: auto; }
+            .sentence-zh { margin-left: 0.3rem; }
+        }
     </style>
 </head>
 <body>
@@ -733,7 +791,6 @@
         </div>
         <div class="header-actions">
             <a href="examen-civique.html" class="header-btn"><i class="fas fa-home"></i> Accueil</a>
-            <a href="flashcards-unit2.html" class="header-btn"><i class="fas fa-arrow-right"></i> Module 2</a>
         </div>
     </header>
 
@@ -762,6 +819,14 @@
         </div>
     </div>
 
+    <nav class="module-tabs" aria-label="模块切换">
+        <a href="flashcards-unit1.html" class="active" aria-current="page"><strong>模块一</strong><span>价值观</span></a>
+        <a href="flashcards-unit2.html"><strong>模块二</strong><span>制度政治</span></a>
+        <a href="flashcards-unit3.html"><strong>模块三</strong><span>权利公民</span></a>
+        <a href="flashcards-unit4.html"><strong>模块四</strong><span>历史地理</span></a>
+        <a href="flashcards-unit5.html"><strong>模块五</strong><span>法国生活</span></a>
+    </nav>
+
     <!-- App Card -->
     <div class="app-card" id="flashcards">
 
@@ -769,8 +834,8 @@
         <div class="unit-banner">
             <h2><i class="fas fa-star"></i> 模块一 · Valeurs et symboles de la République</h2>
             <div class="unit-stats">
-                <i class="fas fa-words"></i> <span id="totalWords">0</span> mots ·
-                <i class="fas fa-sentence"></i> <span id="totalSentences">0</span> phrases
+                <i class="fas fa-font"></i> <span id="totalWords">0</span> mots ·
+                <i class="fas fa-align-left"></i> <span id="totalSentences">0</span> phrases
             </div>
         </div>
 
@@ -780,6 +845,8 @@
             <button id="btnSentence" class="mode-btn"><i class="fas fa-paragraph"></i> 句子练习</button>
         </div>
 
+<div class="speech-notice" id="speechNotice" role="status" hidden></div>
+
         <!-- Flashcard View -->
         <div id="flashcardView">
             <div class="flashcard" id="flashcardElement">
@@ -787,13 +854,21 @@
                 <div class="card-type" id="cardType">NOM</div>
                 <div class="card-word" id="cardWord">—</div>
                 <div class="card-translation" id="cardTranslation">—</div>
-                <div class="card-hint"><i class="fas fa-mouse-pointer"></i> Cliquez pour révéler la traduction</div>
+                <div class="card-hint"><i class="fas fa-volume-up"></i> 点击：中文 + 朗读 · 滑动换词</div>
+            </div>
+
+<div class="speak-row">
+                <button type="button" class="action-small" id="speakBtn"><i class="fas fa-volume-up"></i> 发音</button>
+                <button type="button" class="action-small" id="slowBtn"><i class="fas fa-volume-down"></i> 慢速</button>
+                <label class="auto-speak"><input type="checkbox" id="autoSpeak"> 换词时自动朗读</label>
             </div>
 
             <div class="nav-buttons">
                 <button class="nav-btn" id="prevCard"><i class="fas fa-chevron-left"></i></button>
                 <button class="nav-btn" id="nextCard"><i class="fas fa-chevron-right"></i></button>
             </div>
+
+<input type="range" class="card-slider" id="cardSlider" min="1" value="1" aria-label="跳到第几个单词">
 
             <div class="card-counter">
                 <span id="totalCards">0</span> mots · <i class="far fa-hand-pointer"></i> cliquer pour voir la traduction
@@ -805,18 +880,25 @@
             <div class="sentence-viewport" id="sentenceContainer"></div>
 
             <div class="sentence-controls">
-                <span class="hint"><i class="fas fa-info-circle"></i> Cliquez un mot → voir traduction · Re-cliquez → marquer « inconnu »</span>
+                <span class="hint"><i class="fas fa-info-circle"></i> 点一下词：中文 + 朗读 · 再点一下：标记「生词」</span>
                 <div class="btn-group">
+                    <button type="button" id="allZhBtn" class="action-small">显示全部中文</button>
                     <button id="prevPageBtn" class="action-small"><i class="fas fa-chevron-left"></i> Précédent</button>
                     <button id="nextPageBtn" class="action-small">Suivant <i class="fas fa-chevron-right"></i></button>
                 </div>
             </div>
+
+<div class="page-numbers" id="pageNumbers"></div>
 
             <div class="unknown-panel">
                 <strong><i class="fas fa-exclamation-triangle"></i> Mots inconnus :</strong>
                 <span id="unknownDisplay">Aucun marqué</span>
                 <button id="resetUnknownBtn" class="action-small danger" style="float:right;background:#e74c3c;color:white;">Effacer</button>
             </div>
+        </div>
+
+        <div class="module-pager">
+            <a class="action-small" href="flashcards-unit2.html">模块二 · 制度政治 <i class="fas fa-arrow-right"></i></a>
         </div>
 
         <hr style="border: 0.5px solid #eee; margin: 1.5rem 0 0.5rem;">
@@ -1055,7 +1137,7 @@
             "Quelle proposition est correcte ? La liberté d'expression :",
             "Quelles sont les couleurs du drapeau français ?",
             "Qu'est-ce que la Marseillaise ?",
-            "Qu'est ce qui est traditionnellement organisé sur les Champs Élysées le 14 juillet pour célébrer la fête nationale ?",
+            "Qu'est-ce qui est traditionnellement organisé sur les Champs-Élysées le 14 juillet pour célébrer la fête nationale ?",
             "Qui est Marianne ?",
             "Une personne peut-elle changer librement de religion ?",
             "\"La France est une République indivisible, ..., démocratique et sociale\". Complétez cette phrase extraite de l'article 1er de la Constitution :",
@@ -1093,7 +1175,7 @@
             "A-t-on le droit d'insulter publiquement quelqu'un parce qu'il est différent (handicap, apparence physique, sexe...) ?",
             "Le régime de la France est :",
             "Pourquoi le principe de laïcité doit-il être respecté à l'école ?",
-            "En quelle année la loi de séparation des Églises et de l'Etat a-t-elle été votée ?",
+            "En quelle année la loi de séparation des Églises et de l'État a-t-elle été votée ?",
             "Une personne a-t-elle le droit de ne pas croire en une religion ?",
             "Quel droit est garanti par la laïcité ?",
             "À l'école publique, qui peut porter des signes religieux très visibles ?",
@@ -1104,227 +1186,330 @@
             "Que garantit le principe de laïcité ?",
             "A-t-on le droit de changer de religion ?",
             "Que représente la laïcité ?",
-            "Qu'est ce qui est interdit par la Charte de la laïcité à l'école ?",
+            "Qu'est-ce qui est interdit par la Charte de la laïcité à l'école ?",
             "Que dit l'article 1er de la Constitution française ?"
         ];
 
-        // ===== TRANSLATIONS =====
-        const translationMap = new Map();
-        words.forEach(w => translationMap.set(w.french.toLowerCase().trim(), w.chinese));
+    // ===== 整句中文 =====
+    const sentenceZh = {"À quoi correspond la date du 14 juillet ?":"7月14日是什么日子？","Quel est l'un des symboles de la République française ?":"下列哪一项是法兰西共和国的象征之一？","Le principe d'égalité signifie que :":"平等原则意味着：","\"Liberté, égalité, fraternité\", c'est :":"\"自由、平等、博爱\"是：","A-t-on le droit d'insulter publiquement quelqu'un parce qu'il est différent (handicap, apparence physique, sexe...) ?":"能否因为某人与众不同（残疾、外貌、性别……）就公开侮辱他？","Certains métiers peuvent-ils être réservés aux hommes ?":"某些职业可以只限男性从事吗？","De quand date la Constitution de la Ve République ?":"第五共和国宪法是什么时候颁布的？","Le régime de la France est :":"法国的政体是：","Lequel de ces symboles représente officiellement la République française ?":"下列哪个象征正式代表法兰西共和国？","Où peut-on voir la devise de la République ?":"在哪里可以看到共和国的格言？","Quels sont des symboles officiels de la République française ?":"哪些是法兰西共和国的官方象征？","Qu'est-ce que l'égalité ?":"什么是平等？","Que signifie la liberté ?":"自由意味着什么？","Que signifie le mot \"fraternité\" dans la devise française ?":"法国格言中的\"博爱\"一词是什么意思？","Quel animal est un symbole de la France ?":"哪种动物是法国的象征？","Quel est l'un des rôles des associations ?":"协会的作用之一是什么？","Quel est le nom de l'hymne national ?":"国歌叫什么名字？","Quel symbole de la République française est tricolore ?":"法兰西共和国的哪个象征是三色的？","Quelle est la date de la fête nationale française ?":"法国国庆节是哪一天？","Quelle est la devise de la République française ?":"法兰西共和国的格言是什么？","Quelle est la langue officielle de la République française ?":"法兰西共和国的官方语言是什么？","Quelle est la place de la langue française dans la République ?":"法语在共和国中处于什么地位？","Quelle liberté permet à chacun d'exprimer ses idées ?":"哪项自由让每个人都能表达自己的想法？","Quelle proposition est correcte ? La liberté d'expression :":"哪种说法是正确的？言论自由：","Quelles sont les couleurs du drapeau français ?":"法国国旗是哪几种颜色？","Qu'est-ce que la Marseillaise ?":"什么是《马赛曲》？","Qu'est-ce qui est traditionnellement organisé sur les Champs-Élysées le 14 juillet pour célébrer la fête nationale ?":"为庆祝国庆节，7月14日香榭丽舍大街上传统上会举行什么活动？","Qui est Marianne ?":"玛丽安娜是谁？","Une personne peut-elle changer librement de religion ?":"一个人可以自由改变宗教信仰吗？","\"La France est une République indivisible, ..., démocratique et sociale\". Complétez cette phrase extraite de l'article 1er de la Constitution :":"\"法国是一个不可分割的、……、民主的和社会的共和国。\"请补全这句摘自《宪法》第一条的话：","En quelle année la loi de séparation des Églises et de l'État a-t-elle été votée ?":"政教分离法是哪一年通过的？","Que permet le principe de laïcité ?":"世俗原则允许什么？","Quel droit est garanti par la laïcité ?":"世俗原则保障哪项权利？","Pourquoi le principe de laïcité doit-il être respecté à l'école ?":"为什么在学校必须遵守世俗原则？","Qu'est-ce que la laïcité ?":"什么是世俗原则（政教分离）？","Un enfant peut-il refuser d'aller à l'école pour une raison religieuse ?":"孩子可以以宗教理由拒绝上学吗？","Une personne a-t-elle le droit de ne pas croire en une religion ?":"一个人有权不信仰任何宗教吗？","Parmi les propositions suivantes, laquelle constitue une participation citoyenne ?":"下列哪一项属于公民参与？","Que garantit la liberté d'expression ?":"言论自由保障什么？","À quoi sert un titre de séjour ?":"居留证有什么用？","La liberté de circulation permet à toute personne de :":"行动自由使每个人都可以：","Sur quel site internet peut-on retrouver le symbole de la République française ?":"在哪个网站上可以找到法兰西共和国的象征？","Complétez ces paroles de la Marseillaise : \"Aux armes [...] ! Formez vos bataillons\"":"请补全《马赛曲》歌词：\"拿起武器[……]！组成你们的队伍\"","Complétez les paroles de la Marseillaise : \"Allons enfants de la patrie [...]\"":"请补全《马赛曲》歌词：\"前进，祖国的儿女[……]\"","En application de la liberté individuelle, quelle proposition est correcte ? Une personne peut :":"根据个人自由原则，哪种说法是正确的？一个人可以：","Concernant la pratique de la religion, quelle proposition est correcte ?":"关于宗教活动，哪种说法是正确的？","En tant que parent, peut-on refuser que son enfant participe aux cours de sport à l'école car ils sont mixtes ?":"作为家长，能否因为体育课男女混合上课而拒绝让孩子参加？","Quelle est la devise de la France ?":"法国的格言是什么？","La répudiation de sa femme est :":"休妻（单方面抛弃妻子）是：","Les impôts permettent de financer les dépenses publiques. Quelle proposition est correcte ?":"税收用于支付公共开支。哪种说法是正确的？","Peut-on brûler publiquement un drapeau français ?":"可以公开焚烧法国国旗吗？","Que fait l'État pour lutter contre les discriminations ?":"国家采取什么措施反对歧视？","Que représente Marianne ?":"玛丽安娜代表什么？","Qu'est-ce que la liberté d'association ?":"什么是结社自由？","Qu'est-ce que la liberté ?":"什么是自由？","Sur quel document peut-on voir Marianne ?":"在哪种文件上可以看到玛丽安娜？","Un employeur refuse d'embaucher des femmes dans son entreprise. Que dit la loi ?":"一位雇主拒绝在自己的企业里招聘女性。法律是怎么规定的？","Une des valeurs de la devise républicaine est l'égalité. Qu'est-ce que cela signifie ?":"共和国格言中的价值观之一是平等。这是什么意思？","À l'école publique, qui peut porter des signes religieux très visibles ?":"在公立学校，谁可以佩戴非常显眼的宗教标志？","Selon le principe de laïcité, que signifie la neutralité de l'État ?":"根据世俗原则，国家中立是什么意思？","Que peut faire un usager du service public dans une mairie ?":"公共服务的使用者在市政府里可以做什么？","Qui doit respecter le principe de neutralité religieuse dans une préfecture ?":"在省政府，谁必须遵守宗教中立原则？","La laïcité impose-t-elle aux agents publics d'être neutres vis-à-vis des usagers ?":"世俗原则是否要求公务人员对服务对象保持中立？","Que garantit le principe de laïcité ?":"世俗原则保障什么？","A-t-on le droit de changer de religion ?":"人们有权改变宗教信仰吗？","Que représente la laïcité ?":"世俗原则代表什么？","Qu'est-ce qui est interdit par la Charte de la laïcité à l'école ?":"《世俗原则宪章》禁止在学校做什么？","Que dit l'article 1er de la Constitution française ?":"《法国宪法》第一条是怎么说的？"};
 
-        const extra = {
-            "à":"在/向","quoi":"什么","correspond":"对应","date":"日期","du":"的","14":"14",
-            "juillet":"七月","quel":"哪个","est":"是","l'un":"之一","des":"的/一些",
-            "symboles":"象征","de":"的","république":"共和国","française":"法国的",
-            "le":"这个","principe":"原则","d'égalité":"平等","signifie":"意味着",
-            "que":"…的是","tous":"所有","les":"这些","citoyens":"公民","sont":"是",
-            "égaux":"平等的","devant":"在…面前","loi":"法律","liberté":"自由",
-            "égalité":"平等","fraternité":"博爱","c'est":"这是","a-t-on":"我们有",
-            "droit":"权利","d'insulter":"侮辱","publiquement":"公开地","quelqu'un":"某人",
-            "parce":"因为","qu'il":"他","différent":"不同的","handicap":"残疾",
-            "apparence":"外貌","physique":"身体的","sexe":"性别","certains":"某些",
-            "métiers":"职业","peuvent-ils":"它们能","être":"被","réservés":"保留",
-            "aux":"给","hommes":"男人","quand":"什么时候","constitution":"宪法",
-            "ve":"第五","1958":"1958年","régime":"政体","france":"法国","une":"一个",
-            "démocratique":"民主的","lequel":"哪一个","ces":"这些","représente":"代表",
-            "officiellement":"官方地","où":"哪里","peut-on":"我们能够","voir":"看见",
-            "devise":"格言","sur":"在…上","bâtiments":"建筑","publics":"公共的",
-            "mairies":"市政府","quels":"哪些","officiels":"官方的","qu'est-ce":"什么是",
-            "l'égalité":"平等","mot":"词","dans":"在…中","animal":"动物","symbole":"象征",
-            "rôles":"作用","associations":"协会","nom":"名字","hymne":"国歌",
-            "national":"国家的","tricolore":"三色的","quelle":"什么","fête":"节日",
-            "nationale":"国家的","langue":"语言","officielle":"官方的","place":"地位",
-            "française":"法语","permet":"允许","chacun":"每个人","exprimer":"表达",
-            "ses":"他/她的","idées":"想法","proposition":"命题","correcte":"正确的",
-            "expression":"表达","couleurs":"颜色","drapeau":"旗","français":"法国的",
-            "bleu":"蓝色","blanc":"白色","rouge":"红色","marseillaise":"马赛曲",
-            "traditionnellement":"传统上","organisé":"组织","champs":"田园",
-            "élysées":"爱丽舍","célébrer":"庆祝","marianne":"玛丽安娜","personne":"人",
-            "changer":"改变","librement":"自由地","religion":"宗教","indivisible":"不可分割的",
-            "laïque":"世俗的","sociale":"社会的","complétez":"完成","phrase":"句子",
-            "extraite":"摘自","article":"条款","1er":"第一条","en":"在","année":"年份",
-            "séparation":"分离","églises":"教会","état":"国家","votée":"投票通过",
-            "1905":"1905年","laïcité":"世俗主义","garanti":"保障","par":"通过",
-            "pourquoi":"为什么","doit-il":"它必须","respecté":"尊重","école":"学校",
-            "enfant":"孩子","refuser":"拒绝","aller":"去","pour":"为了","raison":"理由",
-            "religieuse":"宗教的","a-t-elle":"她有","ne":"不","pas":"没有","croire":"相信",
-            "parmi":"在…之中","propositions":"提议","suivantes":"以下的","laquelle":"哪一个",
-            "constitue":"构成","participation":"参与","citoyenne":"公民的","garantit":"保障",
-            "sert":"用于","titre":"证件","séjour":"居留","circulation":"通行","toute":"任何",
-            "site":"网站","internet":"互联网","retrouver":"找到","paroles":"歌词",
-            "aux":"向","armes":"武器","formez":"组成","bataillons":"营","allons":"前进",
-            "enfants":"孩子们","patrie":"祖国","application":"应用","individuelle":"个人的",
-            "concernant":"关于","pratique":"实践","tant":"作为","parent":"家长",
-            "participe":"参加","cours":"课程","sport":"体育","car":"因为","mixtes":"混合的",
-            "répudiation":"休妻","femme":"妻子","impôts":"税收","permettent":"允许",
-            "financer":"资助","dépenses":"开支","publiques":"公共的","brûler":"焚烧",
-            "fait":"做","l'état":"国家","lutter":"斗争","contre":"反对","discriminations":"歧视",
-            "d'association":"结社","document":"文件","employeur":"雇主","embaucher":"雇佣",
-            "femmes":"女性","entreprise":"企业","dit":"说","valeurs":"价值观",
-            "républicaine":"共和的","cela":"这","république":"共和国","qu'est":"什么是",
-            "ce":"这","interdit":"禁止","charte":"章程","l'article":"条款"
-        };
-        Object.entries(extra).forEach(([k,v]) => { if(!translationMap.has(k)) translationMap.set(k,v); });
+    // ===== 逐词释义（词组优先匹配）=====
+    const dict = {"14":"14","1er":"第一","à":"在；到；对","a-t-elle":"她是否（有）","a-t-on":"人们是否（有）","agents":"工作人员","aller":"去","allons":"前进吧","animal":"动物","année":"年份","apparence":"外貌","application":"应用；依照","armes":"武器","article":"条款","association":"协会；结社","associations":"协会","aux":"向；对（à + les）","bataillons":"营；队伍","brûler":"焚烧","car":"因为","cela":"这；那","célébrer":"庆祝","certains":"某些","ces":"这些","cette":"这个","chacun":"每个人","changer":"改变","charte":"宪章","circulation":"通行；行动","citoyenne":"公民的","complétez":"请补全","concernant":"关于","constitue":"构成","constitution":"宪法","contre":"反对","correcte":"正确的","correspond":"对应；纪念","couleurs":"颜色","cours":"课程","croire":"相信；信仰","dans":"在…里","date":"日期；始于","de":"的；从","démocratique":"民主的","dépenses":"开支","des":"一些；…的","devise":"格言","différent":"不同的","discriminations":"歧视","dit":"说；规定","document":"文件","doit":"必须","doit-il":"它是否必须","drapeau":"旗帜","droit":"权利；法律","du":"…的（de + le）","école":"学校","égalité":"平等","églises":"教会","embaucher":"雇用","employeur":"雇主","en":"在；以","enfant":"孩子","enfants":"孩子；儿女","entreprise":"企业","est":"是","est-ce":"是否","et":"和","état":"国家","été":"曾经；已被","être":"是；被","expression":"表达；体现","exprimer":"表达","extraite":"摘录的","faire":"做","fait":"做；作出","femme":"女人；妻子","femmes":"女性","fête":"节日","financer":"资助；支付","formez":"组成","français":"法国的；法语","française":"法国的","france":"法国","fraternité":"博爱","garanti":"受保障的","garantit":"保障","handicap":"残疾","hommes":"男性","hymne":"国歌；颂歌","idées":"想法","il":"他；它","ils":"他们","impose-t-elle":"它是否要求","impôts":"税收","individuelle":"个人的","indivisible":"不可分割的","insulter":"侮辱","interdit":"禁止","internet":"互联网","juillet":"七月","la":"（阴性冠词）","laïcité":"世俗原则","langue":"语言","laquelle":"哪一个","le":"（阳性冠词）","lequel":"哪一个","les":"（复数冠词）","liberté":"自由","librement":"自由地","loi":"法律","lutter":"斗争","mairie":"市政府","marianne":"玛丽安娜","marseillaise":"马赛曲","métiers":"职业","mixtes":"男女混合的","mot":"词","national":"国家的","nationale":"国家的","ne":"不（否定词）","neutralité":"中立","neutres":"中立的","nom":"名字；名义","officielle":"官方的","officiellement":"正式地","officiels":"官方的","organisé":"被组织","où":"哪里","par":"由；通过","parce":"因为","parent":"家长","parmi":"在…之中","paroles":"歌词","participation":"参与","participe":"参加","pas":"不","patrie":"祖国","permet":"允许","permettent":"允许","personne":"人","peut":"可以","peut-elle":"她能否","peut-il":"他能否","peut-on":"能否","peuvent-ils":"他们能否","phrase":"句子","physique":"身体的","place":"位置；地位","porter":"佩戴","pour":"为了","pourquoi":"为什么","pratique":"实践","préfecture":"省政府","principe":"原则","proposition":"说法；选项","propositions":"说法；选项","public":"公共的","publics":"公共的","publique":"公立的；公共的","publiquement":"公开地","publiques":"公共的","quand":"什么时候","que":"什么；…（连词）","quel":"哪个","quelle":"哪个","quelles":"哪些","quelqu'un":"某人","quels":"哪些","qui":"谁；…的人","quoi":"什么","raison":"理由","refuse":"拒绝","refuser":"拒绝","régime":"政体；制度","religieuse":"宗教的","religieux":"宗教的","religion":"宗教","représente":"代表","républicaine":"共和的","république":"共和国","répudiation":"休妻","réservés":"专供；仅限","respecté":"被遵守","respecter":"遵守；尊重","retrouver":"找到","rôles":"作用","sa":"他/她的","séjour":"居留","selon":"根据","séparation":"分离","sert":"用于","service":"服务","ses":"他/她的（复数）","sexe":"性别","signes":"标志","signifie":"意味着","site":"网站","sociale":"社会的","son":"他/她的","sont":"是","sport":"体育","suivantes":"下列的","sur":"在…上","symbole":"象征","symboles":"象征","tant":"如此","titre":"证件","toute":"任何","traditionnellement":"传统上","très":"非常","tricolore":"三色的","un":"一个","une":"一个","usager":"使用者","usagers":"服务对象","valeurs":"价值观","ve":"第五","vis-à-vis":"对于","visibles":"显眼的","voir":"看到","vos":"你们的","votée":"表决通过的","qu'est-ce":"什么是","c'est":"这是","qu'il":"（连词）他","l'un":"其中之一","champs-élysées":"香榭丽舍大街"};
+    const phrases = {"qu'est-ce que":"什么是","qu'est-ce qu'une":"什么是一个","qu'est-ce qu'un":"什么是一个","qu'est-ce qui":"什么东西","est-ce que":"…吗（疑问句）","est-ce légal":"是否合法","se passe-t-il":"会发生什么","y a-t-il":"有（多少）","a eu lieu":"发生了","ont lieu":"举行","à quoi sert":"有什么用","à partir de":"从…起","combien de temps":"多长时间","depuis quand":"从什么时候起","de quand date":"是什么时候的","en cas de":"如果发生…","en cas d'accident":"发生事故时","en même temps":"同时","en tant que":"作为","au nom de":"以…名义","à la place d'une autre":"代替另一个人","à la fin de":"在…结束时","à la fin du":"在…结束时","il est interdit":"禁止","fait référence":"涉及","font partie de":"是…的成员","par terre":"在地上","parce qu'il":"因为他","jusqu'à quel âge":"到几岁","à quel âge":"几岁时","14 juillet":"7月14日（国庆日）","11 novembre":"11月11日（一战停战日）","8 mai":"5月8日（二战胜利日）","1er janvier":"1月1日","premier ministre":"总理","assemblée nationale":"国民议会","union européenne":"欧盟","commission européenne":"欧盟委员会","parlement européen":"欧洲议会","députés européens":"欧洲议会议员","élections européennes":"欧洲议会选举","élections législatives":"立法选举","élections municipales":"市镇选举","élections présidentielles":"总统选举","journée de l'europe":"欧洲日","traité de maastricht":"马斯特里赫特条约","état de droit":"法治国家","pouvoir exécutif":"行政权","pouvoir législatif":"立法权","autorité judiciaire":"司法机关","séparation des pouvoirs":"权力分立","suffrage universel":"普选","partis politiques":"政党","conseil municipal":"市议会","défenseur des droits":"权利捍卫者（独立官职）","monnaie unique":"单一货币","palais de l'élysée":"爱丽舍宫（总统府）","hôtel de matignon":"马提尼翁宫（总理府）","république française":"法兰西共和国","ve république":"第五共和国","révolution française":"法国大革命","fête nationale":"国庆节","hymne national":"国歌","drapeau français":"法国国旗","principe de laïcité":"世俗原则","charte de la laïcité":"世俗原则宪章","charte de l'environnement":"环境宪章","liberté d'expression":"言论自由","liberté d'association":"结社自由","liberté de circulation":"行动自由","liberté de la presse":"新闻自由","liberté individuelle":"个人自由","libertés individuelles":"个人自由","services publics":"公共服务","service public":"公共服务","agents publics":"公务人员","signes religieux":"宗教标志","titre de séjour":"居留证","déclaration des droits de l'homme et du citoyen":"《人权和公民权宣言》","peine de mort":"死刑","traite des êtres humains":"贩卖人口","dignité humaine":"人的尊严","droit de grève":"罢工权","droit syndical":"工会权利","droit de vote":"投票权","réseaux sociaux":"社交网络","ordre public":"公共秩序","intérêt général":"公共利益","personne en danger":"处于危险中的人","machine à laver":"洗衣机","napoléon ier":"拿破仑一世","seconde guerre mondiale":"第二次世界大战","première guerre mondiale":"第一次世界大战","jour férié":"法定假日","département d'outre-mer":"海外省","chaîne de montagnes":"山脉","tour eiffel":"埃菲尔铁塔","victor hugo":"维克多·雨果","simone de beauvoir":"西蒙娜·德·波伏娃","albert camus":"阿尔贝·加缪","auguste rodin":"奥古斯特·罗丹","carte vitale":"医保卡","mutuelle santé":"补充医疗互助保险","permis de conduire":"驾照","bail locatif":"房屋租约","congé parental d'éducation":"育儿假","conseil de prud'hommes":"劳资法庭","france travail":"法国就业署","contrat de travail":"劳动合同","allocations chômage":"失业金","école maternelle":"幼儿园","école élémentaire":"小学","école publique":"公立学校","instruction obligatoire":"义务教育","établissements scolaires":"学校","vacances scolaires":"学校假期","cantine scolaire":"学校食堂","parents d'élève":"学生家长","en situation de handicap":"有残疾的","autorité parentale":"亲权（父母监护权）","numéro d'urgence":"紧急电话号码","médecin traitant":"主治医生","assurance maladie":"医疗保险","accès aux soins":"就医","fait-elle référence":"它涉及","plus longtemps que":"比…时间更长"};
 
-        function getTranslation(rawWord) {
-            const clean = rawWord.toLowerCase().replace(/[.,;:!?»«""'’…\[\]()]/g, '').trim();
-            if (translationMap.has(clean)) return translationMap.get(clean);
-            const noPrefix = clean.replace(/^(l'|d'|s'|qu'|n'|c'|j'|t'|m')/, '');
-            if (noPrefix !== clean && translationMap.has(noPrefix)) return translationMap.get(noPrefix);
-            return '?';
-        }
+    const UNIT = 1;
+    const PER_PAGE = 10;
+    const $ = id => document.getElementById(id);
 
-        // ===== STATE =====
-        let currentCardIndex = 0;
-        let currentPage = 0;
-        const sentencesPerPage = 10;
-        let unknownWords = new Set();
+    // ===== 记住进度（浏览器不允许存储时自动忽略）=====
+    const store = {
+        get(k, d) { try { const v = localStorage.getItem('mv-flash-' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+        set(k, v) { try { localStorage.setItem('mv-flash-' + k, JSON.stringify(v)); } catch (e) {} }
+    };
+    const clamp = (n, max) => Math.min(Math.max(parseInt(n, 10) || 0, 0), max);
+    const totalPages = Math.ceil(sentences.length / PER_PAGE);
 
-        const flashcardView = document.getElementById('flashcardView');
-        const sentenceView = document.getElementById('sentenceView');
-        const btnFlash = document.getElementById('btnFlashcard');
-        const btnSent = document.getElementById('btnSentence');
-        const cardWord = document.getElementById('cardWord');
-        const cardType = document.getElementById('cardType');
-        const cardTrans = document.getElementById('cardTranslation');
-        const cardNumber = document.getElementById('cardNumber');
-        const totalCardsSpan = document.getElementById('totalCards');
-        const totalWordsSpan = document.getElementById('totalWords');
-        const totalSentencesSpan = document.getElementById('totalSentences');
-        const sentenceContainer = document.getElementById('sentenceContainer');
-        const unknownDisplay = document.getElementById('unknownDisplay');
-        const flashcardEl = document.getElementById('flashcardElement');
+    let cardIndex = clamp(store.get('card-' + UNIT, 0), words.length - 1);
+    let page = clamp(store.get('page-' + UNIT, 0), totalPages - 1);
+    let showAllZh = store.get('showzh', false) === true;
+    const savedUnknown = store.get('unknown-' + UNIT, []);
+    const unknown = new Map(Array.isArray(savedUnknown) ? savedUnknown : []);
 
-        function updateCard() {
-            if (words.length === 0) return;
-            const w = words[currentCardIndex];
-            cardNumber.textContent = (currentCardIndex + 1) + ' / ' + words.length;
-            cardType.textContent = w.type.toUpperCase();
-            cardWord.textContent = w.french;
-            cardTrans.textContent = w.chinese;
-            cardTrans.classList.remove('visible');
-        }
+    // ===== 法语朗读 =====
+    const synth = window.speechSynthesis;
+    const canSpeak = !!(synth && window.SpeechSynthesisUtterance);
+    let voice = null;
+    let current = null; // 保留引用，避免部分浏览器中途停止
 
-        function nextCard() {
-            if (words.length === 0) return;
-            currentCardIndex = (currentCardIndex + 1) % words.length;
-            updateCard();
-        }
+    function pickVoice() {
+        const fr = synth.getVoices().filter(v => /^fr([-_]|$)/i.test(v.lang));
+        const novelty = /Eddy|Flo |Grandma|Grandpa|Reed|Rocko|Sandy|Shelley/i;
+        const normal = fr.filter(v => !novelty.test(v.name));
+        const france = normal.filter(v => /^fr[-_]FR/i.test(v.lang));
+        voice = france.find(v => /Google|Natural|Amélie|Audrey|Thomas|Denise/i.test(v.name))
+            || france[0] || normal[0] || fr[0] || null;
+    }
 
-        function prevCard() {
-            if (words.length === 0) return;
-            currentCardIndex = (currentCardIndex - 1 + words.length) % words.length;
-            updateCard();
-        }
+    function warn(msg) {
+        const box = $('speechNotice');
+        box.textContent = msg;
+        box.hidden = false;
+    }
+    const UNSUPPORTED = '当前浏览器不支持朗读（微信内置浏览器常见）。请点右上角选择「在浏览器打开」，用 Safari 或 Chrome。';
 
-        function renderPage() {
-            const totalPages = Math.ceil(sentences.length / sentencesPerPage);
-            if (currentPage >= totalPages) currentPage = totalPages - 1;
-            if (currentPage < 0) currentPage = 0;
-            const start = currentPage * sentencesPerPage;
-            const pageSentences = sentences.slice(start, start + sentencesPerPage);
-            sentenceContainer.innerHTML = '';
-            pageSentences.forEach((sentence, idx) => {
-                const globalIndex = start + idx + 1;
-                const sentDiv = document.createElement('div');
-                sentDiv.className = 'sentence-item';
-                const numSpan = document.createElement('span');
-                numSpan.className = 'sentence-number';
-                numSpan.textContent = globalIndex + '.';
-                sentDiv.appendChild(numSpan);
-                const tokens = sentence.match(/[^\s]+/g) || [];
-                tokens.forEach(token => {
-                    const core = token.replace(/[.,;:!?»«""'’…\[\]()]/g, '');
-                    const lowerCore = core.toLowerCase();
-                    const chip = document.createElement('span');
-                    chip.className = 'word-chip';
-                    if (unknownWords.has(lowerCore)) chip.classList.add('unknown');
-                    const trans = getTranslation(token);
-                    chip.innerHTML = token + '<span class="chip-translate">' + trans + '</span>';
-                    chip.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        if (!chip.classList.contains('show-translate')) {
-                            chip.classList.add('show-translate');
-                        } else {
-                            if (unknownWords.has(lowerCore)) {
-                                unknownWords.delete(lowerCore);
-                                chip.classList.remove('unknown');
-                            } else {
-                                unknownWords.add(lowerCore);
-                                chip.classList.add('unknown');
-                            }
-                            updateUnknownList();
-                        }
-                    });
-                    sentDiv.appendChild(chip);
-                });
-                sentenceContainer.appendChild(sentDiv);
-            });
-        }
+    function toSpoken(text) {
+        return text
+            .replace(/’/g, "'")
+            .replace(/\[\.\.\.\]|\.\.\./g, ' ')
+            .replace(/(\d{4})-(\d{4})/g, '$1 à $2')
+            .replace(/ - /g, ', ')
+            .replace(/\bIVème\b/g, 'quatrième')
+            .replace(/\bVème\b|\bVe\b/g, 'cinquième')
+            .replace(/\bIer\b/g, 'premier')
+            .replace(/\b1ère\b/g, 'première')
+            .replace(/\b7ème\b/g, 'septième')
+            .replace(/[()«»"]/g, ', ');
+    }
 
-        function updateUnknownList() {
-            unknownDisplay.textContent = unknownWords.size ? Array.from(unknownWords).join(' · ') : 'Aucun marqué';
-        }
-
-        function resetUnknown() {
-            unknownWords.clear();
-            updateUnknownList();
-            renderPage();
-        }
-
-        function showFlashcard() {
-            flashcardView.style.display = 'block';
-            sentenceView.style.display = 'none';
-            btnFlash.classList.add('active');
-            btnSent.classList.remove('active');
-        }
-
-        function showSentence() {
-            flashcardView.style.display = 'none';
-            sentenceView.style.display = 'block';
-            btnSent.classList.add('active');
-            btnFlash.classList.remove('active');
-            renderPage();
-        }
-
-        // ===== EVENT LISTENERS =====
-        document.getElementById('prevCard').addEventListener('click', prevCard);
-        document.getElementById('nextCard').addEventListener('click', nextCard);
-
-        flashcardEl.addEventListener('click', () => {
-            cardTrans.classList.toggle('visible');
-        });
-
-        btnFlash.addEventListener('click', showFlashcard);
-        btnSent.addEventListener('click', showSentence);
-
-        document.getElementById('prevPageBtn').addEventListener('click', () => {
-            if (currentPage > 0) { currentPage--; renderPage(); }
-        });
-
-        document.getElementById('nextPageBtn').addEventListener('click', () => {
-            const totalPages = Math.ceil(sentences.length / sentencesPerPage);
-            if (currentPage < totalPages - 1) { currentPage++; renderPage(); }
-        });
-
-        document.getElementById('resetUnknownBtn').addEventListener('click', resetUnknown);
-
-        // ===== KEYBOARD SHORTCUTS =====
-        document.addEventListener('keydown', function(e) {
-            if (flashcardView.style.display !== 'none') {
-                if (e.key === 'ArrowRight') { e.preventDefault(); nextCard(); }
-                else if (e.key === 'ArrowLeft') { e.preventDefault(); prevCard(); }
-                else if (e.key === ' ' || e.key === 'f') { e.preventDefault(); cardTrans.classList.toggle('visible'); }
+    function speak(text, rate) {
+        if (!canSpeak) { warn(UNSUPPORTED); return; }
+        synth.cancel();
+        current = new SpeechSynthesisUtterance(toSpoken(text));
+        current.lang = 'fr-FR';
+        if (voice) current.voice = voice;
+        current.rate = rate || 0.9;
+        current.onerror = e => {
+            if (e.error !== 'canceled' && e.error !== 'interrupted') {
+                warn('朗读失败。请检查手机音量，并确认系统里装有法语语音。');
             }
-        });
+        };
+        synth.speak(current);
+    }
 
-        // ===== INIT =====
-        totalWordsSpan.textContent = words.length;
-        totalSentencesSpan.textContent = sentences.length;
-        totalCardsSpan.textContent = words.length;
-        updateCard();
-        showFlashcard();
-    })();
+    if (canSpeak) {
+        pickVoice();
+        if (synth.addEventListener) synth.addEventListener('voiceschanged', pickVoice);
+        window.addEventListener('pagehide', () => synth.cancel());
+    } else {
+        warn(UNSUPPORTED);
+    }
+
+    // ===== 单词闪卡 =====
+    const cardEl = $('flashcardElement');
+    const cardTrans = $('cardTranslation');
+
+    function updateCard(userMoved) {
+        const w = words[cardIndex];
+        $('cardNumber').textContent = (cardIndex + 1) + ' / ' + words.length;
+        $('cardType').textContent = w.type.toUpperCase();
+        $('cardWord').textContent = w.french;
+        $('cardWord').classList.toggle('long', w.french.length > 28);
+        cardTrans.textContent = w.chinese;
+        cardTrans.classList.remove('visible');
+        $('cardSlider').value = cardIndex + 1;
+        store.set('card-' + UNIT, cardIndex);
+        if (userMoved) {
+            if ($('autoSpeak').checked) speak(w.french);
+            else if (canSpeak) synth.cancel();
+        }
+    }
+
+    function moveCard(step) {
+        cardIndex = (cardIndex + step + words.length) % words.length;
+        updateCard(true);
+    }
+
+    function flipCard() {
+        const show = cardTrans.classList.toggle('visible');
+        if (show) speak(words[cardIndex].french);
+    }
+
+    // ===== 句子练习 =====
+    const norm = t => t.toLowerCase().replace(/’/g, "'").replace(/^[^0-9a-zà-ÿœ]+|[^0-9a-zà-ÿœ]+$/g, '');
+    const ELISION = /^(l|d|s|qu|n|c|j|t|m)'/;
+    const own = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+    const maxPhrase = Math.max(1, ...Object.keys(phrases).map(k => k.split(' ').length));
+
+    function segment(sentence) {
+        // 法语标点前有空格：标点单独成段，不做成可点击的词
+        const tokens = sentence.split(/\s+/).filter(Boolean);
+        const out = [];
+        for (let i = 0; i < tokens.length;) {
+            if (!norm(tokens[i])) { out.push({ text: tokens[i] }); i++; continue; }
+            let hit = null;
+            for (let n = Math.min(maxPhrase, tokens.length - i); n > 1 && !hit; n--) {
+                const part = tokens.slice(i, i + n);
+                if (part.some(t => !norm(t))) continue;
+                if (part.slice(0, -1).some(t => /[,.;:!?"»)\]]$/.test(t))) continue;
+                const keys = part.map(norm);
+                let key = keys.join(' ');
+                if (!own(phrases, key)) key = [keys[0].replace(ELISION, ''), ...keys.slice(1)].join(' ');
+                if (own(phrases, key)) hit = { text: part.join(' '), zh: phrases[key], n };
+            }
+            if (!hit) {
+                const full = norm(tokens[i]);
+                const base = full.replace(ELISION, '');
+                const zh = own(dict, full) ? dict[full] : (own(dict, base) ? dict[base] : '');
+                hit = { text: tokens[i], zh, n: 1 };
+            }
+            out.push(hit);
+            i += hit.n;
+        }
+        return out;
+    }
+
+    const cleanText = t => t.replace(/^[\s"«(\[]+|[\s.,;:!?"»)\]]+$/g, '');
+
+    function el(tag, cls, text) {
+        const node = document.createElement(tag);
+        if (cls) node.className = cls;
+        if (text !== undefined) node.textContent = text;
+        return node;
+    }
+
+    function renderPage() {
+        const box = $('sentenceContainer');
+        box.textContent = '';
+        const start = page * PER_PAGE;
+        sentences.slice(start, start + PER_PAGE).forEach((sentence, idx) => {
+            const item = el('div', 'sentence-item');
+            const row = el('div', 'sentence-row');
+            row.appendChild(el('span', 'sentence-number', (start + idx + 1) + '.'));
+            const chips = el('div', 'sentence-words');
+            segment(sentence).forEach(seg => {
+                if (seg.zh === undefined) { chips.appendChild(el('span', 'punct', seg.text)); return; }
+                const french = cleanText(seg.text);
+                const key = norm(french);
+                const chip = el('button', 'word-chip', seg.text);
+                chip.type = 'button';
+                chip.dataset.key = key;
+                chip.appendChild(el('span', 'chip-translate', seg.zh || '（暂无释义）'));
+                if (unknown.has(key)) chip.classList.add('unknown');
+                chip.addEventListener('click', () => {
+                    speak(french);
+                    if (!chip.classList.contains('show-translate')) {
+                        chip.classList.add('show-translate');
+                        return;
+                    }
+                    if (unknown.has(key)) unknown.delete(key);
+                    else unknown.set(key, [french, seg.zh]);
+                    box.querySelectorAll('.word-chip').forEach(c => c.classList.toggle('unknown', unknown.has(c.dataset.key)));
+                    updateUnknownList();
+                });
+                chips.appendChild(chip);
+            });
+            row.appendChild(chips);
+
+            const actions = el('div', 'sentence-actions');
+            const play = el('button', 'icon-btn');
+            play.type = 'button';
+            play.title = '朗读整句';
+            play.setAttribute('aria-label', '朗读整句');
+            play.appendChild(el('i', 'fas fa-volume-up'));
+            play.addEventListener('click', () => speak(sentence));
+            const zhBtn = el('button', 'icon-btn zh-btn', '中');
+            zhBtn.type = 'button';
+            zhBtn.title = '显示整句中文';
+            actions.append(play, zhBtn);
+            row.appendChild(actions);
+
+            const zh = el('div', 'sentence-zh', sentenceZh[sentence] || '');
+            zh.hidden = !showAllZh;
+            zhBtn.classList.toggle('on', showAllZh);
+            zhBtn.addEventListener('click', () => {
+                zh.hidden = !zh.hidden;
+                zhBtn.classList.toggle('on', !zh.hidden);
+            });
+            item.append(row, zh);
+            box.appendChild(item);
+        });
+        $('pageNumbers').querySelectorAll('button').forEach((b, i) => b.classList.toggle('active', i === page));
+        $('prevPageBtn').disabled = page === 0;
+        $('nextPageBtn').disabled = page === totalPages - 1;
+        store.set('page-' + UNIT, page);
+    }
+
+    function goPage(p, scroll) {
+        if (p < 0 || p >= totalPages) return;
+        page = p;
+        if (canSpeak) synth.cancel();
+        renderPage();
+        if (scroll) $('sentenceView').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function updateUnknownList() {
+        const box = $('unknownDisplay');
+        box.textContent = unknown.size ? '' : 'Aucun marqué';
+        unknown.forEach(([french, zh]) => {
+            const b = el('button', 'unknown-word', french + ' · ' + zh);
+            b.type = 'button';
+            b.addEventListener('click', () => speak(french));
+            box.appendChild(b);
+        });
+        store.set('unknown-' + UNIT, Array.from(unknown));
+    }
+
+    function setMode(mode) {
+        const sent = mode === 'sentence';
+        $('flashcardView').style.display = sent ? 'none' : 'block';
+        $('sentenceView').style.display = sent ? 'block' : 'none';
+        $('btnSentence').classList.toggle('active', sent);
+        $('btnFlashcard').classList.toggle('active', !sent);
+        if (canSpeak) synth.cancel();
+        if (sent) renderPage();
+        store.set('mode', mode);
+    }
+
+    // ===== 事件 =====
+    $('prevCard').addEventListener('click', () => moveCard(-1));
+    $('nextCard').addEventListener('click', () => moveCard(1));
+    $('cardSlider').max = words.length;
+    $('cardSlider').addEventListener('input', e => { cardIndex = e.target.value - 1; updateCard(false); });
+
+    let touchX = null, touchY = null, swiped = false;
+    cardEl.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; touchY = e.touches[0].clientY; swiped = false; }, { passive: true });
+    cardEl.addEventListener('touchend', e => {
+        if (touchX === null) return;
+        const dx = e.changedTouches[0].clientX - touchX;
+        const dy = e.changedTouches[0].clientY - touchY;
+        if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) { swiped = true; moveCard(dx < 0 ? 1 : -1); }
+        touchX = null;
+    });
+    cardEl.addEventListener('click', () => { if (swiped) { swiped = false; return; } flipCard(); });
+
+    $('speakBtn').addEventListener('click', e => { e.stopPropagation(); speak(words[cardIndex].french); });
+    $('slowBtn').addEventListener('click', e => { e.stopPropagation(); speak(words[cardIndex].french, 0.55); });
+    $('autoSpeak').checked = store.get('autospeak', false) === true;
+    $('autoSpeak').addEventListener('change', e => {
+        store.set('autospeak', e.target.checked);
+        if (e.target.checked) speak(words[cardIndex].french);
+    });
+
+    $('btnFlashcard').addEventListener('click', () => setMode('flashcard'));
+    $('btnSentence').addEventListener('click', () => setMode('sentence'));
+    $('prevPageBtn').addEventListener('click', () => goPage(page - 1, true));
+    $('nextPageBtn').addEventListener('click', () => goPage(page + 1, true));
+    for (let i = 0; i < totalPages; i++) {
+        const b = el('button', 'page-num', String(i + 1));
+        b.type = 'button';
+        b.addEventListener('click', () => goPage(i));
+        $('pageNumbers').appendChild(b);
+    }
+    $('allZhBtn').textContent = showAllZh ? '隐藏全部中文' : '显示全部中文';
+    $('allZhBtn').addEventListener('click', () => {
+        showAllZh = !showAllZh;
+        store.set('showzh', showAllZh);
+        $('allZhBtn').textContent = showAllZh ? '隐藏全部中文' : '显示全部中文';
+        renderPage();
+    });
+    $('resetUnknownBtn').addEventListener('click', () => { unknown.clear(); updateUnknownList(); renderPage(); });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        if (e.target.tagName === 'INPUT') return;
+        if ($('flashcardView').style.display === 'none') {
+            if (e.key === 'ArrowRight') goPage(page + 1);
+            else if (e.key === 'ArrowLeft') goPage(page - 1);
+            return;
+        }
+        if (e.key === 'ArrowRight') { e.preventDefault(); moveCard(1); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); moveCard(-1); }
+        else if (e.key === ' ' || e.key === 'f') { e.preventDefault(); flipCard(); }
+        else if (e.key === 's') { speak(words[cardIndex].french); }
+    });
+
+    // ===== 初始化 =====
+    $('totalWords').textContent = words.length;
+    $('totalSentences').textContent = sentences.length;
+    $('totalCards').textContent = words.length;
+    updateCard(false);
+    updateUnknownList();
+    setMode(store.get('mode', 'flashcard') === 'sentence' ? 'sentence' : 'flashcard');
+    // 手机上让当前模块标签滚动到可见位置
+    const tabs = document.querySelector('.module-tabs');
+    const active = tabs.querySelector('.active');
+    tabs.scrollLeft = active.offsetLeft - (tabs.clientWidth - active.offsetWidth) / 2;
+})();
 </script>
 </body>
 </html>

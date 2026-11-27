@@ -720,7 +720,65 @@
         justify-content: center;
       }
     }
-  </style>
+        /* ===== 模块切换 ===== */
+        .module-tabs {
+            position: sticky; top: 0; z-index: 20;
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
+            background: var(--white); padding: 10px 30px;
+            border-bottom: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+        .module-tabs a {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 52px; padding: 6px 4px; border-radius: 10px;
+            background: var(--light-gray); color: var(--primary-blue);
+            text-decoration: none; font-family: 'Montserrat', sans-serif; text-align: center;
+        }
+        .module-tabs a strong { font-size: 0.9rem; white-space: nowrap; }
+        .module-tabs a span { font-size: 0.72rem; color: var(--medium-gray); white-space: nowrap; }
+        .module-tabs a:hover { background: var(--primary-light-yellow); }
+        .module-tabs a.active { background: var(--primary-blue); color: var(--white); }
+        .module-tabs a.active span { color: var(--primary-yellow); }
+        .module-pager { display: flex; justify-content: space-between; gap: 10px; margin-top: 1.5rem; flex-wrap: wrap; }
+        .module-pager a { text-decoration: none; display: inline-block; }
+        .module-pager a:last-child { margin-left: auto; }
+
+        /* ===== 朗读 ===== */
+        .speech-notice { background: #fff4cc; border-radius: 10px; padding: 0.7rem 1rem; font-size: 0.85rem; margin-bottom: 1rem; }
+        .flashcard { user-select: none; touch-action: pan-y; }
+        .flashcard .card-word.long { font-size: 1.5rem; }
+        .speak-row { display: flex; justify-content: center; align-items: center; gap: 0.8rem; flex-wrap: wrap; margin: 0.5rem 0; }
+        .auto-speak { font-size: 0.85rem; color: var(--medium-gray); display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .card-slider { display: block; width: 100%; max-width: 600px; margin: 0.8rem auto 0; accent-color: var(--primary-blue); }
+
+        /* ===== 句子 ===== */
+        #sentenceView { scroll-margin-top: 90px; }
+        .sentence-item { display: block; }
+        .sentence-row { display: flex; align-items: flex-start; gap: 0.4rem; }
+        .sentence-row .sentence-number { margin-top: 0.3rem; }
+        .sentence-words { flex: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.25rem; min-width: 0; }
+        .word-chip { font-family: inherit; color: inherit; line-height: 1.6; flex-wrap: wrap; text-align: left; max-width: 100%; }
+        .punct { padding: 0 0.15rem; }
+        .sentence-actions { display: flex; gap: 0.3rem; }
+        .icon-btn { width: 2.1rem; height: 2.1rem; border-radius: 50%; border: none; background: var(--light-gray); color: var(--primary-blue); font-weight: 700; cursor: pointer; }
+        .icon-btn:hover, .icon-btn.on { background: var(--primary-yellow); }
+        .sentence-zh { margin: 0.5rem 0 0.1rem 2.9rem; color: var(--primary-blue); font-size: 0.95rem; }
+        .page-numbers { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.4rem; margin: 0.8rem 0; }
+        .page-num { width: 2.2rem; height: 2.2rem; border-radius: 50%; border: none; background: var(--light-gray); cursor: pointer; font-weight: 600; color: var(--primary-blue); }
+        .page-num.active { background: var(--primary-blue); color: var(--white); }
+        .action-small:disabled { opacity: 0.4; cursor: default; transform: none; }
+        .unknown-word { border: 1px solid #e6b9a0; background: var(--white); border-radius: 2rem; padding: 0.2rem 0.7rem; margin: 0.25rem 0.25rem 0 0; cursor: pointer; font-family: inherit; font-size: 0.85rem; }
+
+        @media (max-width: 768px) {
+            .module-tabs { padding: 8px; grid-template-columns: repeat(5, minmax(62px, 1fr)); }
+            .module-tabs a strong { font-size: 0.78rem; }
+            .module-tabs a span { font-size: 0.66rem; }
+            .sentence-row { flex-wrap: wrap; }
+            .sentence-words { flex-basis: calc(100% - 3.2rem); }
+            .sentence-actions { margin-left: auto; }
+            .sentence-zh { margin-left: 0.3rem; }
+        }
+    </style>
 </head>
 <body>
 
@@ -733,8 +791,6 @@
     </div>
     <div class="header-actions">
       <a href="examen-civique.html" class="header-btn"><i class="fas fa-home"></i> Accueil</a>
-      <a href="flashcards-unit1.html" class="header-btn"><i class="fas fa-arrow-left"></i> Module 1</a>
-      <a href="flashcards-unit3.html" class="header-btn"><i class="fas fa-arrow-right"></i> Module 3</a>
     </div>
   </header>
 
@@ -763,6 +819,14 @@
     </div>
   </div>
 
+    <nav class="module-tabs" aria-label="模块切换">
+        <a href="flashcards-unit1.html"><strong>模块一</strong><span>价值观</span></a>
+        <a href="flashcards-unit2.html" class="active" aria-current="page"><strong>模块二</strong><span>制度政治</span></a>
+        <a href="flashcards-unit3.html"><strong>模块三</strong><span>权利公民</span></a>
+        <a href="flashcards-unit4.html"><strong>模块四</strong><span>历史地理</span></a>
+        <a href="flashcards-unit5.html"><strong>模块五</strong><span>法国生活</span></a>
+    </nav>
+
   <!-- App Card -->
   <div class="app-card" id="flashcards">
 
@@ -770,8 +834,8 @@
     <div class="unit-banner">
       <h2><i class="fas fa-gavel"></i> 模块二 · Institutions et politique</h2>
       <div class="unit-stats">
-        <i class="fas fa-words"></i> <span id="totalWords">0</span> mots · 
-        <i class="fas fa-sentence"></i> <span id="totalSentences">0</span> phrases
+        <i class="fas fa-font"></i> <span id="totalWords">0</span> mots · 
+        <i class="fas fa-align-left"></i> <span id="totalSentences">0</span> phrases
       </div>
     </div>
 
@@ -781,6 +845,8 @@
       <button id="btnSentence" class="mode-btn"><i class="fas fa-paragraph"></i> 句子练习</button>
     </div>
 
+<div class="speech-notice" id="speechNotice" role="status" hidden></div>
+
     <!-- Flashcard View -->
     <div id="flashcardView">
       <div class="flashcard" id="flashcardElement">
@@ -788,13 +854,21 @@
         <div class="card-type" id="cardType">NOM</div>
         <div class="card-word" id="cardWord">—</div>
         <div class="card-translation" id="cardTranslation">—</div>
-        <div class="card-hint"><i class="fas fa-mouse-pointer"></i> Cliquez pour révéler la traduction</div>
+        <div class="card-hint"><i class="fas fa-volume-up"></i> 点击：中文 + 朗读 · 滑动换词</div>
       </div>
+
+<div class="speak-row">
+                <button type="button" class="action-small" id="speakBtn"><i class="fas fa-volume-up"></i> 发音</button>
+                <button type="button" class="action-small" id="slowBtn"><i class="fas fa-volume-down"></i> 慢速</button>
+                <label class="auto-speak"><input type="checkbox" id="autoSpeak"> 换词时自动朗读</label>
+            </div>
 
       <div class="nav-buttons">
         <button class="nav-btn" id="prevCard"><i class="fas fa-chevron-left"></i></button>
         <button class="nav-btn" id="nextCard"><i class="fas fa-chevron-right"></i></button>
       </div>
+
+<input type="range" class="card-slider" id="cardSlider" min="1" value="1" aria-label="跳到第几个单词">
 
       <div class="card-counter">
         <span id="totalCards">0</span> mots · <i class="far fa-hand-pointer"></i> cliquer pour voir la traduction
@@ -806,12 +880,15 @@
       <div class="sentence-viewport" id="sentenceContainer"></div>
 
       <div class="sentence-controls">
-        <span class="hint"><i class="fas fa-info-circle"></i> Cliquez un mot → voir traduction · Re-cliquez → marquer « inconnu »</span>
+        <span class="hint"><i class="fas fa-info-circle"></i> 点一下词：中文 + 朗读 · 再点一下：标记「生词」</span>
         <div class="btn-group">
+                    <button type="button" id="allZhBtn" class="action-small">显示全部中文</button>
           <button id="prevPageBtn" class="action-small"><i class="fas fa-chevron-left"></i> Précédent</button>
           <button id="nextPageBtn" class="action-small">Suivant <i class="fas fa-chevron-right"></i></button>
         </div>
       </div>
+
+<div class="page-numbers" id="pageNumbers"></div>
 
       <div class="unknown-panel">
         <strong><i class="fas fa-exclamation-triangle"></i> Mots inconnus :</strong>
@@ -820,7 +897,12 @@
       </div>
     </div>
 
-    <hr style="border: 0.5px solid #eee; margin: 1.5rem 0 0.5rem;">
+    <div class="module-pager">
+            <a class="action-small" href="flashcards-unit1.html"><i class="fas fa-arrow-left"></i> 模块一 · 价值观</a>
+            <a class="action-small" href="flashcards-unit3.html">模块三 · 权利公民 <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        <hr style="border: 0.5px solid #eee; margin: 1.5rem 0 0.5rem;">
     <div style="text-align:right;font-size:0.8rem;color:var(--medium-gray);">
       <i class="fas fa-sailboat"></i> mille voiles · 千帆
     </div>
@@ -1162,7 +1244,7 @@
       "Qui est le chef du Gouvernement ?",
       "Combien y a-t-il de régions en France ?",
       "Quel est le rôle du Défenseur des droits ?",
-      "Depuis quand l'euro est-elle la monnaie unique ?",
+      "Depuis quand l'euro est-il la monnaie unique ?",
       "Quel est le rôle principal du département ?",
       "Quel est le rôle principal des communes ?",
       "Combien de communes environ existe-t-il en France ?",
@@ -1182,174 +1264,326 @@
       "Quel pays est un pays fondateur de l'Union européenne ?"
     ];
 
-    // ===== TRANSLATIONS =====
-    const translationMap = new Map();
-    words.forEach(w => translationMap.set(w.french.toLowerCase().trim(), w.chinese));
+    // ===== 整句中文 =====
+    const sentenceZh = {"Qui nomme le Premier ministre ?":"谁任命总理？","Le Parlement est composé :":"议会由什么组成：","Qu'est-ce que le pouvoir exécutif ?":"什么是行政权？","Les dirigeants sont élus par les citoyens dans :":"在哪种制度下，领导人由公民选举产生：","A-t-on le droit de ne pas respecter une loi ?":"人们有权不遵守法律吗？","Qui doit respecter la loi ?":"谁必须遵守法律？","Quel est le rôle de l'autorité judiciaire ?":"司法机关的作用是什么？","Quel pouvoir détient un juge ?":"法官拥有什么权力？","L'autorité judiciaire est exercée par :":"司法权由谁行使：","Que se passe-t-il si un ministre ne respecte pas la loi ?":"如果一位部长不遵守法律，会怎么样？","Qui est élu lors des élections législatives ?":"立法选举选出的是谁？","Combien de députés composent l'Assemblée nationale ?":"国民议会由多少名议员组成？","Quand sont élus les sénateurs ?":"参议员什么时候选举产生？","Qui est élu lors des élections municipales ?":"市镇选举选出的是谁？","Qui est élu lors des élections présidentielles ?":"总统选举选出的是谁？","À partir de quel âge a-t-on le droit de voter ?":"从几岁起有投票权？","Pour combien de temps est élu le président de la République française ?":"法兰西共和国总统的任期是多久？","Pour combien de temps sont élus les députés ?":"国民议会议员的任期是多久？","Pour combien de temps sont élus les sénateurs ?":"参议员的任期是多久？","Qui possède le pouvoir exécutif ?":"谁掌握行政权？","Quelle condition est nécessaire pour voter aux élections ?":"在选举中投票需要什么条件？","Qui peut voter aux élections en France ?":"在法国，谁可以参加选举投票？","Que signifie « suffrage universel » ?":"\"普选\"是什么意思？","Concernant les partis politiques, quelle proposition est correcte ?":"关于政党，哪种说法是正确的？","Quel est le rôle des députés ?":"国民议会议员的作用是什么？","La séparation des pouvoirs est un principe fondamental. Quels sont les trois pouvoirs concernés ?":"权力分立是一项基本原则。涉及哪三种权力？","Qui possède le pouvoir législatif ?":"谁掌握立法权？","Qui sanctionne l'auteur d'un vol ?":"谁惩处盗窃犯？","Qui élit les députés ?":"谁选举国民议会议员？","Qui vote les lois ?":"谁表决通过法律？","Qui réside au palais de l'Élysée ?":"谁住在爱丽舍宫？","Combien y a-t-il de départements en France ?":"法国有多少个省？","Qui représente l'État dans un département ?":"谁在省内代表国家？","Qui dirige la commune ?":"谁领导市镇？","Est-ce que le président de la République a tous les pouvoirs ?":"共和国总统拥有所有权力吗？","Qui est le préfet ?":"省长是谁（是做什么的）？","Quel est le rôle du Parlement ?":"议会的作用是什么？","Quel est le régime politique de la France aujourd'hui ?":"当今法国的政治制度是什么？","Combien d'États font partie de l'Union européenne au 1er janvier 2025 ?":"截至2025年1月1日，欧盟有多少个成员国？","Quel État n'est pas membre de l'Union européenne ?":"哪个国家不是欧盟成员国？","Quelle condition est nécessaire pour voter aux élections européennes ?":"在欧洲议会选举中投票需要什么条件？","À quelle fréquence les élections européennes sont-elles organisées ?":"欧洲议会选举多久举行一次？","Quel pays est un pays fondateur de l'Union européenne ?":"哪个国家是欧盟创始国？","Quelle est la monnaie utilisée en France ?":"法国使用什么货币？","Qui élit les députés européens ?":"谁选举欧洲议会议员？","Quand célèbre-t-on la journée de l'Europe ?":"欧洲日是哪一天？","Qu'est-ce que l'État de droit ?":"什么是法治国家？","Le président de la République a commis un crime. Quelle proposition est correcte ?":"共和国总统犯了重罪。哪种说法是正确的？","La loi est l'expression de :":"法律是什么的体现：","Quelle est la durée du mandat du conseil municipal et du maire ?":"市议会和市长的任期是多久？","Que garantit l'État de droit ?":"法治国家保障什么？","Une personne peut-elle voter à la place d'une autre ?":"一个人可以代替另一个人投票吗？","Est-ce que le vote est obligatoire ?":"投票是强制性的吗？","À la fin de son mandat, le président de la République peut-il décider de rester au pouvoir ?":"任期结束时，共和国总统可以决定继续掌权吗？","Qui dirige l'action du Gouvernement ?":"谁领导政府工作？","Quelle est l'organisation administrative de la France ?":"法国的行政区划是怎样的？","Qu'est-ce que le pouvoir législatif ?":"什么是立法权？","Pourquoi séparer les trois pouvoirs dans une démocratie ?":"在民主制度中，为什么要把三种权力分开？","Quel est le rôle du gouvernement ?":"政府的作用是什么？","Qu'est-ce que l'Hôtel de Matignon ?":"什么是马提尼翁宫？","Quel est le rôle du président de la République ?":"共和国总统的作用是什么？","Quel est le rôle du Premier ministre ?":"总理的作用是什么？","Qui est le chef du Gouvernement ?":"谁是政府首脑？","Combien y a-t-il de régions en France ?":"法国有多少个大区？","Quel est le rôle du Défenseur des droits ?":"权利捍卫者的职责是什么？","Depuis quand l'euro est-il la monnaie unique ?":"欧元从什么时候起成为单一货币？","Quel est le rôle principal du département ?":"省的主要职能是什么？","Quel est le rôle principal des communes ?":"市镇的主要职能是什么？","Combien de communes environ existe-t-il en France ?":"法国大约有多少个市镇？","Quel traité concerne la construction de l'Union européenne ?":"哪个条约涉及欧盟的建设？","Quel État a quitté l'Union européenne en 2020 ?":"哪个国家在2020年退出了欧盟？","Quelle est la devise de l'Union européenne ?":"欧盟的格言是什么？","Quel est l'hymne de l'Union européenne ?":"欧盟的盟歌是什么？","De quoi est composé le drapeau européen ?":"欧盟旗帜由什么图案组成？","De quelle couleur est le drapeau européen ?":"欧盟旗帜是什么颜色？","En quelle année le traité de Maastricht a-t-il été signé ?":"《马斯特里赫特条约》是哪一年签署的？","Où est le siège du Parlement européen ?":"欧洲议会的所在地在哪里？","Où est le siège de la Commission européenne ?":"欧盟委员会的总部在哪里？"};
 
-    const extra = {
-      "qui":"谁","nomme":"任命","premier":"第一","ministre":"部长","parlement":"议会","est":"是","composé":"组成","pouvoir":"权力","exécutif":"行政的","dirigeants":"领导人","élus":"选举的","par":"被","les":"这些","citoyens":"公民","dans":"在…里","a-t-on":"我们有","droit":"权利","ne":"不","pas":"没有","respecter":"尊重","loi":"法律","doit":"必须","quel":"什么","rôle":"角色","autorité":"机关","judiciaire":"司法的","détient":"持有","juge":"法官","exercée":"行使","que":"什么","se":"自己","passe-t-il":"发生","si":"如果","un":"一个","élu":"当选","lors":"在…时","élections":"选举","législatives":"立法的","combien":"多少","députés":"议员","composent":"构成","assemblée":"议会","nationale":"国家的","quand":"何时","sénateurs":"参议员","municipales":"市镇的","présidentielles":"总统的","à":"在","partir":"从…起","âge":"年龄","voter":"投票","pour":"为了","combien":"多少","temps":"时间","président":"总统","république":"共和国","possède":"拥有","condition":"条件","nécessaire":"必要的","aux":"在","signifie":"意味着","suffrage":"选举","universel":"普遍的","concernant":"关于","partis":"政党","politiques":"政治的","proposition":"命题","correcte":"正确的","séparation":"分离","pouvoirs":"权力","principe":"原则","fondamental":"基本的","trois":"三","concernés":"相关的","législatif":"立法的","sanctionne":"惩罚","auteur":"作者","vol":"盗窃","élit":"选举","vote":"投票","lois":"法律","réside":"居住","palais":"宫殿","élysée":"爱丽舍","départements":"省","représente":"代表","état":"国家","dirige":"领导","commune":"市镇","tous":"所有","préfet":"省长","régime":"制度","france":"法国","aujourd'hui":"今天","états":"国家","font":"做","partie":"部分","union":"联盟","européenne":"欧洲的","membre":"成员","fréquence":"频率","organisées":"组织","pays":"国家","fondateur":"创始","monnaie":"货币","utilisée":"使用","européens":"欧洲的","célèbre-t-on":"庆祝","journée":"日","europe":"欧洲","commis":"犯下","crime":"罪行","expression":"表达","durée":"期限","mandat":"任期","conseil":"议会","municipal":"市镇的","maire":"市长","garantit":"保障","personne":"人","place":"位置","obligatoire":"强制","fin":"结束","décider":"决定","rester":"保持","action":"行动","gouvernement":"政府","organisation":"组织","administrative":"行政的","pourquoi":"为什么","séparer":"分开","démocratie":"民主","hôtel":"府邸","matignon":"马提尼翁","chef":"首脑","régions":"大区","défenseur":"保卫者","droits":"权利","depuis":"自从","euro":"欧元","unique":"唯一的","principal":"主要的","département":"省","communes":"市镇","environ":"大约","traité":"条约","construction":"建设","quitté":"离开","devise":"格言","hymne":"国歌","drapeau":"旗帜","couleur":"颜色","signé":"签署","siège":"所在地","commission":"委员会"
+    // ===== 逐词释义（词组优先匹配）=====
+    const dict = {"1er":"第一","2020":"2020年","2025":"2025年","a":"有；（助动词）已","à":"在；到；对","a-t-il":"是否（已）","a-t-on":"人们是否（有）","action":"行动；工作","administrative":"行政的","âge":"年龄","année":"年份","assemblée":"议会","au":"在；向（à + le）","aujourd'hui":"今天","auteur":"行为人；作者","autorité":"机关；权力","autre":"另一个","aux":"向；对（à + les）","célèbre-t-on":"人们庆祝","chef":"首脑","citoyens":"公民","combien":"多少","commis":"犯下","commission":"委员会","commune":"市镇","communes":"市镇","composé":"由…组成的","composent":"组成","concernant":"关于","concerne":"涉及","concernés":"相关的","condition":"条件","conseil":"委员会；议会","construction":"建设","correcte":"正确的","couleur":"颜色","crime":"重罪","dans":"在…里","de":"的；从","décider":"决定","défenseur":"捍卫者","démocratie":"民主","département":"省","départements":"省","depuis":"自从","députés":"国民议会议员","des":"一些；…的","détient":"掌握","devise":"格言","dirige":"领导","dirigeants":"领导人","doit":"必须","drapeau":"旗帜","droit":"权利；法律","droits":"权利","du":"…的（de + le）","durée":"时长；期限","élections":"选举","élit":"选举","élu":"当选的","élus":"当选的","élysée":"爱丽舍","en":"在；以","environ":"大约","est":"是","est-ce":"是否","est-il":"（他/它）是否","et":"和","état":"国家","états":"国家","été":"曾经；已被","euro":"欧元","europe":"欧洲","européen":"欧洲的","européenne":"欧洲的","européennes":"欧洲的","européens":"欧洲的","exécutif":"行政的","exercée":"被行使","existe-t-il":"是否存在","expression":"表达；体现","fin":"结束","fondamental":"基本的","fondateur":"创始的；奠基的","font":"做；构成","française":"法国的","france":"法国","fréquence":"频率","garantit":"保障","gouvernement":"政府","hôtel":"府邸","hymne":"国歌；颂歌","janvier":"一月","journée":"日","judiciaire":"司法的","juge":"法官","la":"（阴性冠词）","le":"（阳性冠词）","législatif":"立法的","législatives":"立法的","les":"（复数冠词）","loi":"法律","lois":"法律","lors":"在…时","maastricht":"马斯特里赫特","maire":"市长","mandat":"任期","matignon":"马提尼翁","membre":"成员","ministre":"部长","monnaie":"货币","municipal":"市镇的","municipales":"市镇的","nationale":"国家的","ne":"不（否定词）","nécessaire":"必要的","nomme":"任命","obligatoire":"义务的；强制的","organisation":"组织；结构","organisées":"被举行","où":"哪里","palais":"宫殿","par":"由；通过","parlement":"议会","partie":"部分","partir":"出发；从","partis":"政党","pas":"不","passe-t-il":"发生","pays":"国家","personne":"人","peut":"可以","peut-elle":"她能否","peut-il":"他能否","place":"位置；地位","politique":"政治的","politiques":"政治的","possède":"拥有","pour":"为了","pourquoi":"为什么","pouvoir":"权力","pouvoirs":"权力","préfet":"省长","premier":"第一","président":"总统","présidentielles":"总统的","principal":"主要的","principe":"原则","proposition":"说法；选项","quand":"什么时候","que":"什么；…（连词）","quel":"哪个","quelle":"哪个","quels":"哪些","qui":"谁；…的人","quitté":"离开；退出","quoi":"什么","régime":"政体；制度","régions":"大区","représente":"代表","république":"共和国","réside":"居住","respecte":"遵守","respecter":"遵守；尊重","rester":"留下","rôle":"作用","sanctionne":"惩处","se":"自己（反身代词）","sénateurs":"参议员","séparation":"分离","séparer":"分开","si":"如果","siège":"所在地；总部","signé":"签署","signifie":"意味着","son":"他/她的","sont":"是","sont-elles":"它们是否","suffrage":"选举","temps":"时间","tous":"所有","traité":"条约","trois":"三","un":"一个","une":"一个","union":"联盟","unique":"单一的","universel":"普遍的","utilisée":"使用的","vol":"盗窃","vote":"投票；表决","voter":"投票","y":"那里（il y a 有）","qu'est-ce":"什么是","n'est":"不是","d'un":"一个…的","d'une":"一个…的"};
+    const phrases = {"qu'est-ce que":"什么是","qu'est-ce qu'une":"什么是一个","qu'est-ce qu'un":"什么是一个","qu'est-ce qui":"什么东西","est-ce que":"…吗（疑问句）","est-ce légal":"是否合法","se passe-t-il":"会发生什么","y a-t-il":"有（多少）","a eu lieu":"发生了","ont lieu":"举行","à quoi sert":"有什么用","à partir de":"从…起","combien de temps":"多长时间","depuis quand":"从什么时候起","de quand date":"是什么时候的","en cas de":"如果发生…","en cas d'accident":"发生事故时","en même temps":"同时","en tant que":"作为","au nom de":"以…名义","à la place d'une autre":"代替另一个人","à la fin de":"在…结束时","à la fin du":"在…结束时","il est interdit":"禁止","fait référence":"涉及","font partie de":"是…的成员","par terre":"在地上","parce qu'il":"因为他","jusqu'à quel âge":"到几岁","à quel âge":"几岁时","14 juillet":"7月14日（国庆日）","11 novembre":"11月11日（一战停战日）","8 mai":"5月8日（二战胜利日）","1er janvier":"1月1日","premier ministre":"总理","assemblée nationale":"国民议会","union européenne":"欧盟","commission européenne":"欧盟委员会","parlement européen":"欧洲议会","députés européens":"欧洲议会议员","élections européennes":"欧洲议会选举","élections législatives":"立法选举","élections municipales":"市镇选举","élections présidentielles":"总统选举","journée de l'europe":"欧洲日","traité de maastricht":"马斯特里赫特条约","état de droit":"法治国家","pouvoir exécutif":"行政权","pouvoir législatif":"立法权","autorité judiciaire":"司法机关","séparation des pouvoirs":"权力分立","suffrage universel":"普选","partis politiques":"政党","conseil municipal":"市议会","défenseur des droits":"权利捍卫者（独立官职）","monnaie unique":"单一货币","palais de l'élysée":"爱丽舍宫（总统府）","hôtel de matignon":"马提尼翁宫（总理府）","république française":"法兰西共和国","ve république":"第五共和国","révolution française":"法国大革命","fête nationale":"国庆节","hymne national":"国歌","drapeau français":"法国国旗","principe de laïcité":"世俗原则","charte de la laïcité":"世俗原则宪章","charte de l'environnement":"环境宪章","liberté d'expression":"言论自由","liberté d'association":"结社自由","liberté de circulation":"行动自由","liberté de la presse":"新闻自由","liberté individuelle":"个人自由","libertés individuelles":"个人自由","services publics":"公共服务","service public":"公共服务","agents publics":"公务人员","signes religieux":"宗教标志","titre de séjour":"居留证","déclaration des droits de l'homme et du citoyen":"《人权和公民权宣言》","peine de mort":"死刑","traite des êtres humains":"贩卖人口","dignité humaine":"人的尊严","droit de grève":"罢工权","droit syndical":"工会权利","droit de vote":"投票权","réseaux sociaux":"社交网络","ordre public":"公共秩序","intérêt général":"公共利益","personne en danger":"处于危险中的人","machine à laver":"洗衣机","napoléon ier":"拿破仑一世","seconde guerre mondiale":"第二次世界大战","première guerre mondiale":"第一次世界大战","jour férié":"法定假日","département d'outre-mer":"海外省","chaîne de montagnes":"山脉","tour eiffel":"埃菲尔铁塔","victor hugo":"维克多·雨果","simone de beauvoir":"西蒙娜·德·波伏娃","albert camus":"阿尔贝·加缪","auguste rodin":"奥古斯特·罗丹","carte vitale":"医保卡","mutuelle santé":"补充医疗互助保险","permis de conduire":"驾照","bail locatif":"房屋租约","congé parental d'éducation":"育儿假","conseil de prud'hommes":"劳资法庭","france travail":"法国就业署","contrat de travail":"劳动合同","allocations chômage":"失业金","école maternelle":"幼儿园","école élémentaire":"小学","école publique":"公立学校","instruction obligatoire":"义务教育","établissements scolaires":"学校","vacances scolaires":"学校假期","cantine scolaire":"学校食堂","parents d'élève":"学生家长","en situation de handicap":"有残疾的","autorité parentale":"亲权（父母监护权）","numéro d'urgence":"紧急电话号码","médecin traitant":"主治医生","assurance maladie":"医疗保险","accès aux soins":"就医","fait-elle référence":"它涉及","plus longtemps que":"比…时间更长"};
+
+    const UNIT = 2;
+    const PER_PAGE = 10;
+    const $ = id => document.getElementById(id);
+
+    // ===== 记住进度（浏览器不允许存储时自动忽略）=====
+    const store = {
+        get(k, d) { try { const v = localStorage.getItem('mv-flash-' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+        set(k, v) { try { localStorage.setItem('mv-flash-' + k, JSON.stringify(v)); } catch (e) {} }
     };
-    Object.entries(extra).forEach(([k,v]) => { if(!translationMap.has(k)) translationMap.set(k,v); });
+    const clamp = (n, max) => Math.min(Math.max(parseInt(n, 10) || 0, 0), max);
+    const totalPages = Math.ceil(sentences.length / PER_PAGE);
 
-    function getTranslation(rawWord) {
-      const clean = rawWord.toLowerCase().replace(/[.,;:!?»«""'’…\[\]()]/g, '').trim();
-      if (translationMap.has(clean)) return translationMap.get(clean);
-      const noPrefix = clean.replace(/^(l'|d'|s'|qu'|n'|c'|j'|t'|m')/, '');
-      if (noPrefix !== clean && translationMap.has(noPrefix)) return translationMap.get(noPrefix);
-      return '?';
+    let cardIndex = clamp(store.get('card-' + UNIT, 0), words.length - 1);
+    let page = clamp(store.get('page-' + UNIT, 0), totalPages - 1);
+    let showAllZh = store.get('showzh', false) === true;
+    const savedUnknown = store.get('unknown-' + UNIT, []);
+    const unknown = new Map(Array.isArray(savedUnknown) ? savedUnknown : []);
+
+    // ===== 法语朗读 =====
+    const synth = window.speechSynthesis;
+    const canSpeak = !!(synth && window.SpeechSynthesisUtterance);
+    let voice = null;
+    let current = null; // 保留引用，避免部分浏览器中途停止
+
+    function pickVoice() {
+        const fr = synth.getVoices().filter(v => /^fr([-_]|$)/i.test(v.lang));
+        const novelty = /Eddy|Flo |Grandma|Grandpa|Reed|Rocko|Sandy|Shelley/i;
+        const normal = fr.filter(v => !novelty.test(v.name));
+        const france = normal.filter(v => /^fr[-_]FR/i.test(v.lang));
+        voice = france.find(v => /Google|Natural|Amélie|Audrey|Thomas|Denise/i.test(v.name))
+            || france[0] || normal[0] || fr[0] || null;
     }
 
-    // ===== STATE =====
-    let currentCardIndex = 0;
-    let currentPage = 0;
-    const sentencesPerPage = 10;
-    let unknownWords = new Set();
+    function warn(msg) {
+        const box = $('speechNotice');
+        box.textContent = msg;
+        box.hidden = false;
+    }
+    const UNSUPPORTED = '当前浏览器不支持朗读（微信内置浏览器常见）。请点右上角选择「在浏览器打开」，用 Safari 或 Chrome。';
 
-    const flashcardView = document.getElementById('flashcardView');
-    const sentenceView = document.getElementById('sentenceView');
-    const btnFlash = document.getElementById('btnFlashcard');
-    const btnSent = document.getElementById('btnSentence');
-    const cardWord = document.getElementById('cardWord');
-    const cardType = document.getElementById('cardType');
-    const cardTrans = document.getElementById('cardTranslation');
-    const cardNumber = document.getElementById('cardNumber');
-    const totalCardsSpan = document.getElementById('totalCards');
-    const totalWordsSpan = document.getElementById('totalWords');
-    const totalSentencesSpan = document.getElementById('totalSentences');
-    const sentenceContainer = document.getElementById('sentenceContainer');
-    const unknownDisplay = document.getElementById('unknownDisplay');
-    const flashcardEl = document.getElementById('flashcardElement');
-
-    function updateCard() {
-      if (words.length === 0) return;
-      const w = words[currentCardIndex];
-      cardNumber.textContent = (currentCardIndex + 1) + ' / ' + words.length;
-      cardType.textContent = w.type.toUpperCase();
-      cardWord.textContent = w.french;
-      cardTrans.textContent = w.chinese;
-      cardTrans.classList.remove('visible');
+    function toSpoken(text) {
+        return text
+            .replace(/’/g, "'")
+            .replace(/\[\.\.\.\]|\.\.\./g, ' ')
+            .replace(/(\d{4})-(\d{4})/g, '$1 à $2')
+            .replace(/ - /g, ', ')
+            .replace(/\bIVème\b/g, 'quatrième')
+            .replace(/\bVème\b|\bVe\b/g, 'cinquième')
+            .replace(/\bIer\b/g, 'premier')
+            .replace(/\b1ère\b/g, 'première')
+            .replace(/\b7ème\b/g, 'septième')
+            .replace(/[()«»"]/g, ', ');
     }
 
-    function nextCard() {
-      if (words.length === 0) return;
-      currentCardIndex = (currentCardIndex + 1) % words.length;
-      updateCard();
+    function speak(text, rate) {
+        if (!canSpeak) { warn(UNSUPPORTED); return; }
+        synth.cancel();
+        current = new SpeechSynthesisUtterance(toSpoken(text));
+        current.lang = 'fr-FR';
+        if (voice) current.voice = voice;
+        current.rate = rate || 0.9;
+        current.onerror = e => {
+            if (e.error !== 'canceled' && e.error !== 'interrupted') {
+                warn('朗读失败。请检查手机音量，并确认系统里装有法语语音。');
+            }
+        };
+        synth.speak(current);
     }
 
-    function prevCard() {
-      if (words.length === 0) return;
-      currentCardIndex = (currentCardIndex - 1 + words.length) % words.length;
-      updateCard();
+    if (canSpeak) {
+        pickVoice();
+        if (synth.addEventListener) synth.addEventListener('voiceschanged', pickVoice);
+        window.addEventListener('pagehide', () => synth.cancel());
+    } else {
+        warn(UNSUPPORTED);
+    }
+
+    // ===== 单词闪卡 =====
+    const cardEl = $('flashcardElement');
+    const cardTrans = $('cardTranslation');
+
+    function updateCard(userMoved) {
+        const w = words[cardIndex];
+        $('cardNumber').textContent = (cardIndex + 1) + ' / ' + words.length;
+        $('cardType').textContent = w.type.toUpperCase();
+        $('cardWord').textContent = w.french;
+        $('cardWord').classList.toggle('long', w.french.length > 28);
+        cardTrans.textContent = w.chinese;
+        cardTrans.classList.remove('visible');
+        $('cardSlider').value = cardIndex + 1;
+        store.set('card-' + UNIT, cardIndex);
+        if (userMoved) {
+            if ($('autoSpeak').checked) speak(w.french);
+            else if (canSpeak) synth.cancel();
+        }
+    }
+
+    function moveCard(step) {
+        cardIndex = (cardIndex + step + words.length) % words.length;
+        updateCard(true);
+    }
+
+    function flipCard() {
+        const show = cardTrans.classList.toggle('visible');
+        if (show) speak(words[cardIndex].french);
+    }
+
+    // ===== 句子练习 =====
+    const norm = t => t.toLowerCase().replace(/’/g, "'").replace(/^[^0-9a-zà-ÿœ]+|[^0-9a-zà-ÿœ]+$/g, '');
+    const ELISION = /^(l|d|s|qu|n|c|j|t|m)'/;
+    const own = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+    const maxPhrase = Math.max(1, ...Object.keys(phrases).map(k => k.split(' ').length));
+
+    function segment(sentence) {
+        // 法语标点前有空格：标点单独成段，不做成可点击的词
+        const tokens = sentence.split(/\s+/).filter(Boolean);
+        const out = [];
+        for (let i = 0; i < tokens.length;) {
+            if (!norm(tokens[i])) { out.push({ text: tokens[i] }); i++; continue; }
+            let hit = null;
+            for (let n = Math.min(maxPhrase, tokens.length - i); n > 1 && !hit; n--) {
+                const part = tokens.slice(i, i + n);
+                if (part.some(t => !norm(t))) continue;
+                if (part.slice(0, -1).some(t => /[,.;:!?"»)\]]$/.test(t))) continue;
+                const keys = part.map(norm);
+                let key = keys.join(' ');
+                if (!own(phrases, key)) key = [keys[0].replace(ELISION, ''), ...keys.slice(1)].join(' ');
+                if (own(phrases, key)) hit = { text: part.join(' '), zh: phrases[key], n };
+            }
+            if (!hit) {
+                const full = norm(tokens[i]);
+                const base = full.replace(ELISION, '');
+                const zh = own(dict, full) ? dict[full] : (own(dict, base) ? dict[base] : '');
+                hit = { text: tokens[i], zh, n: 1 };
+            }
+            out.push(hit);
+            i += hit.n;
+        }
+        return out;
+    }
+
+    const cleanText = t => t.replace(/^[\s"«(\[]+|[\s.,;:!?"»)\]]+$/g, '');
+
+    function el(tag, cls, text) {
+        const node = document.createElement(tag);
+        if (cls) node.className = cls;
+        if (text !== undefined) node.textContent = text;
+        return node;
     }
 
     function renderPage() {
-      const totalPages = Math.ceil(sentences.length / sentencesPerPage);
-      if (currentPage >= totalPages) currentPage = totalPages - 1;
-      if (currentPage < 0) currentPage = 0;
-      const start = currentPage * sentencesPerPage;
-      const pageSentences = sentences.slice(start, start + sentencesPerPage);
-      sentenceContainer.innerHTML = '';
-      pageSentences.forEach((sentence, idx) => {
-        const globalIndex = start + idx + 1;
-        const sentDiv = document.createElement('div');
-        sentDiv.className = 'sentence-item';
-        const numSpan = document.createElement('span');
-        numSpan.className = 'sentence-number';
-        numSpan.textContent = globalIndex + '.';
-        sentDiv.appendChild(numSpan);
-        const tokens = sentence.match(/[^\s]+/g) || [];
-        tokens.forEach(token => {
-          const core = token.replace(/[.,;:!?»«""'’…\[\]()]/g, '');
-          const lowerCore = core.toLowerCase();
-          const chip = document.createElement('span');
-          chip.className = 'word-chip';
-          if (unknownWords.has(lowerCore)) chip.classList.add('unknown');
-          const trans = getTranslation(token);
-          chip.innerHTML = token + '<span class="chip-translate">' + trans + '</span>';
-          chip.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (!chip.classList.contains('show-translate')) {
-              chip.classList.add('show-translate');
-            } else {
-              if (unknownWords.has(lowerCore)) {
-                unknownWords.delete(lowerCore);
-                chip.classList.remove('unknown');
-              } else {
-                unknownWords.add(lowerCore);
-                chip.classList.add('unknown');
-              }
-              updateUnknownList();
-            }
-          });
-          sentDiv.appendChild(chip);
+        const box = $('sentenceContainer');
+        box.textContent = '';
+        const start = page * PER_PAGE;
+        sentences.slice(start, start + PER_PAGE).forEach((sentence, idx) => {
+            const item = el('div', 'sentence-item');
+            const row = el('div', 'sentence-row');
+            row.appendChild(el('span', 'sentence-number', (start + idx + 1) + '.'));
+            const chips = el('div', 'sentence-words');
+            segment(sentence).forEach(seg => {
+                if (seg.zh === undefined) { chips.appendChild(el('span', 'punct', seg.text)); return; }
+                const french = cleanText(seg.text);
+                const key = norm(french);
+                const chip = el('button', 'word-chip', seg.text);
+                chip.type = 'button';
+                chip.dataset.key = key;
+                chip.appendChild(el('span', 'chip-translate', seg.zh || '（暂无释义）'));
+                if (unknown.has(key)) chip.classList.add('unknown');
+                chip.addEventListener('click', () => {
+                    speak(french);
+                    if (!chip.classList.contains('show-translate')) {
+                        chip.classList.add('show-translate');
+                        return;
+                    }
+                    if (unknown.has(key)) unknown.delete(key);
+                    else unknown.set(key, [french, seg.zh]);
+                    box.querySelectorAll('.word-chip').forEach(c => c.classList.toggle('unknown', unknown.has(c.dataset.key)));
+                    updateUnknownList();
+                });
+                chips.appendChild(chip);
+            });
+            row.appendChild(chips);
+
+            const actions = el('div', 'sentence-actions');
+            const play = el('button', 'icon-btn');
+            play.type = 'button';
+            play.title = '朗读整句';
+            play.setAttribute('aria-label', '朗读整句');
+            play.appendChild(el('i', 'fas fa-volume-up'));
+            play.addEventListener('click', () => speak(sentence));
+            const zhBtn = el('button', 'icon-btn zh-btn', '中');
+            zhBtn.type = 'button';
+            zhBtn.title = '显示整句中文';
+            actions.append(play, zhBtn);
+            row.appendChild(actions);
+
+            const zh = el('div', 'sentence-zh', sentenceZh[sentence] || '');
+            zh.hidden = !showAllZh;
+            zhBtn.classList.toggle('on', showAllZh);
+            zhBtn.addEventListener('click', () => {
+                zh.hidden = !zh.hidden;
+                zhBtn.classList.toggle('on', !zh.hidden);
+            });
+            item.append(row, zh);
+            box.appendChild(item);
         });
-        sentenceContainer.appendChild(sentDiv);
-      });
+        $('pageNumbers').querySelectorAll('button').forEach((b, i) => b.classList.toggle('active', i === page));
+        $('prevPageBtn').disabled = page === 0;
+        $('nextPageBtn').disabled = page === totalPages - 1;
+        store.set('page-' + UNIT, page);
+    }
+
+    function goPage(p, scroll) {
+        if (p < 0 || p >= totalPages) return;
+        page = p;
+        if (canSpeak) synth.cancel();
+        renderPage();
+        if (scroll) $('sentenceView').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function updateUnknownList() {
-      unknownDisplay.textContent = unknownWords.size ? Array.from(unknownWords).join(' · ') : 'Aucun marqué';
+        const box = $('unknownDisplay');
+        box.textContent = unknown.size ? '' : 'Aucun marqué';
+        unknown.forEach(([french, zh]) => {
+            const b = el('button', 'unknown-word', french + ' · ' + zh);
+            b.type = 'button';
+            b.addEventListener('click', () => speak(french));
+            box.appendChild(b);
+        });
+        store.set('unknown-' + UNIT, Array.from(unknown));
     }
 
-    function resetUnknown() {
-      unknownWords.clear();
-      updateUnknownList();
-      renderPage();
+    function setMode(mode) {
+        const sent = mode === 'sentence';
+        $('flashcardView').style.display = sent ? 'none' : 'block';
+        $('sentenceView').style.display = sent ? 'block' : 'none';
+        $('btnSentence').classList.toggle('active', sent);
+        $('btnFlashcard').classList.toggle('active', !sent);
+        if (canSpeak) synth.cancel();
+        if (sent) renderPage();
+        store.set('mode', mode);
     }
 
-    function showFlashcard() {
-      flashcardView.style.display = 'block';
-      sentenceView.style.display = 'none';
-      btnFlash.classList.add('active');
-      btnSent.classList.remove('active');
-    }
+    // ===== 事件 =====
+    $('prevCard').addEventListener('click', () => moveCard(-1));
+    $('nextCard').addEventListener('click', () => moveCard(1));
+    $('cardSlider').max = words.length;
+    $('cardSlider').addEventListener('input', e => { cardIndex = e.target.value - 1; updateCard(false); });
 
-    function showSentence() {
-      flashcardView.style.display = 'none';
-      sentenceView.style.display = 'block';
-      btnSent.classList.add('active');
-      btnFlash.classList.remove('active');
-      renderPage();
-    }
+    let touchX = null, touchY = null, swiped = false;
+    cardEl.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; touchY = e.touches[0].clientY; swiped = false; }, { passive: true });
+    cardEl.addEventListener('touchend', e => {
+        if (touchX === null) return;
+        const dx = e.changedTouches[0].clientX - touchX;
+        const dy = e.changedTouches[0].clientY - touchY;
+        if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) { swiped = true; moveCard(dx < 0 ? 1 : -1); }
+        touchX = null;
+    });
+    cardEl.addEventListener('click', () => { if (swiped) { swiped = false; return; } flipCard(); });
 
-    // ===== EVENT LISTENERS =====
-    document.getElementById('prevCard').addEventListener('click', prevCard);
-    document.getElementById('nextCard').addEventListener('click', nextCard);
-
-    flashcardEl.addEventListener('click', () => {
-      cardTrans.classList.toggle('visible');
+    $('speakBtn').addEventListener('click', e => { e.stopPropagation(); speak(words[cardIndex].french); });
+    $('slowBtn').addEventListener('click', e => { e.stopPropagation(); speak(words[cardIndex].french, 0.55); });
+    $('autoSpeak').checked = store.get('autospeak', false) === true;
+    $('autoSpeak').addEventListener('change', e => {
+        store.set('autospeak', e.target.checked);
+        if (e.target.checked) speak(words[cardIndex].french);
     });
 
-    btnFlash.addEventListener('click', showFlashcard);
-    btnSent.addEventListener('click', showSentence);
-
-    document.getElementById('prevPageBtn').addEventListener('click', () => {
-      if (currentPage > 0) { currentPage--; renderPage(); }
+    $('btnFlashcard').addEventListener('click', () => setMode('flashcard'));
+    $('btnSentence').addEventListener('click', () => setMode('sentence'));
+    $('prevPageBtn').addEventListener('click', () => goPage(page - 1, true));
+    $('nextPageBtn').addEventListener('click', () => goPage(page + 1, true));
+    for (let i = 0; i < totalPages; i++) {
+        const b = el('button', 'page-num', String(i + 1));
+        b.type = 'button';
+        b.addEventListener('click', () => goPage(i));
+        $('pageNumbers').appendChild(b);
+    }
+    $('allZhBtn').textContent = showAllZh ? '隐藏全部中文' : '显示全部中文';
+    $('allZhBtn').addEventListener('click', () => {
+        showAllZh = !showAllZh;
+        store.set('showzh', showAllZh);
+        $('allZhBtn').textContent = showAllZh ? '隐藏全部中文' : '显示全部中文';
+        renderPage();
     });
+    $('resetUnknownBtn').addEventListener('click', () => { unknown.clear(); updateUnknownList(); renderPage(); });
 
-    document.getElementById('nextPageBtn').addEventListener('click', () => {
-      const totalPages = Math.ceil(sentences.length / sentencesPerPage);
-      if (currentPage < totalPages - 1) { currentPage++; renderPage(); }
-    });
-
-    document.getElementById('resetUnknownBtn').addEventListener('click', resetUnknown);
-
-    // ===== KEYBOARD SHORTCUTS =====
     document.addEventListener('keydown', function(e) {
-      if (flashcardView.style.display !== 'none') {
-        if (e.key === 'ArrowRight') { e.preventDefault(); nextCard(); }
-        else if (e.key === 'ArrowLeft') { e.preventDefault(); prevCard(); }
-        else if (e.key === ' ' || e.key === 'f') { e.preventDefault(); cardTrans.classList.toggle('visible'); }
-      }
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        if (e.target.tagName === 'INPUT') return;
+        if ($('flashcardView').style.display === 'none') {
+            if (e.key === 'ArrowRight') goPage(page + 1);
+            else if (e.key === 'ArrowLeft') goPage(page - 1);
+            return;
+        }
+        if (e.key === 'ArrowRight') { e.preventDefault(); moveCard(1); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); moveCard(-1); }
+        else if (e.key === ' ' || e.key === 'f') { e.preventDefault(); flipCard(); }
+        else if (e.key === 's') { speak(words[cardIndex].french); }
     });
 
-    // ===== INIT =====
-    totalWordsSpan.textContent = words.length;
-    totalSentencesSpan.textContent = sentences.length;
-    totalCardsSpan.textContent = words.length;
-    updateCard();
-    showFlashcard();
-  })();
+    // ===== 初始化 =====
+    $('totalWords').textContent = words.length;
+    $('totalSentences').textContent = sentences.length;
+    $('totalCards').textContent = words.length;
+    updateCard(false);
+    updateUnknownList();
+    setMode(store.get('mode', 'flashcard') === 'sentence' ? 'sentence' : 'flashcard');
+    // 手机上让当前模块标签滚动到可见位置
+    const tabs = document.querySelector('.module-tabs');
+    const active = tabs.querySelector('.active');
+    tabs.scrollLeft = active.offsetLeft - (tabs.clientWidth - active.offsetWidth) / 2;
+})();
 </script>
 </body>
 </html>
